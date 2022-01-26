@@ -4,8 +4,9 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.edx.model.v1.DocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.PenRequestEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
 
 public class DocumentBuilder {
     UUID documentID = UUID.randomUUID();
@@ -18,7 +19,7 @@ public class DocumentBuilder {
 
     int fileSize = 8;
 
-    PenRequestEntity penRequest = new PenRequestBuilder().build();
+    SecureExchangeEntity penRequest = new PenRequestBuilder().build();
 
     String createUser = "API";
 
@@ -61,7 +62,7 @@ public class DocumentBuilder {
         return this;
     }
 
-    public DocumentBuilder withPenRequest(PenRequestEntity penRequest) {
+    public DocumentBuilder withPenRequest(SecureExchangeEntity penRequest) {
         this.penRequest = penRequest;
         return this;
     }
@@ -86,10 +87,10 @@ public class DocumentBuilder {
         return this;
     }
 
-    public DocumentEntity build() {
-        DocumentEntity doc = new DocumentEntity();
-        doc.setDocumentID(this.documentID);
-        doc.setDocumentTypeCode(this.documentTypeCode);
+    public SecureExchangeDocumentEntity build() {
+        SecureExchangeDocumentEntity doc = new SecureExchangeDocumentEntity();
+        doc.setSecureExchangeDocumentID(this.documentID);
+        doc.setSecureExchangeDocumentTypeCode(this.documentTypeCode);
         doc.setFileName(this.fileName);
         doc.setFileExtension(this.fileExtension);
         doc.setFileSize(this.fileSize);
@@ -98,7 +99,7 @@ public class DocumentBuilder {
         doc.setCreateDate(LocalDateTime.now());
         doc.setUpdateUser(this.updateUser);
         doc.setUpdateDate(LocalDateTime.now());
-        doc.setPenRequest(this.penRequest);
+        //doc.set(this.penRequest);
 
         return doc;
     }

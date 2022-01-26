@@ -2,9 +2,9 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.PenRequestCommentEndpoint;
-import ca.bc.gov.educ.api.edx.mappers.v1.PenRequestCommentsMapper;
-import ca.bc.gov.educ.api.edx.service.v1.PenRequestCommentService;
-import ca.bc.gov.educ.api.edx.struct.v1.PenRequestComments;
+import ca.bc.gov.educ.api.edx.config.mappers.v1.PenRequestCommentsMapper;
+import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeCommentService;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComments;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,20 +19,20 @@ public class PenRequestCommentsController extends BaseController implements PenR
 
   private static final PenRequestCommentsMapper mapper = PenRequestCommentsMapper.mapper;
   @Getter(AccessLevel.PRIVATE)
-  private final PenRequestCommentService penRequestCommentService;
+  private final SecureExchangeCommentService secureExchangeCommentService;
 
-  PenRequestCommentsController(@Autowired final PenRequestCommentService penRequestCommentService) {
-    this.penRequestCommentService = penRequestCommentService;
+  PenRequestCommentsController(@Autowired final SecureExchangeCommentService secureExchangeCommentService) {
+    this.secureExchangeCommentService = secureExchangeCommentService;
   }
 
   @Override
-  public List<PenRequestComments> retrieveComments(String penRequestId) {
-    return getPenRequestCommentService().retrieveComments(UUID.fromString(penRequestId)).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<SecureExchangeComments> retrieveComments(String penRequestId) {
+    return this.getSecureExchangeCommentService().retrieveComments(UUID.fromString(penRequestId)).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override
-  public PenRequestComments save(String penRequestId, PenRequestComments penRequestComments) {
-    setAuditColumns(penRequestComments);
-    return mapper.toStructure(getPenRequestCommentService().save(UUID.fromString(penRequestId), mapper.toModel(penRequestComments)));
+  public SecureExchangeComments save(String penRequestId, SecureExchangeComments secureExchangeComments) {
+    setAuditColumns(secureExchangeComments);
+    return mapper.toStructure(this.getSecureExchangeCommentService().save(UUID.fromString(penRequestId), mapper.toModel(secureExchangeComments)));
   }
 }

@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.schedulers;
 
-import ca.bc.gov.educ.api.edx.constants.PenRequestStatusCode;
+import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -33,10 +33,10 @@ public class PenRequestScheduler {
   public void removeBlobContentsFromUploadedDocuments() {
     val dateTimeToCompare = LocalDateTime.now().minusHours(24);
     LockAssert.assertLocked();
-    val records = this.documentRepository.findAllByPenRequestPenRequestStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(PenRequestStatusCode.MANUAL.toString(), PenRequestStatusCode.ABANDONED.toString()), 0);
+    val records = this.documentRepository.findAllByPenRequestPenRequestStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(SecureExchangeStatusCode.MANUAL.toString(), SecureExchangeStatusCode.ABANDONED.toString()), 0);
     if (!records.isEmpty()) {
       for (val document : records) {
-        if(document.getPenRequest().getStatusUpdateDate().isBefore(dateTimeToCompare)){
+        if(document.getSecureExchange().getStatusUpdateDate().isBefore(dateTimeToCompare)){
           document.setDocumentData(null); // empty the document data.
           document.setFileSize(0);
         }

@@ -21,28 +21,28 @@ public interface PenReqDocumentEndpoint {
   @GetMapping(URL.PEN_REQUEST_ID_DOCUMENTS + URL.DOCUMENT_ID)
   @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  PenReqDocument readDocument(@PathVariable String penRequestID, @PathVariable String documentID, @RequestParam(value = "includeDocData", defaultValue = "Y") String includeDocData);
+  SecureExchangeDocument readDocument(@PathVariable String penRequestID, @PathVariable String documentID, @RequestParam(value = "includeDocData", defaultValue = "Y") String includeDocData);
 
   @PostMapping(URL.PEN_REQUEST_ID_DOCUMENTS)
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
-  PenReqDocMetadata createDocument(@PathVariable String penRequestID, @Validated @RequestBody PenReqDocument penReqDocument);
+  SecureExchangeDocMetadata createDocument(@PathVariable String penRequestID, @Validated @RequestBody SecureExchangeDocument secureExchangeDocument);
 
   @PutMapping(URL.PEN_REQUEST_ID_DOCUMENTS + URL.DOCUMENT_ID)
   @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  PenReqDocMetadata updateDocument(@PathVariable UUID penRequestID, @PathVariable UUID documentID, @Validated @RequestBody PenReqDocument penReqDocument);
+  SecureExchangeDocMetadata updateDocument(@PathVariable UUID penRequestID, @PathVariable UUID documentID, @Validated @RequestBody SecureExchangeDocument secureExchangeDocument);
 
   @DeleteMapping(URL.PEN_REQUEST_ID_DOCUMENTS + URL.DOCUMENT_ID)
   @PreAuthorize("hasAuthority('SCOPE_DELETE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  PenReqDocMetadata deleteDocument(@PathVariable String penRequestID, @PathVariable String documentID);
+  SecureExchangeDocMetadata deleteDocument(@PathVariable String penRequestID, @PathVariable String documentID);
 
   @GetMapping(URL.PEN_REQUEST_ID_DOCUMENTS)
   @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  Iterable<PenReqDocMetadata> readAllDocumentMetadata(@PathVariable String penRequestID);
+  Iterable<SecureExchangeDocMetadata> readAllDocumentMetadata(@PathVariable String penRequestID);
 
   @GetMapping(URL.FILE_REQUIREMENTS)
   @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_REQUIREMENTS')")
@@ -52,10 +52,10 @@ public interface PenReqDocumentEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_TYPES')")
   @GetMapping(URL.DOCUMENT_TYPES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  Iterable<PenReqDocTypeCode> getDocumentTypeCodes();
+  Iterable<SecureExchangeDocumentTypeCode> getDocumentTypeCodes();
 
   @GetMapping(URL.ALL_DOCUMENTS)
   @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<PenReqDocumentMetadata> readAllDocumentsMetadata();
+  List<SecureExchangeDocumentMetadata> readAllDocumentsMetadata();
 }

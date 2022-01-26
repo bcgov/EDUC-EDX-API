@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-import ca.bc.gov.educ.api.edx.model.v1.DocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.PenRequestEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 
 public class PenRequestBuilder {
-  DocumentEntity document;
+  SecureExchangeDocumentEntity document;
 
   UUID penRequestID = UUID.randomUUID();
 
@@ -32,7 +32,7 @@ public class PenRequestBuilder {
 
   Date updateDate = new Date();
 
-  public PenRequestBuilder withDocument(DocumentEntity document) {
+  public PenRequestBuilder withDocument(SecureExchangeDocumentEntity document) {
     this.document = document;
     return this;
   }
@@ -75,19 +75,19 @@ public class PenRequestBuilder {
     return this;
   }
 
-  public PenRequestEntity build() {
-    PenRequestEntity penRequest = new PenRequestEntity();
+  public SecureExchangeEntity build() {
+    SecureExchangeEntity penRequest = new SecureExchangeEntity();
     penRequest.setCreateUser(this.createUser);
     penRequest.setCreateDate(LocalDateTime.now());
     penRequest.setUpdateUser(this.updateUser);
     penRequest.setUpdateDate(LocalDateTime.now());
 
-    penRequest.setPenRequestID(this.penRequestID);
+    penRequest.setSecureExchangeID(this.penRequestID);
     penRequest.setDigitalID(this.digitalID);
-    penRequest.setPenRequestStatusCode(this.penRequestStatusCode);
-    penRequest.setLegalFirstName(this.legalFirstName);
-    penRequest.setLegalLastName(this.legalLastName);
-    penRequest.setEmailVerified(this.emailVerified);
+    penRequest.setSecureExchangeStatusCode(this.penRequestStatusCode);
+    //penRequest.setLegalFirstName(this.legalFirstName);
+   //penRequest.setLegalLastName(this.legalLastName);
+    //penRequest.setEmailVerified(this.emailVerified);
     return penRequest;
   }
 

@@ -2,8 +2,8 @@ package ca.bc.gov.educ.api.edx.validator;
 
 import ca.bc.gov.educ.api.edx.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.edx.exception.InvalidValueException;
-import ca.bc.gov.educ.api.edx.model.v1.DocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.DocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +32,12 @@ public class PenRequestDocumentsValidator {
   }
 
   @Cacheable("documentTypeCodes")
-  public List<DocumentTypeCodeEntity> loadDocumentType() {
+  public List<SecureExchangeDocumentTypeCodeEntity> loadDocumentType() {
     return documentTypeCodeRepository.findAll();
   }
 
-  public void validateDocumentPayload(final DocumentEntity document, boolean isCreateOperation) {
-    if (isCreateOperation && document.getDocumentID() != null) {
+  public void validateDocumentPayload(final SecureExchangeDocumentEntity document, boolean isCreateOperation) {
+    if (isCreateOperation && document.getSecureExchangeDocumentID() != null) {
       throw new InvalidParameterException("documentID");
     }
     if (isCreateOperation && (document.getDocumentData() == null || document.getDocumentData().length == 0)) {
@@ -58,14 +58,14 @@ public class PenRequestDocumentsValidator {
               String.valueOf(document.getDocumentData().length));
     }
 
-    if (!isDocumentTypeCodeValid(document.getDocumentTypeCode())) {
-      throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
+    if (!isDocumentTypeCodeValid(document.getSecureExchangeDocumentTypeCode())) {
+      throw new InvalidValueException("documentTypeCode", document.getSecureExchangeDocumentTypeCode());
     }
   }
 
   public boolean isDocumentTypeCodeValid(final String documentTypeCode) {
-    for (DocumentTypeCodeEntity entity : loadDocumentType()) {
-      if (entity.getDocumentTypeCode().equalsIgnoreCase(documentTypeCode)) {
+    for (SecureExchangeDocumentTypeCodeEntity entity : loadDocumentType()) {
+      if (entity.getSecure_exchange_document_type_code().equalsIgnoreCase(documentTypeCode)) {
         return entity.getEffectiveDate().isBefore(LocalDateTime.now()) && entity.getExpiryDate().isAfter(LocalDateTime.now());
       }
     }

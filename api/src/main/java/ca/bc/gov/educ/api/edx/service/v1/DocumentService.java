@@ -2,14 +2,16 @@ package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidParameterException;
-import ca.bc.gov.educ.api.edx.model.v1.DocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.DocumentTypeCodeEntity;
-import ca.bc.gov.educ.api.edx.model.v1.PenRequestEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
 import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
-import ca.bc.gov.educ.api.edx.repository.PenRequestRepository;
+import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.PenReqDocRequirement;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocumentTypeCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,16 +31,16 @@ public class DocumentService {
   public static final String PEN_REQUEST_ID = "penRequestId";
   private final DocumentRepository documentRepository;
 
-  private final PenRequestRepository penRequestRepository;
+  private final secureExchangeRequestRepository secureExchangeRequestRepository;
 
   private final DocumentTypeCodeTableRepository documentTypeCodeRepository;
 
   private final ApplicationProperties properties;
 
   @Autowired
-  public DocumentService(final DocumentRepository documentRepository, final PenRequestRepository penRequestRepository, final DocumentTypeCodeTableRepository documentTypeCodeRepository, final ApplicationProperties properties) {
+  public DocumentService(final DocumentRepository documentRepository, final secureExchangeRequestRepository secureExchangeRequestRepository, final DocumentTypeCodeTableRepository documentTypeCodeRepository, final ApplicationProperties properties) {
     this.documentRepository = documentRepository;
-    this.penRequestRepository = penRequestRepository;
+    this.secureExchangeRequestRepository = secureExchangeRequestRepository;
     this.documentTypeCodeRepository = documentTypeCodeRepository;
     this.properties = properties;
   }
@@ -48,21 +50,21 @@ public class DocumentService {
    * Search for Document Metadata by id
    *
    * @param documentID the documentID to fetch the Document from DB
-   * @return The Document {@link DocumentEntity} if found.
+   * @return The Document {@link SecureExchangeDocumentEntity} if found.
    * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
    */
-  public DocumentEntity retrieveDocumentMetadata(final UUID penRequestId, final UUID documentID) {
+  public SecureExchangeDocumentEntity retrieveDocumentMetadata(final UUID penRequestId, final UUID documentID) {
     log.info("retrieving Document Metadata, documentID: " + documentID.toString());
 
     val result = this.documentRepository.findById(documentID);
     if (result.isEmpty()) {
-      throw new EntityNotFoundException(DocumentEntity.class, "documentID", documentID.toString());
+      throw new EntityNotFoundException(SecureExchangeDocumentEntity.class, "documentID", documentID.toString());
     }
 
     val document = result.get();
 
-    if (!document.getPenRequest().getPenRequestID().equals(penRequestId)) {
-      throw new EntityNotFoundException(DocumentEntity.class, PEN_REQUEST_ID, penRequestId.toString());
+    if (!document.getSecureExchange().getSecureExchangeID().equals(penRequestId)) {
+      throw new EntityNotFoundException(SecureExchangeDocumentEntity.class, PEN_REQUEST_ID, penRequestId.toString());
     }
 
     return document;
@@ -72,11 +74,11 @@ public class DocumentService {
    * Search for Document with data by id
    *
    * @param documentID the documentID to fetch the Document from DB
-   * @return The Document {@link DocumentEntity} if found.
+   * @return The Document {@link SecureExchangeDocumentEntity} if found.
    * @throws EntityNotFoundException if no document found by the ID or penRequestID does not match.
    */
   @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
-  public DocumentEntity retrieveDocument(final UUID penRequestId, final UUID documentID, final String includeDocData) {
+  public SecureExchangeDocumentEntity retrieveDocument(final UUID penRequestId, final UUID documentID, final String includeDocData) {
     log.info("retrieving Document, documentID: " + documentID.toString());
 
     val document = this.retrieveDocumentMetadata(penRequestId, documentID);
@@ -95,13 +97,13 @@ public class DocumentService {
   /**
    * Search for all document metadata by penRequestId
    *
-   * @return {@link List<DocumentEntity> }
+   * @return {@link List< SecureExchangeDocumentEntity > }
    */
-  public List<DocumentEntity> retrieveAllDocumentMetadata(final UUID penRequestId) {
+  public List<SecureExchangeDocumentEntity> retrieveAllDocumentMetadata(final UUID penRequestId) {
     return this.documentRepository.findByPenRequestPenRequestID(penRequestId);
   }
 
-  public List<DocumentEntity> retrieveAllDocumentsMetadata(){
+  public List<SecureExchangeDocumentEntity> retrieveAllDocumentsMetadata(){
     return this.documentRepository.findAll();
   }
   /**
@@ -111,16 +113,16 @@ public class DocumentService {
    * @return saved DocumentEntity.
    * @throws InvalidParameterException,EntityNotFoundException if payload contains invalid parameters
    */
-  public DocumentEntity createDocument(final UUID penRequestId, final DocumentEntity document) {
+  public SecureExchangeDocumentEntity createDocument(final UUID penRequestId, final SecureExchangeDocumentEntity document) {
     log.info(
             "creating Document, penRequestId: " + penRequestId.toString() + ", document: " + document.toString());
-    val option = this.penRequestRepository.findById(penRequestId);
+    val option = this.secureExchangeRequestRepository.findById(penRequestId);
     if (option.isPresent()) {
       val penRequest = option.get();
-      document.setPenRequest(penRequest);
+      document.setSecureExchange(penRequest);
       return this.documentRepository.save(document);
     } else {
-      throw new EntityNotFoundException(PenRequestEntity.class, PEN_REQUEST_ID, penRequestId.toString());
+      throw new EntityNotFoundException(SecureExchange.class, PEN_REQUEST_ID, penRequestId.toString());
     }
   }
 
@@ -131,7 +133,7 @@ public class DocumentService {
    * @return DocumentEntity which was deleted.
    * @throws EntityNotFoundException if no entity exist by this id
    */
-  public DocumentEntity deleteDocument(final UUID penRequestId, final UUID documentID) {
+  public SecureExchangeDocumentEntity deleteDocument(final UUID penRequestId, final UUID documentID) {
     log.info("deleting Document, documentID: " + documentID.toString());
     val document = this.retrieveDocumentMetadata(penRequestId, documentID);
     this.documentRepository.delete(document);
@@ -139,7 +141,7 @@ public class DocumentService {
   }
 
   @Cacheable("documentTypeCodeList")
-  public List<DocumentTypeCodeEntity> getDocumentTypeCodeList() {
+  public List<SecureExchangeDocumentTypeCodeEntity> getDocumentTypeCodeList() {
     return this.documentTypeCodeRepository.findAll();
   }
 
@@ -160,24 +162,24 @@ public class DocumentService {
    * @return saved DocumentEntity.
    * @throws InvalidParameterException,EntityNotFoundException if payload contains invalid parameters
    */
-  public DocumentEntity updateDocument(final UUID penRequestId, final UUID documentId, final DocumentEntity document) {
+  public SecureExchangeDocumentEntity updateDocument(final UUID penRequestId, final UUID documentId, final SecureExchangeDocumentEntity document) {
     log.info(
             "updating Document, documentId :: {} penRequestId :: {} :: ", documentId, penRequestId);
-    final Optional<DocumentEntity> documentEntityOptional = this.documentRepository.findById(documentId);
+    final Optional<SecureExchangeDocumentEntity> documentEntityOptional = this.documentRepository.findById(documentId);
     if (documentEntityOptional.isPresent()) {
       val documentEntity = documentEntityOptional.get();
-      val penRequestEntity = documentEntity.getPenRequest();
-      if (!penRequestEntity.getPenRequestID().equals(penRequestId)) {
-        throw new EntityNotFoundException(PenRequestEntity.class, PEN_REQUEST_ID, penRequestId.toString());
+      val penRequestEntity = documentEntity.getSecureExchange();
+      if (!penRequestEntity.getSecureExchangeID().equals(penRequestId)) {
+        throw new EntityNotFoundException(SecureExchange.class, PEN_REQUEST_ID, penRequestId.toString());
       }
       documentEntity.setFileExtension(document.getFileExtension());
-      documentEntity.setDocumentTypeCode(document.getDocumentTypeCode());
+      documentEntity.setSecureExchangeDocumentTypeCode(document.getSecureExchangeDocumentTypeCode());
       documentEntity.setFileName(document.getFileName());
       documentEntity.setUpdateUser(document.getUpdateUser());
       documentEntity.setUpdateDate(document.getUpdateDate());
       return this.documentRepository.save(documentEntity);
     } else {
-      throw new EntityNotFoundException(DocumentEntity.class, "documentId", documentId.toString());
+      throw new EntityNotFoundException(SecureExchangeDocumentEntity.class, "documentId", documentId.toString());
     }
   }
 }

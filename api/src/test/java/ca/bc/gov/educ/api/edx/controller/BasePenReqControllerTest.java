@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.BasePenRequestAPITest;
-import ca.bc.gov.educ.api.edx.struct.v1.PenRequest;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class BasePenReqControllerTest extends BasePenRequestAPITest {
@@ -30,9 +30,9 @@ public abstract class BasePenReqControllerTest extends BasePenRequestAPITest {
 	  return "{\"penRequestID\":\"" + penReqId + "\",\"digitalID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e3\",\"legalFirstName\":\"OM\",\"legalMiddleNames\":\"Grestie\",\"legalLastName\":\"Baulk\",\"dob\":\"1952-10-31\",\"initialSubmitDate\":\"1952-10-31T00:00:00\",\"genderCode\":\"M\",\"email\":\"cbaulk0@bluehost.com\",\"emailVerified\":\"N\",\"currentSchool\":\"Xanthoparmelia wyomingica (Gyel.) Hale\", \"demogChanged\":\"E\"}";
   }
 
-  protected PenRequest getPenRequestEntityFromJsonString() {
+  protected SecureExchange getPenRequestEntityFromJsonString() {
     try {
-      return new ObjectMapper().readValue(this.dummyPenRequestJson(), PenRequest.class);
+      return new ObjectMapper().readValue(this.dummyPenRequestJson(), SecureExchange.class);
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }

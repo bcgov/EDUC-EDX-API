@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import ca.bc.gov.educ.api.edx.model.v1.DocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
 
 public class DocumentTypeCodeBuilder {
@@ -47,14 +47,14 @@ public class DocumentTypeCodeBuilder {
     return this;
   }
 
-  public DocumentTypeCodeEntity build() {
-    DocumentTypeCodeEntity typeCode = new DocumentTypeCodeEntity();
+  public SecureExchangeDocumentTypeCodeEntity build() {
+    SecureExchangeDocumentTypeCodeEntity typeCode = new SecureExchangeDocumentTypeCodeEntity();
     typeCode.setCreateUser(this.createUser);
     typeCode.setCreateDate(this.createDate);
     typeCode.setUpdateUser(this.updateUser);
     typeCode.setUpdateDate(this.updateDate);
 
-    typeCode.setDocumentTypeCode(this.documentTypeCode);
+    typeCode.setSecure_exchange_document_type_code(this.documentTypeCode);
     typeCode.setLabel(this.label);
     typeCode.setDescription(this.description);
     typeCode.setDisplayOrder(this.displayOrder);
@@ -65,14 +65,14 @@ public class DocumentTypeCodeBuilder {
   }
 
   public static void setUpDocumentTypeCodes(DocumentTypeCodeTableRepository documentTypeCodeRepository) {
-    DocumentTypeCodeEntity passport = new DocumentTypeCodeBuilder()
+    SecureExchangeDocumentTypeCodeEntity passport = new DocumentTypeCodeBuilder()
             .withDocumentTypeCode("CAPASSPORT").build();
-    DocumentTypeCodeEntity bcsc = new DocumentTypeCodeBuilder()
+    SecureExchangeDocumentTypeCodeEntity bcsc = new DocumentTypeCodeBuilder()
             .withDocumentTypeCode("BCSCPHOTO").build();
-    DocumentTypeCodeEntity bCeIdPHOTONotEffective = new DocumentTypeCodeBuilder()
+    SecureExchangeDocumentTypeCodeEntity bCeIdPHOTONotEffective = new DocumentTypeCodeBuilder()
             .withDocumentTypeCode("BCeIdPHOTO").build();
     bCeIdPHOTONotEffective.setEffectiveDate(LocalDateTime.from(new GregorianCalendar(2199, Calendar.FEBRUARY, 1).toZonedDateTime()));
-    DocumentTypeCodeEntity dlExpired = new DocumentTypeCodeBuilder()
+    SecureExchangeDocumentTypeCodeEntity dlExpired = new DocumentTypeCodeBuilder()
             .withDocumentTypeCode("dl").build();
     dlExpired.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2020, Calendar.FEBRUARY, 1).toZonedDateTime()));
     documentTypeCodeRepository.save(passport);
