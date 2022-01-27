@@ -25,12 +25,4 @@ public class ApplicationProperties {
   @Value("${bcsc.auto.match.outcomes}")
   private List<String> bcscAutoMatchOutcomes;
 
-  @Value("${nats.server}")
-  private String server;
-
-  @Value("${nats.maxReconnect}")
-  private int maxReconnect;
-
-  @Value("${nats.connectionName}")
-  private String connectionName;
 }

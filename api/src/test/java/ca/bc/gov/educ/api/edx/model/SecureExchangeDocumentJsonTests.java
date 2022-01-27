@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.edx.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentMapperImpl;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
@@ -15,15 +17,13 @@ import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.config.mappers.v1.DocumentMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.DocumentMapperImpl;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {DocumentMapperImpl.class})
+@ContextConfiguration(classes = {SecureExchangeDocumentMapperImpl.class})
 @AutoConfigureJsonTesters
-public class PenReqSecureExchangeDocumentJsonTests {
+public class SecureExchangeDocumentJsonTests {
     @Autowired
     private JacksonTester<SecureExchangeDocument> jsonTester;
 
@@ -31,7 +31,7 @@ public class PenReqSecureExchangeDocumentJsonTests {
     private JacksonTester<SecureExchangeDocMetadata> documentMetadataTester;
 
     @Autowired
-    private final DocumentMapper mapper = DocumentMapper.mapper;
+    private final SecureExchangeDocumentMapper mapper = SecureExchangeDocumentMapper.mapper;
 
     private SecureExchangeDocumentEntity document;
 

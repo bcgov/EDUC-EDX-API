@@ -13,13 +13,13 @@ import java.io.Serializable;
 public class SecureExchangeComments extends BaseRequest implements Serializable {
   private static final long serialVersionUID = -6904836038828419985L;
 
-  String penRetrievalReqCommentID;
-  String penRetrievalRequestID;
+  String secureExchangeCommentID;
+  String secureExchangeID;
   @Size(max = 50)
-  String staffMemberIDIRGUID;
+  String commentUserGUID;
   @Size(max = 255)
-  String staffMemberName;
+  String commentUserName;
   @NotNull(message = "Comment content can not be null")
-  String commentContent;
-  String commentTimestamp;
+  String content;
+
 }

@@ -201,7 +201,7 @@ public class SecureExchangeControllerTest extends BasePenReqControllerTest {
   private Set<SecureExchangeCommentEntity> createSecureExchangeComments(final SecureExchangeEntity secureExchange) {
     final Set<SecureExchangeCommentEntity> commentsEntitySet = new HashSet<>();
     final SecureExchangeCommentEntity secureExchangeComment = new SecureExchangeCommentEntity();
-    secureExchangeComment.setSecureExchange(secureExchange);
+    secureExchangeComment.setSecureExchangeEntity(secureExchange);
     secureExchangeComment.setCommentUserName("hi");
    // secureExchangeComment.setComment(LocalDateTime.now());
     commentsEntitySet.add(secureExchangeComment);
@@ -692,8 +692,7 @@ public class SecureExchangeControllerTest extends BasePenReqControllerTest {
   private String dummyPenRequestCommentsJsonWithValidPenReqID(final String penReqId) {
     return "{\n" +
             "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
-            "  \"commentContent\": \"" + "comment1" + "\",\n" +
-            "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+            "  \"content\": \"" + "comment1" + "\",\n" +
             "}";
   }
 

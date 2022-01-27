@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.mappers.Base64Mapper;
 import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocumentMetadata;
 import org.mapstruct.Mapper;
@@ -21,7 +22,7 @@ public interface SecureExchangeDocumentMapper {
   @Mapping(target = "secureExchange", ignore = true)
   SecureExchangeDocumentEntity toModel(SecureExchangeDocument struct);
 
-  SecureExchangeDocumentMetadata toMetadataStructure(SecureExchangeDocumentEntity entity);
+  SecureExchangeDocMetadata toMetadataStructure(SecureExchangeDocumentEntity entity);
 
   @Mapping(target = "digitalID", source = "secureExchange.digitalID")
   @Mapping(target = "secureExchangeID", source = "secureExchange.secureExchangeID")

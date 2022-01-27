@@ -88,8 +88,7 @@ public class SecureExchangeCommentsControllerTest extends BasePenReqControllerTe
     private String dummyPenRequestCommentsJsonWithValidPenReqID(final String penReqId) {
         return "{\n" +
                 "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
-                "  \"commentContent\": \"" + "comment1" + "\",\n" +
-                "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+                "  \"content\": \"" + "comment1" + "\",\n" +
                 "}";
     }
 }

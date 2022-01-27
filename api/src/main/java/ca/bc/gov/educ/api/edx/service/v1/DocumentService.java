@@ -100,7 +100,7 @@ public class DocumentService {
    * @return {@link List< SecureExchangeDocumentEntity > }
    */
   public List<SecureExchangeDocumentEntity> retrieveAllDocumentMetadata(final UUID penRequestId) {
-    return this.documentRepository.findByPenRequestPenRequestID(penRequestId);
+    return this.documentRepository.findBySecureExchangeSecureExchangeID(penRequestId);
   }
 
   public List<SecureExchangeDocumentEntity> retrieveAllDocumentsMetadata(){

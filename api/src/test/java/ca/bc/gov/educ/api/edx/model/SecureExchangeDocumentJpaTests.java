@@ -74,7 +74,7 @@ public class SecureExchangeDocumentJpaTests {
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
         assertThat(savedDocument.getSecureExchangeDocumentID()).isNotEqualTo(this.document.getSecureExchangeDocumentID());
 
-        assertThat(this.repository.findByPenRequestPenRequestID(this.penRequest.getSecureExchangeID()).size()).isEqualTo(2);
+        assertThat(this.repository.findBySecureExchangeSecureExchangeID(this.penRequest.getSecureExchangeID()).size()).isEqualTo(2);
     }
 
     @Test

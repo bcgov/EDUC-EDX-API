@@ -19,8 +19,8 @@ public interface secureExchangeRequestRepository extends JpaRepository<SecureExc
   @Query(value = "select avg(STATUS_UPDATE_DATE-INITIAL_SUBMIT_DATE) as averageCompletionTime from pen_retrieval_request WHERE PEN_RETRIEVAL_REQUEST_STATUS_CODE IN ('MANUAL','AUTO')", nativeQuery = true)
   GmpStats findCompletionProcessAverageTime();*/
 
-  @Query(value = "SELECT COUNT (PR_DISTINCT_ID) as col_0_0_ FROM(SELECT  DISTINCT (PRDOC.PEN_RETRIEVAL_REQUEST_ID) AS PR_DISTINCT_ID FROM PEN_RETRIEVAL_REQUEST_DOCUMENT PRDOC INNER JOIN PEN_RETRIEVAL_REQUEST PR ON PRDOC.PEN_RETRIEVAL_REQUEST_ID = PR.PEN_RETRIEVAL_REQUEST_ID WHERE PR.pen_retrieval_request_status_code in :statuses and PR.status_update_date between :startDate and :endDate)", nativeQuery = true)
-  long findNumberOfPenRequestsWithDocumentsStatusCodeInAndStatusUpdateDateBetween(List<String> statuses, LocalDateTime startDate, LocalDateTime endDate);
+  //@Query(value = "SELECT COUNT (PR_DISTINCT_ID) as col_0_0_ FROM(SELECT  DISTINCT (PRDOC.PEN_RETRIEVAL_REQUEST_ID) AS PR_DISTINCT_ID FROM PEN_RETRIEVAL_REQUEST_DOCUMENT PRDOC INNER JOIN PEN_RETRIEVAL_REQUEST PR ON PRDOC.PEN_RETRIEVAL_REQUEST_ID = PR.PEN_RETRIEVAL_REQUEST_ID WHERE PR.pen_retrieval_request_status_code in :statuses and PR.status_update_date between :startDate and :endDate)", nativeQuery = true)
+ // long findNumberOfPenRequestsWithDocumentsStatusCodeInAndStatusUpdateDateBetween(List<String> statuses, LocalDateTime startDate, LocalDateTime endDate);
 
-  long countByPenRequestStatusCodeInAndStatusUpdateDateBetween(List<String> statuses, LocalDateTime startDate, LocalDateTime endDate);
+ // long countByPenRequestStatusCodeInAndStatusUpdateDateBetween(List<String> statuses, LocalDateTime startDate, LocalDateTime endDate);
 }

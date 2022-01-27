@@ -14,8 +14,9 @@ import org.mapstruct.factory.Mappers;
 public interface SecureExchangeCommentsMapper {
   SecureExchangeCommentsMapper mapper = Mappers.getMapper(SecureExchangeCommentsMapper.class);
 
+
   SecureExchangeComments toStructure(SecureExchangeCommentEntity entity);
 
-  @Mapping(target = "secureExchange", ignore = true)
+  @Mapping(target = "secureExchangeEntity", ignore = true)
   SecureExchangeCommentEntity toModel(SecureExchangeComments structure);
 }

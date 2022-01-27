@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface secureExchangeRequestCommentRepository extends JpaRepository<SecureExchangeCommentEntity, UUID> {
-  Optional<SecureExchangeCommentEntity> findByCommentContentAndCommentTimestamp(String commentContent, LocalDateTime commentTimestamp);
+  Optional<SecureExchangeCommentEntity> findByContent(String content);
 }

@@ -55,6 +55,6 @@ public class SecureExchangeCommentEntity {
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
   @JoinColumn(name = "secure_exchange_id", referencedColumnName = "secure_exchange_id", updatable = false, insertable = false)
-  private SecureExchangeEntity secureExchange;
+  private SecureExchangeEntity secureExchangeEntity;
 
 }

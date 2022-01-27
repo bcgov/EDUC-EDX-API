@@ -48,7 +48,7 @@ public class SecureExchangeCommentService {
   public SecureExchangeCommentEntity save(UUID penRetrievalRequestId, SecureExchangeCommentEntity secureExchangeComment) {
     val result = this.getSecureExchangeRequestRepository().findById(penRetrievalRequestId);
     if (result.isPresent()) {
-      secureExchangeComment.setSecureExchange(result.get());
+      secureExchangeComment.setSecureExchangeEntity(result.get());
       return this.getSecureExchangeRequestCommentRepository().save(secureExchangeComment);
     }
     throw new EntityNotFoundException(SecureExchangeEntity.class, "PenRequest", penRetrievalRequestId.toString());

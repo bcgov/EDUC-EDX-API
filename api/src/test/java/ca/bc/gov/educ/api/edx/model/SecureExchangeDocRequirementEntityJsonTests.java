@@ -20,7 +20,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.PenReqDocRequirement;
 
 @RunWith(SpringRunner.class)
 @AutoConfigureJsonTesters
-public class PenReqPenReqDocRequirementEntityJsonTests {
+public class SecureExchangeDocRequirementEntityJsonTests {
     @Autowired
     private JacksonTester<PenReqDocRequirement> jsonTester;
 

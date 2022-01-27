@@ -17,7 +17,7 @@ import ca.bc.gov.educ.api.edx.support.PenRequestBuilder;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class PenRequestJpaTests {
+public class SecureExchangeJpaTests {
     @Autowired
     private secureExchangeRequestRepository repository;
 
