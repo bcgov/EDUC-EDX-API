@@ -7,7 +7,7 @@ CREATE TABLE SECURE_EXCHANGE
     EDX_MINISTRY_OWNERSHIP_TEAM_ID RAW(16)              NOT NULL,
     EDX_MINISTRY_CONTACT_TEAM_ID   RAW(16)              NOT NULL,
     SECURE_EXCHANGE_STATUS_CODE    VARCHAR2(10)         NOT NULL,
-    REVIEWER                       VARCHAR2(255)        NOT NULL,
+    REVIEWER                       VARCHAR2(255),
     IS_READ_BY_MINISTRY            VARCHAR2(1)          NOT NULL,
     IS_READ_BY_CONTACT             VARCHAR2(1)          NOT NULL,
     SUBJECT                        VARCHAR2(4000)       NOT NULL,
