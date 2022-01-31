@@ -40,22 +40,22 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
 
   private SecureExchangeDocumentEntity bcscPhoto;
 
-  private SecureExchangeEntity penRequest;
+  private SecureExchangeEntity secureExchange;
 
   private UUID penRequestID;
 
   @Before
   public void setUp() {
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
-    this.penRequest = new PenRequestBuilder()
+    this.secureExchange = new PenRequestBuilder()
             .withoutPenRequestID().build();
     this.bcscPhoto = new DocumentBuilder()
             .withoutDocumentID()
-            .withPenRequest(this.penRequest)
+            .withPenRequest(this.secureExchange)
             .build();
-    this.penRequest = this.secureExchangeRequestRepository.save(this.penRequest);
+    this.secureExchange = this.secureExchangeRequestRepository.save(this.secureExchange);
     this.bcscPhoto = this.repository.save(this.bcscPhoto);
-    this.penRequestID = this.penRequest.getSecureExchangeID();
+    this.penRequestID = this.secureExchange.getSecureExchangeID();
   }
 
   @Test
@@ -128,7 +128,7 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .withoutCreateAndUpdateUser()
-            .withPenRequest(this.penRequest)
+            .withPenRequest(this.secureExchange)
             .build();
     this.repository.save(document);
 
