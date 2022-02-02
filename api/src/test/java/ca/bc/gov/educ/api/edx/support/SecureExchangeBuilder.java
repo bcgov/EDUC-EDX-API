@@ -14,7 +14,7 @@ public class SecureExchangeBuilder {
 
   UUID digitalID = UUID.randomUUID();
 
-  UUID ownershipTeamID = UUID.randomUUID();
+  UUID ministryOwnershipTeamID = UUID.randomUUID();
 
   String secureExchangeStatusCode = "INITREV";
 
@@ -83,7 +83,7 @@ public class SecureExchangeBuilder {
     secureExchange.setCreateDate(LocalDateTime.now());
     secureExchange.setUpdateUser(this.updateUser);
     secureExchange.setUpdateDate(LocalDateTime.now());
-    secureExchange.setOwnershipTeamID(this.ownershipTeamID);
+    secureExchange.setMinistryOwnershipTeamID(this.ministryOwnershipTeamID);
 
     secureExchange.setSecureExchangeID(this.secureExchangeID);
     secureExchange.setDigitalID(this.digitalID);

@@ -86,7 +86,7 @@ public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeCont
 
     private String dummySecureExchangeCommentsJsonWithValidPenReqID(final String penReqId) {
         return "{\n" +
-                "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
+                "  \"secureExchangeRequestID\": \"" + penReqId + "\",\n" +
                 "  \"content\": \"" + "comment1" + "\",\n" +
                 "}";
     }

@@ -25,38 +25,38 @@ public class SecureExchangeEntity {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "secure_exchange_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "SECURE_EXCHANGE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeID;
 
   @NotNull(message = "digitalID cannot be null")
-  @Column(name = "digital_identity_id", updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "DIGITAL_IDENTITY_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID digitalID;
 
-  @NotNull(message = "ownershipTeamID cannot be null")
-  @Column(name = "ownership_team_id", updatable = false, columnDefinition = "BINARY(16)")
-  UUID ownershipTeamID;
+  @NotNull(message = "ministryOwnershipTeamID cannot be null")
+  @Column(name = "MINISTRY_OWNERSHIP_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID ministryOwnershipTeamID;
 
-  @Column(name = "secure_exchange_status_code")
+  @Column(name = "SECURE_EXCHANGE_STATUS_CODE")
   String secureExchangeStatusCode;
 
   @UpperCase
-  @Column(name = "exchange_contact")
+  @Column(name = "EXCHANGE_CONTACT")
   String exchangeContact;
 
   @UpperCase
-  @Column(name = "exchange_contact_type_code")
+  @Column(name = "EXCHANGE_CONTACT_TYPE_CODE")
   String exchangeContactTypeCode;
 
   @UpperCase
-  @Column(name = "reviewer")
+  @Column(name = "REVIEWER")
   String reviewer;
 
   @UpperCase
-  @Column(name = "is_read_by_owner")
-  String isReadByOwner;
+  @Column(name = "IS_READ_BY_MINISTRY")
+  String isReadByMinistry;
 
   @UpperCase
-  @Column(name = "is_read_by_exchange_contact")
+  @Column(name = "IS_READ_BY_EXCHANGE_CONTACT")
   String isReadByExchangeContact;
 
   @PastOrPresent
@@ -67,11 +67,11 @@ public class SecureExchangeEntity {
   @Column(name = "STATUS_UPDATE_DATE")
   LocalDateTime statusUpdateDate;
 
-  @Column(name = "create_user", updatable = false)
+  @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
   @PastOrPresent
-  @Column(name = "create_date", updatable = false)
+  @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
   @Column(name = "update_user")
