@@ -14,12 +14,15 @@ public class SecureExchangeComments extends BaseRequest implements Serializable 
   private static final long serialVersionUID = -6904836038828419985L;
 
   String secureExchangeCommentID;
+  @NotNull
   String secureExchangeID;
   @Size(max = 50)
+  @NotNull
   String commentUserGUID;
   @Size(max = 255)
+  @NotNull
   String commentUserName;
   @NotNull(message = "Comment content can not be null")
   String content;
-
+  String commentTimestamp;
 }

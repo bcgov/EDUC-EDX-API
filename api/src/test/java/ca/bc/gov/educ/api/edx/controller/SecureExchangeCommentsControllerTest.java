@@ -85,9 +85,12 @@ public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeCont
     }
 
     private String dummySecureExchangeCommentsJsonWithValidPenReqID(final String penReqId) {
-        return "{\n" +
-                "  \"secureExchangeRequestID\": \"" + penReqId + "\",\n" +
-                "  \"content\": \"" + "comment1" + "\",\n" +
-                "}";
+      return "{\n" +
+        "  \"secureExchangeID\": \"" + penReqId + "\",\n" +
+        "  \"content\": \"" + "comment1" + "\",\n" +
+        "  \"commentUserName\": \"" + "user1" + "\",\n" +
+        "  \"commentUserGUID\": \"" + UUID.randomUUID().toString() + "\",\n" +
+        "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+        "}";
     }
 }
