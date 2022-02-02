@@ -88,9 +88,9 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testFindSecureExchange_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
-    this.mockMvc.perform(get(URL.BASE_URL+"/?pen" + entity.getSecureExchangeID())
+    this.mockMvc.perform(get(URL.BASE_URL+"/?secureExchangeID" + entity.getSecureExchangeID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
-            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].pen").value(entity.getSecureExchangeID()));
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].secureExchangeID").value(entity.getSecureExchangeID().toString()));
   }
 
   @Test
@@ -240,72 +240,6 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(0)));
   }
-  @Test
-  public void testReadSecureExchangePaginatedWithSorting_Always_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final Map<String, String> sortMap = new HashMap<>();
-    sortMap.put("legalLastName", "ASC");
-    sortMap.put("legalFirstName", "DESC");
-    final String sort = new ObjectMapper().writeValueAsString(sortMap);
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("pageNumber","1").param("pageSize", "5").param("sort", sort)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(5)));
-  }
-
-  @Test
-  public void testReadSecureExchangePaginated_GivenFirstNameFilter_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final SearchCriteria criteria = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.EQUAL).value("Katina").valueType(ValueType.STRING).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
-
-  @Test
-  public void testReadSecureExchangePaginated_GivenLastNameFilter_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.EQUAL).value("Medling").valueType(ValueType.STRING).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
 
   @Test
   public void testReadSecureExchangePaginated_GivenSubmitDateBetween_ShouldReturnStatusOk() throws Exception {
@@ -332,57 +266,6 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
-  @Test
-  public void testReadSecureExchangePaginated_GivenFirstAndLast_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final String fromDate = "2020-04-01T00:00:01";
-    final String toDate = "2020-04-15T00:00:01";
-    final SearchCriteria criteria = SearchCriteria.builder().key("initialSubmitDate").operation(FilterOperation.BETWEEN).value(fromDate + "," + toDate).valueType(ValueType.DATE_TIME).build();
-    final SearchCriteria criteriaFirstName = SearchCriteria.builder().key("legalFirstName").operation(FilterOperation.CONTAINS).value("a").valueType(ValueType.STRING).build();
-    final SearchCriteria criteriaLastName = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.CONTAINS).value("o").valueType(ValueType.STRING).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    criteriaList.add(criteriaFirstName);
-    criteriaList.add(criteriaLastName);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
-
-  @Test
-  public void testReadSecureExchangePaginated_LegalLastNameFilterIgnoreCase_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final SearchCriteria criteria = SearchCriteria.builder().key("legalLastName").operation(FilterOperation.CONTAINS_IGNORE_CASE).value("j").valueType(ValueType.STRING).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
-  }
   @Test
   public void testReadSecureExchangePaginated_digitalID_ShouldReturnStatusOk() throws Exception {
     final var file = new File(
