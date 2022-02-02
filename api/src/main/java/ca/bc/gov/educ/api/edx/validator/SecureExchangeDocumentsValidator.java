@@ -37,7 +37,7 @@ public class SecureExchangeDocumentsValidator {
   }
 
   public void validateDocumentPayload(final SecureExchangeDocumentEntity document, boolean isCreateOperation) {
-    if (isCreateOperation && document.getSecureExchangeDocumentID() != null) {
+    if (isCreateOperation && document.getDocumentID() != null) {
       throw new InvalidParameterException("documentID");
     }
     if (isCreateOperation && (document.getDocumentData() == null || document.getDocumentData().length == 0)) {
@@ -58,8 +58,8 @@ public class SecureExchangeDocumentsValidator {
               String.valueOf(document.getDocumentData().length));
     }
 
-    if (!isDocumentTypeCodeValid(document.getSecureExchangeDocumentTypeCode())) {
-      throw new InvalidValueException("documentTypeCode", document.getSecureExchangeDocumentTypeCode());
+    if (!isDocumentTypeCodeValid(document.getDocumentTypeCode())) {
+      throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
     }
   }
 

@@ -49,9 +49,9 @@ public class SecureExchangeDocumentJpaTests {
 
     @Test
     public void findDocumentTest() {
-        Optional<SecureExchangeDocumentEntity> myDocument = this.repository.findById(this.document.getSecureExchangeDocumentID());
+        Optional<SecureExchangeDocumentEntity> myDocument = this.repository.findById(this.document.getDocumentID());
         assertThat(myDocument).isPresent();
-        assertThat(myDocument.get().getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+        assertThat(myDocument.get().getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
     }
 
     @Test
@@ -60,10 +60,10 @@ public class SecureExchangeDocumentJpaTests {
                                         .withoutDocumentID()
                                         .withSecureExchange(this.secureExchange).build();
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
-        assertThat(savedDocument.getSecureExchangeDocumentID()).isNotEqualTo(this.document.getSecureExchangeDocumentID());
+        assertThat(savedDocument.getDocumentID()).isNotEqualTo(this.document.getDocumentID());
         assertThat(savedDocument.getSecureExchange()).isNotNull();
 
-        assertThat(this.repository.findById(savedDocument.getSecureExchangeDocumentID())).isPresent();
+        assertThat(this.repository.findById(savedDocument.getDocumentID())).isPresent();
     }
 
     @Test
@@ -72,14 +72,14 @@ public class SecureExchangeDocumentJpaTests {
                                         .withoutDocumentID()
                                         .withSecureExchange(this.secureExchange).build();
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
-        assertThat(savedDocument.getSecureExchangeDocumentID()).isNotEqualTo(this.document.getSecureExchangeDocumentID());
+        assertThat(savedDocument.getDocumentID()).isNotEqualTo(this.document.getDocumentID());
 
         assertThat(this.repository.findBySecureExchangeSecureExchangeID(this.secureExchange.getSecureExchangeID()).size()).isEqualTo(2);
     }
 
     @Test
     public void deleteDocumentTest() {
-        this.repository.deleteById(this.document.getSecureExchangeDocumentID());
-        assertThat(this.repository.findById(this.document.getSecureExchangeDocumentID())).isEmpty();
+        this.repository.deleteById(this.document.getDocumentID());
+        assertThat(this.repository.findById(this.document.getDocumentID())).isEmpty();
     }
 }
