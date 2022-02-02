@@ -3,8 +3,8 @@ package ca.bc.gov.educ.api.edx.service.v1;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestCommentRepository;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -19,39 +19,39 @@ import java.util.UUID;
 public class SecureExchangeCommentService {
 
   @Getter(AccessLevel.PRIVATE)
-  private final secureExchangeRequestRepository secureExchangeRequestRepository;
+  private final SecureExchangeRequestRepository secureExchangeRequestRepository;
 
   @Getter(AccessLevel.PRIVATE)
-  private final secureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
+  private final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
 
   @Autowired
-  SecureExchangeCommentService(final secureExchangeRequestRepository secureExchangeRequestRepository, final secureExchangeRequestCommentRepository secureExchangeRequestCommentRepository) {
+  SecureExchangeCommentService(final SecureExchangeRequestRepository secureExchangeRequestRepository, final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository) {
     this.secureExchangeRequestRepository = secureExchangeRequestRepository;
     this.secureExchangeRequestCommentRepository = secureExchangeRequestCommentRepository;
   }
 
-  public Set<SecureExchangeCommentEntity> retrieveComments(UUID penRetrievalRequestId) {
-    final Optional<SecureExchangeEntity> entity = this.getSecureExchangeRequestRepository().findById(penRetrievalRequestId);
+  public Set<SecureExchangeCommentEntity> retrieveComments(UUID secureExchangeRequestId) {
+    final Optional<SecureExchangeEntity> entity = this.getSecureExchangeRequestRepository().findById(secureExchangeRequestId);
     if (entity.isPresent()) {
       return entity.get().getSecureExchangeComment();
     }
-    throw new EntityNotFoundException(SecureExchangeEntity.class, "PenRequest", penRetrievalRequestId.toString());
+    throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
   }
 
   /**
    * Need to find the entity first as it is the parent entity and system is trying to persist the child entity so need to attach it to the parent entity otherwise hibernate will throw detach entity exception.
    *
-   * @param penRetrievalRequestId    The ID of the Pen Retrieval Request.
+   * @param secureExchangeRequestId    The ID of the Pen Retrieval Request.
    * @param secureExchangeComment The individual comment by staff or student.
-   * @return PenRequestCommentsEntity, the saved instance.
+   * @return SecureExchangeCommentEntity, the saved instance.
    */
-  public SecureExchangeCommentEntity save(UUID penRetrievalRequestId, SecureExchangeCommentEntity secureExchangeComment) {
-    val result = this.getSecureExchangeRequestRepository().findById(penRetrievalRequestId);
+  public SecureExchangeCommentEntity save(UUID secureExchangeRequestId, SecureExchangeCommentEntity secureExchangeComment) {
+    val result = this.getSecureExchangeRequestRepository().findById(secureExchangeRequestId);
     if (result.isPresent()) {
       secureExchangeComment.setSecureExchangeEntity(result.get());
       return this.getSecureExchangeRequestCommentRepository().save(secureExchangeComment);
     }
-    throw new EntityNotFoundException(SecureExchangeEntity.class, "PenRequest", penRetrievalRequestId.toString());
+    throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
   }
 
 }

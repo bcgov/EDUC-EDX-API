@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.repository.impl;
 
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRepositoryCustom;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,12 +33,12 @@ public class SecureExchangeRepositoryCustomImpl implements SecureExchangeReposit
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<SecureExchangeEntity> criteriaQuery = criteriaBuilder.createQuery(SecureExchangeEntity.class);
-    Root<SecureExchangeEntity> penRequestEntityRoot = criteriaQuery.from(SecureExchangeEntity.class);
+    Root<SecureExchangeEntity> secureExchangeEntityRoot = criteriaQuery.from(SecureExchangeEntity.class);
     if (StringUtils.isNotBlank(status)) {
-      predicates.add(criteriaBuilder.equal(penRequestEntityRoot.get("penRequestStatusCode"), status));
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("secureExchangeStatusCode"), status));
     }
     if (digitalID != null) {
-      predicates.add(criteriaBuilder.equal(penRequestEntityRoot.get("digitalID"), digitalID));
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("digitalID"), digitalID));
     }
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
 

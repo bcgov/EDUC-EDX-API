@@ -14,7 +14,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.struct.v1.PenReqDocRequirement;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocRequirement;
 
 
 
@@ -22,15 +22,15 @@ import ca.bc.gov.educ.api.edx.struct.v1.PenReqDocRequirement;
 @AutoConfigureJsonTesters
 public class SecureExchangeDocRequirementEntityJsonTests {
     @Autowired
-    private JacksonTester<PenReqDocRequirement> jsonTester;
+    private JacksonTester<SecureExchangeDocRequirement> jsonTester;
 
     @Test
     public void requirementSerializeTest() throws Exception {
         int maxSize = 100;
         List<String> extensions = new ArrayList<String>(Arrays.asList("jpg", "png", "pdf"));
-        PenReqDocRequirement requirement = new PenReqDocRequirement(maxSize, extensions);
+        SecureExchangeDocRequirement requirement = new SecureExchangeDocRequirement(maxSize, extensions);
 
-        JsonContent<PenReqDocRequirement> json = this.jsonTester.write(requirement);
+        JsonContent<SecureExchangeDocRequirement> json = this.jsonTester.write(requirement);
 
         assertThat(json).extractingJsonPathNumberValue("@.maxSize")
             .isEqualTo(maxSize);
@@ -43,7 +43,7 @@ public class SecureExchangeDocRequirementEntityJsonTests {
 
     @Test
     public void documentDeserializeTest() throws Exception {
-        PenReqDocRequirement document = this.jsonTester.readObject("requirement.json");
+        SecureExchangeDocRequirement document = this.jsonTester.readObject("requirement.json");
         assertThat(document.getMaxSize()).isEqualTo(20);
         assertThat(document.getExtensions().size()).isEqualTo(2);
         assertThat(document.getExtensions().get(0)).isEqualTo("pdf");

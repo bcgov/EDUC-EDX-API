@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.utils;
 
-import ca.bc.gov.educ.api.edx.exception.PenRequestRuntimeException;
+import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 
 import java.beans.Expression;
 import java.beans.Statement;
@@ -55,7 +55,7 @@ public class TransformUtil {
           stmt.execute();
         }
       } catch (Exception ex) {
-        throw new PenRequestRuntimeException(ex.getMessage());
+        throw new SecureExchangeRuntimeException(ex.getMessage());
       }
     }
 

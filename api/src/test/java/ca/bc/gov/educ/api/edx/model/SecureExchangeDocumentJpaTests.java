@@ -5,7 +5,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
-import ca.bc.gov.educ.api.edx.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,17 +30,17 @@ public class SecureExchangeDocumentJpaTests {
 
     private SecureExchangeDocumentEntity document;
 
-    private SecureExchangeEntity penRequest;
+    private SecureExchangeEntity secureExchange;
 
     @Before
     public void setUp() {
-        this.penRequest = new PenRequestBuilder()
-                                            .withoutPenRequestID().build();
+        this.secureExchange = new SecureExchangeBuilder()
+                                            .withoutSecureExchangeID().build();
         this.document = new DocumentBuilder()
                             .withoutDocumentID()
-                            .withPenRequest(this.penRequest).build();
+                            .withSecureExchange(this.secureExchange).build();
 
-        this.entityManager.persist(this.penRequest);
+        this.entityManager.persist(this.secureExchange);
         this.entityManager.persist(this.document);
         this.entityManager.flush();
         //document = this.repository.save(document);
@@ -58,7 +58,7 @@ public class SecureExchangeDocumentJpaTests {
     public void saveDocumentTest() {
         SecureExchangeDocumentEntity myDocument = new DocumentBuilder()
                                         .withoutDocumentID()
-                                        .withPenRequest(this.penRequest).build();
+                                        .withSecureExchange(this.secureExchange).build();
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
         assertThat(savedDocument.getSecureExchangeDocumentID()).isNotEqualTo(this.document.getSecureExchangeDocumentID());
         assertThat(savedDocument.getSecureExchange()).isNotNull();
@@ -67,14 +67,14 @@ public class SecureExchangeDocumentJpaTests {
     }
 
     @Test
-    public void findDocumentByPenRequestTest() {
+    public void findDocumentBySecureExchangeTest() {
         SecureExchangeDocumentEntity myDocument = new DocumentBuilder()
                                         .withoutDocumentID()
-                                        .withPenRequest(this.penRequest).build();
+                                        .withSecureExchange(this.secureExchange).build();
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
         assertThat(savedDocument.getSecureExchangeDocumentID()).isNotEqualTo(this.document.getSecureExchangeDocumentID());
 
-        assertThat(this.repository.findBySecureExchangeSecureExchangeID(this.penRequest.getSecureExchangeID()).size()).isEqualTo(2);
+        assertThat(this.repository.findBySecureExchangeSecureExchangeID(this.secureExchange.getSecureExchangeID()).size()).isEqualTo(2);
     }
 
     @Test

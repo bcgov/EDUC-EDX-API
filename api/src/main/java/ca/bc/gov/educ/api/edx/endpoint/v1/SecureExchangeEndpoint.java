@@ -23,22 +23,22 @@ import java.util.concurrent.CompletableFuture;
 import static org.springframework.http.HttpStatus.CREATED;
 
 /**
- * The interface Pen request endpoint.
+ * The interface secure exchange endpoint.
  */
 @RequestMapping(URL.BASE_URL)
-@OpenAPIDefinition(info = @Info(title = "API for Pen Requests.", description = "This CRUD API is for Pen Requests tied to a Digital ID for a particular student in BC.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_PEN_REQUEST", "WRITE_PEN_REQUEST"})})
+@OpenAPIDefinition(info = @Info(title = "API for secure exchange.", description = "This CRUD API is for secure exchanges.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_SECURE_EXCHANGE", "WRITE_SECURE_EXCHANGE"})})
 public interface SecureExchangeEndpoint {
 
   /**
    * Retrieve secure exchange request.
    *
-   * @param secure_exchange_id the id
+   * @param secureExchangeId the id
    * @return the secure exchange
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
   @GetMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  SecureExchange retrieveSecureExchange(@PathVariable String secure_exchange_id);
+  SecureExchange retrieveSecureExchange(@PathVariable String secureExchangeId);
 
   /**
    * Find secure exchanges iterable.
@@ -69,7 +69,7 @@ public interface SecureExchangeEndpoint {
   /**
    * Update Secure Exchange request.
    *
-   * @param secureExchange the pen request
+   * @param secureExchange the secure exchange
    * @return the secure Exchange request
    */
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")

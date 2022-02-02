@@ -1,16 +1,16 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BasePenRequestAPITest;
+import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
 import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.service.v1.DocumentService;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
-import ca.bc.gov.educ.api.edx.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //import javax.transaction.Transactional;
 
 
-public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
+public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITest {
 
   @Autowired
   DocumentService service;
@@ -33,7 +33,7 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
   private DocumentRepository repository;
 
   @Autowired
-  private secureExchangeRequestRepository secureExchangeRequestRepository;
+  private SecureExchangeRequestRepository secureExchangeRequestRepository;
 
   @Autowired
   private DocumentTypeCodeTableRepository documentTypeCodeRepository;
@@ -42,20 +42,20 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
 
   private SecureExchangeEntity secureExchange;
 
-  private UUID penRequestID;
+  private UUID secureExchangeID;
 
   @Before
   public void setUp() {
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
-    this.secureExchange = new PenRequestBuilder()
-            .withoutPenRequestID().build();
+    this.secureExchange = new SecureExchangeBuilder()
+            .withoutSecureExchangeID().build();
     this.bcscPhoto = new DocumentBuilder()
             .withoutDocumentID()
-            .withPenRequest(this.secureExchange)
+            .withSecureExchange(this.secureExchange)
             .build();
     this.secureExchange = this.secureExchangeRequestRepository.save(this.secureExchange);
     this.bcscPhoto = this.repository.save(this.bcscPhoto);
-    this.penRequestID = this.secureExchange.getSecureExchangeID();
+    this.secureExchangeID = this.secureExchange.getSecureExchangeID();
   }
 
   @Test
@@ -64,32 +64,32 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
             .withoutDocumentID()
             .withoutCreateAndUpdateUser()
             .build();
-    document = this.service.createDocument(this.penRequestID, document);
+    document = this.service.createDocument(this.secureExchangeID, document);
 
     assertThat(document).isNotNull();
     assertThat(document.getSecureExchangeDocumentID()).isNotNull();
-    assertThat(document.getSecureExchange().getSecureExchangeID()).isEqualTo(this.penRequestID);
+    assertThat(document.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
 
   @Test
   public void retrieveDocumentMetadataTest() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.penRequestID, this.bcscPhoto.getSecureExchangeDocumentID());
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID());
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
-    assertThat(retrievedDocument.getSecureExchange().getSecureExchangeID()).isEqualTo(this.penRequestID);
+    assertThat(retrievedDocument.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidDocumentIdGivenTest() {
     final UUID randomGuid =  UUID.randomUUID();
-    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.penRequestID, randomGuid))
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.secureExchangeID, randomGuid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }
 
   @Test
-  public void retrieveDocumentMetadataThrowsExceptionWhenInvalidPenRequestIdGivenTest() {
+  public void retrieveDocumentMetadataThrowsExceptionWhenInvalidSecureExchangeIdGivenTest() {
     final UUID randomGuid = UUID.randomUUID();
     assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(randomGuid, randomGuid))
         .isInstanceOf(EntityNotFoundException.class)
@@ -98,7 +98,7 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
 
   @Test
   public void retrieveDocumentDataTest() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getSecureExchangeDocumentID(),"Y");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"Y");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
@@ -107,7 +107,7 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
 
   @Test
   public void retrieveDocumentDataTest1() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getSecureExchangeDocumentID(),"TRUE");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"TRUE");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
@@ -116,7 +116,7 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
 
   @Test
   public void retrieveDocumentDataTest2() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.penRequestID, this.bcscPhoto.getSecureExchangeDocumentID(),"N");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"N");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
@@ -128,28 +128,28 @@ public class SecureExchangeDocumentServiceTests extends BasePenRequestAPITest {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .withoutCreateAndUpdateUser()
-            .withPenRequest(this.secureExchange)
+            .withSecureExchange(this.secureExchange)
             .build();
     this.repository.save(document);
 
-    final List<SecureExchangeDocumentEntity> documents = this.service.retrieveAllDocumentMetadata(this.penRequestID);
+    final List<SecureExchangeDocumentEntity> documents = this.service.retrieveAllDocumentMetadata(this.secureExchangeID);
     assertThat(documents.size()).isEqualTo(2);
   }
 
 
   @Test
   public void deleteDocumentTest() {
-    final SecureExchangeDocumentEntity deletedDocument = this.service.deleteDocument(this.penRequestID, this.bcscPhoto.getSecureExchangeDocumentID());
+    final SecureExchangeDocumentEntity deletedDocument = this.service.deleteDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID());
     assertThat(deletedDocument).isNotNull();
     final UUID guid =  this.bcscPhoto.getSecureExchangeDocumentID();
-    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.penRequestID, guid))
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.secureExchangeID, guid))
             .isInstanceOf(EntityNotFoundException.class);
   }
 
   @Test
   public void deleteDocumentThrowsExceptionWhenInvalidIdGivenTest() {
     final UUID guid =  UUID.randomUUID();
-    assertThatThrownBy(() -> this.service.deleteDocument(this.penRequestID, guid))
+    assertThatThrownBy(() -> this.service.deleteDocument(this.secureExchangeID, guid))
             .isInstanceOf(EntityNotFoundException.class)
             .hasMessageContaining("DocumentEntity");
   }

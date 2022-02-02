@@ -1,20 +1,20 @@
 package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeStatusCodeMapper;
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeEndpoint;
 import ca.bc.gov.educ.api.edx.exception.InvalidParameterException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
-import ca.bc.gov.educ.api.edx.exception.PenRequestRuntimeException;
+import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.filter.SecureExchangeFilterSpecs;
-import ca.bc.gov.educ.api.edx.config.mappers.v1.PenRequestStatusCodeMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
-import ca.bc.gov.educ.api.edx.validator.PenRequestPayloadValidator;
+import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,21 +47,21 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class SecureExchangeController extends BaseController implements SecureExchangeEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
-  private final PenRequestPayloadValidator payloadValidator;
+  private final SecureExchangePayloadValidator payloadValidator;
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeService service;
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
-  private static final PenRequestStatusCodeMapper statusCodeMapper = PenRequestStatusCodeMapper.mapper;
+  private static final SecureExchangeStatusCodeMapper statusCodeMapper = SecureExchangeStatusCodeMapper.mapper;
   private final SecureExchangeFilterSpecs secureExchangeFilterSpecs;
   @Autowired
-  SecureExchangeController(final SecureExchangeService secureExchange, final PenRequestPayloadValidator payloadValidator, SecureExchangeFilterSpecs secureExchangeFilterSpecs) {
+  SecureExchangeController(final SecureExchangeService secureExchange, final SecureExchangePayloadValidator payloadValidator, SecureExchangeFilterSpecs secureExchangeFilterSpecs) {
     this.service = secureExchange;
     this.payloadValidator = payloadValidator;
     this.secureExchangeFilterSpecs = secureExchangeFilterSpecs;
   }
 
-  public SecureExchange retrieveSecureExchange(String secure_exchange_id) {
-    return mapper.toStructure(getService().retrieveSecureExchange(UUIDUtil.fromString(secure_exchange_id)));
+  public SecureExchange retrieveSecureExchange(String secureExchangeId) {
+    return mapper.toStructure(getService().retrieveSecureExchange(UUIDUtil.fromString(secureExchangeId)));
   }
 
     @Override
@@ -80,12 +80,12 @@ public class SecureExchangeController extends BaseController implements SecureEx
     public SecureExchange updateSecureExchange(SecureExchange secureExchange) {
         validatePayload(secureExchange, false);
         setAuditColumns(secureExchange);
-        return mapper.toStructure(getService().updatePenRequest(mapper.toModel(secureExchange)));
+        return mapper.toStructure(getService().updateSecureExchange(mapper.toModel(secureExchange)));
     }
 
   public List<SecureExchangeStatusCode> getSecureExchangeStatusCodes() {
     val secureExchangeStatusCode = new ArrayList<SecureExchangeStatusCode>();
-    getService().getPenRequestStatusCodesList().forEach(element -> secureExchangeStatusCode.add(statusCodeMapper.toStructure(element)));
+    getService().getSecureExchangeStatusCodesList().forEach(element -> secureExchangeStatusCode.add(statusCodeMapper.toStructure(element)));
     return secureExchangeStatusCode;
   }
 
@@ -112,18 +112,18 @@ public class SecureExchangeController extends BaseController implements SecureEx
   public CompletableFuture<Page<SecureExchange>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     val objectMapper = new ObjectMapper();
     final List<Sort.Order> sorts = new ArrayList<>();
-    Specification<SecureExchangeEntity> penRequestSpecs = null;
+    Specification<SecureExchangeEntity> secureExchangeSpecs = null;
     try {
       getSortCriteria(sortCriteriaJson, objectMapper, sorts);
       if (StringUtils.isNotBlank(searchCriteriaListJson)) {
         List<SearchCriteria> criteriaList = objectMapper.readValue(searchCriteriaListJson, new TypeReference<>() {
         });
-        penRequestSpecs = getPenRequestEntitySpecification(criteriaList);
+        secureExchangeSpecs = getSecureExchangeEntitySpecification(criteriaList);
       }
     } catch (JsonProcessingException e) {
-      throw new PenRequestRuntimeException(e.getMessage());
+      throw new SecureExchangeRuntimeException(e.getMessage());
     }
-    return getService().findAll(penRequestSpecs, pageNumber, pageSize, sorts).thenApplyAsync(secureExchangeEntities -> secureExchangeEntities.map(mapper::toStructure));
+    return getService().findAll(secureExchangeSpecs, pageNumber, pageSize, sorts).thenApplyAsync(secureExchangeEntities -> secureExchangeEntities.map(mapper::toStructure));
   }
 
 
@@ -141,18 +141,18 @@ public class SecureExchangeController extends BaseController implements SecureEx
     }
   }
 
-  private Specification<SecureExchangeEntity> getPenRequestEntitySpecification(List<SearchCriteria> criteriaList) {
-    Specification<SecureExchangeEntity> penRequestSpecs = null;
+  private Specification<SecureExchangeEntity> getSecureExchangeEntitySpecification(List<SearchCriteria> criteriaList) {
+    Specification<SecureExchangeEntity> secureExchangeSpecs = null;
     if (!criteriaList.isEmpty()) {
       var i = 0;
       for (SearchCriteria criteria : criteriaList) {
         if (criteria.getKey() != null && criteria.getOperation() != null && criteria.getValueType() != null) {
           Specification<SecureExchangeEntity> typeSpecification = getTypeSpecification(criteria.getKey(), criteria.getOperation(), criteria.getValue(), criteria.getValueType());
           if (i == 0) {
-            penRequestSpecs = Specification.where(typeSpecification);
+            secureExchangeSpecs = Specification.where(typeSpecification);
           } else {
-            assert penRequestSpecs != null;
-            penRequestSpecs = penRequestSpecs.and(typeSpecification);
+            assert secureExchangeSpecs != null;
+            secureExchangeSpecs = secureExchangeSpecs.and(typeSpecification);
           }
           i++;
         } else {
@@ -160,34 +160,34 @@ public class SecureExchangeController extends BaseController implements SecureEx
         }
       }
     }
-    return penRequestSpecs;
+    return secureExchangeSpecs;
   }
 
   private Specification<SecureExchangeEntity> getTypeSpecification(String key, FilterOperation filterOperation, String value, ValueType valueType) {
-    Specification<SecureExchangeEntity> penRequestSpecs = null;
+    Specification<SecureExchangeEntity> secureExchangeSpecs = null;
     switch (valueType) {
       case STRING:
-        penRequestSpecs = secureExchangeFilterSpecs.getStringTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getStringTypeSpecification(key, value, filterOperation);
         break;
       case DATE_TIME:
-        penRequestSpecs = secureExchangeFilterSpecs.getDateTimeTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getDateTimeTypeSpecification(key, value, filterOperation);
         break;
       case LONG:
-        penRequestSpecs = secureExchangeFilterSpecs.getLongTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getLongTypeSpecification(key, value, filterOperation);
         break;
       case INTEGER:
-        penRequestSpecs = secureExchangeFilterSpecs.getIntegerTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getIntegerTypeSpecification(key, value, filterOperation);
         break;
       case DATE:
-        penRequestSpecs = secureExchangeFilterSpecs.getDateTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getDateTypeSpecification(key, value, filterOperation);
         break;
       case UUID:
-        penRequestSpecs = secureExchangeFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
+        secureExchangeSpecs = secureExchangeFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
       default:
         break;
     }
-    return penRequestSpecs;
+    return secureExchangeSpecs;
   }
 
 }

@@ -12,30 +12,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
-import ca.bc.gov.educ.api.edx.support.PenRequestBuilder;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
 public class SecureExchangeJpaTests {
     @Autowired
-    private secureExchangeRequestRepository repository;
+    private SecureExchangeRequestRepository repository;
 
-    private SecureExchangeEntity penRequest;
+    private SecureExchangeEntity secureExchange;
 
     @Before
     public void setUp() {
-        this.penRequest = new PenRequestBuilder()
-                            .withoutPenRequestID().build();
+        this.secureExchange = new SecureExchangeBuilder()
+                            .withoutSecureExchangeID().build();
     }
 
     @Test
     public void saveDocumentTest() {
-        SecureExchangeEntity savedPenRequest = this.repository.save(this.penRequest);
-        assertThat(savedPenRequest.getSecureExchangeID()).isNotNull();
-        assertThat(savedPenRequest.getInitialSubmitDate()).isNull();
+        SecureExchangeEntity savedSecureExchange = this.repository.save(this.secureExchange);
+        assertThat(savedSecureExchange.getSecureExchangeID()).isNotNull();
+        assertThat(savedSecureExchange.getInitialSubmitDate()).isNull();
 
-        assertThat(this.repository.findById(savedPenRequest.getSecureExchangeID())).isPresent();
+        assertThat(this.repository.findById(savedSecureExchange.getSecureExchangeID())).isPresent();
     }
 
 }

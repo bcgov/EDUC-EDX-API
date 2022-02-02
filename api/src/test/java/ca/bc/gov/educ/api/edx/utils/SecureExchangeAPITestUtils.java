@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.utils;
 
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -15,14 +15,14 @@ import java.util.UUID;
  */
 @Component
 @Profile("test")
-public class PenRequestAPITestUtils {
+public class SecureExchangeAPITestUtils {
 
   @Autowired
   private DocumentRepository documentRepository;
 
 
   @Autowired
-  private secureExchangeRequestRepository secureExchangeRequestRepository;
+  private SecureExchangeRequestRepository secureExchangeRequestRepository;
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void cleanDB() {

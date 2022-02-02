@@ -10,11 +10,11 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class})
 @SuppressWarnings("squid:S1214")
-public interface PenRequestCommentsMapper {
-  PenRequestCommentsMapper mapper = Mappers.getMapper(PenRequestCommentsMapper.class);
+public interface SecureExchangeCommentsMapper {
+  SecureExchangeCommentsMapper mapper = Mappers.getMapper(SecureExchangeCommentsMapper.class);
 
   SecureExchangeComments toStructure(SecureExchangeCommentEntity entity);
 
-  @Mapping(target = "secureExchange", ignore = true)
+  @Mapping(target = "secureExchangeEntity", ignore = true)
   SecureExchangeCommentEntity toModel(SecureExchangeComments structure);
 }

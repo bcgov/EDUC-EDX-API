@@ -1,12 +1,12 @@
 package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.controller.BaseController;
-import ca.bc.gov.educ.api.edx.endpoint.v1.PenReqDocumentEndpoint;
+import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeDocumentEndpoint;
 import ca.bc.gov.educ.api.edx.config.mappers.v1.DocumentMapper;
 import ca.bc.gov.educ.api.edx.config.mappers.v1.DocumentTypeCodeMapper;
 import ca.bc.gov.educ.api.edx.service.v1.DocumentService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
-import ca.bc.gov.educ.api.edx.validator.PenRequestDocumentsValidator;
+import ca.bc.gov.educ.api.edx.validator.SecureExchangeDocumentsValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.val;
@@ -18,7 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-public class SecureExchangeDocumentController extends BaseController implements PenReqDocumentEndpoint {
+public class SecureExchangeDocumentController extends BaseController implements SecureExchangeDocumentEndpoint {
 
   private static final DocumentMapper mapper = DocumentMapper.mapper;
 
@@ -27,45 +27,45 @@ public class SecureExchangeDocumentController extends BaseController implements 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;
   @Getter(AccessLevel.PRIVATE)
-  private final PenRequestDocumentsValidator validator;
+  private final SecureExchangeDocumentsValidator validator;
 
   @Autowired
-  SecureExchangeDocumentController(final DocumentService documentService, final PenRequestDocumentsValidator validator) {
+  SecureExchangeDocumentController(final DocumentService documentService, final SecureExchangeDocumentsValidator validator) {
     this.documentService = documentService;
     this.validator = validator;
   }
 
   @Override
-  public SecureExchangeDocument readDocument(String penRequestID, String documentID, String includeDocData) {
-    return mapper.toStructure(getDocumentService().retrieveDocument(UUID.fromString(penRequestID), UUID.fromString(documentID), includeDocData));
+  public SecureExchangeDocument readDocument(String secureExchangeID, String documentID, String includeDocData) {
+    return mapper.toStructure(getDocumentService().retrieveDocument(UUID.fromString(secureExchangeID), UUID.fromString(documentID), includeDocData));
   }
 
   @Override
-  public SecureExchangeDocMetadata createDocument(String penRequestID, SecureExchangeDocument secureExchangeDocument) {
+  public SecureExchangeDocMetadata createDocument(String secureExchangeID, SecureExchangeDocument secureExchangeDocument) {
     setAuditColumns(secureExchangeDocument);
     val model = mapper.toModel(secureExchangeDocument);
     getValidator().validateDocumentPayload(model, true);
-    return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(penRequestID), model));
+    return mapper.toMetadataStructure(getDocumentService().createDocument(UUID.fromString(secureExchangeID), model));
   }
 
   @Override
-  public SecureExchangeDocMetadata updateDocument(UUID penRequestID, UUID documentID, SecureExchangeDocument secureExchangeDocument) {
+  public SecureExchangeDocMetadata updateDocument(UUID secureExchangeID, UUID documentID, SecureExchangeDocument secureExchangeDocument) {
     setAuditColumns(secureExchangeDocument);
     val model = mapper.toModel(secureExchangeDocument);
     getValidator().validateDocumentPayload(model, false);
-    return mapper.toMetadataStructure(getDocumentService().updateDocument(penRequestID, documentID, model));
+    return mapper.toMetadataStructure(getDocumentService().updateDocument(secureExchangeID, documentID, model));
   }
 
-  public SecureExchangeDocMetadata deleteDocument(String penRequestID, String documentID) {
-    return mapper.toMetadataStructure(getDocumentService().deleteDocument(UUID.fromString(penRequestID), UUID.fromString(documentID)));
+  public SecureExchangeDocMetadata deleteDocument(String secureExchangeID, String documentID) {
+    return mapper.toMetadataStructure(getDocumentService().deleteDocument(UUID.fromString(secureExchangeID), UUID.fromString(documentID)));
   }
 
-  public Iterable<SecureExchangeDocMetadata> readAllDocumentMetadata(String penRequestID) {
-    return getDocumentService().retrieveAllDocumentMetadata(UUID.fromString(penRequestID))
+  public Iterable<SecureExchangeDocMetadata> readAllDocumentMetadata(String secureExchangeID) {
+    return getDocumentService().retrieveAllDocumentMetadata(UUID.fromString(secureExchangeID))
             .stream().map(mapper::toMetadataStructure).collect(Collectors.toList());
   }
 
-  public PenReqDocRequirement getDocumentRequirements() {
+  public SecureExchangeDocRequirement getDocumentRequirements() {
     return documentService.getDocumentRequirements();
   }
 

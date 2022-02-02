@@ -15,20 +15,20 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 
 @RequestMapping(URL.BASE_URL)
-public interface PenRequestCommentEndpoint {
+public interface SecureExchangeCommentEndpoint {
 
-  @PreAuthorize("hasAuthority('SCOPE_READ_PEN_REQUEST')")
-  @GetMapping(URL.PEN_REQUEST_ID_COMMENTS)
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
+  @GetMapping(URL.SECURE_EXCHANGE_ID_COMMENTS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional
-  List<SecureExchangeComments> retrieveComments(@PathVariable String penRequestId);
+  List<SecureExchangeComments> retrieveComments(@PathVariable String secureExchangeId);
 
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_PEN_REQUEST')")
-  @PostMapping(URL.PEN_REQUEST_ID_COMMENTS)
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
+  @PostMapping(URL.SECURE_EXCHANGE_ID_COMMENTS)
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
   @Transactional
-  SecureExchangeComments save(@PathVariable String penRequestId, @Validated @RequestBody SecureExchangeComments secureExchangeComments);
+  SecureExchangeComments save(@PathVariable String secureExchangeId, @Validated @RequestBody SecureExchangeComments secureExchangeComments);
 
 
 }

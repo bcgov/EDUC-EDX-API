@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
 
 public class DocumentBuilder {
     UUID documentID = UUID.randomUUID();
@@ -19,7 +18,7 @@ public class DocumentBuilder {
 
     int fileSize = 8;
 
-    SecureExchangeEntity penRequest = new PenRequestBuilder().build();
+    SecureExchangeEntity secureExchange = new SecureExchangeBuilder().build();
 
     String createUser = "API";
 
@@ -62,8 +61,8 @@ public class DocumentBuilder {
         return this;
     }
 
-    public DocumentBuilder withPenRequest(SecureExchangeEntity penRequest) {
-        this.penRequest = penRequest;
+    public DocumentBuilder withSecureExchange(SecureExchangeEntity secureExchange) {
+        this.secureExchange = secureExchange;
         return this;
     }
 
@@ -78,11 +77,11 @@ public class DocumentBuilder {
         this.updateUser = null;
         this.updateDate = null;
 
-        if(this.penRequest != null) {
-            this.penRequest.setCreateUser(null);
-            this.penRequest.setCreateDate(null);
-            this.penRequest.setUpdateUser(null);
-            this.penRequest.setUpdateDate(null);
+        if(this.secureExchange != null) {
+            this.secureExchange.setCreateUser(null);
+            this.secureExchange.setCreateDate(null);
+            this.secureExchange.setUpdateUser(null);
+            this.secureExchange.setUpdateDate(null);
         }
         return this;
     }
@@ -99,7 +98,7 @@ public class DocumentBuilder {
         doc.setCreateDate(LocalDateTime.now());
         doc.setUpdateUser(this.updateUser);
         doc.setUpdateDate(LocalDateTime.now());
-        //doc.set(this.penRequest);
+        doc.setSecureExchange(this.secureExchange);
 
         return doc;
     }

@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Pen Request Status Code Table Repository
+ * Secure Exchange Status Code Table Repository
  *
  * @author Marco Villeneuve
  */
 @Repository
-public interface secureExchangeStatusCodeTableRepository extends JpaRepository<SecureExchangeStatusCodeEntity, Long> {
+public interface SecureExchangeStatusCodeTableRepository extends JpaRepository<SecureExchangeStatusCodeEntity, Long> {
 }

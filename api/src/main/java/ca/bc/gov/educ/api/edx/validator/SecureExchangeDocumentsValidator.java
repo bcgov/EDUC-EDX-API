@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
-public class PenRequestDocumentsValidator {
+public class SecureExchangeDocumentsValidator {
 
   private final ApplicationProperties properties;
   private final DocumentTypeCodeTableRepository documentTypeCodeRepository;
 
   @Autowired
-  public PenRequestDocumentsValidator(final ApplicationProperties properties, final DocumentTypeCodeTableRepository documentTypeCodeRepository) {
+  public SecureExchangeDocumentsValidator(final ApplicationProperties properties, final DocumentTypeCodeTableRepository documentTypeCodeRepository) {
     this.properties = properties;
     this.documentTypeCodeRepository = documentTypeCodeRepository;
   }

@@ -35,21 +35,21 @@ import java.util.concurrent.CompletionException;
 public class SecureExchangeService {
 
   @Getter(AccessLevel.PRIVATE)
-  private final secureExchangeRequestRepository secureExchangeRequestRepository;
+  private final SecureExchangeRequestRepository secureExchangeRequestRepository;
   @Getter(AccessLevel.PRIVATE)
-  private final secureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
+  private final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
   @Getter(AccessLevel.PRIVATE)
   private final DocumentRepository documentRepository;
 
   @Getter(AccessLevel.PRIVATE)
-  private final secureExchangeStatusCodeTableRepository penRequestStatusCodeTableRepo;
+  private final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo;
 
   @Autowired
-  public SecureExchangeService(final secureExchangeRequestRepository secureExchangeRequestRepository, final secureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, final DocumentRepository documentRepository, final secureExchangeStatusCodeTableRepository penRequestStatusCodeTableRepo) {
+  public SecureExchangeService(final SecureExchangeRequestRepository secureExchangeRequestRepository, final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, final DocumentRepository documentRepository, final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo) {
     this.secureExchangeRequestRepository = secureExchangeRequestRepository;
     this.secureExchangeRequestCommentRepository = secureExchangeRequestCommentRepository;
     this.documentRepository = documentRepository;
-    this.penRequestStatusCodeTableRepo = penRequestStatusCodeTableRepo;
+    this.secureExchangeStatusCodeTableRepo = secureExchangeStatusCodeTableRepo;
 
   }
 
@@ -63,9 +63,9 @@ public class SecureExchangeService {
   }
 
   /**
-   * set the status to DRAFT in the initial submit of pen request.
+   * set the status to DRAFT in the initial submit of secure exchange.
    *
-   * @param secureExchangeRequest the pen request object to be persisted in the DB.
+   * @param secureExchangeRequest the secure exchange object to be persisted in the DB.
    * @return the persisted entity.
    */
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
@@ -76,8 +76,8 @@ public class SecureExchangeService {
   }
 
 
-  public Iterable<SecureExchangeStatusCodeEntity> getPenRequestStatusCodesList() {
-    return this.getPenRequestStatusCodeTableRepo().findAll();
+  public Iterable<SecureExchangeStatusCodeEntity> getSecureExchangeStatusCodesList() {
+    return this.getSecureExchangeStatusCodeTableRepo().findAll();
   }
 
   public List<SecureExchangeEntity> findSecureExchange(final UUID digitalID, final String statusCode) {
@@ -92,10 +92,10 @@ public class SecureExchangeService {
    * @param secureExchange the object which needs to be updated.
    * @return updated object.
    */
-  public SecureExchangeEntity updatePenRequest(final SecureExchangeEntity secureExchange) {
-    final Optional<SecureExchangeEntity> curPenRequest = this.getSecureExchangeRequestRepository().findById(secureExchange.getSecureExchangeID());
-    if (curPenRequest.isPresent()) {
-      SecureExchangeEntity newExchangeRequest = curPenRequest.get();
+  public SecureExchangeEntity updateSecureExchange(final SecureExchangeEntity secureExchange) {
+    final Optional<SecureExchangeEntity> curSecureExchange = this.getSecureExchangeRequestRepository().findById(secureExchange.getSecureExchangeID());
+    if (curSecureExchange.isPresent()) {
+      SecureExchangeEntity newExchangeRequest = curSecureExchange.get();
       this.logUpdates(secureExchange, newExchangeRequest);
       secureExchange.setSecureExchangeComment(newExchangeRequest.getSecureExchangeComment());
       BeanUtils.copyProperties(secureExchange, newExchangeRequest);
@@ -103,15 +103,15 @@ public class SecureExchangeService {
       newExchangeRequest = this.secureExchangeRequestRepository.save(newExchangeRequest);
       return newExchangeRequest;
     } else {
-      throw new EntityNotFoundException(SecureExchange.class, "PenRequest", secureExchange.getSecureExchangeID().toString());
+      throw new EntityNotFoundException(SecureExchange.class, "SecureExchange", secureExchange.getSecureExchangeID().toString());
     }
   }
 
   private void logUpdates(final SecureExchangeEntity secureExchange, final SecureExchangeEntity newSecureExchange) {
     if (log.isDebugEnabled()) {
-      log.debug("Pen Request update, current :: {}, new :: {}", newSecureExchange, secureExchange);
+      log.debug("secure exchange update, current :: {}, new :: {}", newSecureExchange, secureExchange);
     } else if (!StringUtils.equalsIgnoreCase(secureExchange.getSecureExchangeStatusCode(), newSecureExchange.getSecureExchangeStatusCode())) {
-      log.info("Pen Request status change, pen request id :: {},  current :: {}, new :: {}",secureExchange.getSecureExchangeID(), newSecureExchange.getSecureExchangeStatusCode(), secureExchange.getSecureExchangeStatusCode());
+      log.info("secure exchange status change, secure exchange id :: {},  current :: {}, new :: {}",secureExchange.getSecureExchangeID(), newSecureExchange.getSecureExchangeStatusCode(), secureExchange.getSecureExchangeStatusCode());
     }
   }
 
@@ -132,15 +132,15 @@ public class SecureExchangeService {
       this.deleteAssociatedDocumentsAndComments(entity.get());
       this.getSecureExchangeRequestRepository().delete(entity.get());
     } else {
-      throw new EntityNotFoundException(SecureExchangeEntity.class, "PenRequestID", id.toString());
+      throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchangeID", id.toString());
     }
   }
 
   @Transactional(propagation = Propagation.SUPPORTS)
-  public CompletableFuture<Page<SecureExchangeEntity>> findAll(final Specification<SecureExchangeEntity> penRequestSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
+  public CompletableFuture<Page<SecureExchangeEntity>> findAll(final Specification<SecureExchangeEntity> secureExchangeSpecs, final Integer pageNumber, final Integer pageSize, final List<Sort.Order> sorts) {
     final Pageable paging = PageRequest.of(pageNumber, pageSize, Sort.by(sorts));
     try {
-      val result = this.getSecureExchangeRequestRepository().findAll(penRequestSpecs, paging);
+      val result = this.getSecureExchangeRequestRepository().findAll(secureExchangeSpecs, paging);
       return CompletableFuture.completedFuture(result);
     } catch (final Exception ex) {
       throw new CompletionException(ex);

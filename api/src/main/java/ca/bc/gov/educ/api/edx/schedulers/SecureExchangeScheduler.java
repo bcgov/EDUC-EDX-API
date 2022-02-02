@@ -16,10 +16,10 @@ import java.util.Arrays;
 
 @Component
 @Slf4j
-public class PenRequestScheduler {
+public class SecureExchangeScheduler {
   private final DocumentRepository documentRepository;
 
-  public PenRequestScheduler(final DocumentRepository documentRepository) {
+  public SecureExchangeScheduler(final DocumentRepository documentRepository) {
     this.documentRepository = documentRepository;
   }
 

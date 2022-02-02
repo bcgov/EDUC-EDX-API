@@ -2,11 +2,10 @@ package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
-import ca.bc.gov.educ.api.edx.controller.v1.PenRequestCommentsController;
+import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeCommentsController;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestCommentRepository;
-import ca.bc.gov.educ.api.edx.repository.secureExchangeRequestRepository;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -24,16 +23,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class SecureExchangeCommentsControllerTest extends BasePenReqControllerTest {
+public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeControllerTest {
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    PenRequestCommentsController controller;
+    SecureExchangeCommentsController controller;
     @Autowired
-    secureExchangeRequestRepository secureExchangeRequestRepository;
+    SecureExchangeRequestRepository secureExchangeRequestRepository;
     @Autowired
-    secureExchangeRequestCommentRepository repository;
+    SecureExchangeRequestCommentRepository repository;
 
     @BeforeClass
     public static void beforeClass() {
@@ -51,41 +50,41 @@ public class SecureExchangeCommentsControllerTest extends BasePenReqControllerTe
     }
 
     @Test
-    public void testRetrievePenRequestComments_GivenInvalidPenReqID_ShouldReturnStatusNotFound() throws Exception {
-        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,UUID.randomUUID())
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+    public void testRetrieveSecureExchangeComments_GivenInvalidPenReqID_ShouldReturnStatusNotFound() throws Exception {
+        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,UUID.randomUUID())
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
                 .andDo(print()).andExpect(status().isNotFound());
     }
 
     @Test
-    public void testRetrievePenRequestComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
-        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
+    public void testRetrieveSecureExchangeComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
+        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         final String penReqId = entity.getSecureExchangeID().toString();
-        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS, penReqId )
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PEN_REQUEST"))))
+        this.mockMvc.perform(get(URL.BASE_URL+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS, penReqId )
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
                 .andDo(print()).andExpect(status().isOk());
     }
 
     @Test
-    public void testCreatePenRequestComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getPenRequestEntityFromJsonString()));
+    public void testCreateSecureExchangeComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         final String penReqId = entity.getSecureExchangeID().toString();
-        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,penReqId )
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId )
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
+                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
     }
 
     @Test
-    public void testCreatePenRequestComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
+    public void testCreateSecureExchangeComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
         final String penReqId = UUID.randomUUID().toString();
-        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.PEN_REQUEST_ID_COMMENTS,penReqId)
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PEN_REQUEST")))
+        this.mockMvc.perform(post(URL.BASE_URL+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId)
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(this.dummyPenRequestCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isNotFound());
+                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isNotFound());
     }
 
-    private String dummyPenRequestCommentsJsonWithValidPenReqID(final String penReqId) {
+    private String dummySecureExchangeCommentsJsonWithValidPenReqID(final String penReqId) {
         return "{\n" +
                 "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
                 "  \"content\": \"" + "comment1" + "\",\n" +

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PenReqDocRequirement implements Serializable {
+public class SecureExchangeDocRequirement implements Serializable {
 
   private static final long serialVersionUID = 1290327040864105148L;
 

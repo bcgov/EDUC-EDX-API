@@ -50,7 +50,7 @@ public class SecureExchangeDocumentJsonTests {
         assertThat(json).extractingJsonPathStringValue("@.documentData")
             .isEqualToIgnoringCase("TXkgY2FyZCE=");
 
-        assertThat(json).doesNotHaveJsonPathValue("@.penRequest");
+        assertThat(json).doesNotHaveJsonPathValue("@.secureExchange");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class SecureExchangeDocumentJsonTests {
         assertThat(json).hasJsonPathStringValue("@.documentID");
         assertThat(json).extractingJsonPathStringValue("@.documentTypeCode")
             .isEqualToIgnoringCase("BCSCPHOTO");
-        assertThat(json).doesNotHaveJsonPathValue("@.documentData").doesNotHaveJsonPathValue("@.penRequest");
+        assertThat(json).doesNotHaveJsonPathValue("@.documentData").doesNotHaveJsonPathValue("@.secureExchange");
 
     }
 

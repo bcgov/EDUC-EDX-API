@@ -6,7 +6,7 @@
     "email": "kjosefowicz0@taobao.com",
     "legalLastName": "Josefowicz",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14",
     "initialSubmitDate": "2020-04-09T13:55:04"
@@ -18,7 +18,7 @@
     "email": "amedling1@dyndns.org",
     "legalLastName": "Medling",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14",
     "initialSubmitDate": "2020-04-01T13:55:04"
@@ -30,7 +30,7 @@
     "email": "dstalman2@123-reg.co.uk",
     "legalLastName": "Stalman",
     "genderCode": "M",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14",
     "initialSubmitDate": "2020-04-15T13:55:04"
@@ -42,7 +42,7 @@
     "email": "eshiliton3@hud.gov",
     "legalLastName": "Shiliton",
     "genderCode": "M",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -53,7 +53,7 @@
     "email": "pblyden4@macromedia.com",
     "legalLastName": "Blyden",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -64,7 +64,7 @@
     "email": "jlowery5@sun.com",
     "legalLastName": "Lowery",
     "genderCode": "M",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -75,7 +75,7 @@
     "email": "mlailey6@columbia.edu",
     "legalLastName": "Lailey",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -86,7 +86,7 @@
     "email": "arobinson7@vinaora.com",
     "legalLastName": "Robinson",
     "genderCode": "M",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -97,7 +97,7 @@
     "email": "crobshaw8@diigo.com",
     "legalLastName": "Robshaw",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   },
@@ -108,7 +108,7 @@
     "email": "mburnell9@indiegogo.com",
     "legalLastName": "Burnell",
     "genderCode": "F",
-    "penRequestStatusCode": "INITREV",
+    "secureExchangeStatusCode": "INITREV",
     "emailVerified": "Y",
     "dob": "1984-11-14"
   }

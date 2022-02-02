@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx;
 
-import ca.bc.gov.educ.api.edx.utils.PenRequestAPITestUtils;
+import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +13,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes = {EdxApiResourceApplication.class})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public abstract class BasePenRequestAPITest {
+public abstract class BaseSecureExchangeAPITest {
 
   @Autowired
-  protected PenRequestAPITestUtils penRequestAPITestUtils;
+  protected SecureExchangeAPITestUtils secureExchangeAPITestUtils;
 
   @Before
   public void before() {
-    this.penRequestAPITestUtils.cleanDB();
+    this.secureExchangeAPITestUtils.cleanDB();
   }
 }

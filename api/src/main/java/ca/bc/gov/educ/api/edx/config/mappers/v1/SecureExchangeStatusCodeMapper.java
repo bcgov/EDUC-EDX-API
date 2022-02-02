@@ -9,10 +9,10 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = UUIDMapper.class)
 @SuppressWarnings("squid:S1214")
-public interface PenRequestStatusCodeMapper {
+public interface SecureExchangeStatusCodeMapper {
 
 
-    PenRequestStatusCodeMapper mapper = Mappers.getMapper(PenRequestStatusCodeMapper.class);
+    SecureExchangeStatusCodeMapper mapper = Mappers.getMapper(SecureExchangeStatusCodeMapper.class);
 
     SecureExchangeStatusCode toStructure(SecureExchangeStatusCodeEntity entity);
 

@@ -1,9 +1,7 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
@@ -16,24 +14,24 @@ import lombok.AccessLevel;
 import lombok.Getter;
 
 @Component
-public class PenRequestPayloadValidator {
+public class SecureExchangePayloadValidator {
 
   public static final String GENDER_CODE = "genderCode";
   @Getter(AccessLevel.PRIVATE)
-  private final SecureExchangeService penRequestService;
+  private final SecureExchangeService secureExchangeService;
   @Getter
   private final ApplicationProperties applicationProperties;
 
   @Autowired
-  public PenRequestPayloadValidator(SecureExchangeService penRequestService, ApplicationProperties applicationProperties) {
-    this.penRequestService = penRequestService;
+  public SecureExchangePayloadValidator(SecureExchangeService secureExchangeService, ApplicationProperties applicationProperties) {
+    this.secureExchangeService = secureExchangeService;
     this.applicationProperties = applicationProperties;
   }
 
   public List<FieldError> validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (isCreateOperation && secureExchange.getSecureExchangeID() != null) {
-      apiValidationErrors.add(createFieldError("penRequestID", secureExchange.getSecureExchangeID(), "penRequestID should be null for post operation."));
+      apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
     }
 
     if (isCreateOperation && secureExchange.getInitialSubmitDate() != null) {
@@ -45,7 +43,7 @@ public class PenRequestPayloadValidator {
 
 
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
-    return new FieldError("penRequest", fieldName, rejectedValue, false, null, null, message);
+    return new FieldError("secureExchange", fieldName, rejectedValue, false, null, null, message);
   }
 
 }

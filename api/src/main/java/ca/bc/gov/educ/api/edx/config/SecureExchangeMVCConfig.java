@@ -6,12 +6,12 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class PenRequestMVCConfig implements WebMvcConfigurer {
+public class SecureExchangeMVCConfig implements WebMvcConfigurer {
 
     private final RequestResponseInterceptor requestResponseInterceptor;
 
     @Autowired
-    public PenRequestMVCConfig(final RequestResponseInterceptor requestResponseInterceptor){
+    public SecureExchangeMVCConfig(final RequestResponseInterceptor requestResponseInterceptor){
         this.requestResponseInterceptor = requestResponseInterceptor;
     }
 

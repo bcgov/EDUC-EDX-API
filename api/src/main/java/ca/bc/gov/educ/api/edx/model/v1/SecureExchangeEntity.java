@@ -1,8 +1,9 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.utils.UpperCase;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -31,7 +32,7 @@ public class SecureExchangeEntity {
   @Column(name = "digital_identity_id", updatable = false, columnDefinition = "BINARY(16)")
   UUID digitalID;
 
-  @NotNull(message = "digitalID cannot be null")
+  @NotNull(message = "ownershipTeamID cannot be null")
   @Column(name = "ownership_team_id", updatable = false, columnDefinition = "BINARY(16)")
   UUID ownershipTeamID;
 
@@ -52,11 +53,11 @@ public class SecureExchangeEntity {
 
   @UpperCase
   @Column(name = "is_read_by_owner")
-  String is_Read_By_Owner;
+  String isReadByOwner;
 
   @UpperCase
   @Column(name = "is_read_by_exchange_contact")
-  String is_Read_By_Exchange_Contact;
+  String isReadByExchangeContact;
 
   @PastOrPresent
   @Column(name = "INITIAL_SUBMIT_DATE")

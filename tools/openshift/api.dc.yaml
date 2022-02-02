@@ -23,7 +23,7 @@ objects:
       template:
         metadata:
           annotations:
-            openshift.io/generated-by: penrequestapi
+            openshift.io/generated-by: edxapi
             prometheus.io/path: /actuator/prometheus
             prometheus.io/port: '8080'
             prometheus.io/scrape: 'true'
