@@ -9,7 +9,7 @@ import java.util.List;
 @Component
 @Getter
 public class ApplicationProperties {
-  public static final String CLIENT_ID = "PEN-REQUEST-API";
+  public static final String CLIENT_ID = "EDX-API";
   public static final String YES = "Y";
   public static final String TRUE = "TRUE";
   public static final String CORRELATION_ID = "correlationID";

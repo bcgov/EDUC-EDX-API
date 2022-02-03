@@ -109,7 +109,7 @@ objects:
           volumes:
             - name: tls-certs
               secret:
-                secretName: pen-request-api-cert
+                secretName: edx-api-cert
             - name: log-storage
               emptyDir: {}
             - name: flb-sc-config-volume
@@ -122,7 +122,7 @@ objects:
     kind: Service
     metadata:
       annotations:
-        service.alpha.openshift.io/serving-cert-secret-name: "pen-request-api-cert"
+        service.alpha.openshift.io/serving-cert-secret-name: "edx-api-cert"
       labels:
         app: "${APP_NAME}-${JOB_NAME}"
       name: "${APP_NAME}-${JOB_NAME}"
