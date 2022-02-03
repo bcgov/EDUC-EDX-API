@@ -1,4 +1,4 @@
-# EDUC-PEN-REQUEST-API
+# EDUC-EDX-API
 
 ## Pre-build Setup
 

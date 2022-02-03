@@ -13,5 +13,5 @@ public final class URL {
   private URL(){
 
   }
-  public static final String BASE_URL="/api/v1/pen-request";
+  public static final String BASE_URL="/api/v1/edx";
 }
