@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "secure_exchange_comment")
+@Table(name = "SECURE_EXCHANGE_COMMENT")
 @Getter
 @Setter
 public class SecureExchangeCommentEntity {
@@ -21,40 +20,40 @@ public class SecureExchangeCommentEntity {
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "secure_exchange_comment_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "SECURE_EXCHANGE_COMMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeCommentID;
 
-  @Column(name = "secure_exchange_id")
+  @Column(name = "SECURE_EXCHANGE_ID")
   UUID secureExchangeID;
 
-  @Column(name = "comment_user_GUID")
-  String commentUserGUID;
+  @Column(name = "COMMENT_USER_IDENTIFIER")
+  String commentUserIdentifier;
 
-  @Column(name = "comment_user_name")
+  @Column(name = "COMMENT_USER_NAME")
   String commentUserName;
 
-  @Column(name = "comment_user_type_code")
+  @Column(name = "SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE")
   String commentUserTypeCode;
 
-  @Column(name = "content")
+  @Column(name = "CONTENT")
   String content;
 
-  @Column(name = "create_user", updatable = false)
+  @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
   @PastOrPresent
-  @Column(name = "create_date", updatable = false)
+  @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
-  @Column(name = "update_user")
+  @Column(name = "UPDATE_USER")
   String updateUser;
 
   @PastOrPresent
-  @Column(name = "update_date")
+  @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
-  @JoinColumn(name = "secure_exchange_id", referencedColumnName = "secure_exchange_id", updatable = false, insertable = false)
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false, insertable = false)
   private SecureExchangeEntity secureExchangeEntity;
 
 }

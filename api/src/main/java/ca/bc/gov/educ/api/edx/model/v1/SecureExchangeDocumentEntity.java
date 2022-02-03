@@ -14,7 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "secure_exchange_document")
+@Table(name = "SECURE_EXCHANGE_DOCUMENT")
 @DynamicUpdate
 public class SecureExchangeDocumentEntity {
 
@@ -30,43 +30,43 @@ public class SecureExchangeDocumentEntity {
                   )
           }
   )
-  @Column(name = "secure_exchange_document_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "SECURE_EXCHANGE_DOCUMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID documentID;
 
   @ManyToOne
-  @JoinColumn(name = "secure_exchange_id", updatable = false, columnDefinition = "BINARY(16)")
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", updatable = false, columnDefinition = "BINARY(16)")
   SecureExchangeEntity secureExchange;
 
-  @Column(name = "secure_exchange_document_type_code")
+  @Column(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE")
   String documentTypeCode;
 
-  @Column(name = "file_name")
+  @Column(name = "FILE_NAME")
   String fileName;
 
-  @Column(name = "file_extension")
+  @Column(name = "FILE_EXTENSION")
   String fileExtension;
 
-  @Column(name = "file_size")
+  @Column(name = "FILE_SIZE")
   Integer fileSize;
 
-  @Column(name = "create_user", updatable = false)
+  @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
   @PastOrPresent
-  @Column(name = "create_date", updatable = false)
+  @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
-  @Column(name = "update_user")
+  @Column(name = "UPDATE_USER")
   String updateUser;
 
   @PastOrPresent
-  @Column(name = "update_date")
+  @Column(name = "UPDATE_DATE")
 
   LocalDateTime updateDate;
 
   @Basic(fetch = FetchType.LAZY)
   @Lob
-  @Column(name = "document_data")
+  @Column(name = "DOCUMENT_DATA")
   byte[] documentData;
 
 }

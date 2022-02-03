@@ -1,11 +1,11 @@
 CREATE TABLE SECURE_EXCHANGE
 (
     SECURE_EXCHANGE_ID             RAW(16)              NOT NULL,
-    EDX_USER_ID                    RAW(16)              NOT NULL,
-    EDX_USER_SCHOOL_ID             RAW(16)              NOT NULL,
-    EDX_USER_DISTRICT_ID           RAW(16)              NOT NULL,
+    EDX_USER_ID                    RAW(16)              ,
+    EDX_USER_SCHOOL_ID             RAW(16)              ,
+    EDX_USER_DISTRICT_ID           RAW(16)              ,
     EDX_MINISTRY_OWNERSHIP_TEAM_ID RAW(16)              NOT NULL,
-    EDX_MINISTRY_CONTACT_TEAM_ID   RAW(16)              NOT NULL,
+    EDX_MINISTRY_CONTACT_TEAM_ID   RAW(16)              ,
     SECURE_EXCHANGE_STATUS_CODE    VARCHAR2(10)         NOT NULL,
     REVIEWER                       VARCHAR2(255),
     IS_READ_BY_MINISTRY            VARCHAR2(1)          NOT NULL,

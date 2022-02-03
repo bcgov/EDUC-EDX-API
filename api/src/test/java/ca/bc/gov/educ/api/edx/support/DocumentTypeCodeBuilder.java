@@ -54,7 +54,7 @@ public class DocumentTypeCodeBuilder {
     typeCode.setUpdateUser(this.updateUser);
     typeCode.setUpdateDate(this.updateDate);
 
-    typeCode.setSecure_exchange_document_type_code(this.documentTypeCode);
+    typeCode.setSecureExchangeDocumentTypeCode(this.documentTypeCode);
     typeCode.setLabel(this.label);
     typeCode.setDescription(this.description);
     typeCode.setDisplayOrder(this.displayOrder);

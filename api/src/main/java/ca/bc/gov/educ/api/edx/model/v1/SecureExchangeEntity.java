@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "secure_exchange")
+@Table(name = "SECURE_EXCHANGE")
 @DynamicUpdate
 public class SecureExchangeEntity {
   @Id
@@ -28,20 +28,26 @@ public class SecureExchangeEntity {
   @Column(name = "SECURE_EXCHANGE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeID;
 
-  @NotNull(message = "digitalID cannot be null")
-  @Column(name = "DIGITAL_IDENTITY_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID digitalID;
+  @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserID;
+
+  @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserSchoolID;
+
+  @Column(name = "EDX_USER_DISTRICT_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserDistrictID;
 
   @NotNull(message = "ministryOwnershipTeamID cannot be null")
-  @Column(name = "MINISTRY_OWNERSHIP_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "EDX_MINISTRY_OWNERSHIP_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID ministryOwnershipTeamID;
 
-  @Column(name = "SECURE_EXCHANGE_STATUS_CODE")
-  String secureExchangeStatusCode;
+  @NotNull(message = "ministryContactTeamID cannot be null")
+  @Column(name = "EDX_MINISTRY_CONTACT_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID ministryContactTeamID;
 
   @UpperCase
-  @Column(name = "EXCHANGE_CONTACT")
-  String exchangeContact;
+  @Column(name = "SECURE_EXCHANGE_STATUS_CODE")
+  String secureExchangeStatusCode;
 
   @UpperCase
   @Column(name = "EXCHANGE_CONTACT_TYPE_CODE")
@@ -56,15 +62,15 @@ public class SecureExchangeEntity {
   String isReadByMinistry;
 
   @UpperCase
-  @Column(name = "IS_READ_BY_EXCHANGE_CONTACT")
+  @Column(name = "IS_READ_BY_CONTACT")
   String isReadByExchangeContact;
 
   @PastOrPresent
-  @Column(name = "INITIAL_SUBMIT_DATE")
+  @Column(name = "SUBMISSION_TIMESTAMP")
   LocalDateTime initialSubmitDate;
 
   @PastOrPresent
-  @Column(name = "STATUS_UPDATE_DATE")
+  @Column(name = "STATUS_UPDATE_TIMESTAMP")
   LocalDateTime statusUpdateDate;
 
   @Column(name = "CREATE_USER", updatable = false)
