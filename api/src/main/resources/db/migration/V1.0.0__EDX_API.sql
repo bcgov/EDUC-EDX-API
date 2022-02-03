@@ -11,7 +11,6 @@ CREATE TABLE SECURE_EXCHANGE
     IS_READ_BY_MINISTRY            VARCHAR2(1)          NOT NULL,
     IS_READ_BY_CONTACT             VARCHAR2(1)          NOT NULL,
     SUBJECT                        VARCHAR2(4000)       NOT NULL,
-    SUBMISSION_TIMESTAMP           DATE                 NOT NULL,
     STATUS_UPDATE_TIMESTAMP        DATE                 NOT NULL,
     CREATE_USER                    VARCHAR2(32)         NOT NULL,
     CREATE_DATE                    DATE DEFAULT SYSDATE NOT NULL,
