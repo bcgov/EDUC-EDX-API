@@ -12,14 +12,14 @@ pipeline{
     APP_NAME = 'edx-api'
     REPO_NAME = "educ-${APP_NAME}"
     OWNER = 'bcgov'
-    JOB_NAME = 'main'
+    JOB_NAME = 'master'
     TAG = 'latest'
     TARGET_ENV = 'tools'
     STAGING_ENV = 'Tools'
     TARGET_ENVIRONMENT = "${NAMESPACE}-${TARGET_ENV}"
 
     APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
-    SOURCE_REPO_REF = 'main'
+    SOURCE_REPO_REF = 'master'
     SOURCE_REPO_URL = 'https://github.com/${OWNER}/${REPO_NAME}.git'
     DC_URL = "https://raw.githubusercontent.com/${OWNER}/${REPO_NAME}/${SOURCE_REPO_REF}/tools/openshift/api.dc.yaml"
     MIN_REPLICAS = "1"
