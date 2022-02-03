@@ -33,7 +33,6 @@ public class SecureExchangeJpaTests {
     public void saveDocumentTest() {
         SecureExchangeEntity savedSecureExchange = this.repository.save(this.secureExchange);
         assertThat(savedSecureExchange.getSecureExchangeID()).isNotNull();
-        assertThat(savedSecureExchange.getInitialSubmitDate()).isNull();
 
         assertThat(this.repository.findById(savedSecureExchange.getSecureExchangeID())).isPresent();
     }
