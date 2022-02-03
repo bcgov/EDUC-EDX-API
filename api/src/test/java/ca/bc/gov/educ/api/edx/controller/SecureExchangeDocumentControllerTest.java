@@ -74,7 +74,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
     secureExchange = this.secureExchangeRequestRepository.save(secureExchange);
     document = this.repository.save(document);
     this.penReqID = secureExchange.getSecureExchangeID();
-    this.documentID = document.getSecureExchangeDocumentID();
+    this.documentID = document.getDocumentID();
   }
 
   @Test

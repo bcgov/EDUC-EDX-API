@@ -65,9 +65,9 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
     assertThat(results.get(0)).isNotNull();
-    assertThat(results.get(0).getSecureExchangeDocumentTypeCode()).isNotBlank();
+    assertThat(results.get(0).getDocumentTypeCode()).isNotBlank();
     assertThat(results.get(0).getFileSize()).isZero();
-    val doc = this.secureExchangeAPITestUtils.getDocumentBlobByDocumentID(results.get(0).getSecureExchangeDocumentID());
+    val doc = this.secureExchangeAPITestUtils.getDocumentBlobByDocumentID(results.get(0).getDocumentID());
     assertThat(doc).isNull();
   }
 }

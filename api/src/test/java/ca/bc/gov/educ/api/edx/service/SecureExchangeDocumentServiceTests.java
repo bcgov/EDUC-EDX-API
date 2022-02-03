@@ -67,15 +67,15 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
     document = this.service.createDocument(this.secureExchangeID, document);
 
     assertThat(document).isNotNull();
-    assertThat(document.getSecureExchangeDocumentID()).isNotNull();
+    assertThat(document.getDocumentID()).isNotNull();
     assertThat(document.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
 
   @Test
   public void retrieveDocumentMetadataTest() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID());
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.secureExchangeID, this.bcscPhoto.getDocumentID());
     assertThat(retrievedDocument).isNotNull();
-    assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
     assertThat(retrievedDocument.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
@@ -98,27 +98,27 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
   @Test
   public void retrieveDocumentDataTest() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"Y");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"Y");
     assertThat(retrievedDocument).isNotNull();
-    assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
     assertThat(retrievedDocument.getDocumentData()).isEqualTo(this.bcscPhoto.getDocumentData());
   }
 
   @Test
   public void retrieveDocumentDataTest1() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"TRUE");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"TRUE");
     assertThat(retrievedDocument).isNotNull();
-    assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
     assertThat(retrievedDocument.getDocumentData()).isEqualTo(this.bcscPhoto.getDocumentData());
   }
 
   @Test
   public void retrieveDocumentDataTest2() {
-    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID(),"N");
+    final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"N");
     assertThat(retrievedDocument).isNotNull();
-    assertThat(retrievedDocument.getSecureExchangeDocumentTypeCode()).isEqualTo("BCSCPHOTO");
+    assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
     assertThat(retrievedDocument.getDocumentData()).isNull();
   }
@@ -139,9 +139,9 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
   @Test
   public void deleteDocumentTest() {
-    final SecureExchangeDocumentEntity deletedDocument = this.service.deleteDocument(this.secureExchangeID, this.bcscPhoto.getSecureExchangeDocumentID());
+    final SecureExchangeDocumentEntity deletedDocument = this.service.deleteDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID());
     assertThat(deletedDocument).isNotNull();
-    final UUID guid =  this.bcscPhoto.getSecureExchangeDocumentID();
+    final UUID guid =  this.bcscPhoto.getDocumentID();
     assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.secureExchangeID, guid))
             .isInstanceOf(EntityNotFoundException.class);
   }

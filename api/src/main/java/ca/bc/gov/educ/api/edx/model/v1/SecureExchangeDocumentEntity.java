@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
@@ -32,14 +31,14 @@ public class SecureExchangeDocumentEntity {
           }
   )
   @Column(name = "secure_exchange_document_id", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-  UUID secureExchangeDocumentID;
+  UUID documentID;
 
   @ManyToOne
   @JoinColumn(name = "secure_exchange_id", updatable = false, columnDefinition = "BINARY(16)")
   SecureExchangeEntity secureExchange;
 
   @Column(name = "secure_exchange_document_type_code")
-  String secureExchangeDocumentTypeCode;
+  String documentTypeCode;
 
   @Column(name = "file_name")
   String fileName;

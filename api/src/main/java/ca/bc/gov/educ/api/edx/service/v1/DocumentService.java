@@ -171,7 +171,7 @@ public class DocumentService {
         throw new EntityNotFoundException(SecureExchange.class, SECURE_EXCHANGE_ID, secureExchangeId.toString());
       }
       documentEntity.setFileExtension(document.getFileExtension());
-      documentEntity.setSecureExchangeDocumentTypeCode(document.getSecureExchangeDocumentTypeCode());
+      documentEntity.setDocumentTypeCode(document.getDocumentTypeCode());
       documentEntity.setFileName(document.getFileName());
       documentEntity.setUpdateUser(document.getUpdateUser());
       documentEntity.setUpdateDate(document.getUpdateDate());

@@ -38,7 +38,7 @@ public interface SecureExchangeEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
   @GetMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  SecureExchange retrieveSecureExchange(@PathVariable String secureExchangeId);
+  SecureExchange retrieveSecureExchange(@PathVariable String id);
 
   /**
    * Find secure exchanges iterable.

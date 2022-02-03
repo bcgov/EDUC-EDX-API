@@ -60,8 +60,8 @@ public class SecureExchangeController extends BaseController implements SecureEx
     this.secureExchangeFilterSpecs = secureExchangeFilterSpecs;
   }
 
-  public SecureExchange retrieveSecureExchange(String secureExchangeId) {
-    return mapper.toStructure(getService().retrieveSecureExchange(UUIDUtil.fromString(secureExchangeId)));
+  public SecureExchange retrieveSecureExchange(String id) {
+    return mapper.toStructure(getService().retrieveSecureExchange(UUIDUtil.fromString(id)));
   }
 
     @Override

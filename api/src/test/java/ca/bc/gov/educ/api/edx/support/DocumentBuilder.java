@@ -88,8 +88,8 @@ public class DocumentBuilder {
 
     public SecureExchangeDocumentEntity build() {
         SecureExchangeDocumentEntity doc = new SecureExchangeDocumentEntity();
-        doc.setSecureExchangeDocumentID(this.documentID);
-        doc.setSecureExchangeDocumentTypeCode(this.documentTypeCode);
+        doc.setDocumentID(this.documentID);
+        doc.setDocumentTypeCode(this.documentTypeCode);
         doc.setFileName(this.fileName);
         doc.setFileExtension(this.fileExtension);
         doc.setFileSize(this.fileSize);

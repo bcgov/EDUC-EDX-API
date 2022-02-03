@@ -19,7 +19,7 @@ public class SecureExchange extends BaseRequest implements Serializable {
   private String secureExchangeID;
   @NotNull(message = "digitalID cannot be null")
   private String digitalID;
-  @Size(max = 10)
+  @NotNull(message = "ministryOwnershipTeamID cannot be null")
   private String ministryOwnershipTeamID;
   @Size(max = 10)
   private String secureExchangeStatusCode;
