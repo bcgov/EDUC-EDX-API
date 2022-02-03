@@ -1,11 +1,11 @@
 CREATE TABLE SECURE_EXCHANGE
 (
     SECURE_EXCHANGE_ID             RAW(16)              NOT NULL,
-    EDX_USER_ID                    RAW(16)              ,
-    EDX_USER_SCHOOL_ID             RAW(16)              ,
-    EDX_USER_DISTRICT_ID           RAW(16)              ,
+    EDX_USER_ID                    RAW(16),
+    EDX_USER_SCHOOL_ID             RAW(16),
+    EDX_USER_DISTRICT_ID           RAW(16),
     EDX_MINISTRY_OWNERSHIP_TEAM_ID RAW(16)              NOT NULL,
-    EDX_MINISTRY_CONTACT_TEAM_ID   RAW(16)              ,
+    EDX_MINISTRY_CONTACT_TEAM_ID   RAW(16),
     SECURE_EXCHANGE_STATUS_CODE    VARCHAR2(10)         NOT NULL,
     REVIEWER                       VARCHAR2(255),
     IS_READ_BY_MINISTRY            VARCHAR2(1)          NOT NULL,
@@ -48,21 +48,6 @@ CREATE TABLE SECURE_EXCHANGE_DOCUMENT_TYPE_CODE
     UPDATE_USER                        VARCHAR2(32)           NOT NULL,
     UPDATE_DATE                        DATE   DEFAULT SYSDATE NOT NULL,
     CONSTRAINT SECURE_EXCHANGE_DOCUMENT_TYPE_CODE_PK PRIMARY KEY (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE)
-);
-
-CREATE TABLE SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE
-(
-    SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE VARCHAR2(10)           NOT NULL,
-    LABEL                                  VARCHAR2(30),
-    DESCRIPTION                            VARCHAR2(255),
-    DISPLAY_ORDER                          NUMBER DEFAULT 1       NOT NULL,
-    EFFECTIVE_DATE                         DATE                   NOT NULL,
-    EXPIRY_DATE                            DATE                   NOT NULL,
-    CREATE_USER                            VARCHAR2(32)           NOT NULL,
-    CREATE_DATE                            DATE   DEFAULT SYSDATE NOT NULL,
-    UPDATE_USER                            VARCHAR2(32)           NOT NULL,
-    UPDATE_DATE                            DATE   DEFAULT SYSDATE NOT NULL,
-    CONSTRAINT SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE_PK PRIMARY KEY (SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE)
 );
 
 CREATE TABLE EDX_PERMISSION
@@ -196,9 +181,9 @@ CREATE TABLE SECURE_EXCHANGE_COMMENT
 (
     SECURE_EXCHANGE_COMMENT_ID             RAW(16)              NOT NULL,
     SECURE_EXCHANGE_ID                     RAW(16)              NOT NULL,
-    COMMENT_USER_IDENTIFIER                RAW(16)              NOT NULL,
+    EDX_USER_ID                            RAW(16),
+    STAFF_USER_IDENTIFIER                  RAW(16),
     COMMENT_USER_NAME                      VARCHAR2(255),
-    SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE VARCHAR2(10)         NOT NULL,
     COMMENT_CONTENT                        VARCHAR2(4000)       NOT NULL,
     COMMENT_TIMESTAMP                      DATE                 NOT NULL,
     CREATE_USER                            VARCHAR2(32)         NOT NULL,
@@ -207,7 +192,6 @@ CREATE TABLE SECURE_EXCHANGE_COMMENT
     UPDATE_DATE                            DATE DEFAULT SYSDATE NOT NULL,
     CONSTRAINT SECURE_EXCHANGE_COMMENT_ID_PK PRIMARY KEY (SECURE_EXCHANGE_COMMENT_ID)
 );
-
 
 CREATE TABLE SECURE_EXCHANGE_NOTE
 (
@@ -267,8 +251,6 @@ ALTER TABLE EDX_ACTIVATION_ROLE
 
 ALTER TABLE SECURE_EXCHANGE_COMMENT
     ADD CONSTRAINT FK_SECURE_EXCHANGE_COMMENT_SECURE_EXCHANGE_ID FOREIGN KEY (SECURE_EXCHANGE_ID) REFERENCES SECURE_EXCHANGE (SECURE_EXCHANGE_ID);
-ALTER TABLE SECURE_EXCHANGE_COMMENT
-    ADD CONSTRAINT FK_SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE FOREIGN KEY (SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE) REFERENCES SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE (SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE);
 
 ALTER TABLE SECURE_EXCHANGE_NOTE
     ADD CONSTRAINT FK_SECURE_EXCHANGE_NOTE_SECURE_EXCHANGE_ID FOREIGN KEY (SECURE_EXCHANGE_ID) REFERENCES SECURE_EXCHANGE (SECURE_EXCHANGE_ID);
@@ -293,8 +275,8 @@ ALTER TABLE SECURE_EXCHANGE
     ADD CONSTRAINT FK_SECURE_EXCHANGE_EDX_USER_DISTRICT_ID FOREIGN KEY (EDX_USER_DISTRICT_ID) REFERENCES EDX_USER_DISTRICT (EDX_USER_DISTRICT_ID);
 
 INSERT INTO SECURE_EXCHANGE_STATUS_CODE (SECURE_EXCHANGE_STATUS_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
-                                               EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
-                                               UPDATE_DATE)
+                                         EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
+                                         UPDATE_DATE)
 VALUES ('NEW', 'New exchange', 'New secure exchange.', 1,
         to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
@@ -313,23 +295,9 @@ VALUES ('CLOSED', 'Closed exchange', 'Closed secure exchange.', 3,
         to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
 
-INSERT INTO SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE (SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
-                                         EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
-                                         UPDATE_DATE)
-VALUES ('IDIR', 'IDIR User', 'IDIR User Type.', 1,
-        to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
-        to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
-
-INSERT INTO SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE (SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
-                                         EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
-                                         UPDATE_DATE)
-VALUES ('EDXUSER', 'EDX User', 'EDX User Type.', 2,
-        to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
-        to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
-
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CABIRTH', 'Canadian Birth Certificate', 'Canadian Birth Certificate', 10,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -337,8 +305,8 @@ VALUES ('CABIRTH', 'Canadian Birth Certificate', 'Canadian Birth Certificate', 1
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CAPASSPORT', 'Canadian Passport', 'Canadian Passport', 20,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -346,8 +314,8 @@ VALUES ('CAPASSPORT', 'Canadian Passport', 'Canadian Passport', 20,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CADL', 'Canadian Driver''s Licence', 'Canadian Driver''s Licence', 30,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -355,8 +323,8 @@ VALUES ('CADL', 'Canadian Driver''s Licence', 'Canadian Driver''s Licence', 30,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('BCIDCARD', 'Provincial Identification Card', 'Provincial Identification Card', 40,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -364,8 +332,8 @@ VALUES ('BCIDCARD', 'Provincial Identification Card', 'Provincial Identification
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('BCSCPHOTO', 'BC Services Card w Photo', 'BC Services Card (Photo version only)', 50,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -373,8 +341,8 @@ VALUES ('BCSCPHOTO', 'BC Services Card w Photo', 'BC Services Card (Photo versio
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('CACITZCARD', 'Canadian Citizenship Card', 'Canadian Citizenship Card', 60,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -382,8 +350,8 @@ VALUES ('CACITZCARD', 'Canadian Citizenship Card', 'Canadian Citizenship Card', 
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('PRCARD', 'Permanent Residence Card', 'Permanent Residence Card', 70,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -391,8 +359,8 @@ VALUES ('PRCARD', 'Permanent Residence Card', 'Permanent Residence Card', 70,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('STUDENTPMT', 'Student / Study Permit', 'Student / Study Permit', 80,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -400,8 +368,8 @@ VALUES ('STUDENTPMT', 'Student / Study Permit', 'Student / Study Permit', 80,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('IMM5292', 'IMM5292 Conf of Perm Residence', 'Confirmation of Permanent Residence (IMM5292)', 90,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -409,8 +377,8 @@ VALUES ('IMM5292', 'IMM5292 Conf of Perm Residence', 'Confirmation of Permanent 
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('IMM1000', 'IMM1000 Record of Landing',
         'Canadian Immigration Record of Landing (IMM 1000, not valid after June 2002)', 100,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
@@ -419,8 +387,8 @@ VALUES ('IMM1000', 'IMM1000 Record of Landing',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('INDSTATUS', 'Indian Status Card', 'Indian Status Card', 110,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -428,8 +396,8 @@ VALUES ('INDSTATUS', 'Indian Status Card', 'Indian Status Card', 110,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('NAMECHANGE', 'Legal Name Change document', 'Canadian court order approving legal change of name', 120,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -437,8 +405,8 @@ VALUES ('NAMECHANGE', 'Legal Name Change document', 'Canadian court order approv
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('FORPASSPRT', 'Foreign Passport', 'Foreign Passport', 130,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -446,8 +414,8 @@ VALUES ('FORPASSPRT', 'Foreign Passport', 'Foreign Passport', 130,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('ADOPTION', 'Canadian adoption order', 'Canadian adoption order', 140,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -455,8 +423,8 @@ VALUES ('ADOPTION', 'Canadian adoption order', 'Canadian adoption order', 140,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('MARRIAGE', 'Marriage Certificate', 'Marriage Certificate', 150,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -464,8 +432,8 @@ VALUES ('MARRIAGE', 'Marriage Certificate', 'Marriage Certificate', 150,
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('FORBIRTH', 'Foreign Birth Certificate', 'Foreign Birth Certificate (with English translation)', 160,
         to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
@@ -473,8 +441,8 @@ VALUES ('FORBIRTH', 'Foreign Birth Certificate', 'Foreign Birth Certificate (wit
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'));
 
 INSERT INTO SECURE_EXCHANGE_DOCUMENT_TYPE_CODE (SECURE_EXCHANGE_DOCUMENT_TYPE_CODE, LABEL, DESCRIPTION,
-                                                      DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
-                                                      CREATE_DATE, UPDATE_USER, UPDATE_DATE)
+                                                DISPLAY_ORDER, EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER,
+                                                CREATE_DATE, UPDATE_USER, UPDATE_DATE)
 VALUES ('OTHER', 'Other', 'Other document type', 170, to_date('2020-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS'),
         to_date('2099-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',
         to_date('2019-12-20 00:00:00', 'YYYY-MM-DD HH24:MI:SS'), 'IDIR/MVILLENE',

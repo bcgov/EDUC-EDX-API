@@ -89,7 +89,7 @@ public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeCont
         "  \"secureExchangeID\": \"" + penReqId + "\",\n" +
         "  \"content\": \"" + "comment1" + "\",\n" +
         "  \"commentUserName\": \"" + "user1" + "\",\n" +
-        "  \"commentUserIdentifier\": \"" + UUID.randomUUID().toString() + "\",\n" +
+        "  \"staffUserIdentifier\": \"" + UUID.randomUUID().toString() + "\",\n" +
         "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
         "}";
     }
