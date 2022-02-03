@@ -71,6 +71,9 @@ public class SecureExchangeService {
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
     secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
     secureExchangeRequest.setStatusUpdateDate(LocalDateTime.now());
+    secureExchangeRequest.setInitialSubmitDate(LocalDateTime.now());
+    secureExchangeRequest.setIsReadByMinistry("N");
+    secureExchangeRequest.setIsReadByExchangeContact("N");
     TransformUtil.uppercaseFields(secureExchangeRequest);
     return this.getSecureExchangeRequestRepository().save(secureExchangeRequest);
   }

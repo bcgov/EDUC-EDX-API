@@ -29,6 +29,9 @@ public class SecureExchange extends BaseRequest implements Serializable {
   @Size(max = 255)
   private String reviewer;
 
+  @Size(max = 4000)
+  private String subject;
+
   @Size(max = 1)
   @Pattern(regexp = "[YN]")
   String isReadByMinistry;
