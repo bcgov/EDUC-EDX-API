@@ -39,7 +39,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     LockAssert.TestHelper.makeAllAssertsPass(true);
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
 
-    final SecureExchangeEntity secureExchange = new SecureExchangeBuilder().withSecureExchangeStatusCode("MANUAL")
+    final SecureExchangeEntity secureExchange = new SecureExchangeBuilder().withSecureExchangeStatusCode("CLOSED")
         .withoutSecureExchangeID().build();
     secureExchange.setStatusUpdateDate(LocalDateTime.now().minusHours(25));
     final SecureExchangeDocumentEntity document = new DocumentBuilder()

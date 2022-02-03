@@ -29,7 +29,7 @@ public class SecureExchangeRepositoryCustomImpl implements SecureExchangeReposit
   }
 
   @Override
-  public List<SecureExchangeEntity> findSecureExchange(UUID digitalID, String status) {
+  public List<SecureExchangeEntity> findSecureExchange(final UUID edxUserSchoolID, final UUID edxUserDistrictID, final UUID ministryOwnershipTeamID, final UUID ministryContactTeamID, final UUID edxUserID, final String status) {
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<SecureExchangeEntity> criteriaQuery = criteriaBuilder.createQuery(SecureExchangeEntity.class);
@@ -37,8 +37,20 @@ public class SecureExchangeRepositoryCustomImpl implements SecureExchangeReposit
     if (StringUtils.isNotBlank(status)) {
       predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("secureExchangeStatusCode"), status));
     }
-    if (digitalID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("digitalID"), digitalID));
+    if (edxUserSchoolID != null) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserSchoolID"), edxUserSchoolID));
+    }
+    if (edxUserDistrictID != null) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserDistrictID"), edxUserDistrictID));
+    }
+    if (ministryOwnershipTeamID != null) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("ministryOwnershipTeamID"), ministryOwnershipTeamID));
+    }
+    if (ministryContactTeamID != null) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("ministryContactTeamID"), ministryContactTeamID));
+    }
+    if (edxUserID != null) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserID"), edxUserID));
     }
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
 

@@ -41,17 +41,12 @@ public class SecureExchangeEntity {
   @Column(name = "EDX_MINISTRY_OWNERSHIP_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID ministryOwnershipTeamID;
 
-  @NotNull(message = "ministryContactTeamID cannot be null")
   @Column(name = "EDX_MINISTRY_CONTACT_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID ministryContactTeamID;
 
   @UpperCase
   @Column(name = "SECURE_EXCHANGE_STATUS_CODE")
   String secureExchangeStatusCode;
-
-  @UpperCase
-  @Column(name = "EXCHANGE_CONTACT_TYPE_CODE")
-  String exchangeContactTypeCode;
 
   @UpperCase
   @Column(name = "REVIEWER")

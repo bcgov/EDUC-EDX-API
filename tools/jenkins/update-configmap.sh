@@ -43,32 +43,32 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -d "{\"description\": \"Write scope for secure exchange\",\"id\": \"WRITE_SECURE_EXCHANGE\",\"name\": \"WRITE_SECURE_EXCHANGE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope READ_DOCUMENT
+echo Writing scope READ_SECURE_EXCHANGE_DOCUMENT
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_DOCUMENT\",\"name\": \"READ_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_SECURE_EXCHANGE_DOCUMENT\",\"name\": \"READ_SECURE_EXCHANGE_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope READ_DOCUMENT_REQUIREMENTS
+echo Writing scope READ_SECURE_EXCHANGE_DOCUMENT_REQUIREMENTS
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_DOCUMENT_REQUIREMENTS\",\"name\": \"READ_DOCUMENT_REQUIREMENTS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_SECURE_EXCHANGE_DOCUMENT_REQUIREMENTS\",\"name\": \"READ_SECURE_EXCHANGE_DOCUMENT_REQUIREMENTS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope WRITE_DOCUMENT
+echo Writing scope WRITE_SECURE_EXCHANGE_DOCUMENT
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"SOAM send email scope\",\"id\": \"WRITE_DOCUMENT\",\"name\": \"WRITE_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"SOAM send email scope\",\"id\": \"WRITE_SECURE_EXCHANGE_DOCUMENT\",\"name\": \"WRITE_SECURE_EXCHANGE_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope READ_DOCUMENT_TYPES
+echo Writing scope READ_SECURE_EXCHANGE_DOCUMENT_TYPES
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_DOCUMENT_TYPES\",\"name\": \"READ_DOCUMENT_TYPES\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"SOAM send email scope\",\"id\": \"READ_SECURE_EXCHANGE_DOCUMENT_TYPES\",\"name\": \"READ_SECURE_EXCHANGE_DOCUMENT_TYPES\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
 echo Writing scope READ_SECURE_EXCHANGE_STATUSES
@@ -99,11 +99,11 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -d "{\"description\": \"SOAM write secure exchange macro scope\",\"id\": \"WRITE_PEN_REQ_MACRO\",\"name\": \"WRITE_PEN_REQ_MACRO\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope DELETE_DOCUMENT
+echo Writing scope DELETE_SECURE_EXCHANGE_DOCUMENT
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"SOAM send email scope\",\"id\": \"DELETE_DOCUMENT\",\"name\": \"DELETE_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+  -d "{\"description\": \"SOAM send email scope\",\"id\": \"DELETE_SECURE_EXCHANGE_DOCUMENT\",\"name\": \"DELETE_SECURE_EXCHANGE_DOCUMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 ###########################################################
 #Setup for config-map

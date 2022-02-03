@@ -16,61 +16,33 @@ import java.io.Serializable;
 public class SecureExchange extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  private String secureExchangeID;
-  @NotNull(message = "digitalID cannot be null")
-  private String digitalID;
+  String secureExchangeID;
+  String edxUserID;
+  String edxUserSchoolID;
+  String edxUserDistrictID;
   @NotNull(message = "ministryOwnershipTeamID cannot be null")
-  private String ministryOwnershipTeamID;
+  String ministryOwnershipTeamID;
+  String ministryContactTeamID;
   @Size(max = 10)
-  private String secureExchangeStatusCode;
-  @Size(max = 40)
-  private String legalFirstName;
-  @Size(max = 255)
-  private String legalMiddleNames;
-  @NotNull(message = "legalLastName cannot be null")
-  @Size(max = 40)
-  private String legalLastName;
-  @NotNull(message = "dob cannot be null")
-  private String dob;
-  @NotNull(message = "genderCode cannot be null")
-  @Size(max = 1)
-  private String genderCode;
-  @Size(max = 40)
-  private String usualFirstName;
-  @Size(max = 255)
-  private String usualMiddleName;
-  @Size(max = 40)
-  private String usualLastName;
-  @NotNull(message = "email cannot be null")
-  @Size(max = 255)
-  private String email;
-  @Size(max = 40)
-  private String maidenName;
-  @Size(max = 255)
-  private String pastNames;
-  @Size(max = 255)
-  private String lastBCSchool;
-  @Size(max = 12)
-  private String lastBCSchoolStudentNumber;
-  @Size(max = 255)
-  private String currentSchool;
+  String secureExchangeStatusCode;
+
   @Size(max = 255)
   private String reviewer;
-  private String failureReason;
-  private String initialSubmitDate;
-  private String statusUpdateDate;
+
   @Size(max = 1)
   @Pattern(regexp = "[YN]")
-  @NotNull(message = "emailVerified cannot be null")
-  private String emailVerified;
-  @Size(max = 255)
-  private String bcscAutoMatchOutcome;
-  @Size(max = 255)
-  private String bcscAutoMatchDetails;
-  @Size(max = 9)
-  private String pen;
+  String isReadByMinistry;
+
   @Size(max = 1)
   @Pattern(regexp = "[YN]")
-  private String demogChanged;
-  private String completeComment;
+  String isReadByExchangeContact;
+
+  String initialSubmitDate;
+
+  String statusUpdateDate;
 }
+
+
+
+
+

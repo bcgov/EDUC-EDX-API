@@ -18,7 +18,7 @@ public class SecureExchangeComments extends BaseRequest implements Serializable 
   String secureExchangeID;
   @Size(max = 50)
   @NotNull
-  String commentUserGUID;
+  String commentUserIdentifier;
   @Size(max = 255)
   @NotNull
   String commentUserName;
