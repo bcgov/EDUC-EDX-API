@@ -20,6 +20,10 @@ public class SecureExchangeBuilder {
 
   String createUser = "API";
 
+  String isReadByMinistry = "N";
+
+  String isReadByContact = "N";
+
   Date createDate = new Date();
 
   String updateUser = "API";
@@ -68,6 +72,9 @@ public class SecureExchangeBuilder {
     secureExchange.setUpdateUser(this.updateUser);
     secureExchange.setUpdateDate(LocalDateTime.now());
     secureExchange.setMinistryOwnershipTeamID(this.ministryOwnershipTeamID);
+    secureExchange.setIsReadByExchangeContact(this.isReadByContact);
+    secureExchange.setIsReadByMinistry(this.isReadByMinistry);
+    secureExchange.setStatusUpdateDate(LocalDateTime.now());
 
     secureExchange.setSecureExchangeID(this.secureExchangeID);
     secureExchange.setEdxUserID(this.edxUserID);

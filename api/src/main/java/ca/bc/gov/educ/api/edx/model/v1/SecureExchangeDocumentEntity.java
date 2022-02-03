@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -37,9 +38,17 @@ public class SecureExchangeDocumentEntity {
   @JoinColumn(name = "SECURE_EXCHANGE_ID", updatable = false, columnDefinition = "BINARY(16)")
   SecureExchangeEntity secureExchange;
 
+  @NotNull(message = "documentTypeCode cannot be null")
   @Column(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE")
   String documentTypeCode;
 
+  @Column(name = "EDX_USER_ID")
+  UUID edxUserID;
+
+  @Column(name = "STAFF_USER_IDENTIFIER")
+  String staffUserIdentifier;
+
+  @NotNull(message = "commentUserName cannot be null")
   @Column(name = "FILE_NAME")
   String fileName;
 
@@ -49,19 +58,22 @@ public class SecureExchangeDocumentEntity {
   @Column(name = "FILE_SIZE")
   Integer fileSize;
 
+  @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
+  @NotNull(message = "createDate cannot be null")
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
+  @NotNull(message = "updateUser cannot be null")
   @Column(name = "UPDATE_USER")
   String updateUser;
 
+  @NotNull(message = "updateDate cannot be null")
   @PastOrPresent
   @Column(name = "UPDATE_DATE")
-
   LocalDateTime updateDate;
 
   @Basic(fetch = FetchType.LAZY)

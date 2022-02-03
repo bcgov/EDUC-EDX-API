@@ -40,8 +40,6 @@ public class SecureExchange extends BaseRequest implements Serializable {
   @Pattern(regexp = "[YN]")
   String isReadByExchangeContact;
 
-  String initialSubmitDate;
-
   String statusUpdateDate;
 }
 

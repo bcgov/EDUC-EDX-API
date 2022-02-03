@@ -6,6 +6,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -27,27 +28,33 @@ public class SecureExchangeCommentEntity {
   UUID secureExchangeID;
 
   @Column(name = "EDX_USER_ID")
-  String edxUserID;
+  UUID edxUserID;
 
   @Column(name = "STAFF_USER_IDENTIFIER")
   String staffUserIdentifier;
 
+  @NotNull(message = "commentUserName cannot be null")
   @Column(name = "COMMENT_USER_NAME")
   String commentUserName;
 
+  @NotNull(message = "content cannot be null")
   @Column(name = "CONTENT")
   String content;
 
+  @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
+  @NotNull(message = "createDate cannot be null")
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
+  @NotNull(message = "updateUser cannot be null")
   @Column(name = "UPDATE_USER")
   String updateUser;
 
+  @NotNull(message = "updateDate cannot be null")
   @PastOrPresent
   @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;

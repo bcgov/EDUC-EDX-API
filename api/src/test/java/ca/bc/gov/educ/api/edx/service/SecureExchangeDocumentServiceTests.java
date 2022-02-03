@@ -62,7 +62,6 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   public void createValidDocumentTest() {
     SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
-            .withoutCreateAndUpdateUser()
             .build();
     document = this.service.createDocument(this.secureExchangeID, document);
 
@@ -127,7 +126,6 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   public void retrieveAllDocumentMetadataTest() {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
-            .withoutCreateAndUpdateUser()
             .withSecureExchange(this.secureExchange)
             .build();
     this.repository.save(document);

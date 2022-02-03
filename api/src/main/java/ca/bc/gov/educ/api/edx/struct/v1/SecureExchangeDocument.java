@@ -29,6 +29,11 @@ public class SecureExchangeDocument extends BaseRequest implements Serializable 
   @NotNull(message = "fileSize cannot be null")
   private Integer fileSize;
 
+  @Size(max = 255)
+  private String staffUserIdentifier;
+
+  private String edxUserID;
+
   @ToString.Exclude
   private String documentData;
 }

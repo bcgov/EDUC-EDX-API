@@ -34,10 +34,6 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
     }
 
-    if (isCreateOperation && secureExchange.getInitialSubmitDate() != null) {
-      apiValidationErrors.add(createFieldError("initialSubmitDate", secureExchange.getSecureExchangeID(), "initialSubmitDate should be null for post operation."));
-    }
-
     return apiValidationErrors;
   }
 

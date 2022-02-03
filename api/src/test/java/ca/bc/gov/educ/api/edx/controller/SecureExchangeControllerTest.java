@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.controller;
 
-import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeController;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
@@ -105,15 +104,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     this.mockMvc.perform(post(URL.BASE_URL+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJson())).andDo(print()).andExpect(status().isCreated());
-  }
-
-  @Test
-  public void testCreateSecureExchange_GivenInitialSubmitDateInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL+"/")
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
-            .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInitialSubmitDate())).andDo(print()).andExpect(status().isBadRequest());
+            .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJson())).andDo(print()).andExpect(status().isCreated());
   }
 
   @Test
@@ -202,7 +193,11 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final SecureExchangeCommentEntity secureExchangeComment = new SecureExchangeCommentEntity();
     secureExchangeComment.setSecureExchangeEntity(secureExchange);
     secureExchangeComment.setCommentUserName("hi");
-   // secureExchangeComment.setComment(LocalDateTime.now());
+    secureExchangeComment.setCreateDate(LocalDateTime.now());
+    secureExchangeComment.setUpdateDate(LocalDateTime.now());
+    secureExchangeComment.setUpdateUser("TEST");
+    secureExchangeComment.setCreateUser("TEST");
+    secureExchangeComment.setContent("HELLO");
     commentsEntitySet.add(secureExchangeComment);
     return commentsEntitySet;
   }
@@ -239,31 +234,6 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(0)));
-  }
-
-  @Test
-  public void testReadSecureExchangePaginated_GivenSubmitDateBetween_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final String fromDate = "2020-04-01T00:00:01";
-    final String toDate = "2020-04-15T00:00:01";
-    final SearchCriteria criteria = SearchCriteria.builder().key("initialSubmitDate").operation(FilterOperation.BETWEEN).value(fromDate + "," + toDate).valueType(ValueType.DATE_TIME).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
   @Test

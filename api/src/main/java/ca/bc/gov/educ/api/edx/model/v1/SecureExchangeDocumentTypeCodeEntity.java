@@ -61,12 +61,14 @@ public class SecureExchangeDocumentTypeCodeEntity {
     /**
      * The Create user.
      */
+    @NotNull(message = "createUser cannot be null")
     @Column(name = "CREATE_USER", updatable = false)
     String createUser;
 
     /**
      * The Create date.
      */
+    @NotNull(message = "createDate cannot be null")
     @PastOrPresent
     @Column(name = "CREATE_DATE", updatable = false)
     LocalDateTime createDate;
@@ -74,12 +76,14 @@ public class SecureExchangeDocumentTypeCodeEntity {
     /**
      * The Update user.
      */
+    @NotNull(message = "updateUser cannot be null")
     @Column(name = "UPDATE_USER", updatable = false)
     String updateUser;
 
     /**
      * The Update date.
      */
+    @NotNull(message = "updateDate cannot be null")
     @PastOrPresent
     @Column(name = "UPDATE_DATE", updatable = false)
     LocalDateTime updateDate;

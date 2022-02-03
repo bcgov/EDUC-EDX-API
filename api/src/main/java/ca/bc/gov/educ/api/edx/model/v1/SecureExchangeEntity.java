@@ -44,6 +44,7 @@ public class SecureExchangeEntity {
   @Column(name = "EDX_MINISTRY_CONTACT_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID ministryContactTeamID;
 
+  @NotNull(message = "secureExchangeStatusCode cannot be null")
   @UpperCase
   @Column(name = "SECURE_EXCHANGE_STATUS_CODE")
   String secureExchangeStatusCode;
@@ -56,32 +57,35 @@ public class SecureExchangeEntity {
   @Column(name = "SUBJECT")
   String subject;
 
+  @NotNull(message = "isReadByMinistry cannot be null")
   @UpperCase
   @Column(name = "IS_READ_BY_MINISTRY")
   String isReadByMinistry;
 
+  @NotNull(message = "isReadByExchangeContact cannot be null")
   @UpperCase
   @Column(name = "IS_READ_BY_CONTACT")
   String isReadByExchangeContact;
 
-  @PastOrPresent
-  @Column(name = "SUBMISSION_TIMESTAMP")
-  LocalDateTime initialSubmitDate;
-
+  @NotNull(message = "statusUpdateDate cannot be null")
   @PastOrPresent
   @Column(name = "STATUS_UPDATE_TIMESTAMP")
   LocalDateTime statusUpdateDate;
 
+  @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
+  @NotNull(message = "createDate cannot be null")
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
+  @NotNull(message = "updateUser cannot be null")
   @Column(name = "update_user")
   String updateUser;
 
+  @NotNull(message = "updateDate cannot be null")
   @PastOrPresent
   @Column(name = "update_date")
   LocalDateTime updateDate;
