@@ -53,6 +53,7 @@ public class SecureExchangeController extends BaseController implements SecureEx
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
   private static final SecureExchangeStatusCodeMapper statusCodeMapper = SecureExchangeStatusCodeMapper.mapper;
   private final SecureExchangeFilterSpecs secureExchangeFilterSpecs;
+
   @Autowired
   SecureExchangeController(final SecureExchangeService secureExchange, final SecureExchangePayloadValidator payloadValidator, SecureExchangeFilterSpecs secureExchangeFilterSpecs) {
     this.service = secureExchange;
@@ -64,31 +65,30 @@ public class SecureExchangeController extends BaseController implements SecureEx
     return mapper.toStructure(getService().retrieveSecureExchange(UUIDUtil.fromString(id)));
   }
 
-    @Override
-    public List<SecureExchange> findSecureExchanges(String digitalID, String status) {
-        return getService().findSecureExchange(UUIDUtil.fromString(digitalID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
-    }
+  @Override
+  public List<SecureExchange> findSecureExchanges(String edxUserSchoolID, String edxUserDistrictID, String ministryOwnershipTeamID, String ministryContactTeamID, String edxUserID, String status) {
+    return getService().findSecureExchange(UUIDUtil.fromString(edxUserSchoolID),UUIDUtil.fromString(edxUserDistrictID),UUIDUtil.fromString(ministryOwnershipTeamID),UUIDUtil.fromString(ministryContactTeamID),UUIDUtil.fromString(edxUserID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
+  }
 
-    @Override
-    public SecureExchange createSecureExchange(SecureExchange secureExchange) {
-        validatePayload(secureExchange, true);
-        setAuditColumns(secureExchange);
-        return mapper.toStructure(getService().createSecureExchange(mapper.toModel(secureExchange)));
-    }
+  @Override
+  public SecureExchange createSecureExchange(SecureExchange secureExchange) {
+    validatePayload(secureExchange, true);
+    setAuditColumns(secureExchange);
+    return mapper.toStructure(getService().createSecureExchange(mapper.toModel(secureExchange)));
+  }
 
-    @Override
-    public SecureExchange updateSecureExchange(SecureExchange secureExchange) {
-        validatePayload(secureExchange, false);
-        setAuditColumns(secureExchange);
-        return mapper.toStructure(getService().updateSecureExchange(mapper.toModel(secureExchange)));
-    }
+  @Override
+  public SecureExchange updateSecureExchange(SecureExchange secureExchange) {
+    validatePayload(secureExchange, false);
+    setAuditColumns(secureExchange);
+    return mapper.toStructure(getService().updateSecureExchange(mapper.toModel(secureExchange)));
+  }
 
   public List<SecureExchangeStatusCode> getSecureExchangeStatusCodes() {
     val secureExchangeStatusCode = new ArrayList<SecureExchangeStatusCode>();
     getService().getSecureExchangeStatusCodesList().forEach(element -> secureExchangeStatusCode.add(statusCodeMapper.toStructure(element)));
     return secureExchangeStatusCode;
   }
-
 
 
   private void validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {

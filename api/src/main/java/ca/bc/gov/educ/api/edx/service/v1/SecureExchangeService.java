@@ -69,7 +69,7 @@ public class SecureExchangeService {
    * @return the persisted entity.
    */
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
-    secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.DRAFT.toString());
+    secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
     secureExchangeRequest.setStatusUpdateDate(LocalDateTime.now());
     TransformUtil.uppercaseFields(secureExchangeRequest);
     return this.getSecureExchangeRequestRepository().save(secureExchangeRequest);
@@ -80,10 +80,9 @@ public class SecureExchangeService {
     return this.getSecureExchangeStatusCodeTableRepo().findAll();
   }
 
-  public List<SecureExchangeEntity> findSecureExchange(final UUID digitalID, final String statusCode) {
-    return this.getSecureExchangeRequestRepository().findSecureExchange(digitalID, statusCode);
+  public List<SecureExchangeEntity> findSecureExchange(final UUID edxUserSchoolID, final UUID edxUserDistrictID, final UUID ministryOwnershipTeamID,final UUID ministryContactTeamID, final UUID edxUserID, final String status) {
+    return this.getSecureExchangeRequestRepository().findSecureExchange(edxUserSchoolID, edxUserDistrictID, ministryOwnershipTeamID, ministryContactTeamID, edxUserID, status);
   }
-
 
 
   /**
@@ -111,7 +110,7 @@ public class SecureExchangeService {
     if (log.isDebugEnabled()) {
       log.debug("secure exchange update, current :: {}, new :: {}", newSecureExchange, secureExchange);
     } else if (!StringUtils.equalsIgnoreCase(secureExchange.getSecureExchangeStatusCode(), newSecureExchange.getSecureExchangeStatusCode())) {
-      log.info("secure exchange status change, secure exchange id :: {},  current :: {}, new :: {}",secureExchange.getSecureExchangeID(), newSecureExchange.getSecureExchangeStatusCode(), secureExchange.getSecureExchangeStatusCode());
+      log.info("secure exchange status change, secure exchange id :: {},  current :: {}, new :: {}", secureExchange.getSecureExchangeID(), newSecureExchange.getSecureExchangeStatusCode(), secureExchange.getSecureExchangeStatusCode());
     }
   }
 

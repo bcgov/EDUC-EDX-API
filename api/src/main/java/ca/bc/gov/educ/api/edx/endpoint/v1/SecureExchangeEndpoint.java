@@ -32,7 +32,6 @@ public interface SecureExchangeEndpoint {
   /**
    * Retrieve secure exchange request.
    *
-   * @param secureExchangeId the id
    * @return the secure exchange
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
@@ -43,7 +42,6 @@ public interface SecureExchangeEndpoint {
   /**
    * Find secure exchanges iterable.
    *
-   * @param digitalID the digital id
    * @param status    the status
    * @return the iterable
    */
@@ -51,7 +49,7 @@ public interface SecureExchangeEndpoint {
   @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Tag(name = "findSecureExchanges", description = "This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.")
-  List<SecureExchange> findSecureExchanges(@RequestParam(name = "digitalID", required = false) String digitalID, @RequestParam(name = "status", required = false) String status);
+  List<SecureExchange> findSecureExchanges(@RequestParam(name = "edxUserSchoolID", required = false) String edxUserSchoolID, @RequestParam(name = "edxUserDistrictID", required = false) String edxUserDistrictID, @RequestParam(name = "ministryOwnershipTeamID", required = false) String ministryOwnershipTeamID, @RequestParam(name = "ministryContactTeamID", required = false) String ministryContactTeamID , @RequestParam(name = "edxUserID", required = false) String edxUserID, @RequestParam(name = "status", required = false) String status);
 
   /**
    * Create secure exchange request.
@@ -113,8 +111,8 @@ public interface SecureExchangeEndpoint {
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   CompletableFuture<Page<SecureExchange>> findAll(@RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
-                                              @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                                              @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
-                                              @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
+                                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
+                                                  @RequestParam(name = "sort", defaultValue = "") String sortCriteriaJson,
+                                                  @RequestParam(name = "searchCriteriaList", required = false) String searchCriteriaListJson);
 
 }

@@ -94,8 +94,8 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   }
 
   @Test
-  public void testRetrieveSecureExchange_GivenRandomDigitalIdAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get(URL.BASE_URL+"/?digitalID=" + UUID.randomUUID() + "&status=" + "INT")
+  public void testRetrieveSecureExchange_GivenRandomEDXUserIDAndStatusCode_ShouldReturnOkStatus() throws Exception {
+    this.mockMvc.perform(get(URL.BASE_URL+"/?edxUserID=" + UUID.randomUUID() + "&status=" + "INT")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
@@ -267,13 +267,13 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   }
 
   @Test
-  public void testReadSecureExchangePaginated_digitalID_ShouldReturnStatusOk() throws Exception {
+  public void testReadSecureExchangePaginated_ministryOwnershipTeamID_ShouldReturnStatusOk() throws Exception {
     final var file = new File(
         Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
     );
     final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
-    final SearchCriteria criteria = SearchCriteria.builder().key("digitalID").operation(FilterOperation.EQUAL).value("fdf94a22-51e3-4816-8665-9f8571af1be4").valueType(ValueType.UUID).build();
+    final SearchCriteria criteria = SearchCriteria.builder().key("ministryOwnershipTeamID").operation(FilterOperation.EQUAL).value("ef4bd106-32a6-402f-9dd8-cf70b69a5ecb").valueType(ValueType.UUID).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     final var objectMapper = new ObjectMapper();
@@ -295,7 +295,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     );
     final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
-    final SearchCriteria criteria = SearchCriteria.builder().key("digitalID").operation(null).value("fdf94a22-51e3-4816-8665-9f8571af1be4").valueType(ValueType.UUID).build();
+    final SearchCriteria criteria = SearchCriteria.builder().key("edxUserID").operation(null).value("fdf94a22-51e3-4816-8665-9f8571af1be4").valueType(ValueType.UUID).build();
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
     final var objectMapper = new ObjectMapper();

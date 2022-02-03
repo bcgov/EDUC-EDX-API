@@ -12,17 +12,11 @@ public class SecureExchangeBuilder {
 
   UUID secureExchangeID = UUID.randomUUID();
 
-  UUID digitalID = UUID.randomUUID();
+  UUID edxUserID = UUID.randomUUID();
 
   UUID ministryOwnershipTeamID = UUID.randomUUID();
 
   String secureExchangeStatusCode = "INITREV";
-
-  String legalFirstName = "Tom";
-
-  String legalMiddleNames;
-
-  String legalLastName = "Wayen";
 
   String createUser = "API";
 
@@ -49,23 +43,13 @@ public class SecureExchangeBuilder {
     return this;
   }
 
-  public SecureExchangeBuilder withDigitalID(UUID digitalID) {
-    this.digitalID = digitalID;
+  public SecureExchangeBuilder withEdxUserID(UUID edxUserID) {
+    this.edxUserID = edxUserID;
     return this;
   }
 
   public SecureExchangeBuilder withSecureExchangeStatusCode(String secureExchangeStatusCode) {
     this.secureExchangeStatusCode = secureExchangeStatusCode;
-    return this;
-  }
-
-  public SecureExchangeBuilder withLegalFirstName(String legalFirstName) {
-    this.legalFirstName = legalFirstName;
-    return this;
-  }
-
-  public SecureExchangeBuilder withLegalLastNamee(String legalLastName) {
-    this.legalLastName = legalLastName;
     return this;
   }
 
@@ -86,7 +70,7 @@ public class SecureExchangeBuilder {
     secureExchange.setMinistryOwnershipTeamID(this.ministryOwnershipTeamID);
 
     secureExchange.setSecureExchangeID(this.secureExchangeID);
-    secureExchange.setDigitalID(this.digitalID);
+    secureExchange.setEdxUserID(this.edxUserID);
     secureExchange.setSecureExchangeStatusCode(this.secureExchangeStatusCode);
     //secureExchange.setLegalFirstName(this.legalFirstName);
    //secureExchange.setLegalLastName(this.legalLastName);

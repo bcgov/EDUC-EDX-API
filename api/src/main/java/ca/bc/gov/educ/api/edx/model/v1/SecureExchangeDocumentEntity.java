@@ -68,5 +68,4 @@ public class SecureExchangeDocumentEntity {
   @Lob
   @Column(name = "DOCUMENT_DATA")
   byte[] documentData;
-
 }

@@ -15,7 +15,7 @@ public class SecureExchangeDocumentMetadata implements Serializable {
 
   private static final long serialVersionUID = -8436081551683809151L;
   String secureExchangeID;
-  String digitalID;
+  String edxUserID;
   String documentID;
   String documentTypeCode;
   String fileName;
