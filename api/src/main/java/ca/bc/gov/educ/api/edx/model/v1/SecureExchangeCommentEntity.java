@@ -26,14 +26,14 @@ public class SecureExchangeCommentEntity {
   @Column(name = "SECURE_EXCHANGE_ID")
   UUID secureExchangeID;
 
-  @Column(name = "COMMENT_USER_IDENTIFIER")
-  String commentUserIdentifier;
+  @Column(name = "EDX_USER_ID")
+  String edxUserID;
+
+  @Column(name = "STAFF_USER_IDENTIFIER")
+  String staffUserIdentifier;
 
   @Column(name = "COMMENT_USER_NAME")
   String commentUserName;
-
-  @Column(name = "SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE")
-  String commentUserTypeCode;
 
   @Column(name = "CONTENT")
   String content;
