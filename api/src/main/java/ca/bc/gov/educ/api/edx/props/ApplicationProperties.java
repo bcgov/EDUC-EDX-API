@@ -22,7 +22,4 @@ public class ApplicationProperties {
   @Value("${file.extensions}")
   private List<String> fileExtensions;
 
-  @Value("${bcsc.auto.match.outcomes}")
-  private List<String> bcscAutoMatchOutcomes;
-
 }
