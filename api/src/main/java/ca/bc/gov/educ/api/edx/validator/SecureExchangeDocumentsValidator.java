@@ -65,7 +65,7 @@ public class SecureExchangeDocumentsValidator {
 
   public boolean isDocumentTypeCodeValid(final String documentTypeCode) {
     for (SecureExchangeDocumentTypeCodeEntity entity : loadDocumentType()) {
-      if (entity.getSecure_exchange_document_type_code().equalsIgnoreCase(documentTypeCode)) {
+      if (entity.getSecureExchangeDocumentTypeCode().equalsIgnoreCase(documentTypeCode)) {
         return entity.getEffectiveDate().isBefore(LocalDateTime.now()) && entity.getExpiryDate().isAfter(LocalDateTime.now());
       }
     }

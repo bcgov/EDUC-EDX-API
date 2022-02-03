@@ -14,14 +14,14 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "secure_exchange_document_type_code")
+@Table(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE")
 public class SecureExchangeDocumentTypeCodeEntity {
     /**
      * The Status code.
      */
     @Id
-    @Column(name = "secure_exchange_document_type_code", unique = true, updatable = false)
-    String secure_exchange_document_type_code;
+    @Column(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE", unique = true, updatable = false)
+    String secureExchangeDocumentTypeCode;
 
     /**
      * The Label.

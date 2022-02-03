@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "secure_exchange_comment_user_type_code")
+@Table(name = "SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE")
 public class SecureExchangeCommentUserTypeCodeEntity {
 
   @Id
-  @Column(name = "secureExchangeCommentUserTypeCode", unique = true, updatable = false)
+  @Column(name = "SECURE_EXCHANGE_COMMENT_USER_TYPE_CODE", unique = true, updatable = false)
   String secureExchangeCommentUserTypeCode;
 
   /**
