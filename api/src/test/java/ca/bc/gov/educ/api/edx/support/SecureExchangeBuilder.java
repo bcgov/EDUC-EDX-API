@@ -24,7 +24,7 @@ public class SecureExchangeBuilder {
 
   String updateUser = "API";
 
-  String emailVerified = "N";
+  String subject = "Hello student";
 
   Date updateDate = new Date();
 
@@ -71,10 +71,8 @@ public class SecureExchangeBuilder {
 
     secureExchange.setSecureExchangeID(this.secureExchangeID);
     secureExchange.setEdxUserID(this.edxUserID);
+    secureExchange.setSubject(this.subject);
     secureExchange.setSecureExchangeStatusCode(this.secureExchangeStatusCode);
-    //secureExchange.setLegalFirstName(this.legalFirstName);
-   //secureExchange.setLegalLastName(this.legalLastName);
-    //secureExchange.setEmailVerified(this.emailVerified);
     return secureExchange;
   }
 

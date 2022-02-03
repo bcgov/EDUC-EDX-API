@@ -52,6 +52,10 @@ public class SecureExchangeEntity {
   @Column(name = "REVIEWER")
   String reviewer;
 
+  @NotNull(message = "subject cannot be null")
+  @Column(name = "SUBJECT")
+  String subject;
+
   @UpperCase
   @Column(name = "IS_READ_BY_MINISTRY")
   String isReadByMinistry;

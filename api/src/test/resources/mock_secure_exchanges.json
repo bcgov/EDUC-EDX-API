@@ -2,124 +2,64 @@
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69a5ecb",
-    "legalFirstName": "Katina",
-    "legalMiddleNames": "Katina Josefowicz",
-    "email": "kjosefowicz0@taobao.com",
-    "legalLastName": "Josefowicz",
-    "genderCode": "F",
     "secureExchangeStatusCode": "NEW",
-    "emailVerified": "Y",
-    "dob": "1984-11-14",
+    "subject": "New student",
     "initialSubmitDate": "2020-04-09T13:55:04"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Anestassia",
-    "legalMiddleNames": "Anestassia Medling",
-    "email": "amedling1@dyndns.org",
-    "legalLastName": "Medling",
-    "genderCode": "F",
     "secureExchangeStatusCode": "NEW",
-    "emailVerified": "Y",
-    "dob": "1984-11-14",
+    "subject": "New student",
     "initialSubmitDate": "2020-04-01T13:55:04"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Dorey",
-    "legalMiddleNames": "Dorey Stalman",
-    "email": "dstalman2@123-reg.co.uk",
-    "legalLastName": "Stalman",
-    "genderCode": "M",
     "secureExchangeStatusCode": "INPROG",
-    "emailVerified": "Y",
-    "dob": "1984-11-14",
+    "subject": "New student",
     "initialSubmitDate": "2020-04-15T13:55:04"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Ebeneser",
-    "legalMiddleNames": "Ebeneser Shiliton",
-    "email": "eshiliton3@hud.gov",
-    "legalLastName": "Shiliton",
-    "genderCode": "M",
-    "secureExchangeStatusCode": "INPROG",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "INPROG"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Phoebe",
-    "legalMiddleNames": "Phoebe Blyden",
-    "email": "pblyden4@macromedia.com",
-    "legalLastName": "Blyden",
-    "genderCode": "F",
-    "secureExchangeStatusCode": "INPROG",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "INPROG"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Judd",
-    "legalMiddleNames": "Judd Lowery",
-    "email": "jlowery5@sun.com",
-    "legalLastName": "Lowery",
-    "genderCode": "M",
-    "secureExchangeStatusCode": "INPROG",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "INPROG"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Mavra",
-    "legalMiddleNames": "Mavra Lailey",
-    "email": "mlailey6@columbia.edu",
-    "legalLastName": "Lailey",
-    "genderCode": "F",
-    "secureExchangeStatusCode": "CLOSED",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "CLOSED"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Alvy",
-    "legalMiddleNames": "Alvy Robinson",
-    "email": "arobinson7@vinaora.com",
-    "legalLastName": "Robinson",
-    "genderCode": "M",
-    "secureExchangeStatusCode": "CLOSED",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "CLOSED"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Christean",
-    "legalMiddleNames": "Christean Robshaw",
-    "email": "crobshaw8@diigo.com",
-    "legalLastName": "Robshaw",
-    "genderCode": "F",
-    "secureExchangeStatusCode": "CLOSED",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "CLOSED"
   },
   {
     "edxUserSchoolID": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
     "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
-    "legalFirstName": "Marianna",
-    "legalMiddleNames": "Marianna Burnell",
-    "email": "mburnell9@indiegogo.com",
-    "legalLastName": "Burnell",
-    "genderCode": "F",
-    "secureExchangeStatusCode": "CLOSED",
-    "emailVerified": "Y",
-    "dob": "1984-11-14"
+    "subject": "New student",
+    "secureExchangeStatusCode": "CLOSED"
   }
 ]
