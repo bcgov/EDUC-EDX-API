@@ -14,4 +14,5 @@ public final class URL {
 
   }
   public static final String BASE_URL="/api/v1/edx";
+  public static final String BASE_URL_SECURE_EXCHANGE="/api/v1/edx/exchange";
 }
