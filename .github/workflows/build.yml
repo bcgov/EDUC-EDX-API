@@ -2,12 +2,42 @@ name: docker-build-push
 on:
   workflow_dispatch:
 jobs:
-  build-push:
-    uses: bcgov/pipeline-templates/.github/workflows/build-push.yaml@main
-    with:
-      IMAGE_REGISTRY: image-registry.openshift-image-registry.svc:5000/8878b4-tools
-      IMAGE: edx-api
-      WORKDIR: ./
-    secrets:
-      IMAGE_REGISTRY_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
-      IMAGE_REGISTRY_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+  build:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout main
+        uses: actions/checkout@main
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Spring Boot Image
+        id: edx_api_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags:  ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.SPRING_BOOT_IMAGE_NAME }}:${{ github.sha }}
+
+#      - name: Install doctl
+#        uses: digitalocean/action-doctl@v2
+#        with:
+#          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+#
+#      - name: Save DigitalOcean kubeconfig with short-lived credentials
+#        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 k8s-1-20-2-do-0-blr1-1619022201280
+#
+#      # Deploy Angular & Spring Boot Docker image to the DigitalOcean kubernetes cluster
+#      - name: Deploy
+#        run: |-
+#          kubectl set image deployment/${{env.ANGULAR_DEPLOYMENT_NAME}} ${{env.ANGULAR_CONTAINER_NAME}}=${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.ANGULAR_IMAGE_NAME }}:${{ github.sha }}
+#          kubectl set image deployment/${{env.SPRING_BOOT_DEPLOYMENT_NAME}} ${{ env.SPRING_BOOT_CONTAINER_NAME}}=${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.SPRING_BOOT_IMAGE_NAME }}:${{ github.sha }}
+#          kubectl rollout status deployment/${{env.ANGULAR_DEPLOYMENT_NAME}}
+#          kubectl rollout status deployment/${{env.SPRING_BOOT_DEPLOYMENT_NAME}}
+#          kubectl get services -o wide
