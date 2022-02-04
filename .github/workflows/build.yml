@@ -1,0 +1,13 @@
+name: docker-build-push
+on:
+  workflow_dispatch:
+jobs:
+  build-push:
+    uses: bcgov/pipeline-templates/.github/workflows/build-push.yaml@main
+    with:
+      IMAGE_REGISTRY: image-registry.openshift-image-registry.svc:5000/${{ secrets.NAMESPACE }}
+      IMAGE: edx-api
+      WORKDIR: ./
+    secrets:
+      IMAGE_REGISTRY_USER: ${{ secrets.IMAGE_REGISTRY_USER }}
+      IMAGE_REGISTRY_PASSWORD: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
