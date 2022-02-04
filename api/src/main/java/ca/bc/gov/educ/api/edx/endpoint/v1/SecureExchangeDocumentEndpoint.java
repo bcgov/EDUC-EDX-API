@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
-@RequestMapping(URL.BASE_URL)
+@RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 @Tag(name = "API for secure exchange documents.", description = "This API is for secure exchange documents.")
 public interface SecureExchangeDocumentEndpoint {
 
