@@ -5,7 +5,7 @@ jobs:
   build-push:
     uses: bcgov/pipeline-templates/.github/workflows/build-push.yaml@main
     with:
-      IMAGE_REGISTRY: image-registry.openshift-image-registry.svc:5000/${{ secrets.NAMESPACE }}
+      IMAGE_REGISTRY: image-registry.openshift-image-registry.svc:5000/8878b4-tools
       IMAGE: edx-api
       WORKDIR: ./
     secrets:
