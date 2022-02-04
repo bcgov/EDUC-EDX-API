@@ -9,5 +9,5 @@ jobs:
       IMAGE: edx-api
       WORKDIR: ./
     secrets:
-      IMAGE_REGISTRY_USER: ${{ secrets.IMAGE_REGISTRY_USER }}
-      IMAGE_REGISTRY_PASSWORD: ${{ secrets.IMAGE_REGISTRY_PASSWORD }}
+      IMAGE_REGISTRY_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
+      IMAGE_REGISTRY_PASSWORD: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
