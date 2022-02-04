@@ -79,7 +79,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void readDocumentTest() throws Exception {
-    this.mvc.perform(get(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
+    this.mvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -91,7 +91,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void createDocumentTest() throws Exception {
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -107,7 +107,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void updateDocumentTest() throws Exception {
-    final var result = this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    final var result = this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(Files.readAllBytes(new ClassPathResource(
@@ -125,7 +125,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
     final SecureExchangeDocMetadata secureExchangeDocMetadata = JsonUtil.getJsonObjectFromString(SecureExchangeDocMetadata.class,result.getResponse().getContentAsString());
     secureExchangeDocMetadata.setCreateDate(null);
     secureExchangeDocMetadata.setFileExtension("pdf");
-    this.mvc.perform(put(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, secureExchangeDocMetadata.getDocumentID())
+    this.mvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, secureExchangeDocMetadata.getDocumentID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(JsonUtil.getJsonStringFromObject(secureExchangeDocMetadata))
@@ -142,7 +142,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void testCreateDocument_GivenMandatoryFieldsNullValues_ShouldReturnStatusBadRequest() throws Exception {
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.geNullDocumentJsonAsString())
@@ -155,7 +155,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   @Test
   public void testCreateDocument_GivenDocumentIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(UUID.randomUUID().toString());
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -169,7 +169,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   public void testCreateDocument_GivenInvalidFileExtension_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
     secureExchangeDocument.setFileExtension("exe");
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -183,7 +183,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   public void testCreateDocument_GivenInvalidDocumentTypeCode_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
     secureExchangeDocument.setDocumentTypeCode("doc");
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -197,7 +197,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   public void testCreateDocument_GivenFileSizeIsMore_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
     secureExchangeDocument.setFileSize(99999999);
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -211,7 +211,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   public void testCreateDocument_GivenDocTypeNotEffective_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
     secureExchangeDocument.setDocumentTypeCode("BCeIdPHOTO");
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -225,7 +225,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   public void testCreateDocument_GivenDocTypeExpired_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
     secureExchangeDocument.setDocumentTypeCode("dl");
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(this.getDummyDocJsonString(secureExchangeDocument))
@@ -237,7 +237,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void createDocumentWithInvalidFileSizeTest() throws Exception {
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -250,7 +250,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void createDocumentWithoutDocumentDataTest() throws Exception {
-    this.mvc.perform(post(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
+    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
@@ -262,7 +262,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void deleteDocumentTest() throws Exception {
-    this.mvc.perform(delete(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
+    this.mvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, this.documentID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -277,7 +277,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void readAllDocumentMetadataTest() throws Exception {
-    this.mvc.perform(get(URL.BASE_URL+URL.SECURE_EXCHANGE_ID_DOCUMENTS,this.penReqID.toString())
+    this.mvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS,this.penReqID.toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -290,7 +290,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void readAllDocumentMetadataWithoutSecureExchangeIDTest() throws Exception {
-    this.mvc.perform(get(URL.BASE_URL+URL.ALL_DOCUMENTS)
+    this.mvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.ALL_DOCUMENTS)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT")))
         .accept(MediaType.APPLICATION_JSON))
       .andExpect(status().isOk())
@@ -304,7 +304,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
   }
   @Test
   public void getDocumentRequirementsTest() throws Exception {
-    this.mvc.perform(get(URL.BASE_URL+URL.FILE_REQUIREMENTS)
+    this.mvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.FILE_REQUIREMENTS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT_REQUIREMENTS")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -316,7 +316,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   @Test
   public void getDocumentTypesTest() throws Exception {
-    this.mvc.perform(get(URL.BASE_URL+URL.DOCUMENT_TYPES)
+    this.mvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.DOCUMENT_TYPES)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_DOCUMENT_TYPES")))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
