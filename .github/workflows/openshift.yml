@@ -57,9 +57,7 @@ env:
   ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
-  push:
-    # Edit to the branch(es) you want to build and deploy on each push.
-    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   openshift-ci-cd:
