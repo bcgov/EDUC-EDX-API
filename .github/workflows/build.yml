@@ -1,6 +1,10 @@
 name: docker-build-push
 on:
   workflow_dispatch:
+
+env:
+  SPRING_BOOT_IMAGE_NAME: edx-api-master
+
 jobs:
   build:
     name: Build, push, and deploy
