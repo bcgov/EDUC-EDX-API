@@ -15,7 +15,7 @@ public abstract class BaseSecureExchangeControllerTest extends BaseSecureExchang
   }
 
   protected String dummySecureExchangeNoCreateUpdateDateJsonWithMin(final String ministryOwnershipTeamID) {
-    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"secureExchangeStatusCode\":\"NEW\",\"isReadByExchangeContact\":\"N\",\"isReadByMinistry\":\"N\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"edxUserID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"legalFirstName\":\"Chester\",\"legalMiddleNames\":\"Grestie\",\"legalLastName\":\"Baulk\",\"dob\":\"1952-10-31\",\"genderCode\":\"M\",\"email\":\"cbaulk0@bluehost.com\",\"emailVerified\":\"N\",\"currentSchool\":\"Xanthoparmelia wyomingica (Gyel.) Hale\",\"pen\":\"127054021\"}";
+    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"isReadByExchangeContact\":\"N\",\"isReadByMinistry\":\"N\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"edxUserID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"legalFirstName\":\"Chester\",\"legalMiddleNames\":\"Grestie\",\"legalLastName\":\"Baulk\",\"dob\":\"1952-10-31\",\"genderCode\":\"M\",\"email\":\"cbaulk0@bluehost.com\",\"emailVerified\":\"N\",\"currentSchool\":\"Xanthoparmelia wyomingica (Gyel.) Hale\",\"pen\":\"127054021\"}";
   }
 
   protected String dummySecureExchangeJsonWithInvalidPenReqID() {

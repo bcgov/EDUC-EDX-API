@@ -40,6 +40,10 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
     }
 
+    if (isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null) {
+      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be null for post operation."));
+    }
+
     if (ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryOwnershipTeamID())).isEmpty()) {
       apiValidationErrors.add(createFieldError("ministryOwnershipTeamID", secureExchange.getMinistryOwnershipTeamID(), "ministryOwnershipTeamID value was not found as a valid team."));
     }

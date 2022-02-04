@@ -14,8 +14,6 @@ public interface SecureExchangeEntityMapper {
 
   SecureExchangeEntityMapper mapper = Mappers.getMapper(SecureExchangeEntityMapper.class);
 
-  @Mapping(target = "createDate", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
   SecureExchange toStructure(SecureExchangeEntity entity);
 
   @Mapping(target = "secureExchangeComment", ignore = true)
