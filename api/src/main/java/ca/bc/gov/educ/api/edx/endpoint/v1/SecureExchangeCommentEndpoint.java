@@ -14,7 +14,7 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.CREATED;
 
 
-@RequestMapping(URL.BASE_URL)
+@RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 public interface SecureExchangeCommentEndpoint {
 
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")

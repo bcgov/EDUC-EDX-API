@@ -12,30 +12,28 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "SECURE_EXCHANGE_COMMENT")
+@Table(name = "SECURE_EXCHANGE_NOTE")
 @Getter
 @Setter
-public class SecureExchangeCommentEntity {
+public class SecureExchangeNoteEntity {
 
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "SECURE_EXCHANGE_COMMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-  UUID secureExchangeCommentID;
+  @Column(name = "SECURE_EXCHANGE_NOTE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  UUID secureExchangeNoteID;
 
   @Column(name = "SECURE_EXCHANGE_ID")
   UUID secureExchangeID;
 
-  @Column(name = "EDX_USER_ID")
-  UUID edxUserID;
-
+  @NotNull(message = "staffUserIdentifier cannot be null")
   @Column(name = "STAFF_USER_IDENTIFIER")
   String staffUserIdentifier;
 
-  @NotNull(message = "commentUserName cannot be null")
-  @Column(name = "COMMENT_USER_NAME")
-  String commentUserName;
+  @NotNull(message = "staffUserName cannot be null")
+  @Column(name = "STAFF_USER_NAME")
+  String staffUserName;
 
   @NotNull(message = "content cannot be null")
   @Column(name = "CONTENT")

@@ -2,9 +2,12 @@ package ca.bc.gov.educ.api.edx.validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -22,10 +25,13 @@ public class SecureExchangePayloadValidator {
   @Getter
   private final ApplicationProperties applicationProperties;
 
+  private final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
+
   @Autowired
-  public SecureExchangePayloadValidator(SecureExchangeService secureExchangeService, ApplicationProperties applicationProperties) {
+  public SecureExchangePayloadValidator(SecureExchangeService secureExchangeService, ApplicationProperties applicationProperties, MinistryOwnershipTeamRepository ministryOwnershipTeamRepository) {
     this.secureExchangeService = secureExchangeService;
     this.applicationProperties = applicationProperties;
+    this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
   }
 
   public List<FieldError> validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
@@ -34,8 +40,12 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
     }
 
-    if (isCreateOperation && secureExchange.getInitialSubmitDate() != null) {
-      apiValidationErrors.add(createFieldError("initialSubmitDate", secureExchange.getSecureExchangeID(), "initialSubmitDate should be null for post operation."));
+    if (ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryOwnershipTeamID())).isEmpty()) {
+      apiValidationErrors.add(createFieldError("ministryOwnershipTeamID", secureExchange.getMinistryOwnershipTeamID(), "ministryOwnershipTeamID value was not found as a valid team."));
+    }
+
+    if (StringUtils.isNotEmpty(secureExchange.getMinistryContactTeamID()) && ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryContactTeamID())).isEmpty()) {
+      apiValidationErrors.add(createFieldError("ministryContactTeamID", secureExchange.getMinistryContactTeamID(), "ministryContactTeamID value was not found as a valid team."));
     }
 
     return apiValidationErrors;

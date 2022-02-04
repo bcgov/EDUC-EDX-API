@@ -25,7 +25,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 /**
  * The interface secure exchange endpoint.
  */
-@RequestMapping(URL.BASE_URL)
+@RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 @OpenAPIDefinition(info = @Info(title = "API for secure exchange.", description = "This CRUD API is for secure exchanges.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_SECURE_EXCHANGE", "WRITE_SECURE_EXCHANGE"})})
 public interface SecureExchangeEndpoint {
 

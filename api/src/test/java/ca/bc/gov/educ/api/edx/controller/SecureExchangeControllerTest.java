@@ -1,14 +1,15 @@
 package ca.bc.gov.educ.api.edx.controller;
 
-import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeController;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
+import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStatusCodeTableRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SearchCriteria;
@@ -58,6 +59,9 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Autowired
   SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo;
 
+  @Autowired
+  MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -72,7 +76,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testRetrieveSecureExchange_GivenRandomID_ShouldThrowEntityNotFoundException() throws Exception {
-    this.mockMvc.perform(get(URL.BASE_URL+"/" + UUID.randomUUID())
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" + UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isNotFound());
   }
@@ -80,7 +84,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testRetrieveSecureExchange_GivenValidID_ShouldReturnOkStatus() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
-    this.mockMvc.perform(get(URL.BASE_URL+"/" + entity.getSecureExchangeID())
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" + entity.getSecureExchangeID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.secureExchangeID").value(entity.getSecureExchangeID().toString()));
   }
@@ -88,37 +92,31 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testFindSecureExchange_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
-    this.mockMvc.perform(get(URL.BASE_URL+"/?secureExchangeID" + entity.getSecureExchangeID())
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?secureExchangeID" + entity.getSecureExchangeID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].secureExchangeID").value(entity.getSecureExchangeID().toString()));
   }
 
   @Test
   public void testRetrieveSecureExchange_GivenRandomEDXUserIDAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get(URL.BASE_URL+"/?edxUserID=" + UUID.randomUUID() + "&status=" + "INT")
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?edxUserID=" + UUID.randomUUID() + "&status=" + "INT")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
 
   @Test
   public void testCreateSecureExchange_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL+"/")
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJson())).andDo(print()).andExpect(status().isCreated());
-  }
-
-  @Test
-  public void testCreateSecureExchange_GivenInitialSubmitDateInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL+"/")
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
-            .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInitialSubmitDate())).andDo(print()).andExpect(status().isBadRequest());
+            .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMin(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isCreated());
   }
 
   @Test
   public void testCreateSecureExchange_GivenPenReqIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
@@ -126,7 +124,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testCreateSecureExchange_LowercaseEmailVerifiedFlag_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidEmailVerifiedFlag())).andDo(print()).andExpect(status().isBadRequest());
@@ -134,27 +132,31 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testUpdateSecureExchange_GivenInvalidPenReqIDInPayload_ShouldReturnStatusNotFound() throws Exception {
-    this.mockMvc.perform(put(URL.BASE_URL+"/")
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isNotFound());
+            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidPenReqIDWithMinOwner(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
   public void testUpdateSecureExchange_GivenValidPenReqIDInPayload_ShouldReturnStatusOk() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(put(URL.BASE_URL+"/")
+    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
-            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isOk());
+            .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithValidPenReqID(penReqId, ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isOk());
   }
 
   @Test
   public void testUpdateSecureExchange_GivenInvalidDemogChangedInPayload_ShouldReturnBadRequest() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(put(URL.BASE_URL+"/")
+    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidDemogChanged(penReqId))).andDo(print()).andExpect(status().isBadRequest());
@@ -162,7 +164,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testDeleteSecureExchange_GivenInvalidId_ShouldReturn404() throws Exception {
-    this.mockMvc.perform(delete(URL.BASE_URL+"/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" + UUID.randomUUID().toString())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNotFound());
@@ -172,7 +174,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testDeleteSecureExchange_GivenValidId_ShouldReturn204() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(delete(URL.BASE_URL+"/" + penReqId)
+    this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" + penReqId)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
@@ -191,7 +193,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
             .build();
     this.documentRepository.save(document);
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(delete(URL.BASE_URL+"/" + penReqId)
+    this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" + penReqId)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
@@ -202,7 +204,11 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final SecureExchangeCommentEntity secureExchangeComment = new SecureExchangeCommentEntity();
     secureExchangeComment.setSecureExchangeEntity(secureExchange);
     secureExchangeComment.setCommentUserName("hi");
-   // secureExchangeComment.setComment(LocalDateTime.now());
+    secureExchangeComment.setCreateDate(LocalDateTime.now());
+    secureExchangeComment.setUpdateDate(LocalDateTime.now());
+    secureExchangeComment.setUpdateUser("TEST");
+    secureExchangeComment.setCreateUser("TEST");
+    secureExchangeComment.setContent("HELLO");
     commentsEntitySet.add(secureExchangeComment);
     return commentsEntitySet;
   }
@@ -210,7 +216,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testReadSecureExchangeStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
     this.secureExchangeStatusCodeTableRepo.save(this.createPenReqStatus());
-    this.mockMvc.perform(get(URL.BASE_URL+URL.STATUSES)
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.STATUSES)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_STATUSES"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
   }
@@ -224,7 +230,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     });
     this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED+"?pageSize=2")
+            .perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.PAGINATED+"?pageSize=2")
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
                     .contentType(APPLICATION_JSON))
             .andReturn();
@@ -234,36 +240,11 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testReadSecureExchangePaginated_whenNoDataInDB_ShouldReturnStatusOk() throws Exception {
     final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
+            .perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.PAGINATED)
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
                     .contentType(APPLICATION_JSON))
             .andReturn();
     this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(0)));
-  }
-
-  @Test
-  public void testReadSecureExchangePaginated_GivenSubmitDateBetween_ShouldReturnStatusOk() throws Exception {
-    final File file = new File(
-            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
-    );
-    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
-    });
-    final String fromDate = "2020-04-01T00:00:01";
-    final String toDate = "2020-04-15T00:00:01";
-    final SearchCriteria criteria = SearchCriteria.builder().key("initialSubmitDate").operation(FilterOperation.BETWEEN).value(fromDate + "," + toDate).valueType(ValueType.DATE_TIME).build();
-    final List<SearchCriteria> criteriaList = new ArrayList<>();
-    criteriaList.add(criteria);
-    final ObjectMapper objectMapper = new ObjectMapper();
-    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
-    System.out.println(criteriaJSON);
-    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    final MvcResult result = this.mockMvc
-            .perform(get(URL.BASE_URL+URL.PAGINATED)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
-                    .param("searchCriteriaList", criteriaJSON)
-                    .contentType(APPLICATION_JSON))
-            .andReturn();
-    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(2)));
   }
 
   @Test
@@ -280,7 +261,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
     this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
     final MvcResult result = this.mockMvc
-        .perform(get(URL.BASE_URL+URL.PAGINATED)
+        .perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.PAGINATED)
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
                 .param("searchCriteriaList", criteriaJSON)
             .contentType(APPLICATION_JSON))
@@ -301,7 +282,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final var objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
     this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
-    this.mockMvc.perform(get(URL.BASE_URL+URL.PAGINATED)
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.PAGINATED)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
             .param("searchCriteriaList", criteriaJSON)
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
@@ -319,6 +300,18 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     entity.setUpdateUser("TEST");
     entity.setUpdateDate(LocalDateTime.now());
     entity.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime()));
+    return entity;
+  }
+
+  private MinistryOwnershipTeamEntity getMinistryOwnershipTeam(){
+    MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setUpdateDate(LocalDateTime.now());
+    entity.setUpdateUser("JACK");
+    entity.setCreateUser("JACK");
+    entity.setUpdateDate(LocalDateTime.now());
+    entity.setTeamName("JOHN");
+    entity.setGroupRoleIdentifier("ABC");
     return entity;
   }
 

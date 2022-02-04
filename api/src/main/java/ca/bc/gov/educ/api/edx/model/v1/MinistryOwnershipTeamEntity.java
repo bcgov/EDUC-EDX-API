@@ -12,34 +12,25 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "SECURE_EXCHANGE_COMMENT")
+@Table(name = "EDX_MINISTRY_OWNERSHIP_TEAM")
 @Getter
 @Setter
-public class SecureExchangeCommentEntity {
+public class MinistryOwnershipTeamEntity {
 
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "SECURE_EXCHANGE_COMMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-  UUID secureExchangeCommentID;
+  @Column(name = "EDX_MINISTRY_OWNERSHIP_TEAM_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  UUID ministryOwnershipTeamId;
 
-  @Column(name = "SECURE_EXCHANGE_ID")
-  UUID secureExchangeID;
+  @NotNull(message = "teamName cannot be null")
+  @Column(name = "TEAM_NAME")
+  String teamName;
 
-  @Column(name = "EDX_USER_ID")
-  UUID edxUserID;
-
-  @Column(name = "STAFF_USER_IDENTIFIER")
-  String staffUserIdentifier;
-
-  @NotNull(message = "commentUserName cannot be null")
-  @Column(name = "COMMENT_USER_NAME")
-  String commentUserName;
-
-  @NotNull(message = "content cannot be null")
-  @Column(name = "CONTENT")
-  String content;
+  @NotNull(message = "groupRoleIdentifier cannot be null")
+  @Column(name = "GROUP_ROLE_IDENTIFIER")
+  String groupRoleIdentifier;
 
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
@@ -58,9 +49,5 @@ public class SecureExchangeCommentEntity {
   @PastOrPresent
   @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;
-
-  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
-  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false, insertable = false)
-  private SecureExchangeEntity secureExchangeEntity;
 
 }
