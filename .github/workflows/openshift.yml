@@ -169,7 +169,6 @@ jobs:
         openshift_token: ${{ env.OPENSHIFT_TOKEN }}
         insecure_skip_tls_verify: true
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
-
     - name: Deploy
       uses: actions/checkout@v2
       run: |
