@@ -170,6 +170,7 @@ jobs:
         insecure_skip_tls_verify: true
         namespace: ${{ env.OPENSHIFT_NAMESPACE }}
 
+    - uses: actions/checkout@v2
     - name: Deploy
       run: |
         set -eux
