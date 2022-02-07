@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeController;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
-import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
@@ -32,8 +32,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -104,6 +103,17 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
 
+
+  @Test
+  public void testCreateSecureExchange_GivenValidCommentPayload_ShouldReturnStatusCreated() throws Exception {
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+      .contentType(APPLICATION_JSON)
+      .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isCreated());
+  }
+
   @Test
   public void testCreateSecureExchange_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
@@ -164,7 +174,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testDeleteSecureExchange_GivenInvalidId_ShouldReturn404() throws Exception {
-    this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" + UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNotFound());
