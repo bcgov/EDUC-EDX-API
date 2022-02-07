@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import org.junit.After;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
-  private static final SecureExchangeCommentsMapper.SecureExchangeEntityMapper mapper = SecureExchangeCommentsMapper.SecureExchangeEntityMapper.mapper;
+  private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
   @Autowired
   private MockMvc mockMvc;
   @Autowired
