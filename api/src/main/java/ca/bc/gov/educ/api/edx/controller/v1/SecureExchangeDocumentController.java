@@ -2,8 +2,8 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeDocumentEndpoint;
-import ca.bc.gov.educ.api.edx.config.mappers.v1.DocumentMapper;
-import ca.bc.gov.educ.api.edx.config.mappers.v1.DocumentTypeCodeMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentTypeCodeMapper;
 import ca.bc.gov.educ.api.edx.service.v1.DocumentService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangeDocumentsValidator;
@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @RestController
 public class SecureExchangeDocumentController extends BaseController implements SecureExchangeDocumentEndpoint {
 
-  private static final DocumentMapper mapper = DocumentMapper.mapper;
+  private static final SecureExchangeDocumentMapper mapper = SecureExchangeDocumentMapper.mapper;
 
-  private static final DocumentTypeCodeMapper documentTypeCodeMapper = DocumentTypeCodeMapper.mapper;
+  private static final SecureExchangeDocumentTypeCodeMapper documentTypeCodeMapper = SecureExchangeDocumentTypeCodeMapper.mapper;
 
   @Getter(AccessLevel.PRIVATE)
   private final DocumentService documentService;

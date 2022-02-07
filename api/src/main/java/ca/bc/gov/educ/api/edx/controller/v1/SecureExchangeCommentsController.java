@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeCommentEndpoint;
-import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeCommentsMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeCommentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComments;
 import lombok.AccessLevel;

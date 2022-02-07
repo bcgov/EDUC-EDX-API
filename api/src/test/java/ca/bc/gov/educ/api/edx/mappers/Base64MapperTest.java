@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.edx.mappers;
 
-import ca.bc.gov.educ.api.edx.config.mappers.Base64Mapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class Base64MapperTest {

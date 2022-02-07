@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.edx.controller;
 
-import ca.bc.gov.educ.api.edx.config.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeCommentsController;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeControllerTest {
-    private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
+    private static final SecureExchangeCommentsMapper.SecureExchangeEntityMapper mapper = SecureExchangeCommentsMapper.SecureExchangeEntityMapper.mapper;
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -89,7 +89,7 @@ public class SecureExchangeCommentsControllerTest extends BaseSecureExchangeCont
         "  \"secureExchangeID\": \"" + penReqId + "\",\n" +
         "  \"content\": \"" + "comment1" + "\",\n" +
         "  \"commentUserName\": \"" + "user1" + "\",\n" +
-        "  \"staffUserIdentifier\": \"" + UUID.randomUUID().toString() + "\",\n" +
+        "  \"staffUserIdentifier\": \"" + UUID.randomUUID() + "\",\n" +
         "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
         "}";
     }
