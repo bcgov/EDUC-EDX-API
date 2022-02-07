@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,15 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
 
-
   @Before
   public void setUp() {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
+  }
+
+  @After
+  public void tearDown() {
+    this.ministryOwnershipTeamRepository.deleteAll();
   }
 
   @Test

@@ -4,18 +4,18 @@ import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import org.mapstruct.DecoratedWith;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+@DecoratedWith(SecureExchangeEntityDecorator.class)
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class})
 @SuppressWarnings("squid:S1214")
 public interface SecureExchangeEntityMapper {
 
   SecureExchangeEntityMapper mapper = Mappers.getMapper(SecureExchangeEntityMapper.class);
 
-  @Mapping(target = "createDate", ignore = true)
-  @Mapping(target = "updateDate", ignore = true)
   SecureExchange toStructure(SecureExchangeEntity entity);
 
   @Mapping(target = "secureExchangeComment", ignore = true)

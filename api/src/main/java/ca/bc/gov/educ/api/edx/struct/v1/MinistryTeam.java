@@ -13,7 +13,7 @@ import java.io.Serializable;
 public class MinistryTeam extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  String ministryOwnershipTeamID;
+  String ministryOwnershipTeamId;
   String teamName;
   String groupRoleIdentifier;
 
