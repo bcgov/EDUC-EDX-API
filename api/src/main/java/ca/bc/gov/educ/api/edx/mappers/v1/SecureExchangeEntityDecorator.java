@@ -23,7 +23,7 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
 
     var comments = struct.getCommentsList();
 
-    if(!comments.isEmpty()) {
+    if(comments != null && !comments.isEmpty()) {
       postedEntity.setSecureExchangeComment(new HashSet<>());
 
       for (val comment : comments) {

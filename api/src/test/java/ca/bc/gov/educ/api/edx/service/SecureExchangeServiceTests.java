@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hibernate.Hibernate;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Before
   public void setUp() {
+  }
+
+  @After
+  public void tearDown() {
+    this.ministryOwnershipTeamRepository.deleteAll();
   }
 
   @Test
