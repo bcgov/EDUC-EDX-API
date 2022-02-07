@@ -80,4 +80,5 @@ public class DocumentTypeCodeBuilder {
     documentTypeCodeRepository.save(bCeIdPHOTONotEffective);
     documentTypeCodeRepository.save(dlExpired);
   }
+
 }

@@ -9,9 +9,11 @@ public final class URL {
   public static final String DOCUMENT_ID = "/{documentID}";
   public static final String DOCUMENT_TYPES = "/document-types";
   public static final String FILE_REQUIREMENTS = "/file-requirements";
+  public static final String MINISTRY_TEAMS = "/ministry-teams";
 
   private URL(){
 
   }
   public static final String BASE_URL_SECURE_EXCHANGE="/api/v1/edx/exchange";
+  public static final String BASE_URL_USERS="/api/v1/edx/users";
 }

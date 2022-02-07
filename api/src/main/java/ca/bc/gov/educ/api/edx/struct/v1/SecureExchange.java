@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -41,6 +42,8 @@ public class SecureExchange extends BaseRequest implements Serializable {
   String isReadByExchangeContact;
 
   String statusUpdateDate;
+
+  private List<SecureExchangeComments> commentsList;
 }
 
 
