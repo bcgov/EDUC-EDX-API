@@ -52,6 +52,10 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("ministryContactTeamID", secureExchange.getMinistryContactTeamID(), "ministryContactTeamID value was not found as a valid team."));
     }
 
+    if (StringUtils.isEmpty(secureExchange.getEdxUserID()) && StringUtils.isEmpty(secureExchange.getEdxUserDistrictID()) && StringUtils.isEmpty(secureExchange.getEdxUserSchoolID()) && StringUtils.isEmpty(secureExchange.getMinistryContactTeamID()) ) {
+      apiValidationErrors.add(createFieldError("secureExchange", null, "ministryContactTeamID, edxUserID, edxUserSchool and edxUserDistrictID - one of these fields must contain a value."));
+    }
+
     return apiValidationErrors;
   }
 

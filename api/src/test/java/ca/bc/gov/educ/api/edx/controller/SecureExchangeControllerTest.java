@@ -125,6 +125,16 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   }
 
   @Test
+  public void testCreateSecureExchange_GivenPenReqIdInPayloadNoID_ShouldReturnStatusBadRequest() throws Exception {
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+      .contentType(APPLICATION_JSON)
+      .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinNoID(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testCreateSecureExchange_GivenPenReqIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
