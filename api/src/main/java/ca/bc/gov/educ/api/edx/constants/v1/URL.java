@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.constants.v1;
 
 public final class URL {
   public static final String STATUSES = "/statuses";
+  public static final String CONTACT_TYPE = "/contact-type";
   public static final String PAGINATED = "/paginated";
   public static final String SECURE_EXCHANGE_ID_COMMENTS = "/{secureExchangeId}/comments";
   public static final String SECURE_EXCHANGE_ID_DOCUMENTS = "/{secureExchangeID}/documents";

@@ -28,21 +28,18 @@ public class SecureExchangeEntity {
   @Column(name = "SECURE_EXCHANGE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeID;
 
-  @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserID;
-
-  @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserSchoolID;
-
-  @Column(name = "EDX_USER_DISTRICT_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserDistrictID;
-
   @NotNull(message = "ministryOwnershipTeamID cannot be null")
   @Column(name = "EDX_MINISTRY_OWNERSHIP_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID ministryOwnershipTeamID;
 
-  @Column(name = "EDX_MINISTRY_CONTACT_TEAM_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID ministryContactTeamID;
+  @NotNull(message = "secureExchangeContactTypeCode cannot be null")
+  @UpperCase
+  @Column(name = "SECURE_EXCHANGE_CONTACT_TYPE_CODE")
+  String secureExchangeContactTypeCode;
+
+  @NotNull(message = "contactIdentifier cannot be null")
+  @Column(name = "CONTACT_IDENTIFIER")
+  String contactIdentifier;
 
   @NotNull(message = "secureExchangeStatusCode cannot be null")
   @UpperCase

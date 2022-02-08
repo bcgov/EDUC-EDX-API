@@ -1,20 +1,20 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeStatusCodeTableRepository;
+import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
-import org.apache.commons.lang3.StringUtils;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
-import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
-import lombok.AccessLevel;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @Component
 public class SecureExchangePayloadValidator {
@@ -27,11 +27,17 @@ public class SecureExchangePayloadValidator {
 
   private final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
 
+  private final SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
+  private final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepository;
+
   @Autowired
-  public SecureExchangePayloadValidator(SecureExchangeService secureExchangeService, ApplicationProperties applicationProperties, MinistryOwnershipTeamRepository ministryOwnershipTeamRepository) {
+  public SecureExchangePayloadValidator(SecureExchangeService secureExchangeService, ApplicationProperties applicationProperties, MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository, SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepository) {
     this.secureExchangeService = secureExchangeService;
     this.applicationProperties = applicationProperties;
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
+    this.secureExchangeContactTypeCodeTableRepository = secureExchangeContactTypeCodeTableRepository;
+    this.secureExchangeStatusCodeTableRepository = secureExchangeStatusCodeTableRepository;
   }
 
   public List<FieldError> validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
@@ -44,16 +50,16 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be null for post operation."));
     }
 
+    if (!isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null && secureExchangeStatusCodeTableRepository.findById(secureExchange.getSecureExchangeStatusCode()).isEmpty()) {
+      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode value was not found as a valid status code."));
+    }
+
     if (ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryOwnershipTeamID())).isEmpty()) {
       apiValidationErrors.add(createFieldError("ministryOwnershipTeamID", secureExchange.getMinistryOwnershipTeamID(), "ministryOwnershipTeamID value was not found as a valid team."));
     }
 
-    if (StringUtils.isNotEmpty(secureExchange.getMinistryContactTeamID()) && ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryContactTeamID())).isEmpty()) {
-      apiValidationErrors.add(createFieldError("ministryContactTeamID", secureExchange.getMinistryContactTeamID(), "ministryContactTeamID value was not found as a valid team."));
-    }
-
-    if (StringUtils.isEmpty(secureExchange.getEdxUserID()) && StringUtils.isEmpty(secureExchange.getEdxUserDistrictID()) && StringUtils.isEmpty(secureExchange.getEdxUserSchoolID()) && StringUtils.isEmpty(secureExchange.getMinistryContactTeamID()) ) {
-      apiValidationErrors.add(createFieldError("secureExchange", null, "ministryContactTeamID, edxUserID, edxUserSchool and edxUserDistrictID - one of these fields must contain a value."));
+    if (secureExchangeContactTypeCodeTableRepository.findById(secureExchange.getSecureExchangeContactTypeCode()).isEmpty()) {
+      apiValidationErrors.add(createFieldError("secureExchangeContactTypeCode", secureExchange.getSecureExchangeContactTypeCode(), "secureExchangeContactTypeCode value was not found as a valid contact type."));
     }
 
     return apiValidationErrors;

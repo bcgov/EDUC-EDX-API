@@ -12,11 +12,13 @@ public class SecureExchangeBuilder {
 
   UUID secureExchangeID = UUID.randomUUID();
 
-  UUID edxUserID = UUID.randomUUID();
+  String contactIdentifier = UUID.randomUUID().toString();
 
   UUID ministryOwnershipTeamID = UUID.randomUUID();
 
   String secureExchangeStatusCode = "INITREV";
+
+  String secureExchangeContactTypeCode = "SCHOOL";
 
   String createUser = "API";
 
@@ -47,11 +49,6 @@ public class SecureExchangeBuilder {
     return this;
   }
 
-  public SecureExchangeBuilder withEdxUserID(UUID edxUserID) {
-    this.edxUserID = edxUserID;
-    return this;
-  }
-
   public SecureExchangeBuilder withSecureExchangeStatusCode(String secureExchangeStatusCode) {
     this.secureExchangeStatusCode = secureExchangeStatusCode;
     return this;
@@ -77,7 +74,8 @@ public class SecureExchangeBuilder {
     secureExchange.setStatusUpdateDate(LocalDateTime.now());
 
     secureExchange.setSecureExchangeID(this.secureExchangeID);
-    secureExchange.setEdxUserID(this.edxUserID);
+    secureExchange.setContactIdentifier(this.contactIdentifier);
+    secureExchange.setSecureExchangeContactTypeCode(this.secureExchangeContactTypeCode);
     secureExchange.setSubject(this.subject);
     secureExchange.setSecureExchangeStatusCode(this.secureExchangeStatusCode);
     return secureExchange;

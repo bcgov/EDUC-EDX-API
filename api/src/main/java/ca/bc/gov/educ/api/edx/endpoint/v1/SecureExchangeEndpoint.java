@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStatusCode;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -81,10 +82,20 @@ public interface SecureExchangeEndpoint {
    *
    * @return the secure Exchange status codes
    */
-  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_STATUSES')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_CODES')")
   @GetMapping(URL.STATUSES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<SecureExchangeStatusCode> getSecureExchangeStatusCodes();
+
+  /**
+   * Gets secure Exchange contact type codes.
+   *
+   * @return the secure Exchange contact type codes
+   */
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_CODES')")
+  @GetMapping(URL.CONTACT_TYPE)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<SecureExchangeContactTypeCode> getSecureExchangeContactTypeCodes();
 
   /**
    * Delete by id response entity.
