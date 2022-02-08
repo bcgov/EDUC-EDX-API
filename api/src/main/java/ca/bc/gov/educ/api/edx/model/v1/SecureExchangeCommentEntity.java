@@ -38,7 +38,7 @@ public class SecureExchangeCommentEntity {
   String commentUserName;
 
   @NotNull(message = "content cannot be null")
-  @Column(name = "CONTENT")
+  @Column(name = "COMMENT_CONTENT")
   String content;
 
   @NotNull(message = "createUser cannot be null")

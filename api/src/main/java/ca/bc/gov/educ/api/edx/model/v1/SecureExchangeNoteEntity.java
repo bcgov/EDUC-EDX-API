@@ -36,7 +36,7 @@ public class SecureExchangeNoteEntity {
   String staffUserName;
 
   @NotNull(message = "content cannot be null")
-  @Column(name = "CONTENT")
+  @Column(name = "NOTE_CONTENT")
   String content;
 
   @NotNull(message = "createUser cannot be null")
