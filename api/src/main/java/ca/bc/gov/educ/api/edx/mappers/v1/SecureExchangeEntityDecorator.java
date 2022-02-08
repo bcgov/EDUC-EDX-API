@@ -2,10 +2,13 @@ package ca.bc.gov.educ.api.edx.mappers.v1;
 
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.struct.BaseRequest;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.UUID;
@@ -37,6 +40,12 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         newComment.setSecureExchangeEntity(postedEntity);
         newComment.setCreateUser(comment.getCreateUser());
         newComment.setUpdateUser(comment.getUpdateUser());
+        if (StringUtils.isBlank(comment.getCreateUser())) {
+          newComment.setCreateUser(ApplicationProperties.CLIENT_ID);
+        }
+        if (StringUtils.isBlank(comment.getUpdateUser())) {
+          newComment.setUpdateUser(ApplicationProperties.CLIENT_ID);
+        }
         newComment.setUpdateDate(LocalDateTime.now());
         newComment.setCreateDate(LocalDateTime.now());
         postedEntity.getSecureExchangeComment().add(newComment);
@@ -44,4 +53,5 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
     }
     return postedEntity;
   }
+
 }
