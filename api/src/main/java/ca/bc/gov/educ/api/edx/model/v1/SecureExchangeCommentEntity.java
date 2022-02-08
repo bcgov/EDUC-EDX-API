@@ -24,9 +24,6 @@ public class SecureExchangeCommentEntity {
   @Column(name = "SECURE_EXCHANGE_COMMENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeCommentID;
 
-  @Column(name = "SECURE_EXCHANGE_ID")
-  UUID secureExchangeID;
-
   @Column(name = "EDX_USER_ID")
   UUID edxUserID;
 
@@ -40,6 +37,11 @@ public class SecureExchangeCommentEntity {
   @NotNull(message = "content cannot be null")
   @Column(name = "COMMENT_CONTENT")
   String content;
+
+  @NotNull(message = "commentTimestamp cannot be null")
+  @PastOrPresent
+  @Column(name = "COMMENT_TIMESTAMP")
+  LocalDateTime commentTimestamp;
 
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
@@ -60,7 +62,7 @@ public class SecureExchangeCommentEntity {
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
-  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false, insertable = false)
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
   private SecureExchangeEntity secureExchangeEntity;
 
 }

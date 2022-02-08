@@ -37,6 +37,7 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         if(StringUtils.isNotBlank(comment.getEdxUserID())) {
           newComment.setEdxUserID(UUID.fromString(comment.getEdxUserID()));
         }
+
         newComment.setSecureExchangeEntity(postedEntity);
         newComment.setCreateUser(comment.getCreateUser());
         newComment.setUpdateUser(comment.getUpdateUser());
@@ -45,6 +46,10 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         }
         if (StringUtils.isBlank(comment.getUpdateUser())) {
           newComment.setUpdateUser(ApplicationProperties.CLIENT_ID);
+        }
+
+        if (StringUtils.isBlank(comment.getCommentTimestamp())) {
+          newComment.setCommentTimestamp(LocalDateTime.now());
         }
         newComment.setUpdateDate(LocalDateTime.now());
         newComment.setCreateDate(LocalDateTime.now());
