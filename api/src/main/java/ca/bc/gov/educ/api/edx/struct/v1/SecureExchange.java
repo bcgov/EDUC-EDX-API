@@ -22,6 +22,7 @@ public class SecureExchange extends BaseRequest implements Serializable {
   String contactIdentifier;
   @NotNull(message = "ministryOwnershipTeamID cannot be null")
   String ministryOwnershipTeamID;
+  @NotNull(message = "secureExchangeContactTypeCode cannot be null")
   @Size(max = 10)
   String secureExchangeContactTypeCode;
   @Size(max = 10)
