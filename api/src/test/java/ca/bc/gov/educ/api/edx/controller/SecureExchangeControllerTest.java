@@ -4,14 +4,8 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeController;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
-import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
-import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
-import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
-import ca.bc.gov.educ.api.edx.repository.SecureExchangeStatusCodeTableRepository;
+import ca.bc.gov.educ.api.edx.model.v1.*;
+import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.ValueType;
@@ -61,13 +55,18 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Autowired
   MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
 
+  @Autowired
+  SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
   @Before
   public void setUp() {
+    this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
     MockitoAnnotations.openMocks(this);
   }
 
   @After
   public void after() {
+    this.secureExchangeContactTypeCodeTableRepository.deleteAll();
     this.documentRepository.deleteAll();
     this.repository.deleteAll();
   }
@@ -98,11 +97,10 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testRetrieveSecureExchange_GivenRandomEDXUserIDAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?edxUserID=" + UUID.randomUUID() + "&status=" + "INT")
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?contactIdentifier=" + UUID.randomUUID() + "&status=" + "INT")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
   }
-
 
   @Test
   public void testCreateSecureExchange_GivenValidCommentPayload_ShouldReturnStatusCreated() throws Exception {
@@ -224,6 +222,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final SecureExchangeCommentEntity secureExchangeComment = new SecureExchangeCommentEntity();
     secureExchangeComment.setSecureExchangeEntity(secureExchange);
     secureExchangeComment.setCommentUserName("hi");
+    secureExchangeComment.setCommentTimestamp(LocalDateTime.now());
     secureExchangeComment.setCreateDate(LocalDateTime.now());
     secureExchangeComment.setUpdateDate(LocalDateTime.now());
     secureExchangeComment.setUpdateUser("TEST");
@@ -237,7 +236,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testReadSecureExchangeStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
     this.secureExchangeStatusCodeTableRepo.save(this.createPenReqStatus());
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.STATUSES)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_STATUSES"))))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_CODES"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
   }
 
@@ -310,7 +309,22 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   private ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity createPenReqStatus() {
     final ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity entity = new ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity();
-    entity.setSecureExchangeStatusCode("INITREV");
+    entity.setSecureExchangeStatusCode("NEW");
+    entity.setDescription("Initial Review");
+    entity.setDisplayOrder(1);
+    entity.setEffectiveDate(LocalDateTime.now());
+    entity.setLabel("Initial Review");
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setCreateUser("TEST");
+    entity.setUpdateUser("TEST");
+    entity.setUpdateDate(LocalDateTime.now());
+    entity.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime()));
+    return entity;
+  }
+
+  private SecureExchangeContactTypeCodeEntity createContactType() {
+    final SecureExchangeContactTypeCodeEntity entity = new SecureExchangeContactTypeCodeEntity();
+    entity.setSecureExchangeContactTypeCode("EDXUSER");
     entity.setDescription("Initial Review");
     entity.setDisplayOrder(1);
     entity.setEffectiveDate(LocalDateTime.now());

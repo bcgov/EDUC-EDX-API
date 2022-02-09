@@ -298,7 +298,6 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
       .andExpect(jsonPath("$.length()", is(1)))
       .andExpect(jsonPath("$.[0].documentID", is(this.documentID.toString())))
       .andExpect(jsonPath("$.[0].secureExchangeID", is(notNullValue())))
-      .andExpect(jsonPath("$.[0].edxUserID", is(notNullValue())))
       .andExpect(jsonPath("$.[0].documentTypeCode", is("CAPASSPORT")))
       .andExpect(jsonPath("$.[0].documentData").doesNotExist());
   }

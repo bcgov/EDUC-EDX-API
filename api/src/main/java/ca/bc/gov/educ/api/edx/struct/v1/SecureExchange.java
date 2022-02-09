@@ -18,12 +18,13 @@ public class SecureExchange extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
   String secureExchangeID;
-  String edxUserID;
-  String edxUserSchoolID;
-  String edxUserDistrictID;
+  @NotNull(message = "contactIdentifier cannot be null")
+  String contactIdentifier;
   @NotNull(message = "ministryOwnershipTeamID cannot be null")
   String ministryOwnershipTeamID;
-  String ministryContactTeamID;
+  @NotNull(message = "secureExchangeContactTypeCode cannot be null")
+  @Size(max = 10)
+  String secureExchangeContactTypeCode;
   @Size(max = 10)
   String secureExchangeStatusCode;
 

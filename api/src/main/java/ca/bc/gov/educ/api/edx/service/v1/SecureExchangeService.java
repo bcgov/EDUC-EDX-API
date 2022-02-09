@@ -2,10 +2,12 @@ package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,13 +46,16 @@ public class SecureExchangeService {
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo;
 
+  @Getter(AccessLevel.PRIVATE)
+  private final SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
   @Autowired
-  public SecureExchangeService(final SecureExchangeRequestRepository secureExchangeRequestRepository, final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, final DocumentRepository documentRepository, final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo) {
+  public SecureExchangeService(final SecureExchangeRequestRepository secureExchangeRequestRepository, final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, final DocumentRepository documentRepository, final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo, final SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository) {
     this.secureExchangeRequestRepository = secureExchangeRequestRepository;
     this.secureExchangeRequestCommentRepository = secureExchangeRequestCommentRepository;
     this.documentRepository = documentRepository;
     this.secureExchangeStatusCodeTableRepo = secureExchangeStatusCodeTableRepo;
-
+    this.secureExchangeContactTypeCodeTableRepository = secureExchangeContactTypeCodeTableRepository;
   }
 
   public SecureExchangeEntity retrieveSecureExchange(final UUID id) {
@@ -77,9 +82,12 @@ public class SecureExchangeService {
     return this.getSecureExchangeRequestRepository().save(secureExchangeRequest);
   }
 
-
   public Iterable<SecureExchangeStatusCodeEntity> getSecureExchangeStatusCodesList() {
     return this.getSecureExchangeStatusCodeTableRepo().findAll();
+  }
+
+  public Iterable<SecureExchangeContactTypeCodeEntity> getSecureExchangeContactTypeCodesList() {
+    return this.getSecureExchangeContactTypeCodeTableRepository().findAll();
   }
 
   public List<SecureExchangeEntity> findSecureExchange(final UUID edxUserSchoolID, final UUID edxUserDistrictID, final UUID ministryOwnershipTeamID,final UUID ministryContactTeamID, final UUID edxUserID, final String status) {

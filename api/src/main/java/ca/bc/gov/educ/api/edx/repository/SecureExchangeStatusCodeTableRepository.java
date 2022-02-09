@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * @author Marco Villeneuve
  */
 @Repository
-public interface SecureExchangeStatusCodeTableRepository extends JpaRepository<SecureExchangeStatusCodeEntity, Long> {
+public interface SecureExchangeStatusCodeTableRepository extends JpaRepository<SecureExchangeStatusCodeEntity, String> {
 }

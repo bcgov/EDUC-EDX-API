@@ -3,7 +3,9 @@ package ca.bc.gov.educ.api.edx.service;
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
@@ -15,8 +17,8 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
+import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,13 +33,18 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private SecureExchangeRequestRepository secureExchangeRequestRepository;
 
+  @Autowired
+  private SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
   @Before
   public void setUp() {
+    this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
   }
 
   @After
   public void tearDown() {
     this.ministryOwnershipTeamRepository.deleteAll();
+    this.secureExchangeContactTypeCodeTableRepository.deleteAll();
   }
 
   @Test
@@ -61,6 +68,29 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 //    assertThat(pulledExchange.get().getSecureExchangeComment().size()).isEqualTo(1);
   }
 
+  @Test
+  public void getSecureExchangeContactTypes() {
+    final Iterable<SecureExchangeContactTypeCodeEntity> contactTypes = this.service.getSecureExchangeContactTypeCodesList();
+    assertThat(contactTypes).isNotNull();
+    long count = StreamSupport.stream(contactTypes.spliterator(), false).count();
+    assertThat(count).isEqualTo(1);
+  }
+
+  private SecureExchangeContactTypeCodeEntity createContactType() {
+    final SecureExchangeContactTypeCodeEntity entity = new SecureExchangeContactTypeCodeEntity();
+    entity.setSecureExchangeContactTypeCode("EDXUSER");
+    entity.setDescription("Initial Review");
+    entity.setDisplayOrder(1);
+    entity.setEffectiveDate(LocalDateTime.now());
+    entity.setLabel("Initial Review");
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setCreateUser("TEST");
+    entity.setUpdateUser("TEST");
+    entity.setUpdateDate(LocalDateTime.now());
+    entity.setExpiryDate(LocalDateTime.from(new GregorianCalendar(2099, Calendar.FEBRUARY, 1).toZonedDateTime()));
+    return entity;
+  }
+
   private MinistryOwnershipTeamEntity getMinistryOwnershipEntity(String teamName, String groupRoleIdentifier) {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();
     entity.setTeamName(teamName);
@@ -77,6 +107,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
     entity.setStaffUserIdentifier("test");
     entity.setCommentUserName("test");
     entity.setContent("test");
+    entity.setCommentTimestamp(LocalDateTime.now());
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");

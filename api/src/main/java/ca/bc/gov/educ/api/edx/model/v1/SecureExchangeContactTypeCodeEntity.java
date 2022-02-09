@@ -11,12 +11,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "SECURE_EXCHANGE_STATUS_CODE")
-public class SecureExchangeStatusCodeEntity {
+@Table(name = "SECURE_EXCHANGE_CONTACT_TYPE_CODE")
+public class SecureExchangeContactTypeCodeEntity {
 
   @Id
-  @Column(name = "SECURE_EXCHANGE_STATUS_CODE", unique = true, updatable = false)
-  String secureExchangeStatusCode;
+  @Column(name = "SECURE_EXCHANGE_CONTACT_TYPE_CODE", unique = true, updatable = false)
+  String secureExchangeContactTypeCode;
   /**
    * The Label.
    */

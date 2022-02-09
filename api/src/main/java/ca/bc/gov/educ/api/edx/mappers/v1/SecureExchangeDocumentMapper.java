@@ -24,7 +24,7 @@ public interface SecureExchangeDocumentMapper {
 
   SecureExchangeDocMetadata toMetadataStructure(SecureExchangeDocumentEntity entity);
 
-  @Mapping(target = "edxUserID", source = "secureExchange.edxUserID")
+  @Mapping(target = "edxUserID", source = "edxUserID")
   @Mapping(target = "secureExchangeID", source = "secureExchange.secureExchangeID")
   SecureExchangeDocumentMetadata toMetaData(SecureExchangeDocumentEntity entity);
 }

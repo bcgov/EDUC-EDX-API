@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.filter.SecureExchangeFilterSpecs;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeContactTypeCodeMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStatusCodeMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
@@ -53,6 +54,7 @@ public class SecureExchangeController extends BaseController implements SecureEx
   private final SecureExchangeService service;
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
   private static final SecureExchangeStatusCodeMapper statusCodeMapper = SecureExchangeStatusCodeMapper.mapper;
+  private static final SecureExchangeContactTypeCodeMapper secureExchangeContactTypeCodeMapper = SecureExchangeContactTypeCodeMapper.mapper;
   private final SecureExchangeFilterSpecs secureExchangeFilterSpecs;
 
   @Autowired
@@ -91,6 +93,11 @@ public class SecureExchangeController extends BaseController implements SecureEx
     return secureExchangeStatusCode;
   }
 
+  public List<SecureExchangeContactTypeCode> getSecureExchangeContactTypeCodes() {
+    val secureExchangeContactTypeCode = new ArrayList<SecureExchangeContactTypeCode>();
+    getService().getSecureExchangeContactTypeCodesList().forEach(element -> secureExchangeContactTypeCode.add(secureExchangeContactTypeCodeMapper.toStructure(element)));
+    return secureExchangeContactTypeCode;
+  }
 
   private void validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
     val validationResult = getPayloadValidator().validatePayload(secureExchange, isCreateOperation);
