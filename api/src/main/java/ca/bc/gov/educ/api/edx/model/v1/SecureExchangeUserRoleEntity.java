@@ -43,7 +43,7 @@ public class SecureExchangeUserRoleEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
+  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeUserEntity.class)
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID", updatable = false, insertable = false)
   private SecureExchangeUserEntity secureExchangeUserEntity;
 }
