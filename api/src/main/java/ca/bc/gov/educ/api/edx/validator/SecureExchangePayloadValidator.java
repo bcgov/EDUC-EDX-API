@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
@@ -46,8 +47,9 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
     }
 
-    if (isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null) {
-      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be null for post operation."));
+    if (isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null &&
+      !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.NEW.toString()) && !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.INPROGRESS.toString())) {
+      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be NEW or INPROGRESS for post operation."));
     }
 
     if (!isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null && secureExchangeStatusCodeTableRepository.findById(secureExchange.getSecureExchangeStatusCode()).isEmpty()) {

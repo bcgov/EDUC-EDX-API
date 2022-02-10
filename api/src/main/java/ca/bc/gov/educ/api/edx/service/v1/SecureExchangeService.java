@@ -74,10 +74,16 @@ public class SecureExchangeService {
    * @return the persisted entity.
    */
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
-    secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
+    if(secureExchangeRequest.getSecureExchangeStatusCode() == null) {
+      secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
+    }
     secureExchangeRequest.setStatusUpdateDate(LocalDateTime.now());
-    secureExchangeRequest.setIsReadByMinistry("N");
-    secureExchangeRequest.setIsReadByExchangeContact("N");
+    if(secureExchangeRequest.getIsReadByExchangeContact() == null) {
+      secureExchangeRequest.setIsReadByExchangeContact("N");
+    }
+    if(secureExchangeRequest.getIsReadByMinistry() == null) {
+      secureExchangeRequest.setIsReadByMinistry("N");
+    }
     TransformUtil.uppercaseFields(secureExchangeRequest);
     return this.getSecureExchangeRequestRepository().save(secureExchangeRequest);
   }
