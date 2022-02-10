@@ -13,9 +13,9 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SECURE_EXCHANGE_USER_DISTRICT")
+@Table(name = "EDX_USER_DISTRICT")
 @DynamicUpdate
-public class SecureExchangeUserDistrictEntity {
+public class EdxUserDistrictEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
@@ -43,7 +43,4 @@ public class SecureExchangeUserDistrictEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeUserEntity.class)
-  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID", updatable = false, insertable = false)
-  private SecureExchangeUserEntity secureExchangeUserEntity;
 }

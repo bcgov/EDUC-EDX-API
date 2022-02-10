@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.edx.support;
 
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
+import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
+
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
-import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
 
 public class DocumentTypeCodeBuilder {
 

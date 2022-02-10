@@ -3,12 +3,10 @@ package ca.bc.gov.educ.api.edx.mappers.v1;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
-import ca.bc.gov.educ.api.edx.struct.BaseRequest;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.UUID;

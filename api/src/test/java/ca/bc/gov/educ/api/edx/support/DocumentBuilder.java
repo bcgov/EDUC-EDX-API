@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.edx.support;
 
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
-
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 
 public class DocumentBuilder {
     UUID documentID = UUID.randomUUID();

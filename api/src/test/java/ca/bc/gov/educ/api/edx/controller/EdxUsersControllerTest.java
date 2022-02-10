@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
@@ -15,11 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {

@@ -1,12 +1,11 @@
 package ca.bc.gov.educ.api.edx.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeDocumentMapperImpl;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
+import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +16,7 @@ import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @RunWith(SpringRunner.class)

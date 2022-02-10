@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
-import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hibernate.Hibernate;
@@ -17,7 +16,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
