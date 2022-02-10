@@ -1,11 +1,6 @@
 package ca.bc.gov.educ.api.edx.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocRequirement;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +9,11 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocRequirement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 

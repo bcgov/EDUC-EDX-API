@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -96,8 +95,8 @@ public class SecureExchangeService {
     return this.getSecureExchangeContactTypeCodeTableRepository().findAll();
   }
 
-  public List<SecureExchangeEntity> findSecureExchange(final UUID edxUserSchoolID, final UUID edxUserDistrictID, final UUID ministryOwnershipTeamID,final UUID ministryContactTeamID, final UUID edxUserID, final String status) {
-    return this.getSecureExchangeRequestRepository().findSecureExchange(edxUserSchoolID, edxUserDistrictID, ministryOwnershipTeamID, ministryContactTeamID, edxUserID, status);
+  public List<SecureExchangeEntity> findSecureExchange(final String contactIdentifier, final String secureExchangeContactTypeCode) {
+    return this.getSecureExchangeRequestRepository().findSecureExchange(contactIdentifier, secureExchangeContactTypeCode);
   }
 
 

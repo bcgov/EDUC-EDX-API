@@ -13,21 +13,21 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SECURE_EXCHANGE_ROLE")
+@Table(name = "EDX_USER_SCHOOL")
 @DynamicUpdate
-public class SecureExchangeRoleEntity {
+public class EdxUserSchoolEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "EDX_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserDistrictID;
+  @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserSchoolID;
 
-  @Column(name = "ROLE_NAME")
-  String roleName;
+  @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserID;
 
-  @Column(name = "ROLE_DESCRIPTION")
-  String roleDescription;
+  @Column(name = "MINCODE")
+  String mincode;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

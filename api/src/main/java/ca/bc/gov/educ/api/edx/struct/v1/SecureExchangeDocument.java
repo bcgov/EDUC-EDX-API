@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.edx.struct.v1;
 
 import ca.bc.gov.educ.api.edx.struct.BaseRequest;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;

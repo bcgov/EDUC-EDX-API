@@ -13,24 +13,21 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "SECURE_EXCHANGE_USER")
+@Table(name = "EDX_USER_SCHOOL_ROLE")
 @DynamicUpdate
-public class SecureExchangeUserEntity {
+public class EdxUserSchoolRoleEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
           @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserID;
+  @Column(name = "EDX_USER_SCHOOL_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserSchoolRoleID;
 
-  @Column(name = "DIGITAL_IDENTITY_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID digitalIdentityID;
+  @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxUserSchoolID;
 
-  @Column(name = "FIRST_NAME")
-  String firstName;
-
-  @Column(name = "LAST_NAME")
-  String lastName;
+  @Column(name = "EDX_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
+  UUID edxRoleID;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
@@ -46,4 +43,7 @@ public class SecureExchangeUserEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = EdxUserSchoolEntity.class)
+  @JoinColumn(name = "EDX_USER_SCHOOL_ID", referencedColumnName = "EDX_USER_SCHOOL_ID", updatable = false, insertable = false)
+  private EdxUserEntity edxUserSchoolEntity;
 }

@@ -52,6 +52,10 @@ public class SecureExchangePayloadValidator {
       apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be NEW or INPROGRESS for post operation."));
     }
 
+    if (isCreateOperation && secureExchange.getSequenceNumber() != null){
+      apiValidationErrors.add(createFieldError("sequenceNumber", secureExchange.getSequenceNumber(), "sequenceNumber should be null for post operation."));
+    }
+
     if (!isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null && secureExchangeStatusCodeTableRepository.findById(secureExchange.getSecureExchangeStatusCode()).isEmpty()) {
       apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode value was not found as a valid status code."));
     }

@@ -43,14 +43,13 @@ public interface SecureExchangeEndpoint {
   /**
    * Find secure exchanges iterable.
    *
-   * @param status    the status
    * @return the iterable
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
   @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   @Tag(name = "findSecureExchanges", description = "This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.")
-  List<SecureExchange> findSecureExchanges(@RequestParam(name = "edxUserSchoolID", required = false) String edxUserSchoolID, @RequestParam(name = "edxUserDistrictID", required = false) String edxUserDistrictID, @RequestParam(name = "ministryOwnershipTeamID", required = false) String ministryOwnershipTeamID, @RequestParam(name = "ministryContactTeamID", required = false) String ministryContactTeamID , @RequestParam(name = "edxUserID", required = false) String edxUserID, @RequestParam(name = "status", required = false) String status);
+  List<SecureExchange> findSecureExchanges(@RequestParam(name = "contactIdentifier", required = false) String contactIdentifier, @RequestParam(name = "secureExchangeContactTypeCode", required = false) String secureExchangeContactTypeCode);
 
   /**
    * Create secure exchange request.

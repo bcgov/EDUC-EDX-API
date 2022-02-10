@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.edx.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
-
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,8 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
-import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest

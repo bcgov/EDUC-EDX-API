@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.filter.SecureExchangeFilterSpecs;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeCommentsMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeContactTypeCodeMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStatusCodeMapper;
@@ -69,8 +68,8 @@ public class SecureExchangeController extends BaseController implements SecureEx
   }
 
   @Override
-  public List<SecureExchange> findSecureExchanges(String edxUserSchoolID, String edxUserDistrictID, String ministryOwnershipTeamID, String ministryContactTeamID, String edxUserID, String status) {
-    return getService().findSecureExchange(UUIDUtil.fromString(edxUserSchoolID),UUIDUtil.fromString(edxUserDistrictID),UUIDUtil.fromString(ministryOwnershipTeamID),UUIDUtil.fromString(ministryContactTeamID),UUIDUtil.fromString(edxUserID), status).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public List<SecureExchange> findSecureExchanges(String contactIdentifier, String secureExchangeContactTypeCode) {
+    return getService().findSecureExchange(contactIdentifier,secureExchangeContactTypeCode).stream().map(mapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

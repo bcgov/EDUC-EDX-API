@@ -15,7 +15,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Repository
 public class SecureExchangeRepositoryCustomImpl implements SecureExchangeRepositoryCustom {
@@ -29,29 +28,19 @@ public class SecureExchangeRepositoryCustomImpl implements SecureExchangeReposit
   }
 
   @Override
-  public List<SecureExchangeEntity> findSecureExchange(final UUID edxUserSchoolID, final UUID edxUserDistrictID, final UUID ministryOwnershipTeamID, final UUID ministryContactTeamID, final UUID edxUserID, final String status) {
+  public List<SecureExchangeEntity> findSecureExchange(final String contactIdentifier, final String secureExchangeContactTypeCode) {
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<SecureExchangeEntity> criteriaQuery = criteriaBuilder.createQuery(SecureExchangeEntity.class);
     Root<SecureExchangeEntity> secureExchangeEntityRoot = criteriaQuery.from(SecureExchangeEntity.class);
-    if (StringUtils.isNotBlank(status)) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("secureExchangeStatusCode"), status));
+
+    if (StringUtils.isNotBlank(contactIdentifier)) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("contactIdentifier"), contactIdentifier));
     }
-    if (edxUserSchoolID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserSchoolID"), edxUserSchoolID));
+    if (StringUtils.isNotBlank(secureExchangeContactTypeCode)) {
+      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("secureExchangeContactTypeCode"), secureExchangeContactTypeCode));
     }
-    if (edxUserDistrictID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserDistrictID"), edxUserDistrictID));
-    }
-    if (ministryOwnershipTeamID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("ministryOwnershipTeamID"), ministryOwnershipTeamID));
-    }
-    if (ministryContactTeamID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("ministryContactTeamID"), ministryContactTeamID));
-    }
-    if (edxUserID != null) {
-      predicates.add(criteriaBuilder.equal(secureExchangeEntityRoot.get("edxUserID"), edxUserID));
-    }
+
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
 
     return entityManager.createQuery(criteriaQuery).getResultList();

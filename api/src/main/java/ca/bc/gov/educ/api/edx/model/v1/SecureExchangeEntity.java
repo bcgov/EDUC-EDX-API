@@ -87,6 +87,11 @@ public class SecureExchangeEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  @GeneratedValue(generator = "SEQUENCE")
+  @GenericGenerator(name = "sequence", strategy = "org.hibernate.id.SequenceGenerator")
+  @Column(name = "SEQUENCE_NUMBER", unique = true, updatable = false)
+  String sequenceNumber;
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "secureExchangeEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SecureExchangeCommentEntity.class)
