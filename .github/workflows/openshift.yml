@@ -54,12 +54,12 @@ env:
   ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 
   APP_NAME: 'edx-api'
-  REPO_NAME: "educ-${APP_NAME}"
+  REPO_NAME: "educ-$APP_NAME"
   APP_DOMAIN: "apps.silver.gov.bc.ca"
   JOB_NAME: "master"
-  APP_NAME_FULL: "${APP_NAME}-${JOB_NAME}"
-  NAMESPACE: "${OPENSHIFT_NAMESPACE}"
-  HOST_ROUTE: "${APP_NAME}-dev.${APP_DOMAIN}"
+  APP_NAME_FULL: "$APP_NAME-$JOB_NAME"
+  NAMESPACE: "$OPENSHIFT_NAMESPACE"
+  HOST_ROUTE: "$APP_NAME-dev.$APP_DOMAIN"
   TAG: "latest"
   MIN_REPLICAS: "1"
   MAX_REPLICAS: "1"
