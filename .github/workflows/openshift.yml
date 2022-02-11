@@ -55,6 +55,20 @@ env:
   SPRING_BOOT_IMAGE_NAME: edx-api-master
   DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
   ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
+
+  APP_DOMAIN: "apps.silver.gov.bc.ca"
+  REPO_NAME: ${repoName}
+  JOB_NAME: "master"
+  NAMESPACE: ${OPENSHIFT_NAMESPACE}
+  HOST_ROUTE: ${APP_NAME}-dev.${APP_DOMAIN}
+  TAG: "latest"
+  MIN_REPLICAS: "1"
+  MAX_REPLICAS: "1"
+  MIN_CPU: "75m"
+  MAX_CPU: "150m"
+  MIN_MEM: "400Mi"
+  MAX_MEM: "800Mi"
+
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
   workflow_dispatch:
@@ -177,7 +191,8 @@ jobs:
         #        oc delete is/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
         #          || true && echo "No stale imagestreams"
         # Process and apply deployment template
-        oc process -f tools/openshift/api.dc.yaml -p SUFFIX=${{ env.SPRING_BOOT_IMAGE_NAME }} \
+        oc process -f tools/openshift/api.dc.yaml -p REPO_NAME=${{ env.REPO_NAME }} -p JOB_NAME=${{ env.JOB_NAME }} -p NAMESPACE=${{ env.NAMESPACE }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
+        
         | oc apply -f -
         # Start rollout (if necessary) and follow it
         oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
