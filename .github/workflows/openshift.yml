@@ -59,8 +59,10 @@ env:
   JOB_NAME: "master"
   APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE }}
+  COMMON_NAMESPACE: ${{ secrets.OPENSHIFT_COMMON_NAMESPACE }}
   HOST_ROUTE: "edx-api-master-dev.apps.silver.gov.bc.ca"
   TAG: "latest"
+  TARGET_ENV: "dev"
   MIN_REPLICAS: "1"
   MAX_REPLICAS: "1"
   MIN_CPU: "75m"
@@ -194,6 +196,9 @@ jobs:
         # Process and apply deployment template
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p JOB_NAME=${{ env.JOB_NAME }} -p NAMESPACE=${{ env.NAMESPACE }} -p HOST_ROUTE=${{ env.HOST_ROUTE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
         | oc apply -f -
+        
+        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/jenkins/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }}
+        
         # Start rollout (if necessary) and follow it
         oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
         || true && echo "Rollout in progress"
