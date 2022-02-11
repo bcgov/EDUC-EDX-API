@@ -188,7 +188,7 @@ jobs:
         oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
         || true && echo "No rollout in progress"
         
-        oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.SPRING_BOOT_IMAGE_NAME }}:${{ env.TAG }}
+        oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:${{ env.TAG }}
         
         #        # Remove any stale imagestreams
         #        oc delete is/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
