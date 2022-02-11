@@ -60,7 +60,6 @@ env:
 
   APP_NAME: 'edx-api'
   REPO_NAME: "educ-edx-api"
-  APP_DOMAIN: "apps.silver.gov.bc.ca"
   JOB_NAME: "master"
   APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.NAMESPACE_NO_ENV }}
