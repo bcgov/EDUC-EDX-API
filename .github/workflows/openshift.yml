@@ -58,8 +58,8 @@ env:
   APP_DOMAIN: "apps.silver.gov.bc.ca"
   JOB_NAME: "master"
   APP_NAME_FULL: "edx-api-master"
-  NAMESPACE: ${{ secrets.OPENSHIFT_NAMESPACE }}
-  COMMON_NAMESPACE: ${{ secrets.OPENSHIFT_COMMON_NAMESPACE }}
+  NAMESPACE: ${{ secrets.NAMESPACE }}
+  COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE }}
   HOST_ROUTE: "edx-api-master-dev.apps.silver.gov.bc.ca"
   TAG: "latest"
   TARGET_ENV: "dev"
