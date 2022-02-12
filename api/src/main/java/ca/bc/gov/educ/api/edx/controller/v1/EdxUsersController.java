@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserSchoolMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.MinistryTeamMapper;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.struct.v1.MinistryTeam;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import lombok.AccessLevel;
@@ -40,13 +39,13 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxUserSchool> findAllEdxUserSchools() {
-    return getService().getEdxUserSchoolsList().stream().map(userSchoolMapper::toStructure).collect(Collectors.toList());
+  public List<String> findAllEdxUserSchoolMincodes(String permissionName) {
+    return getService().getEdxUserSchoolsList(permissionName);
   }
 
   @Override
-  public EdxUser retrieveEdxUser(String edxUserID) {
-    return userMapper.toStructure(getService().retrieveEdxUserByID(UUIDUtil.fromString(edxUserID)));
+  public EdxUser retrieveEdxUser(String id) {
+    return userMapper.toStructure(getService().retrieveEdxUserByID(UUIDUtil.fromString(id)));
   }
 }
 
