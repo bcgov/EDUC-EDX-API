@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
+import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -28,11 +29,16 @@ public class EdxRoleEntity {
   UUID edxRoleID;
 
   @NotNull(message = "roleName cannot be null")
-  @Column(name = "ROLE_NAME")
+  @Column(name = "NAME")
   String roleName;
 
-  @Column(name = "ROLE_DESCRIPTION")
+  @Column(name = "DESCRIPTION")
   String roleDescription;
+
+  @NotNull(message = "isDistrictRole cannot be null")
+  @UpperCase
+  @Column(name = "IS_DISTRICT_ROLE")
+  String isDistrictRole;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
@@ -50,7 +56,17 @@ public class EdxRoleEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "secureExchangeEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SecureExchangeCommentEntity.class)
+  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
   private Set<EdxRolePermissionEntity> edxRolePermissionEntities;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserSchoolRoleEntity.class)
+  private Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntities;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictRoleEntity.class)
+  private Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities;
 
 }

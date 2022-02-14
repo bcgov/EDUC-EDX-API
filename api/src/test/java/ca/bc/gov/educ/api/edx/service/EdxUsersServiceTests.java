@@ -1,21 +1,15 @@
 package ca.bc.gov.educ.api.edx.service;
 
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
-import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
-import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
-import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
-import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
-import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
+import ca.bc.gov.educ.api.edx.model.v1.*;
+import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,23 +27,29 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private EdxUserSchoolRepository edxUserSchoolRepository;
 
-  @Before
-  public void setUp() {
-    var entity = this.edxUserRepository.save(getEdxUserEntity());
-    this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity.getEdxUserID()));
-    this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
-    this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
-  }
+  @Autowired
+  private EdxUserDistrictRepository edxUserDistrictRepository;
+
+  @Autowired
+  private EdxRoleRepository edxRoleRepository;
+
+  @Autowired
+  private EdxPermissionRepository edxPermissionRepository;
 
   @After
   public void tearDown() {
     this.edxUserRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
     this.ministryOwnershipTeamRepository.deleteAll();
+    this.edxRoleRepository.deleteAll();
+    this.edxPermissionRepository.deleteAll();
+    this.edxUserDistrictRepository.deleteAll();
   }
 
   @Test
   public void getAllMinistryTeams() {
+    this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
+    this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
     final List<MinistryOwnershipTeamEntity> teams = this.service.getMinistryTeamsList();
     assertThat(teams).isNotNull();
     assertThat(teams.size()).isEqualTo(2);
@@ -57,6 +57,8 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   public void getAllEdxUserSchools() {
+    var entity = this.edxUserRepository.save(getEdxUserEntity());
+    this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity.getEdxUserID()));
     final List<EdxUserSchoolEntity> edxUserSchoolEntities = this.service.getEdxUserSchoolsList();
     assertThat(edxUserSchoolEntities).isNotNull();
     assertThat(edxUserSchoolEntities.size()).isEqualTo(1);
@@ -64,34 +66,30 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   public void retrieveEdxUser() {
-    var entity = this.edxUserRepository.save(getEdxUserEntity());
-    this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity.getEdxUserID()));
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
     var edxUserSchoolEntities = this.service.retrieveEdxUserByID(entity.getEdxUserID());
     assertThat(edxUserSchoolEntities).isNotNull();
     assertThat(edxUserSchoolEntities.getEdxUserID()).isEqualTo(entity.getEdxUserID());
+    assertThat(edxUserSchoolEntities.getEdxUserSchoolEntities()).isNotNull();
+    assertThat(edxUserSchoolEntities.getEdxUserSchoolEntities().size()).isEqualTo(1);
+    var edxUserSchoolEntity = List.copyOf(edxUserSchoolEntities.getEdxUserSchoolEntities()).get(0);
+    assertThat(edxUserSchoolEntity).isNotNull();
+    assertThat(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().size()).isEqualTo(1);
+    var edxUserSchoolRollEntity = List.copyOf(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).get(0);
+    assertThat(edxUserSchoolRollEntity).isNotNull();
+    assertThat(edxUserSchoolRollEntity.getEdxRoleEntity()).isNotNull();
+    assertThat(edxUserSchoolRollEntity.getEdxRoleEntity().getRoleName()).isEqualTo("Admin");
   }
 
-  private EdxUserEntity getEdxUserEntity(){
-    EdxUserEntity entity = new EdxUserEntity();
-    entity.setDigitalIdentityID(UUID.randomUUID());
-    entity.setFirstName("Test");
-    entity.setLastName("User");
-    entity.setCreateUser("test");
-    entity.setCreateDate(LocalDateTime.now());
-    entity.setUpdateUser("test");
-    entity.setUpdateDate(LocalDateTime.now());
-    return entity;
-  }
+  @Test
+  public void getEdxUserSchoolsByPermissionName() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
-  private EdxUserSchoolEntity getEdxUserSchoolEntity(UUID edxUserId){
-    EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
-    entity.setEdxUserID(edxUserId);
-    entity.setMincode("12345678");
-    entity.setCreateUser("test");
-    entity.setCreateDate(LocalDateTime.now());
-    entity.setUpdateUser("test");
-    entity.setUpdateDate(LocalDateTime.now());
-    return entity;
+    final List<String> edxUserSchoolEntities = this.service.getEdxUserSchoolsList("Exchange");
+    assertThat(edxUserSchoolEntities).isNotNull();
+    assertThat(edxUserSchoolEntities.size()).isEqualTo(1);
+    assertThat(edxUserSchoolEntities.get(0)).isEqualTo("12345678");
   }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipEntity(String teamName, String groupRoleIdentifier) {

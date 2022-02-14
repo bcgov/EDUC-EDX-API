@@ -14,7 +14,7 @@ import java.util.List;
 public class EdxUserSchool extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  String edxUserDistrictID;
+  String edxUserSchoolID;
   String edxUserID;
   String mincode;
 

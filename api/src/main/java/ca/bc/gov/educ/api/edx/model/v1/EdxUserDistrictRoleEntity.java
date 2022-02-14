@@ -23,12 +23,6 @@ public class EdxUserDistrictRoleEntity {
   @Column(name = "EDX_USER_DISTRICT_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserDistrictRoleID;
 
-  @Column(name = "EDX_USER_DISTRICT_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserDistrictID;
-
-  @Column(name = "EDX_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxRoleID;
-
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
@@ -43,4 +37,11 @@ public class EdxUserDistrictRoleEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  @ManyToOne(optional = false, targetEntity = EdxUserDistrictEntity.class)
+  @JoinColumn(name = "EDX_USER_DISTRICT_ID", referencedColumnName = "EDX_USER_DISTRICT_ID", updatable = false)
+  private EdxUserDistrictEntity edxUserDistrictEntity;
+
+  @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
+  @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
+  private EdxRoleEntity edxRoleEntity;
 }

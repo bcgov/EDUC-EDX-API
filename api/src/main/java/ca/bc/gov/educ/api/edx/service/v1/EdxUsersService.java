@@ -54,4 +54,8 @@ public class EdxUsersService {
     }
   }
 
+  public List<String> getEdxUserSchoolsList(String permissionName) {
+    return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionName);
+  }
+
 }

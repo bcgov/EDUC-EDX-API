@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,7 +17,9 @@ public class EdxUser extends BaseRequest implements Serializable {
 
   String edxUserID;
   String digitalIdentityID;
+  @Size(max = 255)
   String firstName;
+  @Size(max = 255)
   String lastName;
 
   private List<EdxUserSchool> edxUserSchools;

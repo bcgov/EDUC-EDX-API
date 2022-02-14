@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -9,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -45,4 +48,8 @@ public class EdxPermissionEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "edxPermissionEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
+  private Set<EdxRolePermissionEntity> edxRolePermissionEntities;
 }

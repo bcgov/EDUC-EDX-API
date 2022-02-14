@@ -1,13 +1,11 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
-import ca.bc.gov.educ.api.edx.struct.v1.EdxRole;
 import lombok.Data;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,10 +23,6 @@ public class EdxRolePermissionEntity {
   @Column(name = "EDX_ROLE_PERMISSION_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxRolePermissionId;
 
-  @NotNull(message = "edxPermissionID cannot be null")
-  @Column(name = "EDX_PERMISSION_ID")
-  UUID edxPermissionID;
-
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
@@ -43,8 +37,12 @@ public class EdxRolePermissionEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = EdxRoleEntity.class)
+  @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
   @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
-  private EdxRole edxRole;
+  private EdxRoleEntity edxRoleEntity;
+
+  @ManyToOne(optional = false, targetEntity = EdxPermissionEntity.class)
+  @JoinColumn(name = "EDX_PERMISSION_ID", referencedColumnName = "EDX_PERMISSION_ID", updatable = false)
+  private EdxPermissionEntity edxPermissionEntity;
 
 }
