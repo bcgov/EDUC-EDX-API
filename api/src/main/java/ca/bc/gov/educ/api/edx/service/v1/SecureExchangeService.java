@@ -24,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +49,10 @@ public class SecureExchangeService {
 
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
+  @Getter(AccessLevel.PRIVATE)
+  @PersistenceContext
+  private EntityManager entityManager;
 
   @Autowired
   public SecureExchangeService(final SecureExchangeRequestRepository secureExchangeRequestRepository, final SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, final DocumentRepository documentRepository, final SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo, final SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository) {
@@ -72,6 +78,7 @@ public class SecureExchangeService {
    * @param secureExchangeRequest the secure exchange object to be persisted in the DB.
    * @return the persisted entity.
    */
+  @Transactional
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
     if(secureExchangeRequest.getSecureExchangeStatusCode() == null) {
       secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
@@ -84,7 +91,9 @@ public class SecureExchangeService {
       secureExchangeRequest.setIsReadByMinistry("N");
     }
     TransformUtil.uppercaseFields(secureExchangeRequest);
-    return this.getSecureExchangeRequestRepository().save(secureExchangeRequest);
+    var entity = this.getSecureExchangeRequestRepository().saveAndFlush(secureExchangeRequest);
+    this.getEntityManager().refresh(entity);
+    return entity;
   }
 
   public Iterable<SecureExchangeStatusCodeEntity> getSecureExchangeStatusCodesList() {

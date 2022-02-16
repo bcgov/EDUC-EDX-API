@@ -89,7 +89,6 @@ public class SecureExchangeEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @GeneratedValue(strategy = GenerationType.SEQUENCE)
   @Column(
     name="SEQUENCE_NUMBER",
     insertable = false,
