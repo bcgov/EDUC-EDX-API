@@ -4,11 +4,13 @@ import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
@@ -87,10 +89,13 @@ public class SecureExchangeEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @GeneratedValue(generator = "SEQUENCE")
-  @GenericGenerator(name = "sequence", strategy = "org.hibernate.id.SequenceGenerator")
-  @Column(name = "SEQUENCE_NUMBER", unique = true, updatable = false)
-  String sequenceNumber;
+  @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  @Column(
+    name="SEQUENCE_NUMBER",
+    insertable = false,
+    updatable=false
+  )
+  Integer sequenceNumber;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude

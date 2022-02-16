@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.constants.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
@@ -61,7 +62,11 @@ public class SecureExchangePayloadValidator {
     }
 
     if (ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getMinistryOwnershipTeamID())).isEmpty()) {
-      apiValidationErrors.add(createFieldError("ministryOwnershipTeamID", secureExchange.getMinistryOwnershipTeamID(), "ministryOwnershipTeamID value was not found as a valid team."));
+      apiValidationErrors.add(createFieldError("ministryOwnershipTeamID", secureExchange.getMinistryOwnershipTeamID(), "ministryOwnershipTeamID value was not found as a valid ministry team."));
+    }
+
+    if (isCreateOperation && secureExchange.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.MINTEAM) && ministryOwnershipTeamRepository.findById(UUID.fromString(secureExchange.getContactIdentifier())).isEmpty()) {
+      apiValidationErrors.add(createFieldError("contactIdentifier", secureExchange.getMinistryOwnershipTeamID(), "contactIdentifier value was not found as a valid ministry team."));
     }
 
     if (secureExchangeContactTypeCodeTableRepository.findById(secureExchange.getSecureExchangeContactTypeCode()).isEmpty()) {

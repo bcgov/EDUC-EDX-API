@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class SecureExchangeComments extends BaseRequest implements Serializable {
+public class SecureExchangeComment extends BaseRequest implements Serializable {
   private static final long serialVersionUID = -6904836038828419985L;
 
   String secureExchangeCommentID;
