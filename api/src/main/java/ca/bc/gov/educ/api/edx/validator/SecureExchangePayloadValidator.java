@@ -49,7 +49,7 @@ public class SecureExchangePayloadValidator {
     }
 
     if (isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null &&
-      !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.NEW.toString()) && !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.INPROGRESS.toString())) {
+      !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.NEW.toString()) && !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.INPROG.toString())) {
       apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be NEW or INPROGRESS for post operation."));
     }
 
