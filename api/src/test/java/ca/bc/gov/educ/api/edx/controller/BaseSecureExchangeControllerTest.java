@@ -19,7 +19,7 @@ public abstract class BaseSecureExchangeControllerTest extends BaseSecureExchang
   }
 
   protected String dummySecureExchangeNoCreateUpdateDateJsonWithMinAndStatusCode(final String ministryOwnershipTeamID) {
-    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"isReadByMinistry\":\"Y\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\",\"secureExchangeStatusCode\":\"INPROGRESS\"}";
+    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"isReadByMinistry\":\"Y\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\",\"secureExchangeStatusCode\":\"INPROG\"}";
   }
 
   protected String dummySecureExchangeNoCreateUpdateDateJsonWithMinNoID(final String ministryOwnershipTeamID) {
