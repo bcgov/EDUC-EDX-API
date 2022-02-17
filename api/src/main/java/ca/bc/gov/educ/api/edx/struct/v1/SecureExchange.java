@@ -46,7 +46,7 @@ public class SecureExchange extends BaseRequest implements Serializable {
 
   String sequenceNumber;
 
-  private List<SecureExchangeComments> commentsList;
+  private List<SecureExchangeComment> commentsList;
 }
 
 

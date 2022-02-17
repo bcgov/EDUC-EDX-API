@@ -133,7 +133,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
       .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinAndStatusCode(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.isReadByMinistry", is("Y")))
-      .andExpect(jsonPath("$.secureExchangeStatusCode", is("INPROGRESS")));
+      .andExpect(jsonPath("$.secureExchangeStatusCode", is("INPROG")));
   }
 
   @Test

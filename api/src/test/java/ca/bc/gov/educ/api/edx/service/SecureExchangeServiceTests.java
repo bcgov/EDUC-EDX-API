@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -49,6 +50,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
+  @Transactional
   public void createSecureExchange() {
     var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     var secureExchange = new SecureExchangeBuilder()

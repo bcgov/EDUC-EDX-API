@@ -4,10 +4,12 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -16,6 +18,36 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
 
   protected SecureExchangeEntityDecorator(final SecureExchangeEntityMapper delegate) {
     this.delegate = delegate;
+  }
+
+  @Override
+  public SecureExchange toStructure(SecureExchangeEntity entity) {
+    val secureExchange = this.delegate.toStructure(entity);
+
+    var comments = entity.getSecureExchangeComment();
+
+    if(comments != null && !comments.isEmpty()) {
+      secureExchange.setCommentsList(new ArrayList<>());
+
+      for (val comment : comments) {
+        SecureExchangeComment newComment = new SecureExchangeComment();
+        newComment.setContent(comment.getContent());
+        newComment.setStaffUserIdentifier(comment.getStaffUserIdentifier());
+        newComment.setCommentUserName(comment.getCommentUserName());
+        if(comment.getEdxUserID() != null) {
+          newComment.setEdxUserID(comment.getEdxUserID().toString());
+        }
+
+        newComment.setSecureExchangeID(secureExchange.getSecureExchangeID());
+        newComment.setCreateUser(comment.getCreateUser());
+        newComment.setUpdateUser(comment.getUpdateUser());
+        newComment.setCommentTimestamp(comment.getCommentTimestamp().toString());
+        newComment.setUpdateDate(comment.getUpdateDate().toString());
+        newComment.setCreateDate(comment.getCreateDate().toString());
+        secureExchange.getCommentsList().add(newComment);
+      }
+    }
+    return secureExchange;
   }
 
   @Override
