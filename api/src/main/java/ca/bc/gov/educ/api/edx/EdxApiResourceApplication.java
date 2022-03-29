@@ -65,7 +65,7 @@ public class EdxApiResourceApplication {
 
   @Bean
   public LockProvider lockProvider(@Autowired final JdbcTemplate jdbcTemplate, @Autowired final PlatformTransactionManager transactionManager) {
-    return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "PEN_RETRIEVAL_REQUEST_SHEDLOCK");
+    return new JdbcTemplateLockProvider(jdbcTemplate, transactionManager, "EDX_SHEDLOCK");
   }
 
   /**
