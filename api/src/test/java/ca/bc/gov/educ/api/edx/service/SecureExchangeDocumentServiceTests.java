@@ -89,10 +89,11 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
   @Test
   public void retrieveDocumentMetadataThrowsExceptionWhenInvalidSecureExchangeIdGivenTest() {
-    final UUID randomGuid = UUID.randomUUID();
-    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(randomGuid, randomGuid))
-        .isInstanceOf(EntityNotFoundException.class)
-        .hasMessageContaining("DocumentEntity");
+    final UUID randomGuid =  UUID.randomUUID();
+    final var docID = this.bcscPhoto.getDocumentID();
+    assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(randomGuid, docID))
+      .isInstanceOf(EntityNotFoundException.class)
+      .hasMessageContaining("DocumentEntity");
   }
 
   @Test
