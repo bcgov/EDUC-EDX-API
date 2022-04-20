@@ -8,38 +8,16 @@ env:
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
   OPENSHIFT_NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-test
 
-  DB_JDBC_CONNECT_STRING: ${{ secrets.DB_JDBC_CONNECT_STRING }}
-  DB_PWD: ${{ secrets.DB_PWD }}
-  DB_USER: ${{ secrets.DB_USER }}
-  SPLUNK_TOKEN: ${{ secrets.SPLUNK_TOKEN }}
-
-  # 🖊️ EDIT to change the image registry settings.
-  # Registries such as GHCR, Quay.io, and Docker Hub are supported.
-  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
-  IMAGE_REGISTRY_USER: ${{ github.actor }}
-  IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
-
   # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
-
-  SPRING_BOOT_IMAGE_NAME: edx-api-master
-  DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
-  ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 
   APP_NAME: 'edx-api'
   REPO_NAME: "educ-edx-api"
   JOB_NAME: "master"
   APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}
-  COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
   TARGET_ENV: "dev"
-  MIN_REPLICAS: "1"
-  MAX_REPLICAS: "1"
-  MIN_CPU: "75m"
-  MAX_CPU: "150m"
-  MIN_MEM: "400Mi"
-  MAX_MEM: "800Mi"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -51,7 +29,7 @@ on:
 
 jobs:
   openshift-ci-cd:
-    name: Deploy to OpenShift TEST
+    name: Tag Image
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-18.04
     environment: test
@@ -61,44 +39,6 @@ jobs:
       SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
 
     steps:
-    - name: Check for required secrets
-      uses: actions/github-script@v4
-      with:
-        script: |
-          const secrets = {
-            OPENSHIFT_SERVER: `${{ secrets.OPENSHIFT_SERVER }}`,
-            OPENSHIFT_TOKEN: `${{ secrets.OPENSHIFT_TOKEN }}`,
-          };
-
-          const GHCR = "ghcr.io";
-          if (`${{ env.IMAGE_REGISTRY }}`.startsWith(GHCR)) {
-            core.info(`Image registry is ${GHCR} - no registry password required`);
-          }
-          else {
-            core.info("A registry password is required");
-            secrets["IMAGE_REGISTRY_PASSWORD"] = `${{ secrets.IMAGE_REGISTRY_PASSWORD }}`;
-          }
-
-          const missingSecrets = Object.entries(secrets).filter(([ name, value ]) => {
-            if (value.length === 0) {
-              core.error(`Secret "${name}" is not set`);
-              return true;
-            }
-            core.info(`✔️ Secret "${name}" is set`);
-            return false;
-          });
-
-          if (missingSecrets.length > 0) {
-            core.setFailed(`❌ At least one required secret is not set in the repository. \n` +
-              "You can add it using:\n" +
-              "GitHub UI: https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository \n" +
-              "GitHub CLI: https://cli.github.com/manual/gh_secret_set \n" +
-              "Also, refer to https://github.com/redhat-actions/oc-login#getting-started-with-the-action-or-see-example");
-          }
-          else {
-            core.info(`✅ All the required secrets are set`);
-          }
-
     - name: Check out repository
       uses: actions/checkout@v2
 
@@ -112,13 +52,6 @@ jobs:
             ref: 'refs/tags/${{ github.event.inputs.version }}',
             sha: context.sha
           })
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.DOCKER_ARTIFACTORY_REPO }}
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
     - name: Install oc
       uses: redhat-actions/openshift-tools-installer@v1
