@@ -6,7 +6,7 @@ env:
   # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
-  OPENSHIFT_NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-test
+  OPENSHIFT_NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-dev
 
   # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
@@ -32,7 +32,7 @@ jobs:
     name: Tag Image
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-18.04
-    environment: test
+    environment: dev
 
     outputs:
       ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
