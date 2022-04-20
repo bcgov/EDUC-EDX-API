@@ -1,4 +1,4 @@
-name: Build_Deploy_DEV
+name: Deploy_TEST
 
 env:
   # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
@@ -6,7 +6,7 @@ env:
   # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
-  OPENSHIFT_NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-dev
+  OPENSHIFT_NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}-test
 
   DB_JDBC_CONNECT_STRING: ${{ secrets.DB_JDBC_CONNECT_STRING }}
   DB_PWD: ${{ secrets.DB_PWD }}
@@ -47,10 +47,10 @@ on:
 
 jobs:
   openshift-ci-cd:
-    name: Build and deploy to OpenShift DEV
+    name: Deploy to OpenShift TEST
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-18.04
-    environment: dev
+    environment: test
 
     outputs:
       ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
@@ -97,6 +97,8 @@ jobs:
 
     - name: Check out repository
       uses: actions/checkout@v2
+      with:
+        ref: 1.0.0
 
     - name: Determine image tags
       if: env.IMAGE_TAGS == ''
@@ -109,33 +111,6 @@ jobs:
         registry: ${{ env.DOCKER_ARTIFACTORY_REPO }}
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-    # https://github.com/redhat-actions/buildah-build#readme
-    - name: Build from Dockerfile
-      id: build-image
-      uses: redhat-actions/buildah-build@v2
-      with:
-        image: ${{ env.APP_NAME_FULL }}
-        tags: ${{ env.IMAGE_TAGS }}
-
-        # If you don't have a Dockerfile/Containerfile, refer to https://github.com/redhat-actions/buildah-build#scratch-build-inputs
-        # Or, perform a source-to-image build using https://github.com/redhat-actions/s2i-build
-        # Otherwise, point this to your Dockerfile/Containerfile relative to the repository root.
-        dockerfiles: |
-          ./Dockerfile
-
-    # https://github.com/redhat-actions/push-to-registry#readme
-    - name: Push to registry
-      id: push-image
-      uses: redhat-actions/push-to-registry@v2
-      with:
-        image: ${{ steps.build-image.outputs.image }}
-        tags: ${{ steps.build-image.outputs.tags }}
-        registry: ${{ env.IMAGE_REGISTRY }}
-        username: ${{ env.IMAGE_REGISTRY_USER }}
-        password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
-
-    # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
 
     - name: Install oc
       uses: redhat-actions/openshift-tools-installer@v1
