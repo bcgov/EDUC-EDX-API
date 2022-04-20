@@ -33,9 +33,9 @@ env:
   NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
-  TARGET_ENV: "dev"
-  MIN_REPLICAS: "1"
-  MAX_REPLICAS: "1"
+  TARGET_ENV: "test"
+  MIN_REPLICAS: "3"
+  MAX_REPLICAS: "3"
   MIN_CPU: "75m"
   MAX_CPU: "150m"
   MIN_MEM: "400Mi"
@@ -97,20 +97,18 @@ jobs:
 
     - name: Check out repository
       uses: actions/checkout@v2
-      with:
-        ref: 1.0.0
+
+    - name: Set tag version
+      run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - name: Test
+      run: |
+        echo $RELEASE_VERSION
+        echo ${{ env.RELEASE_VERSION }}
 
     - name: Determine image tags
       if: env.IMAGE_TAGS == ''
       run: |
         echo "IMAGE_TAGS=latest ${GITHUB_SHA::12}" | tee -a $GITHUB_ENV
-
-    - name: Login to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.DOCKER_ARTIFACTORY_REPO }}
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
     - name: Install oc
       uses: redhat-actions/openshift-tools-installer@v1
@@ -129,7 +127,7 @@ jobs:
         oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
         || true && echo "No rollout in progress"
         
-        oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:${{ env.TAG }}
+        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:${{ env.RELEASE_VERSION }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:${{ env.RELEASE_VERSION }}
         
         # Process and apply deployment template
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p JOB_NAME=${{ env.JOB_NAME }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
