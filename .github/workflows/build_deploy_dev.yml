@@ -168,3 +168,8 @@ jobs:
         oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
         # Get status, returns 0 if rollout is successful
         oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+
+    - name: ZAP Scan
+      uses: zaproxy/action-api-scan@v0.1.0
+      with:
+        target: 'https://${{ env.APP_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/v3/api-docs'
