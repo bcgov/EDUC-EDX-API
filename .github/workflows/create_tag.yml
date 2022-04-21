@@ -1,4 +1,4 @@
-name: Create_Tag
+name: Create Tag
 
 env:
   # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
