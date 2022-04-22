@@ -11,13 +11,9 @@ env:
   # 🖊️ EDIT to specify custom tags for the container image, or default tags will be generated below.
   IMAGE_TAGS: ""
 
-  APP_NAME: 'edx-api'
   REPO_NAME: "educ-edx-api"
   BRANCH: "master"
-  APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}
-  TAG: "latest"
-  TARGET_ENV: "dev"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
