@@ -20,13 +20,10 @@ env:
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
 
   SPRING_BOOT_IMAGE_NAME: edx-api-master
-  DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
-  ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 
   APP_NAME: 'edx-api'
   REPO_NAME: "educ-edx-api"
   BRANCH: "master"
-  APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}
   COMMON_NAMESPACE: ${{ secrets.COMMON_NAMESPACE_NO_ENV }}
   TAG: "latest"
