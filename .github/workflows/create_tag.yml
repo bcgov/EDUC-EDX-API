@@ -13,7 +13,7 @@ env:
 
   APP_NAME: 'edx-api'
   REPO_NAME: "educ-edx-api"
-  JOB_NAME: "master"
+  BRANCH: "master"
   APP_NAME_FULL: "edx-api-master"
   NAMESPACE: ${{ secrets.EDX_NAMESPACE_NO_ENV }}
   TAG: "latest"
@@ -67,4 +67,4 @@ jobs:
         oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
         oc project ${{ env.OPENSHIFT_NAMESPACE }}
         
-        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:latest ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.JOB_NAME }}:${{ github.event.inputs.version }}
+        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.BRANCH }}:latest ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ github.event.inputs.version }}
