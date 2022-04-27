@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The interface EDX Users.
@@ -52,4 +53,15 @@ public interface EdxUsersEndpoint {
   @GetMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   EdxUser retrieveEdxUser(@PathVariable String id);
+
+
+  /**
+   *   There is scope for adding other Query Params to this endpoint. When those get added digitalId can be made required=false.
+   * @return  List of Edx User
+   */
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
+  @GetMapping
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = true) UUID digitalId);
+
 }

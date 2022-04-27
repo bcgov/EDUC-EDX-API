@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -93,6 +95,39 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
       .andExpect(jsonPath("$.[0]", is("12345678")));
+  }
+
+  @Test
+  public void testFindEdxUsers_GivenValidDigitalIdentityID_ShouldReturnOkStatusWithResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID digitalIdentityID = entity.getDigitalIdentityID();
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+            .param("digitalId", String.valueOf(digitalIdentityID))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$.[0].digitalIdentityID", is(digitalIdentityID.toString())));
+
+  }
+
+  @Test
+  public void testFindEdxUsers_GivenNoDigitalIdentityIDAsInput_ShouldReturnError() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID digitalIdentityID = entity.getDigitalIdentityID();
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testFindEdxUsers_GivenInValidDigitalIdentityID_ShouldReturnOkStatusWithEmptyResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID digitalIdentityID = entity.getDigitalIdentityID();
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+            .param("digitalId", UUID.randomUUID().toString())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.hasSize(0)));
+
   }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam(){

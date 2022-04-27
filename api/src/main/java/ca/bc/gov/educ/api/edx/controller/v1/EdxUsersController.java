@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,6 +47,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   @Override
   public EdxUser retrieveEdxUser(String id) {
     return userMapper.toStructure(getService().retrieveEdxUserByID(UUIDUtil.fromString(id)));
+  }
+
+  @Override
+  public List<EdxUser> findEdxUsers(UUID digitalId) {
+    return getService().findEdxUsers(digitalId).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
 }
 
