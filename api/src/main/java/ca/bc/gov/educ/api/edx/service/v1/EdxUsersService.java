@@ -58,4 +58,7 @@ public class EdxUsersService {
     return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionName);
   }
 
+  public List<EdxUserEntity> findEdxUsers(UUID digitalId){
+    return this.getEdxUserRepository().findEdxUserEntitiesByDigitalIdentityID(digitalId);
+  }
 }
