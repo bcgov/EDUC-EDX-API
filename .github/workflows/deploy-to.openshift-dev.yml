@@ -178,18 +178,18 @@ jobs:
         
         oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
         
-        echo '::set-output name=action_echo::disabled'
-        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret sso-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-username": "\(.*\)"/\1/p' | base64 --decode)
-        #SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret sso-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-password": "\(.*\)",/\1/p' | base64 --decode)
+        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-username": "\(.*\)"/\1/p' | base64 --decode) > /dev/null 2>&1
+        SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-password": "\(.*\)",/\1/p' | base64 --decode) > /dev/null 2>&1
         
         ::add-mask::$SOAM_KC_LOAD_USER_ADMIN
-        echo '::set-output name=action_echo::enabled'
+        ::add-mask::$SOAM_KC_LOAD_USER_PASS
+        ::add-mask::${{ env.APP_NAME }}-pgsql.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local
         
         # Process and apply deployment template
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
         | oc apply -f -
         
-        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.DB_JDBC_CONNECT_STRING }} ${{ env.DB_PWD }} $SOAM_KC_LOAD_USER_ADMIN ${{ env.SPLUNK_TOKEN }}
+        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.APP_NAME }}-pgsql.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local $SOAM_KC_LOAD_USER_PASS $SOAM_KC_LOAD_USER_ADMIN ${{ env.SPLUNK_TOKEN }}
         
         # Start rollout (if necessary) and follow it
         oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
