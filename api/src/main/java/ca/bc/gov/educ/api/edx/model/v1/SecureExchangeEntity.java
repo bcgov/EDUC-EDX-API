@@ -59,12 +59,12 @@ public class SecureExchangeEntity {
   @NotNull(message = "isReadByMinistry cannot be null")
   @UpperCase
   @Column(name = "IS_READ_BY_MINISTRY")
-  String isReadByMinistry;
+  Boolean isReadByMinistry;
 
   @NotNull(message = "isReadByExchangeContact cannot be null")
   @UpperCase
   @Column(name = "IS_READ_BY_CONTACT")
-  String isReadByExchangeContact;
+  Boolean isReadByExchangeContact;
 
   @NotNull(message = "statusUpdateDate cannot be null")
   @PastOrPresent

@@ -22,9 +22,9 @@ public class SecureExchangeBuilder {
 
   String createUser = "API";
 
-  String isReadByMinistry = "N";
+  Boolean isReadByMinistry = false;
 
-  String isReadByContact = "N";
+  Boolean isReadByContact = false;
 
   Date createDate = new Date();
 
