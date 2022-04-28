@@ -240,7 +240,7 @@ CREATE TABLE SECURE_EXCHANGE_DOCUMENT
     FILE_NAME                          VARCHAR(255)        NOT NULL,
     FILE_EXTENSION                     VARCHAR(255),
     FILE_SIZE                          NUMERIC,
-    DOCUMENT_DATA                      BLOB,
+    DOCUMENT_DATA                      BYTEA,
     EDX_USER_ID                        UUID,
     STAFF_USER_IDENTIFIER              UUID,
     CREATE_USER                        VARCHAR(32)         NOT NULL,
