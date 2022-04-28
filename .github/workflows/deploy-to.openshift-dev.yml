@@ -168,6 +168,7 @@ jobs:
 
     - name: Deploy API
       run: |
+        set -eu
         # Login to OpenShift and select project
         oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
         oc project ${{ env.OPENSHIFT_NAMESPACE }}
