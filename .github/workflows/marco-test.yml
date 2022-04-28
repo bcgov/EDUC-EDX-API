@@ -129,7 +129,7 @@ jobs:
 
         deploy=`oc get statefulset redis 2> /dev/null || true && echo "No set"`
         echo "Deployment: $deploy" 
-        if [[ "No set" != $deploy ]]; then
+        if [[ "$?" -eq 0 ]]; then
           echo "Found"   
         else
           echo "Not Found"
