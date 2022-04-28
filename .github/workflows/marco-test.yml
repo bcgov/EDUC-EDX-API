@@ -128,7 +128,6 @@ jobs:
         oc project ${{ env.OPENSHIFT_NAMESPACE }}
 
         deploy=`oc get statefulset ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} 2> /dev/null || true && echo "NOT_FOUND"`
-        echo "Deployment: $deploy" 
         if [[ "$deploy" == "NOT_FOUND" ]]; then
           echo "Not Found"
           # Process and apply secret deployment template
