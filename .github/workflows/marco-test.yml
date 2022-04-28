@@ -126,23 +126,18 @@ jobs:
         # Login to OpenShift and select project
         oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
         oc project ${{ env.OPENSHIFT_NAMESPACE }}
-        # Cancel any rollouts in progress
-        oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
-        || true && echo "No rollout in progress"
-        
-        oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
-        
-        # Process and apply deployment template
-        oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
-        | oc apply -f -
-        
-        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.DB_JDBC_CONNECT_STRING }} ${{ env.DB_PWD }} ${{ env.DB_USER }} ${{ env.SPLUNK_TOKEN }}
-        
-        # Start rollout (if necessary) and follow it
-        oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
-        || true && echo "Rollout in progress"
-        oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
-        # Get status, returns 0 if rollout is successful
-        oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+
+#          deploy=`oc get statefulset ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }}`
+#          if [[ "$?" -eq 0 ]]; then
+#            #Do nothing
+#          else
+#            # Process and apply secret deployment template
+#            oc process -f tools/openshift/patroni-postgresql-secrets.yaml -p NAME=${{ env.APP_NAME }} -p SUFFIX=-pgsql-${{ env.TARGET_ENV }} -p APP_DB_NAME=${{ env.APP_NAME }} -p APP_DB_USERNAME=${{ env.APP_NAME }}  \
+#            | oc apply -f -
+#
+#            # Process and apply deployment template
+#            oc process -f tools/openshift/patroni-postgresql.yaml -p NAME=${{ env.APP_NAME }} -p SUFFIX=-pgsql-${{ env.TARGET_ENV }} -p INSTANCE=${{ env.APP_NAME }}-pgsql \
+#            | oc apply -f -
+#          fi
 
 
