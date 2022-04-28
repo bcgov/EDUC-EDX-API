@@ -85,10 +85,10 @@ public class SecureExchangeService {
     }
     secureExchangeRequest.setStatusUpdateDate(LocalDateTime.now());
     if(secureExchangeRequest.getIsReadByExchangeContact() == null) {
-      secureExchangeRequest.setIsReadByExchangeContact("N");
+      secureExchangeRequest.setIsReadByExchangeContact(false);
     }
     if(secureExchangeRequest.getIsReadByMinistry() == null) {
-      secureExchangeRequest.setIsReadByMinistry("N");
+      secureExchangeRequest.setIsReadByMinistry(false);
     }
     TransformUtil.uppercaseFields(secureExchangeRequest);
     var entity = this.getSecureExchangeRequestRepository().saveAndFlush(secureExchangeRequest);
