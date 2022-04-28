@@ -67,8 +67,6 @@ objects:
             app.kubernetes.io/name: patroni
             app: ${NAME}${SUFFIX}
         spec:
-          imagePullSecrets:
-            - name: artifactory-creds
           containers:
             - env:
                 #TODO: Remove POD_IP in favor of PATRONI_KUBERNETES_POD_IP
@@ -77,15 +75,6 @@ objects:
                     fieldRef:
                       apiVersion: v1
                       fieldPath: status.podIP
-                #          - name: PATRONI_KUBERNETES_USE_ENDPOINTS
-                #            value: 'true'
-                #          - name: PATRONI_KUBERNETES_POD_IP
-                #            valueFrom:
-                #              fieldRef:
-                #                apiVersion: v1
-                #                fieldPath: status.podIP
-                #          - name: PATRONI_KUBERNETES_PORTS
-                #            value: '{[{"name": "postgresql", "port": 5432}]}'
                 - name: PATRONI_KUBERNETES_NAMESPACE
                   valueFrom:
                     fieldRef:
@@ -150,7 +139,7 @@ objects:
                   value: 0.0.0.0:5432
                 - name: PATRONI_RESTAPI_LISTEN
                   value: 0.0.0.0:8008
-              image: artifacts.developer.gov.bc.ca/bcgov-docker-local/patroni-postgres:2.0.1-12.4-latest
+              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/spilo-13:2.1-p1
               # Because we are using image reference to a tag, we need to always pull the image otherwise
               #   we end up with outdated/out-of-sync image depending on the node where it is running
               imagePullPolicy: Always
@@ -294,3 +283,4 @@ parameters:
     value: 2Gi
   - name: STORAGE_CLASS
     value: netapp-block-standard
+  - name: NAMESPACE
