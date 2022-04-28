@@ -160,7 +160,7 @@ jobs:
           | oc apply -f -
           
           # Process and apply deployment template
-          oc process -f tools/openshift/patroni-postgresql.yaml -p NAME=${{ env.APP_NAME }}-pgsql -p SUFFIX=-pgsql-${{ env.TARGET_ENV }} -p INSTANCE=${{ env.APP_NAME }}-pgsql \
+          oc process -f tools/openshift/patroni-postgresql.yaml -p NAME=${{ env.APP_NAME }}-pgsql -p SUFFIX=-pgsql-${{ env.TARGET_ENV }} -p INSTANCE=${{ env.APP_NAME }}-pgsql -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} \
           | oc apply -f -
         else
           echo "Found"
