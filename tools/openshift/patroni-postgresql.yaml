@@ -150,7 +150,7 @@ objects:
                   value: 0.0.0.0:5432
                 - name: PATRONI_RESTAPI_LISTEN
                   value: 0.0.0.0:8008
-              image: docker-remote.artifacts.developer.gov.bc.ca/bcgov-docker-local/patroni-postgres:2.0.1-12.4-latest
+              image: artifacts.developer.gov.bc.ca/bcgov-docker-local/patroni-postgres:2.0.1-12.4-latest
               # Because we are using image reference to a tag, we need to always pull the image otherwise
               #   we end up with outdated/out-of-sync image depending on the node where it is running
               imagePullPolicy: Always
