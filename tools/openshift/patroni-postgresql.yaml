@@ -291,6 +291,6 @@ parameters:
   - description: The size of the persistent volume to create.
     displayName: Persistent Volume Size
     name: PVC_SIZE
-    value: 5Gi
+    value: 2Gi
   - name: STORAGE_CLASS
     value: netapp-block-standard
