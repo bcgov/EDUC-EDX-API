@@ -132,7 +132,7 @@ jobs:
         if [[ "No set" != $deploy ]]; then
           echo "Found"   
         else
-             echo "Not Found"
+          echo "Not Found"
 #          # Process and apply secret deployment template
 #          oc process -f tools/openshift/patroni-postgresql-secrets.yaml -p NAME=${{ env.APP_NAME }} -p SUFFIX=-pgsql-${{ env.TARGET_ENV }} -p APP_DB_NAME=${{ env.APP_NAME }} -p APP_DB_USERNAME=${{ env.APP_NAME }}  \
 #          | oc apply -f -
