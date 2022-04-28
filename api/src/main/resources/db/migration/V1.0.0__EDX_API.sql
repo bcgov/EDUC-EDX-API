@@ -11,7 +11,7 @@ CREATE TABLE SECURE_EXCHANGE
     IS_READ_BY_CONTACT                BOOLEAN              NOT NULL,
     SUBJECT                           VARCHAR(4000)       NOT NULL,
     STATUS_UPDATE_TIMESTAMP           DATE                 NOT NULL,
-    SEQUENCE_NUMBER                   NUMERIC               DEFAULT SEC_EXCHANGE_SEQ.nextval NOT NULL,
+    SEQUENCE_NUMBER                   NUMERIC               DEFAULT nextval('SEC_EXCHANGE_SEQ') NOT NULL,
     CREATE_USER                       VARCHAR(32)         NOT NULL,
     CREATE_DATE                       DATE DEFAULT SYSDATE NOT NULL,
     UPDATE_USER                       VARCHAR(32)         NOT NULL,
