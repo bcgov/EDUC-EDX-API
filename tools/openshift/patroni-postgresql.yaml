@@ -67,6 +67,8 @@ objects:
             app.kubernetes.io/name: patroni
             app: ${NAME}${SUFFIX}
         spec:
+          imagePullSecrets:
+            - name: artifactory-creds
           containers:
             - env:
                 #TODO: Remove POD_IP in favor of PATRONI_KUBERNETES_POD_IP
@@ -139,7 +141,7 @@ objects:
                   value: 0.0.0.0:5432
                 - name: PATRONI_RESTAPI_LISTEN
                   value: 0.0.0.0:8008
-              image: image-registry.openshift-image-registry.svc:5000/${NAMESPACE}/spilo-13:2.1-p1
+              image: artifacts.developer.gov.bc.ca/bcgov-docker-local/patroni-postgres:2.0.1-12.4-latest
               # Because we are using image reference to a tag, we need to always pull the image otherwise
               #   we end up with outdated/out-of-sync image depending on the node where it is running
               imagePullPolicy: Always
@@ -152,6 +154,13 @@ objects:
               resources: {}
               terminationMessagePath: /dev/termination-log
               terminationMessagePolicy: File
+              readinessProbe:
+                initialDelaySeconds: 5
+                timeoutSeconds: 5
+                failureThreshold: 4
+                exec:
+                  command:
+                    - /usr/share/scripts/patroni/health_check.sh
               volumeMounts:
                 - mountPath: /home/postgres/pgdata
                   name: postgresql
@@ -276,4 +285,3 @@ parameters:
     value: 2Gi
   - name: STORAGE_CLASS
     value: netapp-block-standard
-  - name: NAMESPACE
