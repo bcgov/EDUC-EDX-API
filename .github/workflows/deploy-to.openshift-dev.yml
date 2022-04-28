@@ -178,12 +178,13 @@ jobs:
         
         oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
         
-        ::echo::off
-        ::add-mask::SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-username": "\(.*\)",/\1/p' | base64 --decode) > /dev/null 2>&1
-        ::add-mask::SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-password": "\(.*\)",/\1/p' | base64 --decode) > /dev/null 2>&1
-        ::add-mask::jdbc:postgresql://${{ env.APP_NAME }}-pgsql.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.APP_NAME }}    
+        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-username": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} | sed -n 's/.*"app-db-password": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
         
-        ::echo::on
+        echo "::add-mask::$SOAM_KC_LOAD_USER_ADMIN"
+        echo "::add-mask::$SOAM_KC_LOAD_USER_PASS"
+        echo "::add-mask::jdbc:postgresql://${{ env.APP_NAME }}-pgsql.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.APP_NAME }}"    
+        
         # Process and apply deployment template
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
         | oc apply -f -
