@@ -67,6 +67,8 @@ objects:
             app.kubernetes.io/name: patroni
             app: ${NAME}${SUFFIX}
         spec:
+          imagePullSecrets:
+            - name: artifactory-creds
           containers:
             - env:
                 #TODO: Remove POD_IP in favor of PATRONI_KUBERNETES_POD_IP
@@ -152,8 +154,6 @@ objects:
               # Because we are using image reference to a tag, we need to always pull the image otherwise
               #   we end up with outdated/out-of-sync image depending on the node where it is running
               imagePullPolicy: Always
-              imagePullSecrets:
-                - name: artifactory-creds
               name: postgresql
               ports:
                 - containerPort: 8008
