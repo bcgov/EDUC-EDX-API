@@ -129,7 +129,7 @@ jobs:
 
         deploy=`oc get statefulset ${{ env.APP_NAME }}-pgsql-${{ env.TARGET_ENV }} 2> /dev/null || true && echo "NOT_FOUND"`
         echo "Deployment: $deploy" 
-        if [[ "NOT_FOUND" -eq $deploy ]]; then
+        if [[ "$deploy" -eq NOT_FOUND ]]; then
           echo "Not Found"
         else
           echo "Found"
