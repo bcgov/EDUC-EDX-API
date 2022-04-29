@@ -38,7 +38,7 @@ public class EdxRoleEntity {
   @NotNull(message = "isDistrictRole cannot be null")
   @UpperCase
   @Column(name = "IS_DISTRICT_ROLE")
-  String isDistrictRole;
+  Boolean isDistrictRole;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

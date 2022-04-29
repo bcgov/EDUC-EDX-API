@@ -39,7 +39,7 @@ public class EdxActivationCodeEntity {
 
   @NotNull(message = "isPrimary cannot be null")
   @Column(name = "IS_PRIMARY")
-  String isPrimary;
+  Boolean isPrimary;
 
   @NotNull(message = "expiryDate cannot be null")
   @PastOrPresent
