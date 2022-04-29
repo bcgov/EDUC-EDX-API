@@ -178,11 +178,11 @@ jobs:
         
         oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
         
-        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-admin": "\(.*\)",/\1/p' | base64 --decode)"
-        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-admin": "\(.*\)",/\1/p' | base64 --decode)"
+        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode)"
+        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode)"
         
-        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-admin": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
-        SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-admin": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
         
         echo "::add-mask::jdbc:postgresql://${{ env.APP_NAME }}-patroni.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.APP_NAME }}"    
         
