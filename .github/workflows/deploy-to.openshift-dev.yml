@@ -182,8 +182,8 @@ jobs:
         echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode)"
         echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode)"
         
-        SOAM_KC_LOAD_USER_ADMIN=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
-        SOAM_KC_LOAD_USER_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        DB_USERNAME=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        DB_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
         
         echo "::add-mask::jdbc:postgresql://${{ env.APP_NAME }}-patroni.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.APP_NAME }}"    
         
@@ -191,7 +191,7 @@ jobs:
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ env.TAG }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
         | oc apply -f -
         
-        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} jdbc:postgresql://${{ env.APP_NAME }}-patroni.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.DB_NAME }} $SOAM_KC_LOAD_USER_PASS $SOAM_KC_LOAD_USER_ADMIN ${{ env.SPLUNK_TOKEN }}
+        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} jdbc:postgresql://${{ env.APP_NAME }}-patroni.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.DB_NAME }} $DB_PASS $DB_USERNAME ${{ env.SPLUNK_TOKEN }}
         
         # Start rollout (if necessary) and follow it
         oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
