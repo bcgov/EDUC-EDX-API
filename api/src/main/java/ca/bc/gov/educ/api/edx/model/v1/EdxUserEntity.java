@@ -58,4 +58,7 @@ public class EdxUserEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "edxUserID", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictEntity.class)
   private Set<EdxUserDistrictEntity> edxUserDistrictEntities;
+
+  @Column(name = "EMAIL")
+  String email;
 }

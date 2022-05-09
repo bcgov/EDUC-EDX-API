@@ -69,4 +69,15 @@ public class EdxActivationCodeEntity {
   @OneToMany(mappedBy = "edxActivationCodeEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxActivationRoleEntity.class)
   private Set<EdxActivationRoleEntity> edxActivationRoleEntities;
 
+  @Column(name = "FIRST_NAME")
+  String firstName;
+
+  @Column(name = "LAST_NAME")
+  String lastName;
+
+  @Column(name = "EMAIL")
+  String email;
+
+
+
 }
