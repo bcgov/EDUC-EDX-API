@@ -24,6 +24,9 @@ public class EdxUser extends BaseRequest implements Serializable {
 
   private List<EdxUserSchool> edxUserSchools;
   private List<EdxUserDistrict> edxUserDistricts;
+
+  @Size(max = 255)
+  String email;
 }
 
 
