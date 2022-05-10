@@ -17,4 +17,8 @@ public interface EdxUserMapper {
   @Mapping(target = "edxUserSchools", source = "edxUserSchoolEntities")
   @Mapping(target = "edxUserDistricts", source = "edxUserDistrictEntities")
   EdxUser toStructure(EdxUserEntity entity);
+
+  @Mapping(source = "edxUserSchools", target = "edxUserSchoolEntities")
+  @Mapping(source = "edxUserDistricts", target = "edxUserDistrictEntities")
+  EdxUserEntity toModel(EdxUser edxUser);
 }

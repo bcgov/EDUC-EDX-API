@@ -2,17 +2,15 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.EdxUsersEndpoint;
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserSchoolMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.MinistryTeamMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.MinistryTeam;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -27,7 +25,14 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private final EdxUsersService service;
   private static final MinistryTeamMapper mapper = MinistryTeamMapper.mapper;
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
-  private static final EdxUserSchoolMapper userSchoolMapper = EdxUserSchoolMapper.mapper;
+
+  private static final EdxUserSchoolMapper USER_SCHOOL_MAPPER = EdxUserSchoolMapper.mapper;
+  private static final EdxUserSchoolRoleMapper USER_SCHOOL_ROLE_MAPPER = EdxUserSchoolRoleMapper.mapper;
+
+  private static final EdxUserDistrictMapper EDX_USER_DISTRICT_MAPPER = EdxUserDistrictMapper.mapper;
+  private static final EdxUserDistrictRoleMapper EDX_USER_DISTRICT_ROLE_MAPPER = EdxUserDistrictRoleMapper.mapper;
+  private static final EdxRoleMapper EDX_ROLE_MAPPER = EdxRoleMapper.mapper;
+
 
   @Autowired
   EdxUsersController(final EdxUsersService secureExchange) {
@@ -53,5 +58,64 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public List<EdxUser> findEdxUsers(UUID digitalId) {
     return getService().findEdxUsers(digitalId).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
+
+  @Override
+  public EdxUser createEdxUser(EdxUser edxUser) {
+    return userMapper.toStructure(getService().createEdxUser(userMapper.toModel(edxUser)));
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxUserById(UUID id) {
+
+    getService().deleteEdxUserById(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public EdxUserSchool createEdxSchoolUser(UUID id, EdxUserSchool edxUserSchool) {
+    return USER_SCHOOL_MAPPER.toStructure(getService().createEdxUserSchool(USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxSchoolUserById(UUID id, UUID edxUserSchoolId) {
+
+   getService().deleteEdxSchoolUserById(id, edxUserSchoolId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public EdxUserSchoolRole createEdxSchoolUserRole(UUID id, EdxUserSchoolRole edxUserSchoolRole) {
+    return USER_SCHOOL_ROLE_MAPPER.toStructure(getService().createEdxUserSchoolRole(USER_SCHOOL_ROLE_MAPPER.toModel(edxUserSchoolRole)));
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxSchoolUserRoleById(UUID id, UUID edxUserSchoolRoleId) {
+    getService().deleteEdxSchoolUserRoleById(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public List<EdxRole> findAllEdxRoles() {
+    return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+  }
+
+  /*@Override
+  public EdxUserDistrict createEdxDistrictUser(EdxUserDistrict edxUserDistrict) {
+    return edxUserDistrictMapper.toStructure(getService().createEdxUserDistrict(edxUserDistrictMapper.toModel(edxUserDistrict)));  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxDistrictUserById(UUID id) {
+    return null;
+  }
+
+  @Override
+  public EdxUserDistrictRole createEdxDistrictUserRole(EdxUserDistrictRole edxUserDistrictRoleDistrict) {
+    return null;
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxDistrictUserRoleById(UUID id) {
+    return null;
+  }*/
 }
 

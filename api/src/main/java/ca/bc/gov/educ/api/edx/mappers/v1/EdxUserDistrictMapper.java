@@ -16,4 +16,9 @@ public interface EdxUserDistrictMapper {
 
   @Mapping(target = "edxUserDistrictRoles", source = "edxUserDistrictRoleEntities")
   EdxUserDistrict toStructure(EdxUserDistrictEntity entity);
+
+
+  @Mapping(source = "edxUserDistrictRoles", target = "edxUserDistrictRoleEntities")
+  EdxUserDistrictEntity toModel(EdxUserDistrict edxUserDistrict);
+
 }
