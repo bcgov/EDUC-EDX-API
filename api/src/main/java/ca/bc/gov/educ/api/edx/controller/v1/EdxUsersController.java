@@ -65,32 +65,32 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public ResponseEntity<Void> deleteEdxUserById(UUID id) {
+  public ResponseEntity<Void> deleteEdxUserById(UUID edxUserId) {
 
-    getService().deleteEdxUserById(id);
+    getService().deleteEdxUserById(edxUserId);
     return ResponseEntity.noContent().build();
   }
 
   @Override
-  public EdxUserSchool createEdxSchoolUser(UUID id, EdxUserSchool edxUserSchool) {
-    return USER_SCHOOL_MAPPER.toStructure(getService().createEdxUserSchool(USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
+  public EdxUserSchool createEdxSchoolUser(UUID edxUserId, EdxUserSchool edxUserSchool) {
+    return USER_SCHOOL_MAPPER.toStructure(getService().createEdxUserSchool(edxUserId,USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
   }
 
   @Override
-  public ResponseEntity<Void> deleteEdxSchoolUserById(UUID id, UUID edxUserSchoolId) {
+  public ResponseEntity<Void> deleteEdxSchoolUserById(UUID edxUserId, UUID edxUserSchoolId) {
 
-   getService().deleteEdxSchoolUserById(id, edxUserSchoolId);
+   getService().deleteEdxSchoolUserById(edxUserId, edxUserSchoolId);
     return ResponseEntity.noContent().build();
   }
 
   @Override
-  public EdxUserSchoolRole createEdxSchoolUserRole(UUID id, EdxUserSchoolRole edxUserSchoolRole) {
-    return USER_SCHOOL_ROLE_MAPPER.toStructure(getService().createEdxUserSchoolRole(USER_SCHOOL_ROLE_MAPPER.toModel(edxUserSchoolRole)));
+  public EdxUserSchoolRole createEdxSchoolUserRole(UUID edxUserId, EdxUserSchoolRole edxUserSchoolRole) {
+    return USER_SCHOOL_ROLE_MAPPER.toStructure(getService().createEdxUserSchoolRole(edxUserId,USER_SCHOOL_ROLE_MAPPER.toModel(edxUserSchoolRole)));
   }
 
   @Override
   public ResponseEntity<Void> deleteEdxSchoolUserRoleById(UUID id, UUID edxUserSchoolRoleId) {
-    getService().deleteEdxSchoolUserRoleById(id);
+    getService().deleteEdxSchoolUserRoleById(id,edxUserSchoolRoleId);
     return ResponseEntity.noContent().build();
   }
 
