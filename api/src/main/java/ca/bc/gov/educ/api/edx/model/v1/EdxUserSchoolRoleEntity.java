@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_SCHOOL_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_SCHOOL_ID_EDX_ROLE_UK", columnNames = {"edxUserSchoolEntity", "edxRoleEntity"})})
+@Table(name = "EDX_USER_SCHOOL_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_SCHOOL_ID_EDX_ROLE_UK", columnNames = {"EDX_USER_SCHOOL_ID", "EDX_ROLE_ID"})})
 @DynamicUpdate
 public class EdxUserSchoolRoleEntity {
     @Id

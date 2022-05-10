@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_SCHOOL", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_ID_MINCODE_UK", columnNames = {"edxUserID", "mincode"})})
+@Table(name = "EDX_USER_SCHOOL", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_ID_MINCODE_UK", columnNames = {"EDX_USER_ID", "MINCODE"})})
 @DynamicUpdate
 public class EdxUserSchoolEntity {
     @Id
