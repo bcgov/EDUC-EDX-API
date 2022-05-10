@@ -13,35 +13,35 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_SCHOOL_ROLE")
+@Table(name = "EDX_USER_SCHOOL_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_SCHOOL_ID_EDX_ROLE_UK", columnNames = {"EDX_USER_SCHOOL_ID", "EDX_ROLE_ID"})})
 @DynamicUpdate
 public class EdxUserSchoolRoleEntity {
-  @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "EDX_USER_SCHOOL_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserSchoolRoleID;
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
+            @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
+    @Column(name = "EDX_USER_SCHOOL_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
+    UUID edxUserSchoolRoleID;
 
-  @Column(name = "CREATE_USER", updatable = false)
-  String createUser;
+    @Column(name = "CREATE_USER", updatable = false)
+    String createUser;
 
-  @PastOrPresent
-  @Column(name = "CREATE_DATE", updatable = false)
-  LocalDateTime createDate;
+    @PastOrPresent
+    @Column(name = "CREATE_DATE", updatable = false)
+    LocalDateTime createDate;
 
-  @Column(name = "update_user")
-  String updateUser;
+    @Column(name = "update_user")
+    String updateUser;
 
-  @PastOrPresent
-  @Column(name = "update_date")
-  LocalDateTime updateDate;
+    @PastOrPresent
+    @Column(name = "update_date")
+    LocalDateTime updateDate;
 
-  @ManyToOne(optional = false, targetEntity = EdxUserSchoolEntity.class)
-  @JoinColumn(name = "EDX_USER_SCHOOL_ID", referencedColumnName = "EDX_USER_SCHOOL_ID", updatable = false)
-  private EdxUserSchoolEntity edxUserSchoolEntity;
+    @ManyToOne(optional = false, targetEntity = EdxUserSchoolEntity.class)
+    @JoinColumn(name = "EDX_USER_SCHOOL_ID", referencedColumnName = "EDX_USER_SCHOOL_ID", updatable = false)
+    private EdxUserSchoolEntity edxUserSchoolEntity;
 
-  @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
-  @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
-  private EdxRoleEntity edxRoleEntity;
+    @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
+    @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
+    private EdxRoleEntity edxRoleEntity;
 }
