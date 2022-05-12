@@ -229,11 +229,10 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"abc@test@test.coms", "VeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTest",})
-  void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus(String emailId) throws Exception {
+  @Test
+  void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
-    edxUser.setEmail(emailId);
+    edxUser.setEmail("abc@test@test.coms");
     String json = getJsonString(edxUser);
     this.mockMvc.perform(post(URL.BASE_URL_USERS)
         .contentType(MediaType.APPLICATION_JSON)
