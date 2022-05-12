@@ -2,7 +2,11 @@ package ca.bc.gov.educ.api.edx;
 
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +24,7 @@ import java.util.UUID;
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public abstract class BaseSecureExchangeAPITest {
-
+  protected final static ObjectMapper objectMapper = new ObjectMapper();
   @Autowired
   protected SecureExchangeAPITestUtils secureExchangeAPITestUtils;
 
@@ -57,10 +61,12 @@ public abstract class BaseSecureExchangeAPITest {
     entity.setDigitalIdentityID(UUID.randomUUID());
     entity.setFirstName("Test");
     entity.setLastName("User");
+    entity.setEmail("test@email.com");
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
     entity.setUpdateDate(LocalDateTime.now());
+
     return entity;
   }
 
@@ -138,5 +144,26 @@ public abstract class BaseSecureExchangeAPITest {
     entity.setUpdateUser("test");
     entity.setUpdateDate(LocalDateTime.now());
     return entity;
+  }
+
+  protected EdxUser createEdxUser() {
+    EdxUser edxUser = new EdxUser();
+    edxUser.setFirstName("TestFirst");
+    edxUser.setLastName("TestLast");
+    edxUser.setDigitalIdentityID(UUID.randomUUID().toString());
+    edxUser.setEmail("test@email.com");
+    edxUser.setCreateUser("Test");
+    return edxUser;
+  }
+
+  protected EdxUserSchool createEdxUserSchool(EdxUser edxUsr) {
+    EdxUserSchool edxUserSchool = new EdxUserSchool();
+    edxUserSchool.setEdxUserID(edxUsr.getEdxUserID());
+    edxUserSchool.setMincode("123456");
+    return edxUserSchool;
+  }
+
+  protected String getJsonString(Object obj) throws JsonProcessingException {
+    return objectMapper.writeValueAsString(obj);
   }
 }

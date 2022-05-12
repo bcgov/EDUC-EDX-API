@@ -16,4 +16,8 @@ public interface EdxRoleMapper {
 
   @Mapping(target = "edxRolePermissions", source = "edxRolePermissionEntities")
   EdxRole toStructure(EdxRoleEntity entity);
+
+
+  @Mapping(source = "edxRolePermissions", target = "edxRolePermissionEntities")
+  EdxRoleEntity toModel(EdxRole edxRole);
 }

@@ -15,6 +15,7 @@ public class EdxUserSchoolRole extends BaseRequest implements Serializable {
 
   String edxUserSchoolRoleID;
   EdxRole edxRole;
+  String edxUserSchoolID;
 }
 
 
