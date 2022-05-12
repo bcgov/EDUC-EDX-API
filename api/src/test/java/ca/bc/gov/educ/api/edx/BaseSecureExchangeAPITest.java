@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -153,6 +154,13 @@ public abstract class BaseSecureExchangeAPITest {
     edxUser.setEmail("test@email.com");
     edxUser.setCreateUser("Test");
     return edxUser;
+  }
+
+  protected EdxUserSchool createEdxUserSchool(EdxUser edxUsr) {
+    EdxUserSchool edxUserSchool = new EdxUserSchool();
+    edxUserSchool.setEdxUserID(edxUsr.getEdxUserID());
+    edxUserSchool.setMincode("123456");
+    return edxUserSchool;
   }
 
   protected String getJsonString(Object obj) throws JsonProcessingException {

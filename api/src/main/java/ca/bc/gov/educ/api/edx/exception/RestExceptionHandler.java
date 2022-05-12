@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityExistsException;
 import java.time.format.DateTimeParseException;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
@@ -134,5 +134,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             InvalidPayloadException ex) {
         log.error("", ex);
         return buildResponseEntity(ex.getError());
+    }
+
+    @ExceptionHandler(EntityExistsException.class)
+    protected ResponseEntity<Object> handleEntityExists(
+            EntityExistsException ex) {
+        log.info("handleEntityExists", ex);
+        ApiError apiError = new ApiError(BAD_REQUEST);
+        apiError.setMessage(ex.getMessage());
+        log.info("{} ", apiError.getMessage(), ex);
+        return buildResponseEntity(apiError);
     }
 }

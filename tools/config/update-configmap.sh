@@ -115,6 +115,50 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -H "Authorization: Bearer $TKN" \
   -d "{\"description\": \"Reading users in EDX\",\"id\": \"READ_EDX_USERS\",\"name\": \"READ_EDX_USERS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+
+echo
+echo Writing scope WRITE_EDX_USER
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Writing users in EDX_USER\",\"id\": \"WRITE_EDX_USER\",\"name\": \"WRITE_EDX_USER\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_EDX_USER
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Deleting user from EDX_USER\",\"id\": \"DELETE_EDX_USER\",\"name\": \"DELETE_EDX_USER\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_EDX_USER_SCHOOL
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Deleting EDX_USER_SCHOOL \",\"id\": \"DELETE_EDX_USER_SCHOOL\",\"name\": \"DELETE_EDX_USER_SCHOOL\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_EDX_USER_SCHOOL
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Writing in EDX_USER_SCHOOL\",\"id\": \"WRITE_EDX_USER_SCHOOL\",\"name\": \"WRITE_EDX_USER_SCHOOL\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_EDX_USER_SCHOOL_ROLE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Writing  in EDX_USER_SCHOOL_ROLE\",\"id\": \"WRITE_EDX_USER_SCHOOL_ROLE\",\"name\": \"WRITE_EDX_USER_SCHOOL_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_EDX_USER_SCHOOL_ROLE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Deleting DELETE_EDX_USER_SCHOOL_ROLE \",\"id\": \"DELETE_EDX_USER_SCHOOL_ROLE\",\"name\": \"DELETE_EDX_USER_SCHOOL_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+
 ###########################################################
 #Setup for config-map
 ###########################################################

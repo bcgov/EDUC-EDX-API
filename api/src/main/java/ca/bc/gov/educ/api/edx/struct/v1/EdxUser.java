@@ -22,11 +22,11 @@ public class EdxUser extends BaseRequest implements Serializable {
   @NotNull(message = "Digital Identity ID cannot be null")
   String digitalIdentityID;
 
-  @Size(max = 255)
+  @Size(max = 255, message = "First Name can have max 255 characters")
   @NotNull(message = "First Name cannot be null")
   String firstName;
 
-  @Size(max = 255)
+  @Size(max = 255, message = "Last Name can have max 255 characters")
   @NotNull(message = "Last Name cannot be null")
   String lastName;
 

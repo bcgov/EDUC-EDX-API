@@ -67,13 +67,13 @@ public interface EdxUsersEndpoint {
   List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = true) UUID digitalId);
 
 
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USERS')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
   EdxUser createEdxUser(@Validated @RequestBody  EdxUser edxUser);
 
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER')")
   @DeleteMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @ResponseStatus(NO_CONTENT)
@@ -96,47 +96,22 @@ public interface EdxUsersEndpoint {
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_SCHOOL_ROLE')")
-  @PostMapping("{id}/school/role")
+  @PostMapping("{id}/school/{edxUserSchoolId}/role")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
-  EdxUserSchoolRole createEdxSchoolUserRole(@PathVariable UUID id, @Validated @RequestBody EdxUserSchoolRole edxUserSchoolRole);
+  EdxUserSchoolRole createEdxSchoolUserRole(@PathVariable UUID id, @PathVariable UUID edxUserSchoolId, @Validated @RequestBody EdxUserSchoolRole edxUserSchoolRole);
 
   @Transactional
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS_SCHOOL_ROLE')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER_SCHOOL_ROLE')")
   @DeleteMapping("{id}/school/role/{edxSchoolUserRoleId}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @ResponseStatus(NO_CONTENT)
   ResponseEntity<Void> deleteEdxSchoolUserRoleById(@PathVariable UUID id,@PathVariable UUID edxSchoolUserRoleId);
 
   @Transactional
-  @PreAuthorize("hasAuthority('SCOPE_READ_MINISTRY_TEAMS')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping("/roles")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<EdxRole> findAllEdxRoles();
 
-  /*@PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_DISTRICT')")
-  @PostMapping("/district")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @ResponseStatus(CREATED)
-  EdxUserDistrict createEdxDistrictUser(@Validated @RequestBody  EdxUserDistrict edxUserDistrict);
-
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS_DISTRICT')")
-  @DeleteMapping("/district/{id}")
-  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-  @ResponseStatus(NO_CONTENT)
-  ResponseEntity<Void> deleteEdxDistrictUserById(@PathVariable UUID id);
-
-
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_DISTRICT_ROLE')")
-  @PostMapping("/district/role")
-  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @ResponseStatus(CREATED)
-  EdxUserDistrictRole createEdxDistrictUserRole(@Validated @RequestBody  EdxUserDistrictRole edxUserDistrictRoleDistrict);
-
-
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS_DISTRICT_ROLE')")
-  @DeleteMapping("/district/role/{id}")
-  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
-  @ResponseStatus(NO_CONTENT)
-  ResponseEntity<Void> deleteEdxDistrictUserRoleById(@PathVariable UUID id);*/
 }

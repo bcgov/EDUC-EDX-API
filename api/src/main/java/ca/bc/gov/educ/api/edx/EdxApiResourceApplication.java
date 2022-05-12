@@ -13,7 +13,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,7 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @SpringBootApplication
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableCaching
 @EnableScheduling
 @EnableSchedulerLock(defaultLockAtMostFor = "1s")
@@ -52,7 +51,7 @@ public class EdxApiResourceApplication {
     public void configure(final WebSecurity web) {
       web.ignoring().antMatchers("/v3/api-docs/**",
               "/actuator/health", "/actuator/prometheus",
-              "/swagger-ui/**", "/health");
+              "/swagger-ui/**", "/health", "/api/**");
     }
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
