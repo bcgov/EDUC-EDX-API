@@ -51,8 +51,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
     final List<MinistryOwnershipTeamEntity> teams = this.service.getMinistryTeamsList();
-    assertThat(teams).isNotNull();
-    assertThat(teams.size()).isEqualTo(2);
+    assertThat(teams).isNotNull().hasSize(2);
   }
 
   @Test
@@ -60,8 +59,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     var entity = this.edxUserRepository.save(getEdxUserEntity());
     this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity.getEdxUserID()));
     final List<EdxUserSchoolEntity> edxUserSchoolEntities = this.service.getEdxUserSchoolsList();
-    assertThat(edxUserSchoolEntities).isNotNull();
-    assertThat(edxUserSchoolEntities.size()).isEqualTo(1);
+    assertThat(edxUserSchoolEntities).isNotNull().hasSize(1);
   }
 
   @Test
@@ -72,10 +70,10 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(edxUserSchoolEntities).isNotNull();
     assertThat(edxUserSchoolEntities.getEdxUserID()).isEqualTo(entity.getEdxUserID());
     assertThat(edxUserSchoolEntities.getEdxUserSchoolEntities()).isNotNull();
-    assertThat(edxUserSchoolEntities.getEdxUserSchoolEntities().size()).isEqualTo(1);
+    assertThat(edxUserSchoolEntities.getEdxUserSchoolEntities()).hasSize(1);
     var edxUserSchoolEntity = List.copyOf(edxUserSchoolEntities.getEdxUserSchoolEntities()).get(0);
     assertThat(edxUserSchoolEntity).isNotNull();
-    assertThat(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().size()).isEqualTo(1);
+    assertThat(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).hasSize(1);
     var edxUserSchoolRollEntity = List.copyOf(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).get(0);
     assertThat(edxUserSchoolRollEntity).isNotNull();
     assertThat(edxUserSchoolRollEntity.getEdxRoleEntity()).isNotNull();
@@ -87,8 +85,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     final List<String> edxUserSchoolEntities = this.service.getEdxUserSchoolsList("Exchange");
-    assertThat(edxUserSchoolEntities).isNotNull();
-    assertThat(edxUserSchoolEntities.size()).isEqualTo(1);
+    assertThat(edxUserSchoolEntities).isNotNull().hasSize(1);
     assertThat(edxUserSchoolEntities.get(0)).isEqualTo("12345678");
   }
 

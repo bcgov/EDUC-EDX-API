@@ -132,7 +132,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
     this.repository.save(document);
 
     final List<SecureExchangeDocumentEntity> documents = this.service.retrieveAllDocumentMetadata(this.secureExchangeID);
-    assertThat(documents.size()).isEqualTo(2);
+    assertThat(documents).hasSize(2);
   }
 
 

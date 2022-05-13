@@ -63,12 +63,11 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
     var savedExchange = this.service.createSecureExchange(secureExchange);
     assertThat(savedExchange).isNotNull();
-    assertThat(savedExchange.getSecureExchangeComment().size()).isEqualTo(1);
+    assertThat(savedExchange.getSecureExchangeComment()).hasSize(1);
 
     var pulledExchange = secureExchangeRequestRepository.findById(savedExchange.getSecureExchangeID());
     assertThat(pulledExchange.get()).isNotNull();
     Hibernate.initialize(pulledExchange.get());
-//    assertThat(pulledExchange.get().getSecureExchangeComment().size()).isEqualTo(1);
   }
 
   @Test
