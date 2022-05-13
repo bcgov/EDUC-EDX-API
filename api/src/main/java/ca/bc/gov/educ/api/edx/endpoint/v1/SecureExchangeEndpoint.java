@@ -108,6 +108,18 @@ public interface SecureExchangeEndpoint {
   ResponseEntity<Void> deleteById(@PathVariable UUID id);
 
   /**
+   * Claim all secure exchanges provided
+   *
+   * @param secureExchangeIDs the secure exchange IDs
+   * @return the response entity
+   */
+  @PostMapping(URL.CLAIM_ALL)
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @Tag(name = "Endpoint to claim all secure exchanges provided by ID.", description = "Endpoint to claim all secure exchanges provided by ID.")
+  ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(@RequestParam List<UUID> secureExchangeIDs, @RequestParam String reviewer);
+
+  /**
    * Find all completable future.
    *
    * @param pageNumber             the page number

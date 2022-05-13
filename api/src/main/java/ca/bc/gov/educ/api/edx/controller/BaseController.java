@@ -15,7 +15,9 @@ public abstract class BaseController {
     if (StringUtils.isBlank(baseRequest.getUpdateUser())) {
       baseRequest.setUpdateUser(ApplicationProperties.CLIENT_ID);
     }
-    baseRequest.setCreateDate(LocalDateTime.now().toString());
+    if (baseRequest.getCreateDate() == null) {
+      baseRequest.setCreateDate(LocalDateTime.now().toString());
+    }
     baseRequest.setUpdateDate(LocalDateTime.now().toString());
   }
 }

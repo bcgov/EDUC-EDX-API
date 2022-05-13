@@ -108,6 +108,19 @@ public class SecureExchangeService {
     return this.getSecureExchangeRequestRepository().findSecureExchange(contactIdentifier, secureExchangeContactTypeCode);
   }
 
+  @Transactional
+  public void claimAllSecureExchanges(final List<UUID> secureExchangeIds, String reviewer) {
+    for(final UUID secureExchangeId : secureExchangeIds) {
+      final Optional<SecureExchangeEntity> curSecureExchange = this.getSecureExchangeRequestRepository().findById(secureExchangeId);
+      if (curSecureExchange.isPresent()) {
+        final SecureExchangeEntity secureExchange = curSecureExchange.get();
+        secureExchange.setReviewer(reviewer);
+        secureExchange.setUpdateDate(LocalDateTime.now());
+        secureExchange.setUpdateUser(reviewer);
+        this.secureExchangeRequestRepository.save(secureExchange);
+      }
+    }
+  }
 
   /**
    * This method has to add some DB fields values to the incoming to keep track of audit columns and parent child relationship.

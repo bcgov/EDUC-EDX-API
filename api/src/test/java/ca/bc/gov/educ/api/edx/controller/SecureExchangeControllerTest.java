@@ -163,6 +163,27 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   }
 
   @Test
+  public void testClaimSecureExchange_ShouldReturnStatusNoContent() throws Exception {
+    final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL +"/?secureExchangeIDs=" + entity.getSecureExchangeID() + "&reviewer=" + "TESTMIN")
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+      .contentType(APPLICATION_JSON)
+      .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void testClaimSecureExchanges_ShouldReturnStatusNoContent() throws Exception {
+    final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+    final SecureExchangeEntity entity2 = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL +"/?secureExchangeIDs=" + entity.getSecureExchangeID() + ',' + entity2.getSecureExchangeID() + "&reviewer=" + "TESTMIN")
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+      .contentType(APPLICATION_JSON)
+      .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+  }
+
+  @Test
   public void testUpdateSecureExchange_GivenInvalidPenReqIDInPayload_ShouldReturnStatusNotFound() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);

@@ -115,6 +115,12 @@ public class SecureExchangeController extends BaseController implements SecureEx
   }
 
   @Override
+  public ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(List<UUID> secureExchangeIDs, String reviewer) {
+    getService().claimAllSecureExchanges(secureExchangeIDs, reviewer);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   @Transactional(propagation = Propagation.SUPPORTS)
   public CompletableFuture<Page<SecureExchange>> findAll(Integer pageNumber, Integer pageSize, String sortCriteriaJson, String searchCriteriaListJson) {
     val objectMapper = new ObjectMapper();
