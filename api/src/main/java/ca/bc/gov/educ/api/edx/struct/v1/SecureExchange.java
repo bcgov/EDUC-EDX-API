@@ -35,12 +35,12 @@ public class SecureExchange extends BaseRequest implements Serializable {
   private String subject;
 
   @Size(max = 1)
-  @Pattern(regexp = "[YN]")
-  String isReadByMinistry;
+  @Pattern(regexp = "true|false")
+  Boolean isReadByMinistry;
 
   @Size(max = 1)
-  @Pattern(regexp = "[YN]")
-  String isReadByExchangeContact;
+  @Pattern(regexp = "true|false")
+  Boolean isReadByExchangeContact;
 
   String statusUpdateDate;
 
