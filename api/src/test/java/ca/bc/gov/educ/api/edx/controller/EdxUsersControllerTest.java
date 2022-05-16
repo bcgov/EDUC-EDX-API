@@ -3,52 +3,37 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserSchoolRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
-import ca.bc.gov.educ.api.edx.model.v1.EdxPermissionEntity;
-import ca.bc.gov.educ.api.edx.model.v1.EdxRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxRole;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolRole;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.io.File;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.core.IsNull.notNullValue;
-import static org.hamcrest.core.IsNull.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
+public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
   @Autowired
@@ -164,7 +149,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
   }
@@ -191,7 +176,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID should be null for post operation.")));
 
@@ -206,7 +191,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("firstName")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name can have max 255 characters")));
@@ -222,7 +207,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("lastName")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name can have max 255 characters")));
@@ -230,7 +215,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  public void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setEmail("abc@test@test.coms");
     String json = getJsonString(edxUser);
@@ -238,7 +223,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("email")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email address should be a valid email address")));
@@ -254,7 +239,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("email")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")));
@@ -270,13 +255,13 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER"))))
       .andDo(print()).andExpect(status().isNoContent());
 
   }
@@ -285,7 +270,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testDeleteEdxUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}", UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER"))))
       .andDo(print()).andExpect(status().isNotFound());
 
   }
@@ -299,7 +284,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -328,7 +313,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -358,7 +343,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -394,7 +379,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -423,7 +408,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -463,7 +448,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -497,7 +482,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -531,7 +516,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -564,7 +549,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -614,7 +599,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -664,7 +649,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -713,7 +698,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -762,7 +747,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -811,7 +796,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))));
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 

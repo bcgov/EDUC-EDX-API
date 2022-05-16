@@ -44,7 +44,7 @@ public class SecureExchangeDocRequirementEntityJsonTests {
     public void documentDeserializeTest() throws Exception {
         SecureExchangeDocRequirement document = this.jsonTester.readObject("requirement.json");
         assertThat(document.getMaxSize()).isEqualTo(20);
-        assertThat(document.getExtensions().size()).isEqualTo(2);
+        assertThat(document.getExtensions()).hasSize(2);
         assertThat(document.getExtensions().get(0)).isEqualTo("pdf");
     }
 
