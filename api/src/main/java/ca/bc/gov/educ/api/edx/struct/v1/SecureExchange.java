@@ -34,11 +34,11 @@ public class SecureExchange extends BaseRequest implements Serializable {
   @Size(max = 4000)
   private String subject;
 
-  @Size(max = 1)
+  @Size(max = 5)
   @Pattern(regexp = "true|false")
   Boolean isReadByMinistry;
 
-  @Size(max = 1)
+  @Size(max = 5)
   @Pattern(regexp = "true|false")
   Boolean isReadByExchangeContact;
 
