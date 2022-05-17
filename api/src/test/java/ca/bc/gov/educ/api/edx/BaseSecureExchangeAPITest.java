@@ -53,7 +53,8 @@ public abstract class BaseSecureExchangeAPITest {
     userDistrictEntity.setEdxUserDistrictRoleEntities(Set.of(userDistrictRoleEntity));
     edxUserDistrictRepository.save(userDistrictEntity);
 
-    return entity;
+//    below is done to refresh detatched entity so we can see the updated School/District fields.
+    return edxUserRepository.findById(entity.getEdxUserID()).orElseThrow();
   }
 
   protected EdxUserEntity getEdxUserEntity(){
