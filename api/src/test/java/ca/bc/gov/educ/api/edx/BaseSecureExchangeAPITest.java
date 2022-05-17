@@ -15,7 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,21 +47,20 @@ public abstract class BaseSecureExchangeAPITest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     edxRoleRepository.save(roleEntity);
 
-    var userSchoolEntity = getEdxUserSchoolEntity(entity.getEdxUserID());
+    var userSchoolEntity = getEdxUserSchoolEntity(entity);
     var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
     userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
     edxUserSchoolRepository.save(userSchoolEntity);
 
-    var userDistrictEntity = getEdxUserDistrictEntity(entity.getEdxUserID());
+    var userDistrictEntity = getEdxUserDistrictEntity(entity);
     var userDistrictRoleEntity = getEdxUserDistrictRoleEntity(userDistrictEntity, roleEntity);
     userDistrictEntity.setEdxUserDistrictRoleEntities(Set.of(userDistrictRoleEntity));
     edxUserDistrictRepository.save(userDistrictEntity);
 
-//    below is done to refresh detatched entity so we can see the updated School/District fields.
-    return edxUserRepository.findById(entity.getEdxUserID()).orElseThrow();
+    return entity;
   }
 
-  protected EdxUserEntity getEdxUserEntity(){
+  protected EdxUserEntity getEdxUserEntity() {
     EdxUserEntity entity = new EdxUserEntity();
     entity.setDigitalIdentityID(UUID.randomUUID());
     entity.setFirstName("Test");
@@ -71,9 +74,9 @@ public abstract class BaseSecureExchangeAPITest {
     return entity;
   }
 
-  protected EdxUserSchoolEntity getEdxUserSchoolEntity(UUID edxUserId){
+  protected EdxUserSchoolEntity getEdxUserSchoolEntity(EdxUserEntity edxUserEntity) {
     EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
-    entity.setEdxUserID(edxUserId);
+    entity.setEdxUserEntity(edxUserEntity);
     entity.setMincode("12345678");
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
@@ -82,9 +85,9 @@ public abstract class BaseSecureExchangeAPITest {
     return entity;
   }
 
-  protected EdxUserDistrictEntity getEdxUserDistrictEntity(UUID edxUserId){
+  protected EdxUserDistrictEntity getEdxUserDistrictEntity(EdxUserEntity edxUserEntity) {
     EdxUserDistrictEntity entity = new EdxUserDistrictEntity();
-    entity.setEdxUserID(edxUserId);
+    entity.setEdxUserEntity(edxUserEntity);
     entity.setDistrictCode("006");
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
@@ -162,6 +165,64 @@ public abstract class BaseSecureExchangeAPITest {
     edxUserSchool.setEdxUserID(edxUsr.getEdxUserID());
     edxUserSchool.setMincode("123456");
     return edxUserSchool;
+  }
+
+  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive) {
+    List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive));
+
+    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive));
+    edxActivationCodeEntityList.add(savedActivationCode);
+    edxActivationCodeEntityList.add(savedActivationCode1);
+    return edxActivationCodeEntityList;
+  }
+
+  private EdxActivationRoleEntity createEdxActivationRoleEntity(EdxActivationCodeEntity edxActivationCodeEntity, EdxRoleEntity savedRoleEntity) {
+    EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
+    edxActivationRoleEntity.setEdxActivationCodeEntity(edxActivationCodeEntity);
+    edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
+    edxActivationCodeEntity.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
+    return edxActivationRoleEntity;
+  }
+
+  private EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive) {
+    EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
+    activationCodeEntity.setMincode("1234567");
+    activationCodeEntity.setActivationCode(activationCode);
+    activationCodeEntity.setIsPrimary(isPrimary);
+    if (isActive) {
+      LocalDateTime tomorrowMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1);
+
+      activationCodeEntity.setExpiryDate(tomorrowMidnight);
+    } else {
+      activationCodeEntity.setExpiryDate(LocalDateTime.now());
+    }
+
+    activationCodeEntity.setFirstName("FirstName");
+    activationCodeEntity.setLastName("Lastname");
+    activationCodeEntity.setEmail("test@test.com");
+
+    activationCodeEntity.setCreateUser("test");
+    activationCodeEntity.setCreateDate(LocalDateTime.now());
+    activationCodeEntity.setUpdateUser("test");
+    activationCodeEntity.setUpdateDate(LocalDateTime.now());
+
+    EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
+    edxActivationRoleEntity.setEdxActivationCodeEntity(activationCodeEntity);
+    edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
+    edxActivationRoleEntity.setCreateUser("test");
+    edxActivationRoleEntity.setCreateDate(LocalDateTime.now());
+    edxActivationRoleEntity.setUpdateUser("test");
+    edxActivationRoleEntity.setUpdateDate(LocalDateTime.now());
+
+    activationCodeEntity.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
+    return activationCodeEntity;
   }
 
   protected String getJsonString(Object obj) throws JsonProcessingException {
