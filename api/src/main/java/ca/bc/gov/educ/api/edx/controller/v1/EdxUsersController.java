@@ -114,6 +114,12 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
     return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
   }
 
+  @Override
+  public EdxUser activateUser(EdxActivateUser edxActivateUser) {
+    RequestUtil.setAuditColumnsForCreateIfBlank(edxActivateUser);
+    return userMapper.toStructure(getService().activateSchoolUser(edxActivateUser));
+  }
+
   private void validatePayload(Supplier<List<FieldError>> validator) {
     val validationResult = validator.get();
     if (!validationResult.isEmpty()) {

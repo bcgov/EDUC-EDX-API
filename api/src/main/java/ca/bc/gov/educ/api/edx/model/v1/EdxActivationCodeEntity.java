@@ -11,6 +11,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class EdxActivationCodeEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
+    @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "EDX_ACTIVATION_CODE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID edxActivationCodeId;
 
@@ -42,8 +43,7 @@ public class EdxActivationCodeEntity {
   Boolean isPrimary;
 
   @NotNull(message = "expiryDate cannot be null")
-  @PastOrPresent
-  @Column(name = "EXPIRY_DATE", updatable = false)
+  @Column(name = "EXPIRY_DATE")
   LocalDateTime expiryDate;
 
   @NotNull(message = "createUser cannot be null")
@@ -64,6 +64,13 @@ public class EdxActivationCodeEntity {
   @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;
 
+  public Set<EdxActivationRoleEntity> getEdxActivationRoleEntities() {
+    if(this.edxActivationRoleEntities== null){
+      this.edxActivationRoleEntities = new HashSet<>();
+    }
+    return this.edxActivationRoleEntities;
+  }
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "edxActivationCodeEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxActivationRoleEntity.class)
@@ -77,7 +84,6 @@ public class EdxActivationCodeEntity {
 
   @Column(name = "EMAIL")
   String email;
-
 
 
 }

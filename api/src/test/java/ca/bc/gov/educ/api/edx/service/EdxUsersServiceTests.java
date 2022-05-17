@@ -57,7 +57,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Test
   public void getAllEdxUserSchools() {
     var entity = this.edxUserRepository.save(getEdxUserEntity());
-    this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity.getEdxUserID()));
+    this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity));
     final List<EdxUserSchoolEntity> edxUserSchoolEntities = this.service.getEdxUserSchoolsList();
     assertThat(edxUserSchoolEntities).isNotNull().hasSize(1);
   }

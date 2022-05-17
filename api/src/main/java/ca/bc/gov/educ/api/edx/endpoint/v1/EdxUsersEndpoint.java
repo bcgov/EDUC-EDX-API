@@ -114,4 +114,12 @@ public interface EdxUsersEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<EdxRole> findAllEdxRoles();
 
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_ACTIVATE_EDX_USER')")
+  @PostMapping("/activation")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxUser activateUser(@Validated @RequestBody  EdxActivateUser edxActivateUser);
+
 }
