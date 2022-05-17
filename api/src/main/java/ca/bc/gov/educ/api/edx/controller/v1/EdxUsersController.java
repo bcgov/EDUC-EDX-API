@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxUserPayLoadValidator;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -66,8 +67,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxUser> findEdxUsers(UUID digitalId) {
-    return getService().findEdxUsers(digitalId).stream().map(userMapper::toStructure).collect(Collectors.toList());
+  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode) {
+    return getService().findEdxUsers(digitalId, mincode).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

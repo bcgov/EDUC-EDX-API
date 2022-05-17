@@ -14,9 +14,9 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolRole;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.val;
 import org.hamcrest.Matchers;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -69,12 +69,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxActivationRoleRepository edxActivationRoleRepository;
 
-  @BeforeEach
+  @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
-  @AfterEach
+  @After
   public void after() {
     this.ministryOwnershipTeamRepository.deleteAll();
     this.edxUserRepository.deleteAll();
@@ -131,12 +131,35 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenNoDigitalIdentityIDAsInput_ShouldReturnError() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-    UUID digitalIdentityID = entity.getDigitalIdentityID();
+  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
+        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
-      .andDo(print()).andExpect(status().isBadRequest());
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
+            .param("mincode", "12345678"))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")));
+  }
+
+  @Test
+  public void testFindEdxUsers_GivenNoInput_ShouldReturnOkStatusWithResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
+        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.hasSize(1)));
+  }
+
+  @Test
+  public void testFindEdxUsers_GivenInvalidMincodeAsInput_ShouldReturnOkStatusWithEmptyResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
+        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
+            .param("mincode", "111"))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$", Matchers.hasSize(0)));
   }
 
   @Test
@@ -148,9 +171,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", Matchers.hasSize(0)));
-
   }
-
 
   @Test
   public void testCreateEdxUsers_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {

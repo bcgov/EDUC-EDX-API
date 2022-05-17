@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import java.util.Optional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,13 +59,14 @@ public interface EdxUsersEndpoint {
 
 
   /**
-   *   There is scope for adding other Query Params to this endpoint. When those get added digitalId can be made required=false.
+   *   This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.
+   *
    * @return  List of Edx User
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = true) UUID digitalId);
+  List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = false) Optional<UUID> digitalId, @RequestParam(name = "mincode", required = false) String mincode);
 
 
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
