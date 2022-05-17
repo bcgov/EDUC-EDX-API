@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.repository.impl;
 
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepositoryCustom;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,12 @@ import java.util.UUID;
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -33,9 +36,14 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<EdxUserEntity> criteriaQuery = criteriaBuilder.createQuery(EdxUserEntity.class);
     Root<EdxUserEntity> edxUserEntityRoot = criteriaQuery.from(EdxUserEntity.class);
+    Join<EdxUserEntity, EdxUserSchoolEntity> edxUserSchoolEntitySchoolJoin = edxUserEntityRoot.join("edxUserSchoolEntities");
 
     if (digitalId.isPresent()) {
       predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("digitalIdentityID"), digitalId.get()));
+    }
+
+    if (StringUtils.isNotBlank(mincode)) {
+      predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("mincode"), mincode));
     }
 
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
