@@ -6,13 +6,13 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.FieldError;
 
 import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
@@ -72,8 +72,8 @@ public class EdxUsersService {
     return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionName);
   }
 
-  public List<EdxUserEntity> findEdxUsers(UUID digitalId) {
-    return this.getEdxUserRepository().findEdxUserEntitiesByDigitalIdentityID(digitalId);
+  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode) {
+    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode);
   }
 
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
