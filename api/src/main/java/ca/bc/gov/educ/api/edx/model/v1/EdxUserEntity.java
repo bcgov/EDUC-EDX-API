@@ -10,6 +10,7 @@ import org.hibernate.annotations.Parameter;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,7 +23,7 @@ public class EdxUserEntity {
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
+    @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
   @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserID;
 
@@ -51,14 +52,29 @@ public class EdxUserEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxUserID", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserSchoolEntity.class)
+  @OneToMany(mappedBy = "edxUserEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserSchoolEntity.class)
   private Set<EdxUserSchoolEntity> edxUserSchoolEntities;
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxUserID", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictEntity.class)
+  @OneToMany(mappedBy = "edxUserEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictEntity.class)
   private Set<EdxUserDistrictEntity> edxUserDistrictEntities;
 
   @Column(name = "EMAIL")
   String email;
+
+  public Set<EdxUserDistrictEntity> getEdxUserDistrictEntities() {
+    if(this.edxUserDistrictEntities== null){
+      this.edxUserDistrictEntities = new HashSet<>();
+    }
+    return this.edxUserDistrictEntities;
+  }
+
+  public Set<EdxUserSchoolEntity> getEdxUserSchoolEntities() {
+    if(this.edxUserSchoolEntities== null){
+      this.edxUserSchoolEntities = new HashSet<>();
+    }
+    return this.edxUserSchoolEntities;
+
+  }
 }

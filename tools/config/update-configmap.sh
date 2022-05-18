@@ -158,6 +158,12 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -H "Authorization: Bearer $TKN" \
   -d "{\"description\": \"Deleting DELETE_EDX_USER_SCHOOL_ROLE \",\"id\": \"DELETE_EDX_USER_SCHOOL_ROLE\",\"name\": \"DELETE_EDX_USER_SCHOOL_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+echo
+echo Writing scope ACTIVATE_EDX_USER
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Activate EDX_USER \",\"id\": \"ACTIVATE_EDX_USER\",\"name\": \"ACTIVATE_EDX_USER\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 ###########################################################
 #Setup for config-map

@@ -26,8 +26,9 @@ public class EdxUserDistrictEntity {
   @Column(name = "EDX_USER_DISTRICT_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserDistrictID;
 
-  @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxUserID;
+  @ManyToOne(optional = false, targetEntity = EdxUserEntity.class)
+  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
+  EdxUserEntity edxUserEntity;
 
   @Column(name = "DISTRICT_CODE")
   String districtCode;

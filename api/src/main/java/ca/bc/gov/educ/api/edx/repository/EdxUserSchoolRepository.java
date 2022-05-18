@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.repository;
 
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEnti
     "         ORDER BY MINCODE", nativeQuery = true)
   List<String> findSchoolsByPermission(String permissionName);
 
-  Optional<EdxUserSchoolEntity> findEdxUserSchoolEntitiesByMincodeAndEdxUserID(String mincode, UUID edxUserId);
+  Optional<EdxUserSchoolEntity> findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(String mincode, EdxUserEntity edxUserEntity);
 
 
 }

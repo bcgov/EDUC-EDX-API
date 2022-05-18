@@ -10,6 +10,7 @@ import org.hibernate.annotations.Parameter;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,8 +27,9 @@ public class EdxUserSchoolEntity {
     @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
     UUID edxUserSchoolID;
 
-    @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
-    UUID edxUserID;
+    @ManyToOne(optional = false, targetEntity = EdxUserEntity.class)
+    @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
+    EdxUserEntity edxUserEntity;
 
     @Column(name = "MINCODE")
     String mincode;
@@ -50,4 +52,11 @@ public class EdxUserSchoolEntity {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "edxUserSchoolEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserSchoolRoleEntity.class)
     private Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntities;
+
+    public Set<EdxUserSchoolRoleEntity> getEdxUserSchoolRoleEntities() {
+        if(this.edxUserSchoolRoleEntities== null){
+            this.edxUserSchoolRoleEntities = new HashSet<>();
+        }
+        return this.edxUserSchoolRoleEntities;
+    }
 }
