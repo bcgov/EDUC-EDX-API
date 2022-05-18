@@ -4,11 +4,14 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolRole;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -19,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -59,6 +63,11 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxUserDistrictRepository edxUserDistrictRepository;
 
+  @Autowired
+  private EdxActivationCodeRepository edxActivationCodeRepository;
+
+  @Autowired
+  private EdxActivationRoleRepository edxActivationRoleRepository;
 
   @Before
   public void setUp() {
@@ -74,6 +83,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
     this.edxUserDistrictRepository.deleteAll();
+    this.edxActivationCodeRepository.deleteAll();
+    this.edxActivationRoleRepository.deleteAll();
   }
 
   @Test
@@ -864,6 +875,122 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions3.andExpect(jsonPath("$.message", is("EdxUserSchoolRole to EdxUserSchool association already exists")))
       .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithOkStatusResponse() throws Exception {
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("1234567");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(UUID.randomUUID().toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
+      .andDo(print()).andExpect(status().isCreated());
+
+  }
+
+  @Test
+  public void testEdxActivateUsers_GivenInValidInput_ActivationCodeIsExpired_UserIsNotCreated_BadRequestResponse() throws Exception {
+   this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("1234567");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(UUID.randomUUID().toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.message", is("This Activation Code has expired")))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testEdxActivateUsers_GivenInValidInput_NoActivationCodeDataPresentInDB_UserIsNotCreated_IsNotFoundResponseStatus() throws Exception {
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("12345678");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(UUID.randomUUID().toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.message", is("EdxActivationCode was not found for parameters {edxActivationCodeId=" + edxActivateUser.getPrimaryEdxCode() + "}")))
+      .andDo(print()).andExpect(status().isNotFound());
+
+  }
+
+
+  @Test
+  public void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUseSchoolAndSchoolRole_WithOkStatusResponse() throws Exception {
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("1234567");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+      .andExpect(jsonPath("$.updateUser", is("ABC")))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[1].edxUserSchoolID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[1].edxUserSchoolRoles", hasSize(1)))
+      .andExpect(jsonPath("$.edxUserSchools[1].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
+      .andDo(print()).andExpect(status().isCreated());
+
+  }
+
+  @Test
+  public void testEdxActivateUsers_GivenValidInput_EdxUserIdPresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true);
+    String edxUserId = userEntity.getEdxUserID().toString();
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("1234567");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setEdxUserId(edxUserId);
+    edxActivateUser.setUpdateUser("ABC");
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+
+      .andExpect(jsonPath("$.updateUser", is("ABC")))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
+      .andDo(print()).andExpect(status().isCreated());
 
   }
 
