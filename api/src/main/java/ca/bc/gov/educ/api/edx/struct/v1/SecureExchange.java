@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
@@ -34,13 +33,9 @@ public class SecureExchange extends BaseRequest implements Serializable {
   @Size(max = 4000)
   private String subject;
 
-  @Size(max = 1)
-  @Pattern(regexp = "[YN]")
-  String isReadByMinistry;
+  Boolean isReadByMinistry;
 
-  @Size(max = 1)
-  @Pattern(regexp = "[YN]")
-  String isReadByExchangeContact;
+  Boolean isReadByExchangeContact;
 
   String statusUpdateDate;
 
