@@ -882,7 +882,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithOkStatusResponse() throws Exception {
     this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true);
     EdxActivateUser edxActivateUser = new EdxActivateUser();
-    edxActivateUser.setMincode("12345678");
+    edxActivateUser.setMincode("1234567");
     edxActivateUser.setPersonalActivationCode("WXYZ");
     edxActivateUser.setPrimaryEdxCode("ABCDE");
     edxActivateUser.setDigitalId(UUID.randomUUID().toString());

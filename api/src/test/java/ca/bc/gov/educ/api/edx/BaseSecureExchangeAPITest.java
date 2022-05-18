@@ -201,7 +201,7 @@ public abstract class BaseSecureExchangeAPITest {
 
       activationCodeEntity.setExpiryDate(tomorrowMidnight);
     } else {
-      activationCodeEntity.setExpiryDate(LocalDateTime.now());
+      activationCodeEntity.setExpiryDate(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(1));
     }
 
     activationCodeEntity.setFirstName("FirstName");
