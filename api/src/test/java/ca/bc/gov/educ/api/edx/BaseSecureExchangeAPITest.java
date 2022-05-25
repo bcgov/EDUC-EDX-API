@@ -60,6 +60,31 @@ public abstract class BaseSecureExchangeAPITest {
     return entity;
   }
 
+  protected EdxUserEntity createUserEntityWithMultipleSchools(EdxUserRepository edxUserRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxUserSchoolRepository edxUserSchoolRepository, EdxUserDistrictRepository edxUserDistrictRepository, List<String> mincodes) {
+    var entity = edxUserRepository.save(getEdxUserEntity());
+
+    //creating and saving role/permission entities
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    edxRoleRepository.save(roleEntity);
+
+    for (String mincode : mincodes) {
+      var userSchoolEntity = getEdxUserSchoolEntity(entity, mincode);
+      var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
+      userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
+      edxUserSchoolRepository.save(userSchoolEntity);
+    }
+
+    var userDistrictEntity = getEdxUserDistrictEntity(entity);
+    var userDistrictRoleEntity = getEdxUserDistrictRoleEntity(userDistrictEntity, roleEntity);
+    userDistrictEntity.setEdxUserDistrictRoleEntities(Set.of(userDistrictRoleEntity));
+    edxUserDistrictRepository.save(userDistrictEntity);
+
+    return edxUserRepository.getById(entity.getEdxUserID());
+  }
+
   protected EdxUserEntity getEdxUserEntity() {
     EdxUserEntity entity = new EdxUserEntity();
     entity.setDigitalIdentityID(UUID.randomUUID());
@@ -78,6 +103,17 @@ public abstract class BaseSecureExchangeAPITest {
     EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
     entity.setEdxUserEntity(edxUserEntity);
     entity.setMincode("12345678");
+    entity.setCreateUser("test");
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setUpdateUser("test");
+    entity.setUpdateDate(LocalDateTime.now());
+    return entity;
+  }
+
+  protected EdxUserSchoolEntity getEdxUserSchoolEntity(EdxUserEntity edxUserEntity, String mincode) {
+    EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
+    entity.setEdxUserEntity(edxUserEntity);
+    entity.setMincode(mincode);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");

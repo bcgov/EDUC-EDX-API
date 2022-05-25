@@ -60,6 +60,7 @@ public interface EdxUsersEndpoint {
 
   /**
    *   This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.
+   *   If we search via mincode we will only return user's roles at that specific mincode. Districts and other schools are filtered out.
    *
    * @return  List of Edx User
    */

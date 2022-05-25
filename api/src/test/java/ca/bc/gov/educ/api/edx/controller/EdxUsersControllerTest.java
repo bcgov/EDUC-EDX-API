@@ -11,7 +11,8 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolRole;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -131,14 +131,29 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResult() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
-        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResultWithoutDistrictsOrOtherSchools() throws Exception {
+
+    List<String> mincodesList = new ArrayList<>();
+    mincodesList.add("123");
+    mincodesList.add("12345678");
+
+    EdxUserEntity entity = this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
+        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, mincodesList);
+
+    //confirm that there are 2 schools and 1 district in the test DB
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$.edxUserSchools", Matchers.hasSize(2)))
+        .andExpect(jsonPath("$.edxUserDistricts", Matchers.hasSize(1)));
+
+    //confirm that searching for specific mincode shows the 1 school that matches and removes district information
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
             .param("mincode", "12345678"))
         .andDo(print()).andExpect(status().isOk())
-        .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")));
+        .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")))
+        .andExpect(jsonPath("$.[0].edxUserDistricts", Matchers.hasSize(0)));
   }
 
   @Test
