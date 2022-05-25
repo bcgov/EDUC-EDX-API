@@ -232,6 +232,8 @@ public abstract class BaseSecureExchangeAPITest {
     activationCodeEntity.setMincode("1234567");
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
+    activationCodeEntity.setValidationCode(UUID.randomUUID());
+    activationCodeEntity.setIsUrlClicked(false);
     if (isActive) {
       LocalDateTime tomorrowMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1);
 

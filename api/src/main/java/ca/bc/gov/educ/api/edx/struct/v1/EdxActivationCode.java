@@ -44,4 +44,7 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
   @Email(message = "Email address should be a valid email address")
   String email;
 
+  String validationCode;
+
+  String isUrlClicked;
 }

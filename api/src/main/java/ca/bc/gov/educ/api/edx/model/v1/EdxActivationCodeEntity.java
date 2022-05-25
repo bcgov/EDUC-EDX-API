@@ -65,7 +65,7 @@ public class EdxActivationCodeEntity {
   LocalDateTime updateDate;
 
   public Set<EdxActivationRoleEntity> getEdxActivationRoleEntities() {
-    if(this.edxActivationRoleEntities== null){
+    if (this.edxActivationRoleEntities == null) {
       this.edxActivationRoleEntities = new HashSet<>();
     }
     return this.edxActivationRoleEntities;
@@ -84,6 +84,14 @@ public class EdxActivationCodeEntity {
 
   @Column(name = "EMAIL")
   String email;
+
+  @NotNull
+  @Column(name = "VALIDATION_CODE")
+  UUID validationCode;
+
+  @NotNull
+  @Column(name = "IS_URL_CLICKED")
+  Boolean isUrlClicked;
 
 
 }
