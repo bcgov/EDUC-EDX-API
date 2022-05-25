@@ -92,7 +92,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipTeam());
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.MINISTRY_TEAMS)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_MINISTRY_TEAMS"))))
-      .andDo(print()).andExpect(status().isOk());
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.[0].description", is("THISISDESCRIPTION")));
   }
 
   @Test
@@ -1017,6 +1018,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     entity.setCreateUser("JACK");
     entity.setUpdateDate(LocalDateTime.now());
     entity.setTeamName("JOHN");
+    entity.setDescription("THISISDESCRIPTION");
     entity.setGroupRoleIdentifier("ABC");
     return entity;
   }

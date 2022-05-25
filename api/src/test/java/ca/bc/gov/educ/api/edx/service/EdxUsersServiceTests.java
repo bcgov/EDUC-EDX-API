@@ -52,6 +52,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
     final List<MinistryOwnershipTeamEntity> teams = this.service.getMinistryTeamsList();
     assertThat(teams).isNotNull().hasSize(2);
+    assertThat(teams.get(0).getDescription()).isEqualTo("Description");
   }
 
   @Test
@@ -94,6 +95,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     entity.setTeamName(teamName);
     entity.setGroupRoleIdentifier(groupRoleIdentifier);
     entity.setCreateUser("test");
+    entity.setDescription("Description");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
     entity.setUpdateDate(LocalDateTime.now());
