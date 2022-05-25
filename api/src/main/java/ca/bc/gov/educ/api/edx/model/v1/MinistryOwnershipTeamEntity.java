@@ -32,6 +32,9 @@ public class MinistryOwnershipTeamEntity {
   @Column(name = "GROUP_ROLE_IDENTIFIER")
   String groupRoleIdentifier;
 
+  @Column(name = "DESCRIPTION")
+  String description;
+
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

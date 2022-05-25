@@ -16,6 +16,7 @@ public class MinistryTeam extends BaseRequest implements Serializable {
   String ministryOwnershipTeamId;
   String teamName;
   String groupRoleIdentifier;
+  String description;
 
 }
 
