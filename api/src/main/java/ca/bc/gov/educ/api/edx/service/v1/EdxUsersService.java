@@ -9,10 +9,12 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -83,7 +85,23 @@ public class EdxUsersService {
   }
 
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode) {
-    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode);
+    List<EdxUserEntity> edxUsers = this.getEdxUserRepository().findEdxUsers(digitalId, mincode);
+
+//    Remove districts and other schools info when searching with mincode.
+    if (StringUtils.isNotBlank(mincode)) {
+      edxUsers.stream()
+          .forEach(user -> {
+              var filteredSchools = user.getEdxUserSchoolEntities().stream()
+                  .filter(school -> school.getMincode().equals(mincode))
+                  .collect(Collectors.toSet());
+
+              user.setEdxUserSchoolEntities(filteredSchools);
+              user.getEdxUserDistrictEntities().clear();
+            }
+          );
+    }
+
+    return edxUsers;
   }
 
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
