@@ -32,6 +32,9 @@ public class EdxRoleEntity {
   @Column(name = "NAME")
   String roleName;
 
+  @Column(name = "LABEL")
+  String label;
+
   @Column(name = "DESCRIPTION")
   String roleDescription;
 

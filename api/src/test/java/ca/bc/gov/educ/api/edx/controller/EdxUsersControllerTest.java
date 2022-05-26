@@ -103,6 +103,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRole.roleName", is("Admin")))
       .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRole.edxRolePermissions[0].edxPermission.permissionName", is("Exchange")))
       .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.roleName", is("Admin")))
+        .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.label", is("Admin")))
       .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.edxRolePermissions[0].edxPermission.permissionName", is("Exchange")));
   }
 
