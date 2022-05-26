@@ -203,7 +203,7 @@ public abstract class BaseSecureExchangeAPITest {
     return edxUserSchool;
   }
 
-  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive) {
+  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
     var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
     var roleEntity = getEdxRoleEntity();
@@ -211,15 +211,15 @@ public abstract class BaseSecureExchangeAPITest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     var savedRoleEntity = edxRoleRepository.save(roleEntity);
 
-    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive));
+    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked));
 
-    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive));
+    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked));
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
   }
 
-  private EdxActivationRoleEntity createEdxActivationRoleEntity(EdxActivationCodeEntity edxActivationCodeEntity, EdxRoleEntity savedRoleEntity) {
+  protected EdxActivationRoleEntity createEdxActivationRoleEntity(EdxActivationCodeEntity edxActivationCodeEntity, EdxRoleEntity savedRoleEntity) {
     EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
     edxActivationRoleEntity.setEdxActivationCodeEntity(edxActivationCodeEntity);
     edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
@@ -227,13 +227,13 @@ public abstract class BaseSecureExchangeAPITest {
     return edxActivationRoleEntity;
   }
 
-  private EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive) {
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked) {
     EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
     activationCodeEntity.setMincode("1234567");
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
-    activationCodeEntity.setValidationCode(UUID.randomUUID());
-    activationCodeEntity.setIsUrlClicked(false);
+    activationCodeEntity.setValidationCode(validationCode);
+    activationCodeEntity.setIsUrlClicked(isURLClicked);
     if (isActive) {
       LocalDateTime tomorrowMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1);
 

@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface EdxActivationCodeRepository extends JpaRepository<EdxActivationCodeEntity, UUID> {
 
   List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndMincode(List<String> activationCode, String mincode);
+
+  List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByValidationCode(UUID userActivationValidationCode);
 }

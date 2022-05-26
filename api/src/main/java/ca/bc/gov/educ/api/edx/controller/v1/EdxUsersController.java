@@ -121,6 +121,12 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
     return userMapper.toStructure(getService().activateSchoolUser(edxActivateUser));
   }
 
+  @Override
+  public ResponseEntity<Void> updateIsUrlClicked(EdxActivationCode edxActivationCode) {
+    getService().expireUserActivationUrl(UUID.fromString(edxActivationCode.getValidationCode()));
+    return ResponseEntity.noContent().build();
+  }
+
   private void validatePayload(Supplier<List<FieldError>> validator) {
     val validationResult = validator.get();
     if (!validationResult.isEmpty()) {
