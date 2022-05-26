@@ -20,6 +20,8 @@ public class EdxRole extends BaseRequest implements Serializable {
   UUID edxRoleID;
   @Size(max = 30)
   String roleName;
+  @Size(max = 30)
+  String label;
   @Size(max = 255)
   String roleDescription;
   @Pattern(regexp = "[YN]")

@@ -135,6 +135,7 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxRoleEntity getEdxRoleEntity() {
     EdxRoleEntity entity = new EdxRoleEntity();
     entity.setRoleName("Admin");
+    entity.setLabel("Admin");
     entity.setIsDistrictRole(false);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
