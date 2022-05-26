@@ -1024,7 +1024,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andDo(print()).andExpect(status().isNoContent());
+      .andDo(print()).andExpect(status().isOk());
 
   }
 

@@ -124,7 +124,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   @Override
   public ResponseEntity<Void> updateIsUrlClicked(EdxActivationCode edxActivationCode) {
     getService().expireUserActivationUrl(UUID.fromString(edxActivationCode.getValidationCode()));
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok().build();
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
