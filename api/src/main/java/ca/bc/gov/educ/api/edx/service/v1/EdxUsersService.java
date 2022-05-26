@@ -312,4 +312,17 @@ public class EdxUsersService {
     schoolRoleEntity.setCreateDate(LocalDateTime.now());
     schoolRoleEntity.setUpdateDate(LocalDateTime.now());
   }
+
+  public void expireUserActivationUrl(UUID userActivationValidationCode) {
+    List<EdxActivationCodeEntity> activationCodeEntities = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByValidationCode(userActivationValidationCode);
+    if(activationCodeEntities.stream().anyMatch(el -> el.getIsUrlClicked().equals(Boolean.TRUE))){
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(BAD_REQUEST).build();
+      throw new InvalidPayloadException(error);
+    }
+    activationCodeEntities.forEach(activationCode -> {
+      activationCode.setIsUrlClicked(Boolean.TRUE);
+      getEdxActivationCodeRepository().save(activationCode);
+    });
+
+  }
 }
