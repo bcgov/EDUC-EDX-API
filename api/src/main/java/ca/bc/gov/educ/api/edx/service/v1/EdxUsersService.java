@@ -315,6 +315,10 @@ public class EdxUsersService {
 
   public void expireUserActivationUrl(UUID userActivationValidationCode) {
     List<EdxActivationCodeEntity> activationCodeEntities = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByValidationCode(userActivationValidationCode);
+    if(activationCodeEntities.isEmpty()){
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid Link Provided").status(BAD_REQUEST).build();
+      throw new InvalidPayloadException(error);
+    }
     if(activationCodeEntities.stream().anyMatch(el -> el.getIsUrlClicked().equals(Boolean.TRUE))){
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(BAD_REQUEST).build();
       throw new InvalidPayloadException(error);

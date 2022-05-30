@@ -1050,6 +1050,27 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
+  @Test
+  public void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true);
+    EdxActivationCode edxActivationCode = new EdxActivationCode();
+    edxActivationCode.setValidationCode(UUID.randomUUID().toString());
+    String jsonString = getJsonString(edxActivationCode);
+
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+    resultActions.andExpect(jsonPath("$.message", is("Invalid Link Provided")));
+
+
+
+  }
+
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();
     entity.setCreateDate(LocalDateTime.now());
