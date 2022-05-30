@@ -1041,7 +1041,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andDo(print()).andExpect(status().isBadRequest());
+      .andDo(print()).andExpect(status().isGone());
 
       resultActions.andExpect(jsonPath("$.message", is("This User Activation Link has already expired")));
 

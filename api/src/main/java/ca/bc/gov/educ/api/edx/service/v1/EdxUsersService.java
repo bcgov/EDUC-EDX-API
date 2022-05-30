@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.GONE;
 
 @Service
 @Slf4j
@@ -320,7 +321,7 @@ public class EdxUsersService {
       throw new InvalidPayloadException(error);
     }
     if(activationCodeEntities.stream().anyMatch(el -> el.getIsUrlClicked().equals(Boolean.TRUE))){
-      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(BAD_REQUEST).build();
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
       throw new InvalidPayloadException(error);
     }
     activationCodeEntities.forEach(activationCode -> {
