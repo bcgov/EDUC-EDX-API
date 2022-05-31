@@ -17,6 +17,7 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
@@ -324,10 +325,31 @@ public class EdxUsersService {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
       throw new InvalidPayloadException(error);
     }
+    if(activationCodeEntities.stream().anyMatch(el -> el.getExpiryDate().isBefore(LocalDateTime.now()))){
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
+      throw new InvalidPayloadException(error);
+    }
     activationCodeEntities.forEach(activationCode -> {
       activationCode.setIsUrlClicked(Boolean.TRUE);
       getEdxActivationCodeRepository().save(activationCode);
     });
 
+  }
+
+  public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) {
+    edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
+    if(!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())){
+      List<UUID> roleIdList = new ArrayList<>();
+      for (val activationRole: edxActivationCodeEntity.getEdxActivationRoleEntities()){
+        activationRole.setEdxActivationCodeEntity(edxActivationCodeEntity); //bi-directional association
+        roleIdList.add(activationRole.getEdxRoleId());
+      }
+      val roleListFromDB = getEdxRoleRepository().findAllById(roleIdList);
+      if(roleListFromDB.size() != roleIdList.size()){
+        ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("The Role Id provided in the payload does not exist.").status(BAD_REQUEST).build();
+        throw new InvalidPayloadException(error);
+      }
+    }
+    return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
   }
 }

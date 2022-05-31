@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.edx;
 
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
@@ -206,11 +208,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
-    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
-    var roleEntity = getEdxRoleEntity();
-    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
-    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
-    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+    EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
 
     var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked));
 
@@ -218,6 +216,14 @@ public abstract class BaseSecureExchangeAPITest {
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
+  }
+
+  protected EdxRoleEntity createRoleAndPermissionData(EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository) {
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    return edxRoleRepository.save(roleEntity);
   }
 
   protected EdxActivationRoleEntity createEdxActivationRoleEntity(EdxActivationCodeEntity edxActivationCodeEntity, EdxRoleEntity savedRoleEntity) {
@@ -262,6 +268,26 @@ public abstract class BaseSecureExchangeAPITest {
 
     activationCodeEntity.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
     return activationCodeEntity;
+  }
+
+  protected EdxActivationCode createActivationCodeDetails(UUID validationCode, EdxRoleEntity edxRoleEntity,String activationCode, boolean isPrimary) {
+    EdxActivationCode edxActivationCode = new EdxActivationCode();
+    edxActivationCode.setValidationCode(validationCode.toString());
+    edxActivationCode.setEmail("test@test.com");
+    edxActivationCode.setFirstName("FirstName");
+    edxActivationCode.setFirstName("LastName");
+    edxActivationCode.setActivationCode(activationCode);
+    edxActivationCode.setIsPrimary(String.valueOf(isPrimary));
+    edxActivationCode.setExpiryDate(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1).toString());
+    edxActivationCode.setIsUrlClicked(String.valueOf(false));
+    edxActivationCode.setMincode("12345678");
+
+    EdxActivationRole edxActivationRole = new EdxActivationRole();
+    edxActivationRole.setEdxRoleId(edxRoleEntity.getEdxRoleID().toString());
+    List<EdxActivationRole>activationRoles = new ArrayList<>();
+    activationRoles.add(edxActivationRole);
+    edxActivationCode.setEdxActivationRoles(activationRoles);
+    return edxActivationCode;
   }
 
   protected String getJsonString(Object obj) throws JsonProcessingException {

@@ -1,9 +1,7 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
@@ -11,11 +9,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "EDX_ACTIVATION_ROLE")
+@Table(name = "EDX_ACTIVATION_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_ACTIVATION_CODE_ID_EDX_ROLE_ID_UK", columnNames = {"EDX_ACTIVATION_CODE_ID", "EDX_ROLE_ID"})})
 @Getter
 @Setter
 public class EdxActivationRoleEntity {

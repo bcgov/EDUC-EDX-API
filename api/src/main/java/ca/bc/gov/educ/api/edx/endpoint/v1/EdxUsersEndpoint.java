@@ -131,4 +131,12 @@ public interface EdxUsersEndpoint {
   @ResponseStatus(OK)
   ResponseEntity<Void> updateIsUrlClicked(@RequestBody EdxActivationCode edxActivationCode);
 
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_ACTIVATION_CODE')")
+  @PostMapping("/activation-code")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxActivationCode createActivationCode(@RequestBody EdxActivationCode edxActivationCode);
+
 }
