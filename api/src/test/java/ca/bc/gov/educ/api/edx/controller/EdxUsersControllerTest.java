@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.model.v1.EdxRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
@@ -1067,9 +1068,83 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     resultActions.andExpect(jsonPath("$.message", is("Invalid Link Provided")));
 
+  }
 
+  @Test
+  public void testCreateActivationCode_GivenValidInput_ActivationCodeDataIsCreated_WithCreatedStatusResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
+    String jsonString = getJsonString(edxActivationCode);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.edxActivationCodeId", is(notNullValue())))
+      .andExpect(jsonPath("$.edxActivationRoles.[0].edxActivationRoleId", is(notNullValue())))
+      .andDo(print()).andExpect(status().isCreated());
 
   }
+
+  @Test
+  public void testCreateActivationCode_GivenInValidInput_ActivationCodeDataContainsId_BadRequestInResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
+    edxActivationCode.setEdxActivationCodeId(validationCode.toString());
+    String jsonString = getJsonString(edxActivationCode);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationCodeId should be null for post operation.")))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+  @Test
+  public void testCreateActivationCode_GivenInValidInput_ActivationRoleDataContainsId_BadRequestInResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
+   val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
+   activationRole.setEdxActivationCodeId(validationCode.toString());
+   activationRole.setEdxActivationRoleId(validationCode.toString());
+   activationRole.setEdxRoleId(null);
+    String jsonString = getJsonString(edxActivationCode);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationCodeId should be null for post operation.")))
+      .andExpect(jsonPath("$.subErrors[1].message", is("edxActivationRoleId should be null for post operation.")))
+      .andExpect(jsonPath("$.subErrors[2].message", is("edxRoleId should not be null for post operation.")))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateActivationCode_GivenInValidInput_ContainsInvalidRoleId_BadRequestInResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
+    val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
+    activationRole.setEdxRoleId(validationCode.toString());
+    String jsonString = getJsonString(edxActivationCode);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("The Role Id provided in the payload does not exist.")))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();

@@ -9,14 +9,18 @@ import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
+import ca.bc.gov.educ.api.edx.validator.EdxActivationCodePayLoadValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxUserPayLoadValidator;
+
 import java.util.Optional;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,6 +41,9 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserPayLoadValidator edxUserPayLoadValidator;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator;
   private static final MinistryTeamMapper mapper = MinistryTeamMapper.mapper;
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
 
@@ -44,11 +51,14 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private static final EdxUserSchoolRoleMapper USER_SCHOOL_ROLE_MAPPER = EdxUserSchoolRoleMapper.mapper;
   private static final EdxRoleMapper EDX_ROLE_MAPPER = EdxRoleMapper.mapper;
 
+  private static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
+
 
   @Autowired
-  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator) {
+  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator) {
     this.service = secureExchange;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
+    this.edxActivationCodePayLoadValidator = edxActivationCodePayLoadValidator;
   }
 
   @Override
@@ -125,6 +135,16 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public ResponseEntity<Void> updateIsUrlClicked(EdxActivationCode edxActivationCode) {
     getService().expireUserActivationUrl(UUID.fromString(edxActivationCode.getValidationCode()));
     return ResponseEntity.ok().build();
+  }
+
+  @Override
+  public EdxActivationCode createActivationCode(EdxActivationCode edxActivationCode) {
+    validatePayload(() -> getEdxActivationCodePayLoadValidator().validateEdxActivationCodePayload(edxActivationCode));
+    RequestUtil.setAuditColumnsForCreate(edxActivationCode);
+    if (!CollectionUtils.isEmpty(edxActivationCode.getEdxActivationRoles())) {
+      edxActivationCode.getEdxActivationRoles().forEach(RequestUtil::setAuditColumnsForCreate);
+    }
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().createEdxActivationCode(EDX_ACTIVATION_CODE_MAPPER.toModel(edxActivationCode)));
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
