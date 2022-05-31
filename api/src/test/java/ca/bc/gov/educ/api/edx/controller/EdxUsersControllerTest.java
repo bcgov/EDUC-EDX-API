@@ -1052,6 +1052,24 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testUpdateIsUrlClicked_GivenValidationLinkHasAlreadyExpired_WillReturnErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,true);
+    EdxActivationCode edxActivationCode = new EdxActivationCode();
+    edxActivationCode.setValidationCode(validationCode.toString());
+    String jsonString = getJsonString(edxActivationCode);
+
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("This User Activation Link has already expired")))
+      .andDo(print()).andExpect(status().isGone());
+
+  }
+
+  @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true);
@@ -1141,6 +1159,24 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("The Role Id provided in the payload does not exist.")))
+      .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateActivationCode_GivenInValidInput_ActivationCodeHasNoActivationRolesData_BadRequestInResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
+    edxActivationCode.getEdxActivationRoles().clear();
+    String jsonString = getJsonString(edxActivationCode);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoles should be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
   }

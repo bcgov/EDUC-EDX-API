@@ -325,6 +325,10 @@ public class EdxUsersService {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
       throw new InvalidPayloadException(error);
     }
+    if(activationCodeEntities.stream().anyMatch(el -> el.getExpiryDate().isBefore(LocalDateTime.now()))){
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
+      throw new InvalidPayloadException(error);
+    }
     activationCodeEntities.forEach(activationCode -> {
       activationCode.setIsUrlClicked(Boolean.TRUE);
       getEdxActivationCodeRepository().save(activationCode);

@@ -23,7 +23,9 @@ public class EdxActivationCodePayLoadValidator {
 
   private List<FieldError> validateEdxActivationRoles(List<EdxActivationRole> edxActivationRoles) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
-    if(!CollectionUtils.isEmpty(edxActivationRoles)){
+    if(CollectionUtils.isEmpty(edxActivationRoles)){
+      apiValidationErrors.add(createFieldError("edxActivationRoles", edxActivationRoles, "edxActivationRoles should be null for post operation."));
+    }else{
       edxActivationRoles.forEach(el->
         apiValidationErrors.addAll(validateEdxActivationRole(el)));
     }
@@ -45,6 +47,6 @@ public class EdxActivationCodePayLoadValidator {
   }
 
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
-    return new FieldError("EdxUser", fieldName, rejectedValue, false, null, null, message);
+    return new FieldError("EdxActivationCode", fieldName, rejectedValue, false, null, null, message);
   }
 }
