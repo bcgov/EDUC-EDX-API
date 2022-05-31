@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
-import ca.bc.gov.educ.api.edx.model.v1.EdxRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
@@ -897,7 +896,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true, "1234567");
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setMincode("1234567");
     edxActivateUser.setPersonalActivationCode("WXYZ");
@@ -920,7 +919,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testEdxActivateUsers_GivenInValidInput_ActivationCodeIsExpired_UserIsNotCreated_BadRequestResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-   this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode, true);
+   this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode, true, "1234567");
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setMincode("1234567");
     edxActivateUser.setPersonalActivationCode("WXYZ");
@@ -960,7 +959,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUseSchoolAndSchoolRole_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true, "1234567");
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setMincode("1234567");
     edxActivateUser.setPersonalActivationCode("WXYZ");
@@ -989,7 +988,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testEdxActivateUsers_GivenValidInput_EdxUserIdPresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true, "1234567");
     String edxUserId = userEntity.getEdxUserID().toString();
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setMincode("1234567");
@@ -1015,9 +1014,30 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testEdxActivateUsers_GivenInValidInput_EdxUserAlreadyExistsWithTheMincodeInDB_EdxUserIsNotUpdated_WithConflictErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, true,"12345678");
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("12345678");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))))
+      .andExpect(jsonPath("$.message", is("This user is already associated to the school")))
+      .andDo(print()).andExpect(status().isConflict());
+
+  }
+
+  @Test
   public void testUpdateIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
   UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, false);
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, false, "1234567");
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
@@ -1033,7 +1053,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkIsAlreadyClicked_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true);
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true, "1234567");
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
@@ -1054,7 +1074,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkHasAlreadyExpired_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,true);
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,true, "1234567");
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
@@ -1072,7 +1092,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true);
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true, "1234567");
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(UUID.randomUUID().toString());
     String jsonString = getJsonString(edxActivationCode);

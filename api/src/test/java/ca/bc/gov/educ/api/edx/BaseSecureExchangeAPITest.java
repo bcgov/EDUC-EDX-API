@@ -206,13 +206,13 @@ public abstract class BaseSecureExchangeAPITest {
     return edxUserSchool;
   }
 
-  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked) {
+  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
     EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
 
-    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked));
+    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked,mincode));
 
-    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked));
+    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, mincode));
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
@@ -234,9 +234,9 @@ public abstract class BaseSecureExchangeAPITest {
     return edxActivationRoleEntity;
   }
 
-  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked) {
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
     EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
-    activationCodeEntity.setMincode("1234567");
+    activationCodeEntity.setMincode(mincode);
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
     activationCodeEntity.setValidationCode(validationCode);

@@ -23,8 +23,7 @@ import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.GONE;
+import static org.springframework.http.HttpStatus.*;
 
 @Service
 @Slf4j
@@ -196,12 +195,26 @@ public class EdxUsersService {
           //create completely new user
           return createEdxUserDetailsFromActivationCodeDetails(edxActivateUser, activationCodes);
         } else {
+          verifyExistingUserMincodeAssociation(edxActivateUser, edxUsers);
+
           //add the user_school and school_role to user to the edx_user
-          return updateEdxUserDetailsFromActivationCodeDetails(edxUsers, activationCodes,edxActivateUser);
+          return updateEdxUserDetailsFromActivationCodeDetails(edxUsers, activationCodes, edxActivateUser);
         }
       }
     } else {
-      throw new EntityNotFoundException(EdxActivationCode.class,"edxActivationCodeId", edxActivateUser.getPrimaryEdxCode());
+      throw new EntityNotFoundException(EdxActivationCode.class, "edxActivationCodeId", edxActivateUser.getPrimaryEdxCode());
+    }
+  }
+
+  private void verifyExistingUserMincodeAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
+    val existingUser = edxUsers.get(0);
+    if (!CollectionUtils.isEmpty(existingUser.getEdxUserSchoolEntities())) {
+      for (EdxUserSchoolEntity schoolEntity : existingUser.getEdxUserSchoolEntities()) {
+        if (schoolEntity.getMincode().equalsIgnoreCase(edxActivateUser.getMincode())) {
+          ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the school").status(CONFLICT).build();
+          throw new InvalidPayloadException(error);
+        }
+      }
     }
   }
 
