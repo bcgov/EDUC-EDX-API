@@ -81,8 +81,9 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
     this.edxUserDistrictRepository.deleteAll();
-    this.edxActivationCodeRepository.deleteAll();
     this.edxActivationRoleRepository.deleteAll();
+    this.edxActivationCodeRepository.deleteAll();
+
   }
 
   @Test
@@ -1201,6 +1202,34 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
+  @Test
+  public void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true, "1234567");
+
+    val resultActions = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+entityList.get(0).getEdxActivationCodeId())
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNoContent());
+
+   // resultActions.andExpect(jsonPath("$.message", is("Invalid Link Provided")));
+
+  }
+
+  @Test
+  public void testDeleteActivationCode_GivenInValidInput_WillReturnNotFoundErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,true, "1234567");
+
+    val resultActions = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+validationCode)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message", is("EdxActivationCodeEntity was not found for parameters {edxActivationCodeId="+validationCode+"}")));
+
+  }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();
