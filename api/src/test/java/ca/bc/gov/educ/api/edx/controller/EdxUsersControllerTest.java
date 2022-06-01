@@ -1213,8 +1213,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNoContent());
 
-   // resultActions.andExpect(jsonPath("$.message", is("Invalid Link Provided")));
-
   }
 
   @Test
