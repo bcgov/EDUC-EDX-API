@@ -77,8 +77,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode) {
-    return getService().findEdxUsers(digitalId, mincode).stream().map(userMapper::toStructure).collect(Collectors.toList());
+  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
+    return getService().findEdxUsers(digitalId, mincode,firstName,lastName).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

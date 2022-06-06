@@ -132,6 +132,18 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS)
+        .param("firstName",entity.getFirstName())
+        .param("lastName", entity.getLastName())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.[0].firstName", is(entity.getFirstName())));
+
+  }
+  @Test
   public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResultWithoutDistrictsOrOtherSchools() throws Exception {
 
     List<String> mincodesList = new ArrayList<>();

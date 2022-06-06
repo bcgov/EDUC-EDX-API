@@ -86,7 +86,7 @@ public class EdxActivationCodeEntity {
   String email;
 
   @NotNull
-  @Column(name = "VALIDATION_CODE")
+  @Column(name = "VALIDATION_CODE", columnDefinition = "BINARY(16)")
   UUID validationCode;
 
   @NotNull
