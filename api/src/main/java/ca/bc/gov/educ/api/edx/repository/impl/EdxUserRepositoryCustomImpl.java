@@ -44,10 +44,10 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
       predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("mincode"), mincode));
     }
     if (StringUtils.isNotBlank(firstName)) {
-      predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("firstName"), firstName));
+      predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("firstName"), firstName));
     }
     if (StringUtils.isNotBlank(lastName)) {
-      predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("lastName"), lastName));
+      predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("lastName"), lastName));
     }
 
     criteriaQuery.where(predicates.toArray(new Predicate[0]));
