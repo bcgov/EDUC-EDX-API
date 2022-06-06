@@ -89,8 +89,8 @@ public class EdxUsersService {
     return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionName);
   }
 
-  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode) {
-    List<EdxUserEntity> edxUsers = this.getEdxUserRepository().findEdxUsers(digitalId, mincode);
+  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
+    List<EdxUserEntity> edxUsers = this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
 
 //    Remove districts and other schools info when searching with mincode.
     if (StringUtils.isNotBlank(mincode)) {
