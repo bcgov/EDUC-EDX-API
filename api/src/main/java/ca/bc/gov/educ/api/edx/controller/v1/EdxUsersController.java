@@ -148,6 +148,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public EdxActivationCode regeneratePrimaryActivationCode(UUID activationCodeId) {
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().regenerateEdxActivationCode(activationCodeId));
+  }
+
+  @Override
   public ResponseEntity<Void> deleteActivationCode(UUID activationCodeId) {
     getService().deleteActivationCode(activationCodeId);
     return ResponseEntity.noContent().build();

@@ -25,6 +25,8 @@ import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import org.apache.commons.lang3.RandomStringUtils;
+
 import static org.springframework.http.HttpStatus.*;
 
 @Service
@@ -352,10 +354,10 @@ public class EdxUsersService {
       activationCode.setIsUrlClicked(Boolean.TRUE);
       getEdxActivationCodeRepository().save(activationCode);
     });
-
   }
 
   public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) {
+    edxActivationCodeEntity.setActivationCode(this.generateActivationCode());
     edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
     if (!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())) {
       List<UUID> roleIdList = new ArrayList<>();
@@ -372,10 +374,25 @@ public class EdxUsersService {
     return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
   }
 
+  public EdxActivationCodeEntity regenerateEdxActivationCode(UUID activationCodeId) {
+    val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
+    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class,EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
+    if (!entity.getIsPrimary()) {
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Activation codes can only be regenerated for Activation Codes marked as primary.").status(BAD_REQUEST).build();
+      throw new InvalidPayloadException(error);
+    }
+    entity.setActivationCode(this.generateActivationCode());
+    return this.getEdxActivationCodeRepository().save(entity);
+  }
+
   public void deleteActivationCode(UUID activationCodeId) {
     val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class,EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
     this.getEdxActivationCodeRepository().delete(entity);
+  }
 
+  private String generateActivationCode() {
+    int codeLength = 8;
+    return RandomStringUtils.randomAlphanumeric(codeLength).toUpperCase();
   }
 }
