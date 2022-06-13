@@ -234,16 +234,16 @@ public abstract class BaseSecureExchangeAPITest {
     return edxActivationRoleEntity;
   }
 
-  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
     EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
     activationCodeEntity.setMincode(mincode);
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
     activationCodeEntity.setValidationCode(validationCode);
     activationCodeEntity.setIsUrlClicked(isURLClicked);
+
     if (isActive) {
       LocalDateTime tomorrowMidnight = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1);
-
       activationCodeEntity.setExpiryDate(tomorrowMidnight);
     } else {
       activationCodeEntity.setExpiryDate(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(1));
@@ -258,16 +258,20 @@ public abstract class BaseSecureExchangeAPITest {
     activationCodeEntity.setUpdateUser("test");
     activationCodeEntity.setUpdateDate(LocalDateTime.now());
 
+    return activationCodeEntity;
+  }
+
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
+    EdxActivationCodeEntity toReturn = createEdxActivationCodeEntity(activationCode, isPrimary, isActive, validationCode, isURLClicked, mincode);
     EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
-    edxActivationRoleEntity.setEdxActivationCodeEntity(activationCodeEntity);
+    edxActivationRoleEntity.setEdxActivationCodeEntity(toReturn);
     edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
     edxActivationRoleEntity.setCreateUser("test");
     edxActivationRoleEntity.setCreateDate(LocalDateTime.now());
     edxActivationRoleEntity.setUpdateUser("test");
     edxActivationRoleEntity.setUpdateDate(LocalDateTime.now());
-
-    activationCodeEntity.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
-    return activationCodeEntity;
+    toReturn.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
+    return toReturn;
   }
 
   protected EdxActivationCode createActivationCodeDetails(UUID validationCode, EdxRoleEntity edxRoleEntity,String activationCode, boolean isPrimary) {
