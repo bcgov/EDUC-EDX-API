@@ -20,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "EDX_SERVICES_SAGA_EVENT_STATES")
+@Table(name = "EDX_SAGA_EVENT_STATES")
 @DynamicUpdate
 public class SagaEventStatesEntity {
 

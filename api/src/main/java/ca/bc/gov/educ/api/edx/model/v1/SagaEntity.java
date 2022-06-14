@@ -19,7 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name = "EDX_SERVICES_SAGA")
+@Table(name = "EDX_SAGA")
 @DynamicUpdate
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SagaEntity {
