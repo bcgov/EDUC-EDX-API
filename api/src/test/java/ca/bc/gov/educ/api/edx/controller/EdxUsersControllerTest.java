@@ -26,8 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -1213,6 +1212,42 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isBadRequest());
 
   }
+
+  /*@Test
+  public void testRegenerateActivationCode_GivenValidInput_SetsNewRandomActivationCode_WillReturnSuccess() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
+    val activationCode = entityList.get(0);
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + activationCode.getEdxActivationCodeId() + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.activationCode", not(equalTo(activationCode.getActivationCode()))))
+      .andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  public void testRegenerateActivationCode_GivenInvalidInput_WillReturnNotFoundErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + validationCode + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNotFound())
+      .andExpect(jsonPath("$.message", is("EdxActivationCodeEntity was not found for parameters {edxActivationCodeId="+validationCode+"}")));
+  }
+
+  @Test
+  public void testRegenerateActivationCode_GivenInvalidInput_WillOnlyRegenerateCodesForPrimaryActivationCodes_WillReturnBadRequest() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
+    val activationCode = entityList.get(1);
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + activationCode.getEdxActivationCodeId() + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.message", is("Activation codes can only be regenerated for Activation Codes marked as primary.")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }*/
 
   @Test
   public void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
