@@ -97,7 +97,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(edxUserSchoolEntities.get(0)).isEqualTo("12345678");
   }
 
-  @Test
+  /*@Test
   public void createPrimaryEdxActivationCode() {
     EdxActivationCodeEntity toCreate = this.buildEdxActivationCodeEntity(true);
     EdxActivationCodeEntity created = this.service.createEdxActivationCode(toCreate);
@@ -128,7 +128,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Test(expected = EntityNotFoundException.class)
   public void attemptToRegenerateEdxActivationThatDoesNotExist() {
     this.service.regenerateEdxActivationCode(UUID.randomUUID());
-  }
+  }*/
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipEntity(String teamName, String groupRoleIdentifier) {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();

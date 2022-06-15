@@ -9,7 +9,10 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
@@ -24,8 +27,6 @@ import org.springframework.util.CollectionUtils;
 import javax.persistence.EntityExistsException;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import org.apache.commons.lang3.RandomStringUtils;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -58,6 +59,8 @@ public class EdxUsersService {
   private static final String EDX_USER_ID = "edxUserID";
 
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
+
+  private static final String MINCODE = "mincode";
 
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository) {
@@ -357,7 +360,6 @@ public class EdxUsersService {
   }
 
   public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) {
-    edxActivationCodeEntity.setActivationCode(this.generateActivationCode());
     edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
     if (!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())) {
       List<UUID> roleIdList = new ArrayList<>();
@@ -374,25 +376,52 @@ public class EdxUsersService {
     return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
   }
 
-  public EdxActivationCodeEntity regenerateEdxActivationCode(UUID activationCodeId) {
-    val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
-    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class,EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
-    if (!entity.getIsPrimary()) {
-      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Activation codes can only be regenerated for Activation Codes marked as primary.").status(BAD_REQUEST).build();
-      throw new InvalidPayloadException(error);
-    }
-    entity.setActivationCode(this.generateActivationCode());
-    return this.getEdxActivationCodeRepository().save(entity);
-  }
-
   public void deleteActivationCode(UUID activationCodeId) {
     val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class,EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
     this.getEdxActivationCodeRepository().delete(entity);
   }
 
-  private String generateActivationCode() {
-    int codeLength = 8;
-    return RandomStringUtils.randomAlphanumeric(codeLength).toUpperCase();
+  public EdxActivationCodeEntity findPrimaryEdxActivationCode(String mincode) {
+    Optional<EdxActivationCodeEntity> primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode);
+    if (!primaryEdxActivationCode.isPresent()) {
+      throw new EntityNotFoundException(EdxActivationCodeEntity.class, MINCODE, mincode);
+    }
+    return primaryEdxActivationCode.get();
+  }
+
+  public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(String mincode) {
+    EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode).orElseGet(() -> this.newPrimaryActivationCode(mincode));
+    try {
+      primaryEdxActivationCode.setActivationCode(this.generateActivationCode());
+    } catch (NoSuchAlgorithmException e) {
+      ApiError.builder().timestamp(LocalDateTime.now()).message("Unable to generate an activation code.").status(INTERNAL_SERVER_ERROR).build();
+    }
+    return this.getEdxActivationCodeRepository().save(primaryEdxActivationCode);
+  }
+
+  private String generateActivationCode() throws NoSuchAlgorithmException {
+    int byteLength = 6; //Base64 encoding an input of 6 bytes will generate a string of 8 characters.
+    byte[] randomBytes = new byte[byteLength];
+    SecureRandom.getInstanceStrong().nextBytes(randomBytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes).toUpperCase();
+  }
+
+  private EdxActivationCodeEntity newPrimaryActivationCode(String mincode) {
+    EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
+    LocalDateTime currentTime = LocalDateTime.now();
+    toReturn.setMincode(mincode);
+    toReturn.setIsPrimary(true);
+    toReturn.setExpiryDate(currentTime);
+    toReturn.setCreateUser("EDX-API");
+    toReturn.setCreateDate(currentTime);
+    toReturn.setUpdateUser("EDX-API");
+    toReturn.setUpdateDate(currentTime);
+    toReturn.setFirstName("");
+    toReturn.setLastName("");
+    toReturn.setEmail("");
+    toReturn.setValidationCode(UUID.randomUUID());
+    toReturn.setIsUrlClicked(false);
+    return toReturn;
   }
 }

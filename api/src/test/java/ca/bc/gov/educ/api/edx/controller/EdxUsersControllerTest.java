@@ -1132,8 +1132,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", is(notNullValue())))
-      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
-      .andExpect(jsonPath("$.activationCode", not(equalTo("ABCDE"))))
       .andExpect(jsonPath("$.edxActivationRoles.[0].edxActivationRoleId", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -1215,7 +1213,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
-  @Test
+  /*@Test
   public void testRegenerateActivationCode_GivenValidInput_SetsNewRandomActivationCode_WillReturnSuccess() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
@@ -1249,7 +1247,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("Activation codes can only be regenerated for Activation Codes marked as primary.")))
       .andDo(print()).andExpect(status().isBadRequest());
-  }
+  }*/
 
   @Test
   public void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
