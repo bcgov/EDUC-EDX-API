@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 
 import java.security.NoSuchAlgorithmException;
@@ -384,19 +385,21 @@ public class EdxUsersService {
 
   public EdxActivationCodeEntity findPrimaryEdxActivationCode(String mincode) {
     Optional<EdxActivationCodeEntity> primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode);
-    if (!primaryEdxActivationCode.isPresent()) {
+    if (primaryEdxActivationCode.isEmpty()) {
       throw new EntityNotFoundException(EdxActivationCodeEntity.class, MINCODE, mincode);
     }
     return primaryEdxActivationCode.get();
   }
 
-  public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(String mincode) {
-    EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode).orElseGet(() -> this.newPrimaryActivationCode(mincode));
+  public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
+    EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(edxPrimaryActivationCode.getMincode()).orElseGet(() -> this.newPrimaryActivationCode(edxPrimaryActivationCode));
     try {
       primaryEdxActivationCode.setActivationCode(this.generateActivationCode());
     } catch (NoSuchAlgorithmException e) {
       ApiError.builder().timestamp(LocalDateTime.now()).message("Unable to generate an activation code.").status(INTERNAL_SERVER_ERROR).build();
     }
+    primaryEdxActivationCode.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
+    primaryEdxActivationCode.setUpdateDate(LocalDateTime.now());
     return this.getEdxActivationCodeRepository().save(primaryEdxActivationCode);
   }
 
@@ -407,15 +410,15 @@ public class EdxUsersService {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes).toUpperCase();
   }
 
-  private EdxActivationCodeEntity newPrimaryActivationCode(String mincode) {
+  private EdxActivationCodeEntity newPrimaryActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
-    toReturn.setMincode(mincode);
+    toReturn.setMincode(edxPrimaryActivationCode.getMincode());
     toReturn.setIsPrimary(true);
     toReturn.setExpiryDate(currentTime);
-    toReturn.setCreateUser("EDX-API");
+    toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);
-    toReturn.setUpdateUser("EDX-API");
+    toReturn.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
     toReturn.setUpdateDate(currentTime);
     toReturn.setFirstName("");
     toReturn.setLastName("");

@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.mappers.v1.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
+import ca.bc.gov.educ.api.edx.struct.BaseRequest;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
@@ -159,8 +160,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(String mincode) {
-    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(mincode));
+  public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(edxPrimaryActivationCode));
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {

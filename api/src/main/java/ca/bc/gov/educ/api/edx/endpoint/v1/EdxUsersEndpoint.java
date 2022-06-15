@@ -156,6 +156,6 @@ public interface EdxUsersEndpoint {
   @PutMapping("/activation-code/primary/{mincode}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(OK)
-  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@PathVariable String mincode);
+  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
 
 }
