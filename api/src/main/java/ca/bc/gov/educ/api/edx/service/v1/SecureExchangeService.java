@@ -81,7 +81,7 @@ public class SecureExchangeService {
   @Transactional
   public SecureExchangeEntity createSecureExchange(final SecureExchangeEntity secureExchangeRequest) {
     if(secureExchangeRequest.getSecureExchangeStatusCode() == null) {
-      secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.NEW.toString());
+      secureExchangeRequest.setSecureExchangeStatusCode(SecureExchangeStatusCode.OPEN.toString());
     }
     secureExchangeRequest.setStatusUpdateDate(LocalDateTime.now());
     if(secureExchangeRequest.getIsReadByExchangeContact() == null) {
