@@ -13,10 +13,8 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
