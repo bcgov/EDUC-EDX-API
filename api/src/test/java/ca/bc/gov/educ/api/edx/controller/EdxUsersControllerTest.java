@@ -143,29 +143,23 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
   @Test
-  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResultWithoutDistrictsOrOtherSchools() throws Exception {
+  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResults() throws Exception {
 
     List<String> mincodesList = new ArrayList<>();
     mincodesList.add("123");
     mincodesList.add("12345678");
 
-    EdxUserEntity entity = this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, mincodesList);
 
-    //confirm that there are 2 schools and 1 district in the test DB
-    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
-        .andDo(print()).andExpect(status().isOk())
-        .andExpect(jsonPath("$.edxUserSchools", Matchers.hasSize(2)))
-        .andExpect(jsonPath("$.edxUserDistricts", Matchers.hasSize(1)));
-
-    //confirm that searching for specific mincode shows the 1 school that matches and removes district information
+    //should return user with all their schools and districts access.
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
             .param("mincode", "12345678"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")))
-        .andExpect(jsonPath("$.[0].edxUserDistricts", Matchers.hasSize(0)));
+        .andExpect(jsonPath("$.[0].edxUserSchools[1].mincode", Matchers.is("123")))
+        .andExpect(jsonPath("$.[0].edxUserDistricts[0].districtCode", Matchers.is("006")));
   }
 
   @Test
