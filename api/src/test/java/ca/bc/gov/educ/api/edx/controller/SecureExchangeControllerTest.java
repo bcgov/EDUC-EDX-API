@@ -62,12 +62,14 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Before
   public void setUp() {
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
+    this.secureExchangeStatusCodeTableRepo.save(createNewStatus());
     MockitoAnnotations.openMocks(this);
   }
 
   @After
   public void after() {
     this.secureExchangeContactTypeCodeTableRepository.deleteAll();
+    this.secureExchangeStatusCodeTableRepo.deleteAll();
     this.documentRepository.deleteAll();
     this.repository.deleteAll();
   }
@@ -133,7 +135,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
       .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinAndStatusCode(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print())
       .andExpect(status().isCreated())
       .andExpect(jsonPath("$.isReadByMinistry", is(true)))
-      .andExpect(jsonPath("$.secureExchangeStatusCode", is("INPROG")));
+      .andExpect(jsonPath("$.secureExchangeStatusCode", is("OPEN")));
   }
 
   @Test
@@ -269,7 +271,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testReadSecureExchangeStatus_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
-    this.secureExchangeStatusCodeTableRepo.save(this.createPenReqStatus());
+    this.secureExchangeStatusCodeTableRepo.save(this.createNewStatus());
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.STATUSES)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_CODES"))))
             .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
@@ -342,9 +344,9 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
         .contentType(APPLICATION_JSON)).andDo(print()).andExpect(status().isBadRequest());
   }
 
-  private ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity createPenReqStatus() {
+  private ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity createNewStatus() {
     final ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity entity = new ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity();
-    entity.setSecureExchangeStatusCode("NEW");
+    entity.setSecureExchangeStatusCode("OPEN");
     entity.setDescription("Initial Review");
     entity.setDisplayOrder(1);
     entity.setEffectiveDate(LocalDateTime.now());
