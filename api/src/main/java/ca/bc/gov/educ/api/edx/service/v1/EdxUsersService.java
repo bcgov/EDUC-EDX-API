@@ -96,22 +96,6 @@ public class EdxUsersService {
   }
 
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
-//    List<EdxUserEntity> edxUsers = this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
-
-////    Remove districts and other schools info when searching with mincode.
-//    if (StringUtils.isNotBlank(mincode)) {
-//      edxUsers.stream()
-//        .forEach(user -> {
-//            var filteredSchools = user.getEdxUserSchoolEntities().stream()
-//              .filter(school -> school.getMincode().equals(mincode))
-//              .collect(Collectors.toSet());
-//
-//            user.setEdxUserSchoolEntities(filteredSchools);
-//            user.getEdxUserDistrictEntities().clear();
-//          }
-//        );
-//    }
-
     return this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
   }
 

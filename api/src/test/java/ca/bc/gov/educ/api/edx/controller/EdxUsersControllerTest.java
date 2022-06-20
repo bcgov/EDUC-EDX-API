@@ -146,7 +146,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResults() throws Exception {
 
     List<String> mincodesList = new ArrayList<>();
-    mincodesList.add("123");
     mincodesList.add("12345678");
 
     this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
@@ -158,7 +157,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .param("mincode", "12345678"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")))
-        .andExpect(jsonPath("$.[0].edxUserSchools[1].mincode", Matchers.is("123")))
         .andExpect(jsonPath("$.[0].edxUserDistricts[0].districtCode", Matchers.is("006")));
   }
 
