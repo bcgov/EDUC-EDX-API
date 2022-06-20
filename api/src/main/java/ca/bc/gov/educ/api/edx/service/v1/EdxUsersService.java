@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -116,9 +117,11 @@ public class EdxUsersService {
   }
 
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
+    for(var entity: edxUserEntity.getEdxUserSchoolEntities()){
+      entity.setEdxUserEntity(edxUserEntity);
+    }
     return this.getEdxUserRepository().save(edxUserEntity);
   }
-
 
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
