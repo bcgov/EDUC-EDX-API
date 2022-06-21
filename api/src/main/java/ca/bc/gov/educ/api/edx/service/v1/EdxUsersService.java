@@ -99,11 +99,11 @@ public class EdxUsersService {
   }
 
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
-    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
+    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode, firstName, lastName);
   }
 
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
-    for(var entity: edxUserEntity.getEdxUserSchoolEntities()){
+    for (var entity : edxUserEntity.getEdxUserSchoolEntities()) {
       entity.setEdxUserEntity(edxUserEntity);
     }
     return this.getEdxUserRepository().save(edxUserEntity);
@@ -268,10 +268,13 @@ public class EdxUsersService {
     activationCodes.forEach(edxActivationCode -> {
       val optionalEdxActivationCodeEntity = getEdxActivationCodeRepository().findById(edxActivationCode.getEdxActivationCodeId());
       val activationCodeEntity = optionalEdxActivationCodeEntity.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class, EDX_ACTIVATION_CODE_ID, edxActivationCode.getEdxActivationCodeId().toString()));
-      activationCodeEntity.setExpiryDate(LocalDateTime.now());
-      activationCodeEntity.setUpdateUser(edxActivateUser.getUpdateUser());
-      activationCodeEntity.setUpdateDate(LocalDateTime.now());
-      getEdxActivationCodeRepository().save(activationCodeEntity);
+      if (!activationCodeEntity.getIsPrimary()) {//expire only the personal activation code
+        activationCodeEntity.setExpiryDate(LocalDateTime.now());
+        activationCodeEntity.setUpdateUser(edxActivateUser.getUpdateUser());
+        activationCodeEntity.setUpdateDate(LocalDateTime.now());
+        getEdxActivationCodeRepository().save(activationCodeEntity);
+      }
+
     });
   }
 
@@ -377,7 +380,7 @@ public class EdxUsersService {
 
   public void deleteActivationCode(UUID activationCodeId) {
     val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
-    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class,EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
+    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class, EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
     this.getEdxActivationCodeRepository().delete(entity);
   }
 
