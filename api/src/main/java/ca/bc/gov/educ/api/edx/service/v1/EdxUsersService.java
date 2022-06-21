@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
@@ -12,7 +13,6 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lombok.AccessLevel;
@@ -61,9 +61,11 @@ public class EdxUsersService {
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
 
   private static final String MINCODE = "mincode";
+  @Getter(AccessLevel.PRIVATE)
+  private final ApplicationProperties props;
 
   @Autowired
-  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository) {
+  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, ApplicationProperties props) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
     this.edxUserSchoolsRepository = edxUserSchoolsRepository;
     this.edxUserRepository = edxUserRepository;
@@ -71,6 +73,7 @@ public class EdxUsersService {
     this.edxRoleRepository = edxRoleRepository;
     this.edxActivationCodeRepository = edxActivationCodeRepository;
     this.edxActivationRoleRepository = edxActivationRoleRepository;
+    this.props = props;
   }
 
   public List<MinistryOwnershipTeamEntity> getMinistryTeamsList() {
@@ -355,11 +358,12 @@ public class EdxUsersService {
     }
     activationCodeEntities.forEach(activationCode -> {
       activationCode.setIsUrlClicked(Boolean.TRUE);
+      activationCode.setUpdateDate(LocalDateTime.now());
       getEdxActivationCodeRepository().save(activationCode);
     });
   }
 
-  public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) {
+  public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
     edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
     if (!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())) {
       List<UUID> roleIdList = new ArrayList<>();
@@ -374,6 +378,14 @@ public class EdxUsersService {
       }
     }
     return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
+  }
+
+  public EdxActivationCodeEntity createPersonalEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
+    edxActivationCodeEntity.setActivationCode(generateActivationCode());
+    edxActivationCodeEntity.setExpiryDate(LocalDateTime.now().plusHours(props.getEdxSchoolUserActivationInviteValidity()));
+    edxActivationCodeEntity.setIsUrlClicked(Boolean.FALSE);
+    edxActivationCodeEntity.setIsPrimary(Boolean.FALSE);
+    return createEdxActivationCode(edxActivationCodeEntity);
   }
 
   public void deleteActivationCode(UUID activationCodeId) {

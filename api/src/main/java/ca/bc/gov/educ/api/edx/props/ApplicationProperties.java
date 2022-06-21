@@ -22,4 +22,34 @@ public class ApplicationProperties {
   @Value("${file.extensions}")
   private List<String> fileExtensions;
 
+  @Value("${nats.server}")
+  private String server;
+  /**
+   * The Max reconnect.
+   */
+  @Value("${nats.maxReconnect}")
+  private int maxReconnect;
+  /**
+   * The Connection name.
+   */
+  @Value("${nats.connectionName}")
+  private String connectionName;
+
+  @Value("${ches.client.id}")
+  private String chesClientID;
+  @Value("${ches.client.secret}")
+  private String chesClientSecret;
+  @Value("${ches.token.url}")
+  private String chesTokenURL;
+  @Value("${ches.endpoint.url}")
+  private String chesEndpointURL;
+  @Value("${notification.email.switch.on}")
+  private Boolean isEmailNotificationSwitchedOn;
+
+  @Value("${edx.school.user.activation.invite.base.url}")
+  private String edxApplicationBaseUrl;
+  @Value("${edx.school.user.activation.invite.append.url}")
+  private String edxSchoolUserActivationInviteAppendUrl;
+  @Value("${edx.school.user.activation.invite.validity.hours}")
+  private Long edxSchoolUserActivationInviteValidity;
 }
