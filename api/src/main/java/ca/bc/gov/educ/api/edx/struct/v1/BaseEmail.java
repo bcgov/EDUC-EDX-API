@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 @Setter
 @Getter
 @ToString
-public abstract class BaseEmailEntity {
+public abstract class BaseEmail {
 
   @NotNull(message = "Email address can not be null.")
   @Email(message = "Email address should be a valid email address")
