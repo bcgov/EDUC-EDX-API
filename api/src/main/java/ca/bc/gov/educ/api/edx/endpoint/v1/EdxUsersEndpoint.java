@@ -152,9 +152,9 @@ public interface EdxUsersEndpoint {
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_PRIMARY_ACTIVATION_CODE')")
-  @PutMapping("/activation-code/primary/{mincode}")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @ResponseStatus(OK)
-  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@PathVariable String mincode);
+  @PostMapping("/activation-code/primary/{mincode}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
 
 }
