@@ -49,8 +49,8 @@ public class SecureExchangePayloadValidator {
     }
 
     if (isCreateOperation && secureExchange.getSecureExchangeStatusCode() != null &&
-      !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.NEW.toString()) && !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.INPROG.toString())) {
-      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be NEW or INPROG for post operation."));
+      !secureExchange.getSecureExchangeStatusCode().equals(SecureExchangeStatusCode.OPEN.toString())) {
+      apiValidationErrors.add(createFieldError("secureExchangeStatusCode", secureExchange.getSecureExchangeStatusCode(), "secureExchangeStatusCode should be OPEN for post operation."));
     }
 
     if (isCreateOperation && secureExchange.getSequenceNumber() != null){

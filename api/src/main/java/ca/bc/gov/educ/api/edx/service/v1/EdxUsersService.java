@@ -15,6 +15,7 @@ import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -98,29 +99,15 @@ public class EdxUsersService {
   }
 
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
-    List<EdxUserEntity> edxUsers = this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
-
-//    Remove districts and other schools info when searching with mincode.
-    if (StringUtils.isNotBlank(mincode)) {
-      edxUsers.stream()
-        .forEach(user -> {
-            var filteredSchools = user.getEdxUserSchoolEntities().stream()
-              .filter(school -> school.getMincode().equals(mincode))
-              .collect(Collectors.toSet());
-
-            user.setEdxUserSchoolEntities(filteredSchools);
-            user.getEdxUserDistrictEntities().clear();
-          }
-        );
-    }
-
-    return edxUsers;
+    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode,firstName,lastName);
   }
 
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
+    for(var entity: edxUserEntity.getEdxUserSchoolEntities()){
+      entity.setEdxUserEntity(edxUserEntity);
+    }
     return this.getEdxUserRepository().save(edxUserEntity);
   }
-
 
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
