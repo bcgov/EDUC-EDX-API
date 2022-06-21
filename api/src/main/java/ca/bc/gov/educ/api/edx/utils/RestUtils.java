@@ -64,7 +64,7 @@ public class RestUtils {
     chesEmail.setBodyType("html");
     chesEmail.setDelayTS(0);
     chesEmail.setEncoding("utf-8");
-    chesEmail.setFrom("noreply.getmypen@gov.bc.ca");
+    chesEmail.setFrom("noreply-edx@gov.bc.ca");
     chesEmail.setPriority("normal");
     chesEmail.setSubject(subject);
     chesEmail.setTag("tag");

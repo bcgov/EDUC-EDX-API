@@ -163,6 +163,7 @@ public class SagaService {
       .createUser(userName)
       .updateUser(userName)
       .updateDate(LocalDateTime.now())
+      .sagaCompensated(false)
       .build();
     return this.createSagaRecord(saga);
   }

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator.base;
 
-import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
+import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
@@ -14,6 +14,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED;
@@ -64,11 +66,12 @@ public class EdxSchoolUserActivationInviteOrchestrator extends BaseOrchestrator<
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_PERSONAL_ACTIVATION_CODE.toString()); // set current event as saga state.
-
-    if (!getEdxSchoolUserActivationInviteOrchestratorService().checkIfSagaDataExists(edxUserActivationInviteSagaData)) {//idempotency check
-      getEdxSchoolUserActivationInviteOrchestratorService().createPersonalActivationCode(edxUserActivationInviteSagaData);
-      saga.setPayload(JsonUtil.getJsonStringFromObject(edxUserActivationInviteSagaData)); // update the payload which will be updated in DB.
-      this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
+    this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
+    Optional<EdxActivationCodeEntity> edxActivationCodeEntityOptional = getEdxSchoolUserActivationInviteOrchestratorService().checkIfActivationSagaDataExists(edxUserActivationInviteSagaData);
+    if (edxActivationCodeEntityOptional.isEmpty()) {//idempotency check
+      getEdxSchoolUserActivationInviteOrchestratorService().createPersonalActivationCodeAndUpdateSagaData(edxUserActivationInviteSagaData, saga); // one transaction updates three tables.
+    } else {
+      getEdxSchoolUserActivationInviteOrchestratorService().updateSagaData(edxUserActivationInviteSagaData, edxActivationCodeEntityOptional.get(), saga);
     }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
@@ -82,11 +85,10 @@ public class EdxSchoolUserActivationInviteOrchestrator extends BaseOrchestrator<
 
   private void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-    saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(SEND_EDX_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
-
-    getEdxSchoolUserActivationInviteOrchestratorService().sendEmail(edxUserActivationInviteSagaData);
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
+    log.debug("edxUserActivationInviteSagaData :: {}", edxUserActivationInviteSagaData);
+    getEdxSchoolUserActivationInviteOrchestratorService().sendEmail(edxUserActivationInviteSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
       .eventType(SEND_EDX_USER_ACTIVATION_EMAIL)

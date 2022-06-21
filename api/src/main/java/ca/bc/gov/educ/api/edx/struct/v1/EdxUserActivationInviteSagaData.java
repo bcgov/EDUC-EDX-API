@@ -49,13 +49,10 @@ public class EdxUserActivationInviteSagaData extends BaseRequest implements Seri
   String personalActivationCode;
   @Null
   String validationCode;
-  @Null
-  String primaryActivationCode;
+
   @Null
   String edxActivationCodeId;
 
-  @Null
-  Boolean isEdxUserActivationInviteProcessed;
   @Null
   @JsonDeserialize(using = LocalDateTimeDeserializer.class)
   @JsonSerialize(using = LocalDateTimeSerializer.class)

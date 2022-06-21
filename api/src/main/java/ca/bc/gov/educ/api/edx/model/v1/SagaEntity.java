@@ -72,7 +72,7 @@ public class SagaEntity {
   @Column(name = "EDX_USER_ID", columnDefinition = "BINARY(16)")
   UUID edxUserId;
 
-  @Column(name = "SECURE_ECHANGE_ID", columnDefinition = "BINARY(16)")
+  @Column(name = "SECURE_EXCHANGE_ID", columnDefinition = "BINARY(16)")
   UUID secureExchangeId;
 
   @Column(name = "MINCODE")
