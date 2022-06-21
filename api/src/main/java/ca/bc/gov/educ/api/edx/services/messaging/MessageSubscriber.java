@@ -38,8 +38,8 @@ public class MessageSubscriber {
   /**
    * Instantiates a new Message subscriber.
    *
-   * @param con                          the con
-   * @param eventHandlers                the event handlers
+   * @param con           the con
+   * @param eventHandlers the event handlers
    */
   @Autowired
   public MessageSubscriber(final Connection con, final List<EventHandler> eventHandlers) {
@@ -64,6 +64,9 @@ public class MessageSubscriber {
           final var eventString = new String(message.getData());
           final var event = JsonUtil.getJsonObjectFromString(Event.class, eventString);
           eventHandler.handleEvent(event);
+        } catch (final InterruptedException e) {
+          Thread.currentThread().interrupt();
+          log.error("Exception ", e);
         } catch (final Exception e) {
           log.error("Exception ", e);
         }
