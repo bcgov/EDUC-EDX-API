@@ -92,7 +92,7 @@ public class EventTaskScheduler {
    *
    * @return the status filters
    */
-  public List<String> getStatusFilters() {
+  protected List<String> getStatusFilters() {
     if (this.statusFilters != null && !this.statusFilters.isEmpty()) {
       return this.statusFilters;
     } else {
@@ -103,7 +103,7 @@ public class EventTaskScheduler {
     }
   }
 
-  private void setRetryCountAndLog(final SagaEntity saga) {
+  protected void setRetryCountAndLog(final SagaEntity saga) {
     Integer retryCount = saga.getRetryCount();
     if (retryCount == null || retryCount == 0) {
       retryCount = 1;

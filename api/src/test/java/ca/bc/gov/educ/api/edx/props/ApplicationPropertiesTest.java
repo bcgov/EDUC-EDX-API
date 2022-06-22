@@ -25,6 +25,7 @@ public class ApplicationPropertiesTest extends BaseSecureExchangeAPITest {
     assertThat(applicationProperties.getEdxSchoolUserActivationInviteValidity()).isPositive();
     assertThat(applicationProperties.getFileExtensions()).isNotEmpty();
     assertThat(applicationProperties.getServer()).isNotEmpty();
+    assertThat(applicationProperties.getMaxReconnect()).isPositive();
 
   }
 }

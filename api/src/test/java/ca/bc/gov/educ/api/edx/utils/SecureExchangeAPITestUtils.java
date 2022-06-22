@@ -1,7 +1,10 @@
 package ca.bc.gov.educ.api.edx.utils;
 
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
+import ca.bc.gov.educ.api.edx.repository.SagaEventStateRepository;
+import ca.bc.gov.educ.api.edx.repository.SagaRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,13 @@ public class SecureExchangeAPITestUtils {
   @Autowired
   private DocumentRepository documentRepository;
 
+  @Autowired
+  @Getter
+  SagaRepository sagaRepository;
+
+  @Autowired
+  @Getter
+  SagaEventStateRepository sagaEventStateRepository;
 
   @Autowired
   private SecureExchangeRequestRepository secureExchangeRequestRepository;
