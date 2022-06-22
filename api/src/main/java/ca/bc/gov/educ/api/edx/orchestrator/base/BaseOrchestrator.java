@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.services.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.NotificationEvent;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;

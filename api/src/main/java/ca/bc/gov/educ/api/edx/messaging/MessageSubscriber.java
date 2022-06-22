@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.edx.services.messaging;
+package ca.bc.gov.educ.api.edx.messaging;
 
 import ca.bc.gov.educ.api.edx.orchestrator.base.EventHandler;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;

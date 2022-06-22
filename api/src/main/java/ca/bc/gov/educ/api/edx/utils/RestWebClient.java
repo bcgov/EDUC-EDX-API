@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.utils;
 
+import ca.bc.gov.educ.api.edx.helpers.LogHelper;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
-import ca.bc.gov.educ.api.edx.services.helpers.LogHelper;
 import lombok.val;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

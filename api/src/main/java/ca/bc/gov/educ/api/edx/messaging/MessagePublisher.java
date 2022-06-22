@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.edx.services.messaging;
+package ca.bc.gov.educ.api.edx.messaging;
 
 import io.nats.client.Connection;
 import lombok.extern.slf4j.Slf4j;

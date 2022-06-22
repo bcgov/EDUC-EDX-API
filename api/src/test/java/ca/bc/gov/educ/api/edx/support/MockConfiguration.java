@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.edx.support;
 
-import ca.bc.gov.educ.api.edx.services.messaging.MessagePublisher;
-import ca.bc.gov.educ.api.edx.services.messaging.MessageSubscriber;
-import ca.bc.gov.educ.api.edx.services.messaging.NatsConnection;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.messaging.MessageSubscriber;
+import ca.bc.gov.educ.api.edx.messaging.NatsConnection;
 import ca.bc.gov.educ.api.edx.utils.RestUtils;
 import io.nats.client.Connection;
 import org.mockito.Mockito;

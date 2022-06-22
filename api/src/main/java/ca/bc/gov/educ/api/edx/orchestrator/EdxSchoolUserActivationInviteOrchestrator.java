@@ -1,12 +1,13 @@
-package ca.bc.gov.educ.api.edx.orchestrator.base;
+package ca.bc.gov.educ.api.edx.orchestrator;
 
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
+import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.services.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
