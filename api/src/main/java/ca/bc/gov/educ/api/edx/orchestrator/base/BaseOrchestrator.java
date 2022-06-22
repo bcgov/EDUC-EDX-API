@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.orchestrator.base;
 
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
@@ -10,6 +11,7 @@ import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.NotificationEvent;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -167,20 +169,6 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
   }
 
   /**
-   * Step base orchestrator.
-   *
-   * @param currentEvent      the event that has occurred.
-   * @param outcome           outcome of the event.
-   * @param nextStepPredicate whether to execute the next step.
-   * @param nextEvent         next event that will occur.
-   * @param stepToExecute     which method to execute for the next event. it is a lambda function.
-   * @return {@link BaseOrchestrator}
-   */
-  public BaseOrchestrator<T> step(final EventType currentEvent, final EventOutcome outcome, final Predicate<T> nextStepPredicate, final EventType nextEvent, final SagaStep<T> stepToExecute) {
-    return this.registerStepToExecute(currentEvent, outcome, nextStepPredicate, nextEvent, stepToExecute);
-  }
-
-  /**
    * Beginning step base orchestrator.
    *
    * @param nextEvent     next event that will occur.
@@ -191,52 +179,17 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
     return this.registerStepToExecute(INITIATED, INITIATE_SUCCESS, (T sagaData) -> true, nextEvent, stepToExecute);
   }
 
-  /**
-   * Beginning step base orchestrator.
-   *
-   * @param nextStepPredicate whether to execute the next step.
-   * @param nextEvent         next event that will occur.
-   * @param stepToExecute     which method to execute for the next event. it is a lambda function.
-   * @return {@link BaseOrchestrator}
-   */
-  public BaseOrchestrator<T> begin(final Predicate<T> nextStepPredicate, final EventType nextEvent, final SagaStep<T> stepToExecute) {
-    return this.registerStepToExecute(INITIATED, INITIATE_SUCCESS, nextStepPredicate, nextEvent, stepToExecute);
-  }
 
   /**
    * End step base orchestrator with complete status.
    *
    * @param currentEvent the event that has occurred.
    * @param outcome      outcome of the event.
-   * @return {@link BaseOrchestrator}
    */
-  public BaseOrchestrator<T> end(final EventType currentEvent, final EventOutcome outcome) {
-    return this.registerStepToExecute(currentEvent, outcome, (T sagaData) -> true, MARK_SAGA_COMPLETE, this::markSagaComplete);
+  public void end(final EventType currentEvent, final EventOutcome outcome) {
+    this.registerStepToExecute(currentEvent, outcome, (T sagaData) -> true, MARK_SAGA_COMPLETE, this::markSagaComplete);
   }
 
-  /**
-   * End step with method to execute with complete status.
-   *
-   * @param currentEvent  the event that has occurred.
-   * @param outcome       outcome of the event.
-   * @param stepToExecute which method to execute for the MARK_SAGA_COMPLETE event. it is a lambda function.
-   * @return {@link BaseOrchestrator}
-   */
-  public BaseOrchestrator<T> end(final EventType currentEvent, final EventOutcome outcome, final SagaStep<T> stepToExecute) {
-    return this.registerStepToExecute(currentEvent, outcome, (T sagaData) -> true, MARK_SAGA_COMPLETE, (Event event, SagaEntity saga, T sagaData) -> {
-      stepToExecute.apply(event, saga, sagaData);
-      this.markSagaComplete(event, saga, sagaData);
-    });
-  }
-
-  /**
-   * Syntax sugar to make the step statement expressive
-   *
-   * @return {@link BaseOrchestrator}
-   */
-  public BaseOrchestrator<T> or() {
-    return this;
-  }
 
   /**
    * this is a simple and convenient method to trigger builder pattern in the child classes.
@@ -346,11 +299,12 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
    * @param nextEvent the next event object.
    */
   protected void postMessageToTopic(final String topicName, final Event nextEvent) {
-    final var eventStringOptional = JsonUtil.getJsonString(nextEvent);
-    if (eventStringOptional.isPresent()) {
-      this.getMessagePublisher().dispatchMessage(topicName, eventStringOptional.get().getBytes());
-    } else {
-      log.error("event string is not present for  :: {} :: this should not have happened", nextEvent);
+    try {
+      final String eventStringOptional = JsonUtil.getJsonStringFromObject(nextEvent);
+      this.getMessagePublisher().dispatchMessage(topicName, eventStringOptional.getBytes());
+    } catch (JsonProcessingException e) {
+      log.error("JsonProcessingException for   :: {} :: this should not have happened", nextEvent);
+      throw new SagaRuntimeException(e);
     }
   }
 
@@ -512,17 +466,6 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
     }
   }
 
-  /**
-   * Create a Saga
-   *
-   * @param payload
-   * @param edxUserId
-   * @param userName
-   * @param mincode
-   * @param emailId
-   * @param secureExchangeId
-   * @return
-   */
   @Override
   @Transactional
   public SagaEntity createSaga(@NotNull final String payload, final UUID edxUserId, final String userName, final String mincode, final String emailId, final UUID secureExchangeId) {

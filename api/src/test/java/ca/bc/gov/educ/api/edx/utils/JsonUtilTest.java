@@ -39,10 +39,5 @@ public class JsonUtilTest {
     assertThat(JsonUtil.getJsonObjectFromBytes(EdxUserActivationInviteSagaData.class, JsonUtil.getJsonSBytesFromObject(sagaData))).isNotNull();
   }
 
-  @Test
-  public void getJsonStringOptionalFromObject() throws JsonProcessingException {
-    EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
-    assertThat(JsonUtil.getJsonString(sagaData)).isNotEmpty();
-  }
 
 }

@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -149,7 +148,7 @@ public class EdxSchoolUserActivationInviteOrchestratorServiceTest extends BaseSe
 
 
   @Test
-  public void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBWithPersonalActivationCodeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateRecordInDBWithPersonalActivationCodeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -181,6 +180,24 @@ public class EdxSchoolUserActivationInviteOrchestratorServiceTest extends BaseSe
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
     assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EDX_USER_ACTIVATION_EMAIL);
     assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+
+  }
+
+  @Test
+  public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+    final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+    final var event = Event.builder()
+      .eventType(SEND_EDX_USER_ACTIVATION_EMAIL)
+      .eventOutcome(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT)
+      .sagaId(this.saga.getSagaId())
+      .eventPayload(sagaPayload)
+      .build();
+    this.orchestrator.handleEvent(event);
+
+    verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+    final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
+    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE);
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
 
   }
 
