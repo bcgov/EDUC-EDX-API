@@ -59,7 +59,6 @@ public interface EdxUsersEndpoint {
 
   /**
    *   This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.
-   *   If we search via mincode we will only return user's roles at that specific mincode. Districts and other schools are filtered out.
    *
    * @return  List of Edx User
    */
@@ -153,9 +152,9 @@ public interface EdxUsersEndpoint {
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_PRIMARY_ACTIVATION_CODE')")
-  @PutMapping("/activation-code/primary/{mincode}")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @ResponseStatus(OK)
-  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@PathVariable String mincode);
+  @PostMapping("/activation-code/primary/{mincode}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
 
 }

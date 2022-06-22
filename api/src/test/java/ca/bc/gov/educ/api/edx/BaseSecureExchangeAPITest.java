@@ -2,10 +2,7 @@ package ca.bc.gov.educ.api.edx;
 
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -259,6 +256,17 @@ public abstract class BaseSecureExchangeAPITest {
     activationCodeEntity.setUpdateDate(LocalDateTime.now());
 
     return activationCodeEntity;
+  }
+
+  protected EdxPrimaryActivationCode createEdxPrimaryActivationCode(String mincode, String createUser, String updateUser) {
+    String currentTime = LocalDateTime.now().toString();
+    EdxPrimaryActivationCode toReturn = new EdxPrimaryActivationCode();
+    toReturn.setMincode(mincode);
+    toReturn.setCreateUser(createUser);
+    toReturn.setUpdateUser(updateUser);
+    toReturn.setCreateDate(currentTime);
+    toReturn.setUpdateDate(currentTime);
+    return toReturn;
   }
 
   protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {

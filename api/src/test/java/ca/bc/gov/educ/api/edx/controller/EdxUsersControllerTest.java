@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
@@ -143,29 +144,21 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
   @Test
-  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResultWithoutDistrictsOrOtherSchools() throws Exception {
+  public void testFindEdxUsers_GivenMincodeAsInput_ShouldReturnOkStatusWithResults() throws Exception {
 
     List<String> mincodesList = new ArrayList<>();
-    mincodesList.add("123");
     mincodesList.add("12345678");
 
-    EdxUserEntity entity = this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, mincodesList);
 
-    //confirm that there are 2 schools and 1 district in the test DB
-    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
-        .andDo(print()).andExpect(status().isOk())
-        .andExpect(jsonPath("$.edxUserSchools", Matchers.hasSize(2)))
-        .andExpect(jsonPath("$.edxUserDistricts", Matchers.hasSize(1)));
-
-    //confirm that searching for specific mincode shows the 1 school that matches and removes district information
+    //should return user with all their schools and districts access.
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
             .param("mincode", "12345678"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].edxUserSchools[0].mincode", Matchers.is("12345678")))
-        .andExpect(jsonPath("$.[0].edxUserDistricts", Matchers.hasSize(0)));
+        .andExpect(jsonPath("$.[0].edxUserDistricts[0].districtCode", Matchers.is("006")));
   }
 
   @Test
@@ -1213,42 +1206,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
-  /*@Test
-  public void testRegenerateActivationCode_GivenValidInput_SetsNewRandomActivationCode_WillReturnSuccess() throws Exception {
-    UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
-    val activationCode = entityList.get(0);
-    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + activationCode.getEdxActivationCodeId() + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
-      .andExpect(jsonPath("$.activationCode", not(equalTo(activationCode.getActivationCode()))))
-      .andDo(print()).andExpect(status().isOk());
-  }
-
-  @Test
-  public void testRegenerateActivationCode_GivenInvalidInput_WillReturnNotFoundErrorResponse() throws Exception {
-    UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
-    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + validationCode + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andDo(print()).andExpect(status().isNotFound())
-      .andExpect(jsonPath("$.message", is("EdxActivationCodeEntity was not found for parameters {edxActivationCodeId="+validationCode+"}")));
-  }
-
-  @Test
-  public void testRegenerateActivationCode_GivenInvalidInput_WillOnlyRegenerateCodesForPrimaryActivationCodes_WillReturnBadRequest() throws Exception {
-    UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode,true, "1234567");
-    val activationCode = entityList.get(1);
-    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/activation-code/" + activationCode.getEdxActivationCodeId() + "/regenerate-primary-activation-code").contentType(MediaType.APPLICATION_JSON)
-      .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andExpect(jsonPath("$.message", is("Activation codes can only be regenerated for Activation Codes marked as primary.")))
-      .andDo(print()).andExpect(status().isBadRequest());
-  }*/
-
   @Test
   public void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
@@ -1274,6 +1231,130 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxActivationCodeEntity was not found for parameters {edxActivationCodeId="+validationCode+"}")));
 
+  }
+
+  @Test
+  public void testFindPrimaryEdxActivationCode_GivenValidInput_WillReturnSuccess() throws Exception {
+    EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, UUID.randomUUID().toString()));
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + primaryActivationCode.getMincode()).contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.mincode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", equalTo(primaryActivationCode.getMincode())))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.isPrimary", equalTo("true")))
+      .andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  public void testFindPrimaryEdxActivationCode_OnlyReturnsPrimaryActivationCodes_WillReturnSuccess() throws Exception {
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + secondaryActivationCode.getMincode()).contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
+      .andExpect(jsonPath("$.mincode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", equalTo(primaryActivationCode.getMincode())))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.isPrimary", equalTo("true")))
+      .andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  public void testFindPrimaryEdxActivationCode_GivenInvalidInput_WillReturnNotFound() throws Exception {
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void testFindPrimaryEdxActivationCode_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
+    EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, UUID.randomUUID().toString()));
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + nonPrimaryActivationCode.getMincode()).contentType(MediaType.APPLICATION_JSON)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void testGenerateOrRegeneratePrimaryEdxActivationCode_GivenValidInput_SetsNewRandomActivationCode_WillReturnCreated() throws Exception {
+    EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, UUID.randomUUID().toString()));
+    EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode(primaryActivationCode.getMincode(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
+    String jsonString = getJsonString(toJsonStringify);
+    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/" + primaryActivationCode.getMincode())
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.activationCode", not(equalTo(primaryActivationCode.getActivationCode()))))
+      .andDo(print()).andExpect(status().isCreated());
+  }
+
+  @Test
+  public void testGenerateOrRegeneratePrimaryEdxActivationCode_GivenNewMincode_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+    String mincode = UUID.randomUUID().toString();
+    EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode(mincode, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
+    String jsonString = getJsonString(toJsonStringify);
+    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/" + mincode)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", equalTo(mincode)))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.isPrimary", equalTo("true")))
+      .andDo(print()).andExpect(status().isCreated());
+  }
+
+  @Test
+  public void testGenerateOrRegeneratePrimaryEdxActivationCode_GivenExistingMincode_SetsNewRandomActivationCodeOfPrimary_WillReturnCreated() throws Exception {
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
+    EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode(mincode, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
+    String jsonString = getJsonString(toJsonStringify);
+    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/" + mincode)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
+      .andExpect(jsonPath("$.mincode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", equalTo(mincode)))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.activationCode", not(equalTo(primaryActivationCode.getActivationCode()))))
+      .andExpect(jsonPath("$.isPrimary", equalTo("true")))
+      .andDo(print()).andExpect(status().isCreated());
+  }
+
+  @Test
+  public void testGenerateOrRegeneratePrimaryEdxActivationCode_GivenExistingMincode_WillOnlyGenerateActivationCodeOfPrimary_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
+    EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode(mincode, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
+    String jsonString = getJsonString(toJsonStringify);
+    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/" + mincode)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
+      .andExpect(jsonPath("$.mincode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.mincode", equalTo(mincode)))
+      .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
+      .andExpect(jsonPath("$.activationCode", not(equalTo(secondaryActivationCode.getActivationCode()))))
+      .andExpect(jsonPath("$.isPrimary", equalTo("true")))
+      .andDo(print()).andExpect(status().isCreated());
   }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {

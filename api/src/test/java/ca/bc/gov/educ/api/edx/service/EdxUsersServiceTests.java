@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -97,38 +98,75 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(edxUserSchoolEntities.get(0)).isEqualTo("12345678");
   }
 
-  /*@Test
-  public void createPrimaryEdxActivationCode() {
-    EdxActivationCodeEntity toCreate = this.buildEdxActivationCodeEntity(true);
-    EdxActivationCodeEntity created = this.service.createEdxActivationCode(toCreate);
-    assertThat(created.getActivationCode()).isNotNull().isNotEmpty().hasSize(8);
+  @Test
+  public void findPrimaryEdxActivationCode() {
+    EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, UUID.randomUUID().toString()));
+    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(primaryToFind.getMincode());
+    assertThat(found.getEdxActivationCodeId()).isNotNull().isEqualTo(primaryToFind.getEdxActivationCodeId());
+    assertThat(found.getIsPrimary()).isTrue();
   }
 
   @Test
-  public void createSecondaryEdxActivationCode() {
-    EdxActivationCodeEntity toCreate = this.buildEdxActivationCodeEntity(false);
-    EdxActivationCodeEntity created = this.service.createEdxActivationCode(toCreate);
-    assertThat(created.getActivationCode()).isNotNull().isNotEmpty().hasSize(8);
+  public void findPrimaryEdxActivationCodeOutOfMany() {
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
+    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
+    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(primaryToFind.getMincode());
+    assertThat(found.getEdxActivationCodeId()).isNotNull().isEqualTo(primaryToFind.getEdxActivationCodeId()).isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    assertThat(found.getIsPrimary()).isTrue();
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCode() {
+    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, UUID.randomUUID().toString()));
+    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(secondaryEdxActivationCode.getMincode());
+    assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+  }
+
+  @Test(expected = EntityNotFoundException.class)
+  public void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCode() {
+    this.service.findPrimaryEdxActivationCode(UUID.randomUUID().toString());
+  }
+
+  @Test
+  public void generatePrimaryEdxActivationCode() {
+    EdxPrimaryActivationCode toGenerate = this.createEdxPrimaryActivationCode(UUID.randomUUID().toString(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
+    EdxActivationCodeEntity generated = this.service.generateOrRegeneratePrimaryEdxActivationCode(toGenerate);
+    assertThat(generated.getMincode()).isNotNull().isNotEmpty().isEqualTo(toGenerate.getMincode());
+    assertThat(generated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8);
+    assertThat(generated.getIsPrimary()).isTrue();
+    assertThat(generated.getCreateUser()).isEqualTo(toGenerate.getCreateUser());
+    assertThat(generated.getUpdateUser()).isEqualTo(toGenerate.getUpdateUser());
   }
 
   @Test
   public void regeneratePrimaryEdxActivationCode() {
-    EdxActivationCodeEntity toRegenerate = this.edxActivationCodeRepository.save(this.buildEdxActivationCodeEntity(true));
-    EdxActivationCodeEntity regenerated = this.service.regenerateEdxActivationCode(toRegenerate.getEdxActivationCodeId());
-    assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(toRegenerate.getActivationCode());
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity existing = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
+    EdxPrimaryActivationCode toRegenerate = this.createEdxPrimaryActivationCode(mincode, "EDX-API-UNIT-TEST-UPDATE-USER", "EDX-API-UNIT-TEST-UPDATE-USER");
+    EdxActivationCodeEntity regenerated = this.service.generateOrRegeneratePrimaryEdxActivationCode(toRegenerate);
+    assertThat(regenerated.getEdxActivationCodeId()).isNotNull().isEqualTo(existing.getEdxActivationCodeId());
+    assertThat(regenerated.getMincode()).isNotNull().isNotEmpty().isEqualTo(toRegenerate.getMincode()).isEqualTo(existing.getMincode());
+    assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(existing.getActivationCode());
+    assertThat(regenerated.getIsPrimary()).isTrue();
+    assertThat(regenerated.getCreateUser()).isEqualTo(existing.getCreateUser());
+    assertThat(regenerated.getUpdateUser()).isEqualTo(toRegenerate.getUpdateUser());
   }
 
-  @Test(expected = InvalidPayloadException.class)
-  public void regenerateSecondaryEdxActivationCode() {
-    EdxActivationCodeEntity toRegenerate = this.edxActivationCodeRepository.save(this.buildEdxActivationCodeEntity(false));
-    EdxActivationCodeEntity regenerated = this.service.regenerateEdxActivationCode(toRegenerate.getEdxActivationCodeId());
-    assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(toRegenerate.getActivationCode());
+  @Test
+  public void regeneratePrimaryEdxActivationCodeOutOfMany() {
+    String mincode = UUID.randomUUID().toString();
+    EdxActivationCodeEntity existingPrimaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
+    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
+    EdxPrimaryActivationCode toRegenerate = this.createEdxPrimaryActivationCode(mincode, "EDX-API-UNIT-TEST-UPDATE-USER", "EDX-API-UNIT-TEST-UPDATE-USER");
+    EdxActivationCodeEntity regenerated = this.service.generateOrRegeneratePrimaryEdxActivationCode(toRegenerate);
+    assertThat(regenerated.getEdxActivationCodeId()).isNotNull().isEqualTo(existingPrimaryEdxActivationCode.getEdxActivationCodeId()).isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    assertThat(regenerated.getMincode()).isNotNull().isNotEmpty().isEqualTo(toRegenerate.getMincode()).isEqualTo(existingPrimaryEdxActivationCode.getMincode()).isEqualTo(secondaryEdxActivationCode.getMincode());
+    assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(existingPrimaryEdxActivationCode.getActivationCode());
+    assertThat(regenerated.getIsPrimary()).isTrue();
+    assertThat(regenerated.getCreateUser()).isEqualTo(existingPrimaryEdxActivationCode.getCreateUser());
+    assertThat(regenerated.getUpdateUser()).isEqualTo(toRegenerate.getUpdateUser());
   }
-
-  @Test(expected = EntityNotFoundException.class)
-  public void attemptToRegenerateEdxActivationThatDoesNotExist() {
-    this.service.regenerateEdxActivationCode(UUID.randomUUID());
-  }*/
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipEntity(String teamName, String groupRoleIdentifier) {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();
@@ -140,9 +178,5 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     entity.setUpdateUser("test");
     entity.setUpdateDate(LocalDateTime.now());
     return entity;
-  }
-
-  private EdxActivationCodeEntity buildEdxActivationCodeEntity(Boolean isPrimary) {
-    return createEdxActivationCodeEntity("ABCDE", isPrimary, true, UUID.randomUUID(), false, "0123456789");
   }
 }
