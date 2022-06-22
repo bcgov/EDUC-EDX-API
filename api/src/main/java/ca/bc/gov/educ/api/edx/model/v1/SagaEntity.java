@@ -14,6 +14,7 @@ import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,7 +47,6 @@ public class SagaEntity {
   @Column(name = "STATUS")
   private String status;
 
-  @NotNull(message = "sagaCompensated cannot be null")
   @Column(name = "SAGA_COMPENSATED")
   private Boolean sagaCompensated;
 
@@ -72,7 +72,7 @@ public class SagaEntity {
   @Column(name = "EDX_USER_ID", columnDefinition = "BINARY(16)")
   UUID edxUserId;
 
-  @Column(name = "SECURE_ECHANGE_ID", columnDefinition = "BINARY(16)")
+  @Column(name = "SECURE_EXCHANGE_ID", columnDefinition = "BINARY(16)")
   UUID secureExchangeId;
 
   @Column(name = "MINCODE")
@@ -83,4 +83,8 @@ public class SagaEntity {
 
   @Column(name = "RETRY_COUNT")
   private Integer retryCount;
+
+  public Boolean getSagaCompensated() {
+    return this.sagaCompensated == null ?Boolean.FALSE:this.sagaCompensated;
+  }
 }

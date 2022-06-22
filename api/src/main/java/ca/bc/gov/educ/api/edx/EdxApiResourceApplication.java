@@ -73,7 +73,7 @@ public class EdxApiResourceApplication {
    *
    * @return the thread pool task scheduler
    */
-  @Bean
+  @Bean(name = "taskExecutor")
   public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
     final ThreadPoolTaskScheduler threadPoolTaskScheduler = new ThreadPoolTaskScheduler();
     threadPoolTaskScheduler.setPoolSize(2);

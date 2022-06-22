@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.EdxUsersEndpoint;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
+import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.mappers.v1.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
@@ -11,9 +12,6 @@ import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodePayLoadValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxUserPayLoadValidator;
-
-import java.util.Optional;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +22,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -148,13 +148,17 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public EdxActivationCode createActivationCode(EdxActivationCode edxActivationCode) {
+  public EdxActivationCode createActivationCode(EdxActivationCode edxActivationCode)  {
     validatePayload(() -> getEdxActivationCodePayLoadValidator().validateEdxActivationCodePayload(edxActivationCode));
     RequestUtil.setAuditColumnsForCreate(edxActivationCode);
     if (!CollectionUtils.isEmpty(edxActivationCode.getEdxActivationRoles())) {
       edxActivationCode.getEdxActivationRoles().forEach(RequestUtil::setAuditColumnsForCreate);
     }
-    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().createEdxActivationCode(EDX_ACTIVATION_CODE_MAPPER.toModel(edxActivationCode)));
+    try {
+      return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().createEdxActivationCode(EDX_ACTIVATION_CODE_MAPPER.toModel(edxActivationCode)));
+    } catch (NoSuchAlgorithmException e) {
+      throw new SecureExchangeRuntimeException(e.getMessage());
+    }
   }
 
   @Override
