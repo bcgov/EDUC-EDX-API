@@ -148,7 +148,7 @@ public class EdxSchoolUserActivationInviteOrchestratorServiceTest extends BaseSe
 
 
   @Test
-  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateRecordInDBWithPersonalActivationCodeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
