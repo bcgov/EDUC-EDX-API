@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.edx.utils;
+package ca.bc.gov.educ.api.edx.rest;
 
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.CHESEmail;

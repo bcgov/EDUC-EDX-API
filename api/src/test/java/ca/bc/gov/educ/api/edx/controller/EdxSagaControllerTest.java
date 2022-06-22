@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxSagaController;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.utils.RestUtils;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import lombok.val;
 import org.junit.After;
 import org.junit.Before;

@@ -29,13 +29,17 @@ public class EmailValidator {
     if (!this.templateConfig.containsKey(email.getTemplateName())) {
       apiValidationErrors.add(this.createTemplateFieldError(email.getTemplateName(), "templateName"));
     }
-    if (!PATTERN.matcher(email.getFromEmail()).matches()) {
+    if (isInvalidEmailAddress(email.getFromEmail())) {
       apiValidationErrors.add(this.createEmailFieldError(email.getFromEmail(), "fromEmail"));
     }
-    if (!PATTERN.matcher(email.getToEmail()).matches()) {
+    if (isInvalidEmailAddress(email.getToEmail())) {
       apiValidationErrors.add(this.createEmailFieldError(email.getToEmail(), "toEmail"));
     }
     return apiValidationErrors;
+  }
+
+  public boolean isInvalidEmailAddress(String email) {
+    return !PATTERN.matcher(email).matches();
   }
 
   private FieldError createEmailFieldError(final Object rejectedValue, final String fieldName) {

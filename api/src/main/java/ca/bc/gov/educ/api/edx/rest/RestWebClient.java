@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.edx.utils;
+package ca.bc.gov.educ.api.edx.rest;
 
 import ca.bc.gov.educ.api.edx.helpers.LogHelper;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;

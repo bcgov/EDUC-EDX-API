@@ -18,6 +18,7 @@
       src/main/java/ca/bc/gov/educ/api/edx/endpoint/**,
       src/main/java/ca/bc/gov/educ/api/edx/messaging/**,
       src/main/java/ca/bc/gov/educ/api/edx/config/**,
+      src/main/java/ca/bc/gov/educ/api/edx/rest/**,
       src/main/java/ca/bc/gov/educ/api/edx/helpers/LogHelper.java,
     </sonar.exclusions>
     <java.version>11</java.version>
@@ -200,6 +201,12 @@
           <artifactId>hamcrest-core</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>pl.pragmatists</groupId>
+      <artifactId>JUnitParams</artifactId>
+      <version>1.1.1</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

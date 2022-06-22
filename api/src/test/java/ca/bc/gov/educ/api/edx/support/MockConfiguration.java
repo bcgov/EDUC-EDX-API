@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.edx.support;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.MessageSubscriber;
 import ca.bc.gov.educ.api.edx.messaging.NatsConnection;
-import ca.bc.gov.educ.api.edx.utils.RestUtils;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import io.nats.client.Connection;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;

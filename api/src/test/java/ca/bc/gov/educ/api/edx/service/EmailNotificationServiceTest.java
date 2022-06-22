@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 
 import ca.bc.gov.educ.api.edx.service.v1.EmailNotificationService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
-import ca.bc.gov.educ.api.edx.utils.RestUtils;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

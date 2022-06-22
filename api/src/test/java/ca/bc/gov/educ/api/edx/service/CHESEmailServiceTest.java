@@ -5,14 +5,10 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.service.v1.CHESEmailService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
-import ca.bc.gov.educ.api.edx.utils.RestUtils;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
