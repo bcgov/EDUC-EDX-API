@@ -1,8 +1,11 @@
 package ca.bc.gov.educ.api.edx.utils;
 
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Test;
+
+import java.io.IOException;
 
 import static org.junit.Assert.*;
 
@@ -30,8 +33,16 @@ public class JsonUtilTest {
   }
 
   @Test
-  public void getJsonBytesFromObjectThrowJsonProcessingException() throws JsonProcessingException {
+  public void getJsonBytesFromObjectThrowJsonProcessingException() throws IOException {
     EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
     assertThat(JsonUtil.getJsonSBytesFromObject(sagaData)).isNotEmpty();
+    assertThat(JsonUtil.getJsonObjectFromBytes(EdxUserActivationInviteSagaData.class, JsonUtil.getJsonSBytesFromObject(sagaData))).isNotNull();
   }
+
+  @Test
+  public void getJsonStringOptionalFromObject() throws JsonProcessingException {
+    EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
+    assertThat(JsonUtil.getJsonString(sagaData)).isNotEmpty();
+  }
+
 }

@@ -20,6 +20,8 @@
       src/main/java/ca/bc/gov/educ/api/edx/config/**,
       src/main/java/ca/bc/gov/educ/api/edx/rest/**,
       src/main/java/ca/bc/gov/educ/api/edx/helpers/LogHelper.java,
+      src/main/java/ca/bc/gov/educ/api/edx/orchestrator/base/SagaEventState.java,
+      src/main/java/ca/bc/gov/educ/api/edx/validator/EmailValidator.java,
     </sonar.exclusions>
     <java.version>11</java.version>
     <maven.compiler.version>3.8.0</maven.compiler.version>
