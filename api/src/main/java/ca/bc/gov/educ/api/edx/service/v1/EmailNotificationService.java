@@ -17,13 +17,11 @@ public class EmailNotificationService {
   /**
    * the Thymeleaf template engine
    */
-  @Getter(AccessLevel.PRIVATE)
   private final SpringTemplateEngine templateEngine;
 
   @Getter(AccessLevel.PRIVATE)
   private final CHESEmailService chesEmailService;
 
-  @Getter(AccessLevel.PRIVATE)
   private final Map<String, String> templateConfig;
 
   public EmailNotificationService(final Map<String, String> templateConfig, final SpringTemplateEngine templateEngine, final CHESEmailService chesEmailService) {

@@ -49,9 +49,9 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
     List<SagaEventStatesEntity> sagaEvents = this.secureExchangeAPITestUtils.getSagaEventStateRepository().findBySaga(saga);
     assertThat(sagaEvents).isNotEmpty().hasSize(1);
     assertThat(this.eventTaskScheduler.getStatusFilters()).isNotEmpty().hasSize(2);
-    this.eventTaskScheduler.setRetryCountAndLog(saga);
     val updatedSaga= this.secureExchangeAPITestUtils.getSagaRepository().findById(saga.getSagaId());
     assertThat(updatedSaga).isNotEmpty();
+    this.eventTaskScheduler.setRetryCountAndLog(updatedSaga.get());
     assertThat(updatedSaga.get().getRetryCount()).isPositive();
   }
 

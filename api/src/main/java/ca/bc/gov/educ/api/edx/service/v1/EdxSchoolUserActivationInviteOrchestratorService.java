@@ -37,10 +37,8 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
   @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService edxUsersService;
 
-  @Getter(AccessLevel.PRIVATE)
   private final EmailProperties emailProperties;
 
-  @Getter(AccessLevel.PRIVATE)
   private final ApplicationProperties props;
 
   @Getter(AccessLevel.PRIVATE)
