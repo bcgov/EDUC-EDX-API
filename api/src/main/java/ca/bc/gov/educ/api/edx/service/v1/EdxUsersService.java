@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -109,6 +110,7 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
+
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -119,6 +121,47 @@ public class EdxUsersService {
       throw new EntityExistsException("EdxUser to EdxUserSchool association already exists");
     }
   }
+
+  public EdxUserSchoolEntity updateEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
+    val entityOptional = getEdxUserRepository().findById(edxUserID);
+    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
+    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
+    if (optionalSchool.isPresent()) {
+      EdxUserSchoolEntity newEdxUserSchoolEntity = optionalSchool.get();
+      logUpdatesEdxUserSchool(newEdxUserSchoolEntity, edxUserSchoolEntity);
+      BeanUtils.copyProperties(edxUserSchoolEntity, newEdxUserSchoolEntity, "edxUserSchoolRoleEntities", "createUser", "createDate");
+
+      newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().clear();
+      newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().addAll(edxUserSchoolEntity.getEdxUserSchoolRoleEntities());
+
+      //check to see if we are adding any new roles
+      for(var schoolRole: newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
+        if (schoolRole.getEdxUserSchoolRoleID() == null) {
+          schoolRole.setCreateDate(LocalDateTime.now());
+          schoolRole.setCreateUser(edxUserSchoolEntity.getUpdateUser());
+          schoolRole.setUpdateDate(LocalDateTime.now());
+          schoolRole.setUpdateUser(edxUserSchoolEntity.getUpdateUser());
+
+          //since we are adding a new role, we need to link the role entity to the school entity (follows pattern from creating Edx User)
+          schoolRole.setEdxUserSchoolEntity(newEdxUserSchoolEntity);
+        }
+      }
+
+      newEdxUserSchoolEntity = getEdxUserSchoolsRepository().save(newEdxUserSchoolEntity);
+
+      return newEdxUserSchoolEntity;
+    } else {
+      throw new EntityNotFoundException(EdxUserSchoolEntity.class, "EdxUserSchoolEntity", edxUserSchoolEntity.getEdxUserSchoolID().toString());
+    }
+  }
+
+  private void logUpdatesEdxUserSchool(final EdxUserSchoolEntity edxUserSchoolEntity, final EdxUserSchoolEntity newEdxUserSchoolEntity) {
+    if (log.isDebugEnabled()) {
+      log.debug("Edx User update, current :: {}, new :: {}", edxUserSchoolEntity, newEdxUserSchoolEntity);
+    }
+  }
+
+
 
   public EdxUserSchoolRoleEntity createEdxUserSchoolRole(UUID edxUserID, UUID edxUserSchoolId, EdxUserSchoolRoleEntity edxUserSchoolRoleEntity) {
     val optionalUserSchoolRoleEntity = getEdxUserSchoolRoleRepository().findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleEntity_EdxRoleID(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID(), edxUserSchoolRoleEntity.getEdxRoleEntity().getEdxRoleID());
