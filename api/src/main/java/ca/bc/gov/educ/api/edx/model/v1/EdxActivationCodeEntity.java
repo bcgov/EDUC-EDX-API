@@ -42,7 +42,6 @@ public class EdxActivationCodeEntity {
   @Column(name = "IS_PRIMARY")
   Boolean isPrimary;
 
-  @NotNull(message = "expiryDate cannot be null")
   @Column(name = "EXPIRY_DATE")
   LocalDateTime expiryDate;
 
@@ -85,11 +84,9 @@ public class EdxActivationCodeEntity {
   @Column(name = "EMAIL")
   String email;
 
-  @NotNull
   @Column(name = "VALIDATION_CODE", columnDefinition = "BINARY(16)")
   UUID validationCode;
 
-  @NotNull
   @Column(name = "IS_URL_CLICKED")
   Boolean isUrlClicked;
 
