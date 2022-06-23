@@ -401,16 +401,14 @@ public class EdxUsersService {
     } catch (NoSuchAlgorithmException e) {
       ApiError.builder().timestamp(LocalDateTime.now()).message("Unable to generate an activation code.").status(INTERNAL_SERVER_ERROR).build();
     }
-    log.info("Step 6");
     this.updateAuditColumnsForPrimaryEdxActivationCode(edxPrimaryActivationCode, primaryEdxActivationCode);
-    log.info("Step 7");
     return this.getEdxActivationCodeRepository().save(primaryEdxActivationCode);
   }
 
   private String generateActivationCode() throws NoSuchAlgorithmException {
     int byteLength = 6; //Base64 encoding an input of 6 bytes will generate a string of 8 characters.
     byte[] randomBytes = new byte[byteLength];
-    SecureRandom.getInstanceStrong().nextBytes(randomBytes);
+    SecureRandom.getInstance("SHA1PRNG").nextBytes(randomBytes);
     return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes).toUpperCase();
   }
 
