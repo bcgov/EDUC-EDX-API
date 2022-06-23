@@ -395,9 +395,7 @@ public class EdxUsersService {
   public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
     EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(edxPrimaryActivationCode.getMincode()).orElseGet(() -> this.newPrimaryActivationCode(edxPrimaryActivationCode));
     try {
-      log.info("Generating activation code");
       primaryEdxActivationCode.setActivationCode(this.generateActivationCode());
-      log.info("Generated.");
     } catch (NoSuchAlgorithmException e) {
       ApiError.builder().timestamp(LocalDateTime.now()).message("Unable to generate an activation code.").status(INTERNAL_SERVER_ERROR).build();
     }

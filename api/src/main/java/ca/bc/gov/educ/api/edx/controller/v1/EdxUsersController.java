@@ -174,8 +174,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   @Override
   public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
-    EdxActivationCode code = EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(edxPrimaryActivationCode));
-    return code;
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(edxPrimaryActivationCode));
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
