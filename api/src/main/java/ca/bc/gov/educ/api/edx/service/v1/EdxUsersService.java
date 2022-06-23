@@ -415,16 +415,11 @@ public class EdxUsersService {
     LocalDateTime currentTime = LocalDateTime.now();
     toReturn.setMincode(edxPrimaryActivationCode.getMincode());
     toReturn.setIsPrimary(true);
-    toReturn.setExpiryDate(currentTime);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);
     toReturn.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
     toReturn.setUpdateDate(currentTime);
-    toReturn.setFirstName("");
-    toReturn.setLastName("");
-    toReturn.setEmail("");
     toReturn.setValidationCode(UUID.randomUUID());
-    toReturn.setIsUrlClicked(false);
     return toReturn;
   }
   private void updateAuditColumnsForPrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode, EdxActivationCodeEntity toUpdate) {
