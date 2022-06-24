@@ -128,15 +128,15 @@ public class EdxUsersService {
     //check for school
     val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
     if (optionalSchool.isPresent()) {
-      EdxUserSchoolEntity newEdxUserSchoolEntity = optionalSchool.get();
-      logUpdatesEdxUserSchool(newEdxUserSchoolEntity, edxUserSchoolEntity);
-      BeanUtils.copyProperties(edxUserSchoolEntity, newEdxUserSchoolEntity, "edxUserSchoolRoleEntities", "createUser", "createDate");
+      EdxUserSchoolEntity currentEdxUserSchoolEntity = optionalSchool.get();
+      logUpdatesEdxUserSchool(currentEdxUserSchoolEntity, edxUserSchoolEntity);
+      BeanUtils.copyProperties(edxUserSchoolEntity, currentEdxUserSchoolEntity, "edxUserSchoolRoleEntities", "createUser", "createDate");
 
-      newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().clear();
-      newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().addAll(edxUserSchoolEntity.getEdxUserSchoolRoleEntities());
+      currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().clear();
+      currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().addAll(edxUserSchoolEntity.getEdxUserSchoolRoleEntities());
 
       //If we add a new role, we need to set the audit fields
-      for(var schoolRole: newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
+      for(var schoolRole: currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
         if (schoolRole.getEdxUserSchoolRoleID() == null) {
           schoolRole.setCreateDate(LocalDateTime.now());
           schoolRole.setCreateUser(edxUserSchoolEntity.getUpdateUser());
@@ -144,11 +144,11 @@ public class EdxUsersService {
           schoolRole.setUpdateUser(edxUserSchoolEntity.getUpdateUser());
 
           //since we are adding a new role, we need to link the role entity to the school entity (follows pattern from creating Edx User)
-          schoolRole.setEdxUserSchoolEntity(newEdxUserSchoolEntity);
+          schoolRole.setEdxUserSchoolEntity(currentEdxUserSchoolEntity);
         }
       }
 
-      newEdxUserSchoolEntity = getEdxUserSchoolsRepository().save(newEdxUserSchoolEntity);
+      var newEdxUserSchoolEntity = getEdxUserSchoolsRepository().save(currentEdxUserSchoolEntity);
 
       return newEdxUserSchoolEntity;
     } else {
@@ -156,13 +156,11 @@ public class EdxUsersService {
     }
   }
 
-  private void logUpdatesEdxUserSchool(final EdxUserSchoolEntity edxUserSchoolEntity, final EdxUserSchoolEntity newEdxUserSchoolEntity) {
+  private void logUpdatesEdxUserSchool(final EdxUserSchoolEntity currentEdxUserSchoolEntity, final EdxUserSchoolEntity newEdxUserSchoolEntity) {
     if (log.isDebugEnabled()) {
-      log.debug("Edx User update, current :: {}, new :: {}", edxUserSchoolEntity, newEdxUserSchoolEntity);
+      log.debug("Edx User update, current :: {}, new :: {}", currentEdxUserSchoolEntity, newEdxUserSchoolEntity);
     }
   }
-
-
 
   public EdxUserSchoolRoleEntity createEdxUserSchoolRole(UUID edxUserID, UUID edxUserSchoolId, EdxUserSchoolRoleEntity edxUserSchoolRoleEntity) {
     val optionalUserSchoolRoleEntity = getEdxUserSchoolRoleRepository().findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleEntity_EdxRoleID(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID(), edxUserSchoolRoleEntity.getEdxRoleEntity().getEdxRoleID());
