@@ -148,9 +148,7 @@ public class EdxUsersService {
         }
       }
 
-      var newEdxUserSchoolEntity = getEdxUserSchoolsRepository().save(currentEdxUserSchoolEntity);
-
-      return newEdxUserSchoolEntity;
+      return getEdxUserSchoolsRepository().save(currentEdxUserSchoolEntity);
     } else {
       throw new EntityNotFoundException(EdxUserSchoolEntity.class, "EdxUserSchoolEntity", edxUserSchoolEntity.getEdxUserSchoolID().toString());
     }
