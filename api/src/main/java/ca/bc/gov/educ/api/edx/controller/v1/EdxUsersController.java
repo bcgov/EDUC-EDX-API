@@ -112,6 +112,13 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public EdxUserSchool updateEdxUserSchool(UUID id, EdxUserSchool edxUserSchool) {
+    validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserSchoolPayload(id, edxUserSchool, false));
+    RequestUtil.setAuditColumnsForUpdate(edxUserSchool);
+    return USER_SCHOOL_MAPPER.toStructure(getService().updateEdxUserSchool(id, USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
+  }
+
+  @Override
   public ResponseEntity<Void> deleteEdxSchoolUserById(UUID id, UUID edxUserSchoolId) {
     getService().deleteEdxSchoolUserById(id, edxUserSchoolId);
     return ResponseEntity.noContent().build();

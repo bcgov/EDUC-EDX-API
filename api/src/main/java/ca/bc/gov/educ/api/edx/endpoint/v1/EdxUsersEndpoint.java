@@ -89,6 +89,12 @@ public interface EdxUsersEndpoint {
   EdxUserSchool createEdxSchoolUser(@PathVariable UUID id, @Validated @RequestBody  EdxUserSchool edxUserSchool);
 
   @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_SCHOOL')")
+  @PutMapping("/{id}/school")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  EdxUserSchool updateEdxUserSchool(@PathVariable UUID id, @Validated @RequestBody  EdxUserSchool edxUserSchool);
+
+  @Transactional
   @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS_SCHOOL')")
   @DeleteMapping("/{id}/school/{edxUserSchoolId}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
