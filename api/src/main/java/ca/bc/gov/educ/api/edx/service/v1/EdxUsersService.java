@@ -110,7 +110,6 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
-
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
