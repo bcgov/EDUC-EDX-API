@@ -481,6 +481,71 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
+  @Test
+  public void testUpdateEdxUserSchool_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
+    //create and save EdxUser with a school
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+        .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
+    String jsonEdxUserSchool = getJsonString(edxUserSchool);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonEdxUserSchool)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+
+    resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
+        .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+        .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
+
+    //create/save our role and permission to attach to the school we created
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
+    edxUserSchoolRole.setEdxUserSchoolID(edxUserSchool.getEdxUserSchoolID());
+    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+
+    //now we update our school with the new role data
+    edxUsrSchool.getEdxUserSchoolRoles().add(edxUserSchoolRole);
+    edxUsrSchool.setUpdateDate(null);
+    edxUsrSchool.setCreateDate(null);
+    String jsonEdxUsrSchool = getJsonString(edxUsrSchool);
+
+    val resultActions2 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonEdxUsrSchool).accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+
+    resultActions2.andExpect(jsonPath("$.edxUserSchoolRoles", hasSize(1))).andDo(print()).andExpect(status().isOk());
+
+    //now we update our school without any roles and it should remove the role
+    edxUsrSchool.getEdxUserSchoolRoles().clear();
+    String jsonEdxUsrSchoolWithoutRole = getJsonString(edxUsrSchool);
+    val resultActions3 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonEdxUsrSchoolWithoutRole).accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+
+    resultActions3.andExpect(jsonPath("$.edxUserSchoolRoles", hasSize(0))).andDo(print()).andExpect(status().isOk());
+  }
 
   @Test
   public void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {

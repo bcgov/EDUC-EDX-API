@@ -125,6 +125,8 @@ public class EdxUsersService {
   public EdxUserSchoolEntity updateEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
+
+    //check for school
     val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
     if (optionalSchool.isPresent()) {
       EdxUserSchoolEntity newEdxUserSchoolEntity = optionalSchool.get();
@@ -134,7 +136,7 @@ public class EdxUsersService {
       newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().clear();
       newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().addAll(edxUserSchoolEntity.getEdxUserSchoolRoleEntities());
 
-      //check to see if we are adding any new roles
+      //If we add a new role, we need to set the audit fields
       for(var schoolRole: newEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
         if (schoolRole.getEdxUserSchoolRoleID() == null) {
           schoolRole.setCreateDate(LocalDateTime.now());
