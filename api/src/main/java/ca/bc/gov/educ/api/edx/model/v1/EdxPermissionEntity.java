@@ -1,18 +1,14 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.UUID;
 
 
 @Data
@@ -21,18 +17,14 @@ import java.util.UUID;
 @DynamicUpdate
 public class EdxPermissionEntity {
   @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "EDX_PERMISSION_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxPermissionId;
-
-  @NotNull(message = "permissionName cannot be null")
-  @Column(name = "NAME")
-  String permissionName;
+  @Column(name = "EDX_PERMISSION_CODE", unique = true, updatable = false)
+  String edxPermissionCode;
 
   @Column(name = "DESCRIPTION")
   String permissionDescription;
+
+  @Column(name = "LABEL")
+  String label;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
@@ -48,8 +40,4 @@ public class EdxPermissionEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxPermissionEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
-  private Set<EdxRolePermissionEntity> edxRolePermissionEntities;
 }

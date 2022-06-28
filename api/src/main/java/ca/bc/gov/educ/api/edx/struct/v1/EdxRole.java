@@ -9,7 +9,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -17,7 +16,7 @@ import java.util.UUID;
 public class EdxRole extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  UUID edxRoleID;
+  String edxRoleCode;
   @Size(max = 30)
   String roleName;
   @Size(max = 30)

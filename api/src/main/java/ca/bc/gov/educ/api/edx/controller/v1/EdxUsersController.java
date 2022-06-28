@@ -67,8 +67,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<String> findAllEdxUserSchoolMincodes(String permissionName) {
-    return getService().getEdxUserSchoolsList(permissionName);
+  public List<String> findAllEdxUserSchoolMincodes(String permissionCode) {
+    return getService().getEdxUserSchoolsList(permissionCode);
   }
 
   @Override

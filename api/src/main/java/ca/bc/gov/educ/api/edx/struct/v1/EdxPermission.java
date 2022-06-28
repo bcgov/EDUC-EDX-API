@@ -7,7 +7,6 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -15,12 +14,13 @@ import java.util.UUID;
 public class EdxPermission extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  UUID edxPermissionId;
+  String edxPermissionCode;
   @Size(max = 30)
   String permissionName;
   @Size(max = 255)
   String permissionDescription;
-
+  @Size(max = 30)
+  String label;
 }
 
 

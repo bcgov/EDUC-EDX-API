@@ -3,11 +3,11 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
@@ -109,9 +109,9 @@ public class EdxSchoolUserActivationInviteOrchestratorServiceTest extends BaseSe
     sagaData.setEmail(email);
     sagaData.setSchoolName("Test School");
     sagaData.setMincode("00899178");
-    List<UUID> rolesList = new ArrayList<>();
-    rolesList.add(edxRoleEntity.getEdxRoleID());
-    sagaData.setEdxActivationRoleIds(rolesList);
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
     return sagaData;
   }
 

@@ -21,9 +21,9 @@ public class EdxActivationCodeSagaDataPayLoadValidator {
 
   public List<FieldError> validateEdxActivationCodeSagaDataPayload(EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
-    int rolesListInDBSize = getEdxRoleRepository().findAllById(edxUserActivationInviteSagaData.getEdxActivationRoleIds()).size();
-    if(rolesListInDBSize!= edxUserActivationInviteSagaData.getEdxActivationRoleIds().size()){
-      apiValidationErrors.add(createFieldError("edxActivationRoleIds", edxUserActivationInviteSagaData.getEdxActivationRoleIds(), "Invalid Edx Roles in the payload"));
+    int rolesListInDBSize = getEdxRoleRepository().findAllById(edxUserActivationInviteSagaData.getEdxActivationRoleCodes()).size();
+    if(rolesListInDBSize!= edxUserActivationInviteSagaData.getEdxActivationRoleCodes().size()){
+      apiValidationErrors.add(createFieldError("edxActivationRoleIds", edxUserActivationInviteSagaData.getEdxActivationRoleCodes(), "Invalid Edx Roles in the payload"));
     }
     return apiValidationErrors;
   }

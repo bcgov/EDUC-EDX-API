@@ -14,7 +14,7 @@ public class EdxUserDistrictRole extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
   String edxUserDistrictRoleID;
-  EdxRole edxRole;
+  String edxRoleCode;
 }
 
 

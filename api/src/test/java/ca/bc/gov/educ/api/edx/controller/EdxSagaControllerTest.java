@@ -4,9 +4,9 @@ import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxSagaController;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import lombok.val;
 import org.junit.After;
 import org.junit.Before;
@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
@@ -146,7 +145,7 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
-    sagaData.getEdxActivationRoleIds().clear();
+    sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -161,7 +160,7 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
-    sagaData.getEdxActivationRoleIds().add(UUID.randomUUID());
+    sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -208,9 +207,9 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
     sagaData.setEmail(email);
     sagaData.setSchoolName("Test School");
     sagaData.setMincode("00899178");
-    List<UUID> rolesList = new ArrayList<>();
-    rolesList.add(edxRoleEntity.getEdxRoleID());
-    sagaData.setEdxActivationRoleIds(rolesList);
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
     return sagaData;
   }
 private void createSagaEntity(String sagaDataStr,EdxUserActivationInviteSagaData sagaData){

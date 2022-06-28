@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface EdxUserSchoolRoleRepository extends JpaRepository<EdxUserSchoolRoleEntity, UUID> {
 
-    Optional<EdxUserSchoolRoleEntity> findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleEntity_EdxRoleID(UUID exdUserSchoolId , UUID edxUserRoleId);
+    Optional<EdxUserSchoolRoleEntity> findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleCode(UUID exdUserSchoolId , String edxRoleCode);
 
 }

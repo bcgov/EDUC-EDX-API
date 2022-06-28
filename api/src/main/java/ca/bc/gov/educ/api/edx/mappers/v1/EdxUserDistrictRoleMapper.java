@@ -14,9 +14,9 @@ public interface EdxUserDistrictRoleMapper {
 
   EdxUserDistrictRoleMapper mapper = Mappers.getMapper(EdxUserDistrictRoleMapper.class);
 
-  @Mapping(target = "edxRole", source = "edxRoleEntity")
+  @Mapping(target = "edxRoleCode", source = "edxRoleCode")
   EdxUserDistrictRole toStructure(EdxUserDistrictRoleEntity entity);
 
-  @Mapping(source = "edxRole", target = "edxRoleEntity")
+  @Mapping(source = "edxRoleCode", target = "edxRoleCode")
   EdxUserDistrictRoleEntity toModel(EdxUserDistrictRole edxUserDistrictRole);
 }

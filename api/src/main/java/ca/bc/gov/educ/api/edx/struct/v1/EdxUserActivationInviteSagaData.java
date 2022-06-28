@@ -14,7 +14,6 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -28,7 +27,7 @@ public class EdxUserActivationInviteSagaData extends BaseRequest implements Seri
   String schoolName;
 
   @NotEmpty(message = "Activation Roles cannot be null or empty")
-  private List<UUID> edxActivationRoleIds;
+  private List<String> edxActivationRoleCodes;
 
   @Size(max = 255)
   @NotNull(message = "First Name cannot be null")

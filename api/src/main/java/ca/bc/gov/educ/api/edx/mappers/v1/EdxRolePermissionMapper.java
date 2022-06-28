@@ -14,6 +14,6 @@ public interface EdxRolePermissionMapper {
 
   EdxRolePermissionMapper mapper = Mappers.getMapper(EdxRolePermissionMapper.class);
 
-  @Mapping(target = "edxPermission", source = "edxPermissionEntity")
+  @Mapping(target = "edxPermissionCode", source = "edxPermissionCode")
   EdxRolePermission toStructure(EdxRolePermissionEntity entity);
 }

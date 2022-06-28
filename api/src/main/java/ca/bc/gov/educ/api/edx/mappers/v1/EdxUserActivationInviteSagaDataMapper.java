@@ -12,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(uses = {UUIDMapper.class, LocalDateTimeMapper.class})
 @SuppressWarnings("squid:S1214")
@@ -21,17 +20,17 @@ public interface EdxUserActivationInviteSagaDataMapper {
   EdxUserActivationInviteSagaDataMapper mapper = Mappers.getMapper(EdxUserActivationInviteSagaDataMapper.class);
 
 
-  @Mapping(target = "edxActivationRoles", source = "edxActivationRoleIds")
+  @Mapping(target = "edxActivationRoles", source = "edxActivationRoleCodes")
   EdxActivationCode toEdxActivationCode(EdxUserActivationInviteSagaData edxUserActivationInviteSagaData);
 
-  default List<EdxActivationRole> map(List<UUID> values) {
+  default List<EdxActivationRole> map(List<String> values) {
     if (values == null) {
       return Collections.emptyList();
     }
     List<EdxActivationRole> activationRoles = new ArrayList<>();
-    for (UUID value : values) {
+    for (String value : values) {
       EdxActivationRole activationRole = new EdxActivationRole();
-      activationRole.setEdxRoleId(value.toString());
+      activationRole.setEdxRoleCode(value);
       activationRoles.add(activationRole);
     }
     return activationRoles;

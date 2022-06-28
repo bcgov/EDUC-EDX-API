@@ -4,11 +4,9 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
-import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SagaEventStates;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -17,8 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +22,7 @@ import java.util.UUID;
 
 import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
@@ -64,9 +60,9 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
     sagaData.setEmail("test@gmail.com");
     sagaData.setSchoolName("Test School");
     sagaData.setMincode("00899178");
-    List<UUID> rolesList = new ArrayList<>();
-    rolesList.add(edxRoleEntity.getEdxRoleID());
-    sagaData.setEdxActivationRoleIds(rolesList);
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
     return SagaEntity.builder()
       .sagaId(UUID.randomUUID())
       .updateDate(LocalDateTime.now().minusMinutes(15))

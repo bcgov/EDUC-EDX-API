@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "EDX_ACTIVATION_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_ACTIVATION_CODE_ID_EDX_ROLE_ID_UK", columnNames = {"EDX_ACTIVATION_CODE_ID", "EDX_ROLE_ID"})})
+@Table(name = "EDX_ACTIVATION_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_ACTIVATION_CODE_ID_EDX_ROLE_CODE_UK", columnNames = {"EDX_ACTIVATION_CODE_ID", "EDX_ROLE_CODE"})})
 @Getter
 @Setter
 public class EdxActivationRoleEntity {
@@ -24,8 +24,8 @@ public class EdxActivationRoleEntity {
   @Column(name = "EDX_ACTIVATION_ROLE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID edxActivationRoleId;
 
-  @Column(name = "EDX_ROLE_ID")
-  UUID edxRoleId;
+  @Column(name = "EDX_ROLE_CODE")
+  String edxRoleCode;
 
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
