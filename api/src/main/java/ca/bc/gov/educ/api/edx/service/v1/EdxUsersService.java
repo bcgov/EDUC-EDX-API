@@ -10,23 +10,18 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityExistsException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -95,8 +90,8 @@ public class EdxUsersService {
     }
   }
 
-  public List<String> getEdxUserSchoolsList(String permissionName) {
-    return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionName);
+  public List<String> getEdxUserSchoolsList(String permissionCode) {
+    return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
   }
 
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
@@ -161,7 +156,7 @@ public class EdxUsersService {
   }
 
   public EdxUserSchoolRoleEntity createEdxUserSchoolRole(UUID edxUserID, UUID edxUserSchoolId, EdxUserSchoolRoleEntity edxUserSchoolRoleEntity) {
-    val optionalUserSchoolRoleEntity = getEdxUserSchoolRoleRepository().findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleEntity_EdxRoleID(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID(), edxUserSchoolRoleEntity.getEdxRoleEntity().getEdxRoleID());
+    val optionalUserSchoolRoleEntity = getEdxUserSchoolRoleRepository().findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleCode(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID(), edxUserSchoolRoleEntity.getEdxRoleCode());
     if (optionalUserSchoolRoleEntity.isEmpty()) {
       val optionalEdxUserSchoolEntity = getEdxUserSchoolsRepository().findById(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID());
       optionalEdxUserSchoolEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserSchoolEntity.class, "edxUserSchoolId", edxUserSchoolId.toString()));
@@ -323,7 +318,7 @@ public class EdxUsersService {
     edxActivationRoleEntities.forEach(edxActivationRoleEntity -> {
       EdxUserSchoolRoleEntity schoolRoleEntity = new EdxUserSchoolRoleEntity();
       schoolRoleEntity.setEdxUserSchoolEntity(edxUserSchoolEntity);
-      schoolRoleEntity.setEdxRoleEntity(getEdxRoleRepository().getById(edxActivationRoleEntity.getEdxRoleId()));
+      schoolRoleEntity.setEdxRoleCode(edxActivationRoleEntity.getEdxRoleCode());
       updateAuditColumnsForEdxUserSchoolRoleEntity(edxActivateUser, schoolRoleEntity);
       schoolRoleEntitySet.add(schoolRoleEntity);
     });
@@ -396,13 +391,13 @@ public class EdxUsersService {
   public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
     edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
     if (!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())) {
-      List<UUID> roleIdList = new ArrayList<>();
+      List<String> roleCodeList = new ArrayList<>();
       for (val activationRole : edxActivationCodeEntity.getEdxActivationRoleEntities()) {
         activationRole.setEdxActivationCodeEntity(edxActivationCodeEntity); //bi-directional association
-        roleIdList.add(activationRole.getEdxRoleId());
+        roleCodeList.add(activationRole.getEdxRoleCode());
       }
-      val roleListFromDB = getEdxRoleRepository().findAllById(roleIdList);
-      if (roleListFromDB.size() != roleIdList.size()) {
+      val roleListFromDB = getEdxRoleRepository().findAllById(roleCodeList);
+      if (roleListFromDB.size() != roleCodeList.size()) {
         ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("The Role Id provided in the payload does not exist.").status(BAD_REQUEST).build();
         throw new InvalidPayloadException(error);
       }

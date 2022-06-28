@@ -44,7 +44,7 @@ public interface EdxUsersEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USER_SCHOOLS')")
   @GetMapping(URL.USER_SCHOOL_MINCODES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<String> findAllEdxUserSchoolMincodes(@RequestParam(name = "permissionName") String permissionName);
+  List<String> findAllEdxUserSchoolMincodes(@RequestParam(name = "permissionCode") String permissionCode);
 
   /**
    * Retrieve edx user.

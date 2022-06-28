@@ -133,7 +133,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxRoleEntity getEdxRoleEntity() {
     EdxRoleEntity entity = new EdxRoleEntity();
-    entity.setRoleName("Admin");
+    entity.setEdxRoleCode("Admin");
     entity.setLabel("Admin");
     entity.setIsDistrictRole(false);
     entity.setCreateUser("test");
@@ -145,7 +145,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxPermissionEntity getEdxPermissionEntity() {
     EdxPermissionEntity entity = new EdxPermissionEntity();
-    entity.setPermissionName("Exchange");
+    entity.setEdxPermissionCode("Exchange");
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -155,8 +155,8 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxRolePermissionEntity getEdxRolePermissionEntity(EdxRoleEntity edxRoleEntity, EdxPermissionEntity edxPermissionEntity) {
     EdxRolePermissionEntity entity = new EdxRolePermissionEntity();
-    entity.setEdxRoleEntity(edxRoleEntity);
-    entity.setEdxPermissionEntity(edxPermissionEntity);
+    entity.setEdxRoleCode(edxRoleEntity.getEdxRoleCode());
+    entity.setEdxPermissionCode(edxPermissionEntity.getEdxPermissionCode());
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -166,7 +166,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxUserSchoolRoleEntity getEdxUserSchoolRoleEntity(EdxUserSchoolEntity edxUserSchoolEntity, EdxRoleEntity edxRoleEntity) {
     EdxUserSchoolRoleEntity entity = new EdxUserSchoolRoleEntity();
-    entity.setEdxRoleEntity(edxRoleEntity);
+    entity.setEdxRoleCode(edxRoleEntity.getEdxRoleCode());
     entity.setEdxUserSchoolEntity(edxUserSchoolEntity);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
@@ -177,7 +177,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxUserDistrictRoleEntity getEdxUserDistrictRoleEntity(EdxUserDistrictEntity edxUserDistrictEntity, EdxRoleEntity edxRoleEntity) {
     EdxUserDistrictRoleEntity entity = new EdxUserDistrictRoleEntity();
-    entity.setEdxRoleEntity(edxRoleEntity);
+    entity.setEdxRoleCode(edxRoleEntity.getEdxRoleCode());
     entity.setEdxUserDistrictEntity(edxUserDistrictEntity);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
@@ -226,7 +226,7 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxActivationRoleEntity createEdxActivationRoleEntity(EdxActivationCodeEntity edxActivationCodeEntity, EdxRoleEntity savedRoleEntity) {
     EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
     edxActivationRoleEntity.setEdxActivationCodeEntity(edxActivationCodeEntity);
-    edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
+    edxActivationRoleEntity.setEdxRoleCode(savedRoleEntity.getEdxRoleCode());
     edxActivationCodeEntity.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
     return edxActivationRoleEntity;
   }
@@ -273,7 +273,7 @@ public abstract class BaseSecureExchangeAPITest {
     EdxActivationCodeEntity toReturn = createEdxActivationCodeEntity(activationCode, isPrimary, isActive, validationCode, isURLClicked, mincode);
     EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
     edxActivationRoleEntity.setEdxActivationCodeEntity(toReturn);
-    edxActivationRoleEntity.setEdxRoleId(savedRoleEntity.getEdxRoleID());
+    edxActivationRoleEntity.setEdxRoleCode(savedRoleEntity.getEdxRoleCode());
     edxActivationRoleEntity.setCreateUser("test");
     edxActivationRoleEntity.setCreateDate(LocalDateTime.now());
     edxActivationRoleEntity.setUpdateUser("test");
@@ -295,7 +295,7 @@ public abstract class BaseSecureExchangeAPITest {
     edxActivationCode.setMincode("12345678");
 
     EdxActivationRole edxActivationRole = new EdxActivationRole();
-    edxActivationRole.setEdxRoleId(edxRoleEntity.getEdxRoleID().toString());
+    edxActivationRole.setEdxRoleCode(edxRoleEntity.getEdxRoleCode());
     List<EdxActivationRole>activationRoles = new ArrayList<>();
     activationRoles.add(edxActivationRole);
     edxActivationCode.setEdxActivationRoles(activationRoles);

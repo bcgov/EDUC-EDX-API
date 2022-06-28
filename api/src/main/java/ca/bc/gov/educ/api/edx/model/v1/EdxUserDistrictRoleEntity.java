@@ -30,18 +30,17 @@ public class EdxUserDistrictRoleEntity {
   @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
-  @Column(name = "update_user")
+  @Column(name = "UPDATE_USER")
   String updateUser;
 
   @PastOrPresent
-  @Column(name = "update_date")
+  @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;
 
   @ManyToOne(optional = false, targetEntity = EdxUserDistrictEntity.class)
   @JoinColumn(name = "EDX_USER_DISTRICT_ID", referencedColumnName = "EDX_USER_DISTRICT_ID", updatable = false)
   private EdxUserDistrictEntity edxUserDistrictEntity;
 
-  @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
-  @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
-  private EdxRoleEntity edxRoleEntity;
+  @Column(name = "EDX_ROLE_CODE")
+  private String edxRoleCode;
 }

@@ -40,8 +40,8 @@ public class EdxActivationCodePayLoadValidator {
     if (activationRole.getEdxActivationRoleId() != null) {
       apiValidationErrors.add(createFieldError("edxActivationRoleId", activationRole.getEdxActivationRoleId(), "edxActivationRoleId should be null for post operation."));
     }
-    if (activationRole.getEdxRoleId() == null) {
-      apiValidationErrors.add(createFieldError("edxRoleId", activationRole.getEdxActivationRoleId(), "edxRoleId should not be null for post operation."));
+    if (activationRole.getEdxRoleCode() == null) {
+      apiValidationErrors.add(createFieldError("edxRoleId", activationRole.getEdxActivationRoleId(), "edxRoleCode should not be null for post operation."));
     }
     return apiValidationErrors;
   }

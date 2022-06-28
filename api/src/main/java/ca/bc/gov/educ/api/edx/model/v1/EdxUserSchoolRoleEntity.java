@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_SCHOOL_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_SCHOOL_ID_EDX_ROLE_UK", columnNames = {"EDX_USER_SCHOOL_ID", "EDX_ROLE_ID"})})
+@Table(name = "EDX_USER_SCHOOL_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_SCHOOL_ID_EDX_ROLE_UK", columnNames = {"EDX_USER_SCHOOL_ID", "EDX_ROLE_CODE"})})
 @DynamicUpdate
 public class EdxUserSchoolRoleEntity {
     @Id
@@ -41,7 +41,6 @@ public class EdxUserSchoolRoleEntity {
     @JoinColumn(name = "EDX_USER_SCHOOL_ID", referencedColumnName = "EDX_USER_SCHOOL_ID", updatable = false)
     private EdxUserSchoolEntity edxUserSchoolEntity;
 
-    @ManyToOne(optional = false, targetEntity = EdxRoleEntity.class)
-    @JoinColumn(name = "EDX_ROLE_ID", referencedColumnName = "EDX_ROLE_ID", updatable = false)
-    private EdxRoleEntity edxRoleEntity;
+    @Column(name = "EDX_ROLE_CODE")
+    private String edxRoleCode;
 }

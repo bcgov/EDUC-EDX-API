@@ -5,15 +5,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.UUID;
 
 
 @Data
@@ -22,15 +19,8 @@ import java.util.UUID;
 @DynamicUpdate
 public class EdxRoleEntity {
   @Id
-  @GeneratedValue(generator = "UUID")
-  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-  @Column(name = "EDX_ROLE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  UUID edxRoleID;
-
-  @NotNull(message = "roleName cannot be null")
-  @Column(name = "NAME")
-  String roleName;
+  @Column(name = "EDX_ROLE_CODE", unique = true, updatable = false)
+  String edxRoleCode;
 
   @Column(name = "LABEL")
   String label;
@@ -59,17 +49,7 @@ public class EdxRoleEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
+  @OneToMany(mappedBy = "edxRoleCode", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
   private Set<EdxRolePermissionEntity> edxRolePermissionEntities;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserSchoolRoleEntity.class)
-  private Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntities;
-
-  @ToString.Exclude
-  @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxRoleEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictRoleEntity.class)
-  private Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities;
 
 }

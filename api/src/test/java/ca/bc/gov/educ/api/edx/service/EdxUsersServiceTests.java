@@ -2,8 +2,9 @@ package ca.bc.gov.educ.api.edx.service;
 
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
-import ca.bc.gov.educ.api.edx.model.v1.*;
+import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
+import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
@@ -85,8 +86,8 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).hasSize(1);
     var edxUserSchoolRollEntity = List.copyOf(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).get(0);
     assertThat(edxUserSchoolRollEntity).isNotNull();
-    assertThat(edxUserSchoolRollEntity.getEdxRoleEntity()).isNotNull();
-    assertThat(edxUserSchoolRollEntity.getEdxRoleEntity().getRoleName()).isEqualTo("Admin");
+    assertThat(edxUserSchoolRollEntity.getEdxRoleCode()).isNotNull();
+    assertThat(edxUserSchoolRollEntity.getEdxRoleCode()).isEqualTo("Admin");
   }
 
   @Test

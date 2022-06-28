@@ -9,9 +9,6 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
-
-import java.util.ArrayList;
-import java.util.List;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -24,6 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -101,18 +100,15 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
-      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRole.roleName", is("Admin")))
-      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRole.edxRolePermissions[0].edxPermission.permissionName", is("Exchange")))
-      .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.roleName", is("Admin")))
-        .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.label", is("Admin")))
-      .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRole.edxRolePermissions[0].edxPermission.permissionName", is("Exchange")));
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRoleCode", is("Admin")))
+      .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRoleCode", is("Admin")));
   }
 
   @Test
   public void testFindAllEdxUserSchoolMincodes_GivenValidPermissionName_ShouldReturnOkStatusAndMincodes() throws Exception {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOL_MINCODES)
-        .param("permissionName", "Exchange")
+        .param("permissionCode", "Exchange")
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USER_SCHOOLS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
@@ -521,7 +517,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(edxUserSchool.getEdxUserSchoolID());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
 
     //now we update our school with the new role data
     edxUsrSchool.getEdxUserSchoolRoles().add(edxUserSchoolRole);
@@ -693,7 +689,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(edxUsrSchool.getEdxUserSchoolID());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
 
@@ -745,7 +741,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolRoleID(UUID.randomUUID().toString());
     edxUserSchoolRole.setEdxUserSchoolID(edxUsrSchool.getEdxUserSchoolID());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
     val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}" + "/role", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
@@ -794,7 +790,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(UUID.randomUUID().toString());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
     val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}" + "/role", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
@@ -843,7 +839,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     String guid = UUID.randomUUID().toString();
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(guid);
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
     val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}" + "/role", edxUsr.getEdxUserID(), guid)
@@ -892,7 +888,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     String guid = UUID.randomUUID().toString();
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(edxUsrSchool.getEdxUserSchoolID());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
     val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}" + "/role", guid, edxUsrSchool.getEdxUserSchoolID())
@@ -941,7 +937,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     String guid = UUID.randomUUID().toString();
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(edxUsrSchool.getEdxUserSchoolID());
-    edxUserSchoolRole.setEdxRole(EdxRoleMapper.mapper.toStructure(savedRoleEntity));
+    edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
     String jsonRole = getJsonString(edxUserSchoolRole);
 
     val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}" + "/role", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
@@ -1220,7 +1216,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
    val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
    activationRole.setEdxActivationCodeId(validationCode.toString());
    activationRole.setEdxActivationRoleId(validationCode.toString());
-   activationRole.setEdxRoleId(null);
+   activationRole.setEdxRoleCode(null);
     String jsonString = getJsonString(edxActivationCode);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
@@ -1230,7 +1226,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationCodeId should be null for post operation.")))
       .andExpect(jsonPath("$.subErrors[1].message", is("edxActivationRoleId should be null for post operation.")))
-      .andExpect(jsonPath("$.subErrors[2].message", is("edxRoleId should not be null for post operation.")))
+      .andExpect(jsonPath("$.subErrors[2].message", is("edxRoleCode should not be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -1241,7 +1237,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
     val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
-    activationRole.setEdxRoleId(validationCode.toString());
+    activationRole.setEdxRoleCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
