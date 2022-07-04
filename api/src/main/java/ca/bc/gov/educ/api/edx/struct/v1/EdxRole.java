@@ -16,9 +16,8 @@ import java.util.List;
 public class EdxRole extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  String edxRoleCode;
   @Size(max = 30)
-  String roleName;
+  String edxRoleCode;
   @Size(max = 30)
   String label;
   @Size(max = 255)
