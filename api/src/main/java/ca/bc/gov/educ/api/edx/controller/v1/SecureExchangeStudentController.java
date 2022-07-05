@@ -27,7 +27,7 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
 
     @Override
     public SecureExchange addStudent(String studentId, String secureExchangeID) {
-        return mapper.toStructure(studentService.addStudentToExchange(UUID.fromString(secureExchangeID), UUID.fromString(studentId)));
+        return studentService.addStudentToExchange(UUID.fromString(secureExchangeID), UUID.fromString(studentId));
     }
 
     @Override

@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
@@ -23,13 +24,14 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
+    private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 
     @Autowired
     public SecureExchangeStudentService(SecureExchangeRequestRepository secureExchangeRequestRepository, SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository, DocumentRepository documentRepository, SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo, SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository, SecureExchangeService exchangeService) {
         this.exchangeService = exchangeService;
     }
 
-    public SecureExchangeEntity addStudentToExchange(UUID secureExchangeID, UUID studentID) throws EntityNotFoundException {
+    public SecureExchange addStudentToExchange(UUID secureExchangeID, UUID studentID) throws EntityNotFoundException {
         // TODO check to see if student exists by id
         // get secure exchange
         SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
@@ -49,7 +51,7 @@ public class SecureExchangeStudentService {
             secureExchange.getSecureExchangeStudents().add(student);
             this.exchangeService.updateSecureExchange(secureExchange);
         }
-        return secureExchange;
+        return mapper.toStructure(secureExchange);
     }
 
     public void deleteStudentFromExchange(UUID secureExchangeID, UUID studentID) {
@@ -73,10 +75,8 @@ public class SecureExchangeStudentService {
     }
 
     public List<SecureExchangeStudent> getStudentIDsFromExchange(UUID secureExchangeID) throws EntityNotFoundException {
-        // TODO create mapper
-        //SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(UUID.fromString(secureExchangeID));
-        //Set<SecureExchangeStudentEntity> students = secureExchange.getSecureExchangeStudents();
-        //return (students != null) ? new ArrayList<>(students) : null;
-        return null;
+        SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
+        SecureExchange secureExchange = mapper.toStructure(secureExchangeEntity);
+        return secureExchange.getStudentsList();
     }
 }
