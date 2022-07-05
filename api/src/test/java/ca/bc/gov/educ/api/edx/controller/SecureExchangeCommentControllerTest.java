@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -17,6 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -68,11 +72,31 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     @Test
     public void testCreateSecureExchangeComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
         final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
-        final String penReqId = entity.getSecureExchangeID().toString();
-        this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId )
+        final String secureExchangeID = entity.getSecureExchangeID().toString();
+        this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,secureExchangeID )
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isCreated());
+                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidSecureExchangeId(secureExchangeID))).andDo(print()).andExpect(status().isCreated());
+
+        val updatedSecureExchangeEntity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).get();
+        assertThat(updatedSecureExchangeEntity.getIsReadByMinistry(), equalTo(true));
+        assertThat(updatedSecureExchangeEntity.getIsReadByExchangeContact(), equalTo(false));
+
+    }
+
+    @Test
+    public void testCreateSecureExchangeComments_GivenValidPayloadWithEdxUserId_ShouldReturnStatusCreated() throws Exception {
+        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+        final String secureExchangeID = entity.getSecureExchangeID().toString();
+        this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,secureExchangeID )
+          .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+          .contentType(MediaType.APPLICATION_JSON)
+          .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidSecureExchangeIdAndEdxUserId(secureExchangeID))).andDo(print()).andExpect(status().isCreated());
+
+        val updatedSecureExchangeEntity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).get();
+        assertThat(updatedSecureExchangeEntity.getIsReadByMinistry(), equalTo(false));
+        assertThat(updatedSecureExchangeEntity.getIsReadByExchangeContact(), equalTo(true));
+
     }
 
     @Test
@@ -81,12 +105,12 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId)
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
                 .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidPenReqID(penReqId))).andDo(print()).andExpect(status().isNotFound());
+                .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidSecureExchangeId(penReqId))).andDo(print()).andExpect(status().isNotFound());
     }
 
-    private String dummySecureExchangeCommentsJsonWithValidPenReqID(final String penReqId) {
+    private String dummySecureExchangeCommentsJsonWithValidSecureExchangeId(final String secureExchangeID) {
       return "{\n" +
-        "  \"secureExchangeID\": \"" + penReqId + "\",\n" +
+        "  \"secureExchangeID\": \"" + secureExchangeID + "\",\n" +
         "  \"content\": \"" + "comment1" + "\",\n" +
         "  \"commentUserName\": \"" + "user1" + "\",\n" +
         "  \"createUser\": \"" + "user1" + "\",\n" +
@@ -94,5 +118,17 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
         "  \"staffUserIdentifier\": \"" + UUID.randomUUID() + "\",\n" +
         "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
         "}";
+    }
+
+    private String dummySecureExchangeCommentsJsonWithValidSecureExchangeIdAndEdxUserId(final String secureExchangeID) {
+        return "{\n" +
+          "  \"secureExchangeID\": \"" + secureExchangeID + "\",\n" +
+          "  \"content\": \"" + "comment1" + "\",\n" +
+          "  \"commentUserName\": \"" + "user1" + "\",\n" +
+          "  \"createUser\": \"" + "user1" + "\",\n" +
+          "  \"updateUser\": \"" + "user1" + "\",\n" +
+          "  \"edxUserID\": \"" + UUID.randomUUID() + "\",\n" +
+          "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+          "}";
     }
 }
