@@ -85,6 +85,21 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     }
 
     @Test
+    public void testCreateSecureExchangeComments_GivenValidPayloadWithEdxUserId_ShouldReturnStatusCreated() throws Exception {
+        final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+        final String secureExchangeID = entity.getSecureExchangeID().toString();
+        this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,secureExchangeID )
+          .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+          .contentType(MediaType.APPLICATION_JSON)
+          .accept(MediaType.APPLICATION_JSON).content(this.dummySecureExchangeCommentsJsonWithValidSecureExchangeIdAndEdxUserId(secureExchangeID))).andDo(print()).andExpect(status().isCreated());
+
+        val updatedSecureExchangeEntity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).get();
+        assertThat(updatedSecureExchangeEntity.getIsReadByMinistry(), equalTo(false));
+        assertThat(updatedSecureExchangeEntity.getIsReadByExchangeContact(), equalTo(true));
+
+    }
+
+    @Test
     public void testCreateSecureExchangeComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
         final String penReqId = UUID.randomUUID().toString();
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId)
@@ -103,5 +118,17 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
         "  \"staffUserIdentifier\": \"" + UUID.randomUUID() + "\",\n" +
         "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
         "}";
+    }
+
+    private String dummySecureExchangeCommentsJsonWithValidSecureExchangeIdAndEdxUserId(final String secureExchangeID) {
+        return "{\n" +
+          "  \"secureExchangeID\": \"" + secureExchangeID + "\",\n" +
+          "  \"content\": \"" + "comment1" + "\",\n" +
+          "  \"commentUserName\": \"" + "user1" + "\",\n" +
+          "  \"createUser\": \"" + "user1" + "\",\n" +
+          "  \"updateUser\": \"" + "user1" + "\",\n" +
+          "  \"edxUserID\": \"" + UUID.randomUUID() + "\",\n" +
+          "  \"commentTimestamp\": \"2020-02-09T00:00:00\"\n" +
+          "}";
     }
 }
