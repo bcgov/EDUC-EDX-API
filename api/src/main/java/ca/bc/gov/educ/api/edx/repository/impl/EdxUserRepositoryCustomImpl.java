@@ -36,11 +36,11 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<EdxUserEntity> criteriaQuery = criteriaBuilder.createQuery(EdxUserEntity.class);
     Root<EdxUserEntity> edxUserEntityRoot = criteriaQuery.from(EdxUserEntity.class);
-    Join<EdxUserEntity, EdxUserSchoolEntity> edxUserSchoolEntitySchoolJoin = edxUserEntityRoot.join("edxUserSchoolEntities");
 
     digitalId.ifPresent(uuid -> predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("digitalIdentityID"), uuid)));
 
     if (StringUtils.isNotBlank(mincode)) {
+      Join<EdxUserEntity, EdxUserSchoolEntity> edxUserSchoolEntitySchoolJoin = edxUserEntityRoot.join("edxUserSchoolEntities");
       predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("mincode"), mincode));
     }
     if (StringUtils.isNotBlank(firstName)) {

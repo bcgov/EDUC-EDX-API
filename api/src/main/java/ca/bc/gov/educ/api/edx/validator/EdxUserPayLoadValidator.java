@@ -41,7 +41,7 @@ public class EdxUserPayLoadValidator {
         if (isCreateOperation && edxUserSchool.getEdxUserID() == null) {
             apiValidationErrors.add(createFieldError("edxUserID", edxUserSchool.getEdxUserID(), "edxUserID should not be null for post operation."));
         }
-        if(!edxUserId.toString().equals(edxUserSchool.getEdxUserID())) {
+        if (!edxUserId.toString().equals(edxUserSchool.getEdxUserID())) {
             apiValidationErrors.add(createFieldError("edxUserId", edxUserSchool.getEdxUserSchoolID(), "edxUserID in path and payload edxUserId mismatch."));
         }
         return apiValidationErrors;
