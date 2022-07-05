@@ -29,7 +29,7 @@ public class SecureExchangeStudentService {
         this.exchangeService = exchangeService;
     }
 
-    public void addStudentToExchange(UUID secureExchangeID, UUID studentID) throws EntityNotFoundException {
+    public SecureExchangeEntity addStudentToExchange(UUID secureExchangeID, UUID studentID) throws EntityNotFoundException {
         // TODO check to see if student exists by id
         // get secure exchange
         SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
@@ -49,6 +49,7 @@ public class SecureExchangeStudentService {
             secureExchange.getSecureExchangeStudents().add(student);
             this.exchangeService.updateSecureExchange(secureExchange);
         }
+        return secureExchange;
     }
 
     public void deleteStudentFromExchange(UUID secureExchangeID, UUID studentID) {

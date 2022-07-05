@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -17,7 +18,7 @@ public interface SecureExchangeStudentEndpoint {
     @PutMapping(URL.SECURE_EXCHANGE_ID_STUDENTS + "/{studentId}")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @Transactional
-    void addStudent(@PathVariable String studentId, @PathVariable String secureExchangeID);
+    SecureExchange addStudent(@PathVariable String studentId, @PathVariable String secureExchangeID);
 
     @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
     @DeleteMapping(URL.SECURE_EXCHANGE_ID_STUDENTS + "/{studentId}")

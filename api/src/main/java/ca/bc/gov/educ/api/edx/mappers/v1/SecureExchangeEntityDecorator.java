@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.mappers.v1;
 
+import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
+import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
@@ -17,6 +19,9 @@ import java.util.UUID;
 
 public abstract class SecureExchangeEntityDecorator implements SecureExchangeEntityMapper {
   private final SecureExchangeEntityMapper delegate;
+
+  private final UUIDMapper uUIDMapper = new UUIDMapper();
+  private final LocalDateTimeMapper localDateTimeMapper = new LocalDateTimeMapper();
 
   protected SecureExchangeEntityDecorator(final SecureExchangeEntityMapper delegate) {
     this.delegate = delegate;
@@ -111,12 +116,12 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
       for(val student : students){
         SecureExchangeStudentEntity secureExchangeStudentEntity = new SecureExchangeStudentEntity();
         secureExchangeStudentEntity.setSecureExchangeEntity(postedEntity);
-        secureExchangeStudentEntity.setSecureExchangeStudentId(UUID.fromString(student.getSecureExchangeStudentId()));
+        secureExchangeStudentEntity.setSecureExchangeStudentId(uUIDMapper.map(student.getSecureExchangeStudentId()));
         secureExchangeStudentEntity.setCreateUser(
                 (StringUtils.isBlank(student.getCreateUser())) ? ApplicationProperties.CLIENT_ID : student.getCreateUser()
         );
         secureExchangeStudentEntity.setCreateDate(
-                (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : LocalDateTime.parse(student.getCreateDate())
+                (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : localDateTimeMapper.map(student.getCreateDate())
         );
         postedEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
       }
