@@ -7,19 +7,18 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @EqualsAndHashCode
 @Data
 public class SecureExchangeStudent implements Serializable {
 
-    UUID secureExchangeStudentId;
+    String secureExchangeId;
+    String secureExchangeStudentId;
     @NotNull
-    UUID studentId;
+    String studentId;
     @Size(max = 32)
     String createUser;
     @Null(message = "createDate should be null.")
-    LocalDateTime createDate;
+    String createDate;
 
 }
