@@ -2,9 +2,11 @@ package ca.bc.gov.educ.api.edx.mappers.v1;
 
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
@@ -47,6 +49,21 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         secureExchange.getCommentsList().add(newComment);
       }
     }
+
+    var students = entity.getSecureExchangeStudents();
+    if(students != null && !students.isEmpty()){
+      secureExchange.setStudentsList(new ArrayList<>());
+      for (val student : students) {
+        SecureExchangeStudent secureExchangeStudent = new SecureExchangeStudent();
+        secureExchangeStudent.setSecureExchangeId(entity.getSecureExchangeID().toString());
+        secureExchangeStudent.setSecureExchangeStudentId(student.getSecureExchangeStudentId().toString());
+        secureExchangeStudent.setStudentId(student.getStudentId().toString());
+        secureExchangeStudent.setCreateUser(student.getCreateUser());
+        secureExchangeStudent.setCreateDate(student.getCreateDate().toString());
+        secureExchange.getStudentsList().add(secureExchangeStudent);
+      }
+    }
+
     return secureExchange;
   }
 
@@ -86,6 +103,25 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         postedEntity.getSecureExchangeComment().add(newComment);
       }
     }
+
+    var students = struct.getStudentsList();
+
+    if(students != null && !students.isEmpty()) {
+      postedEntity.setSecureExchangeStudents(new HashSet<>());
+      for(val student : students){
+        SecureExchangeStudentEntity secureExchangeStudentEntity = new SecureExchangeStudentEntity();
+        secureExchangeStudentEntity.setSecureExchangeEntity(postedEntity);
+        secureExchangeStudentEntity.setSecureExchangeStudentId(UUID.fromString(student.getSecureExchangeStudentId()));
+        secureExchangeStudentEntity.setCreateUser(
+                (StringUtils.isBlank(student.getCreateUser())) ? ApplicationProperties.CLIENT_ID : student.getCreateUser()
+        );
+        secureExchangeStudentEntity.setCreateDate(
+                (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : LocalDateTime.parse(student.getCreateDate())
+        );
+        postedEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
+      }
+    }
+
     return postedEntity;
   }
 
