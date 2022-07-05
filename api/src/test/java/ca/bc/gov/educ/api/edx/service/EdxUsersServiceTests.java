@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.service;
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
@@ -82,6 +83,14 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
     var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),null, null, null);
     assertThat(edxUserEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  public void getPermissionRoles() {
+    createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    final List<EdxRoleEntity> roles = this.service.getRolePermissionsList();
+    assertThat(roles).isNotNull().hasSize(1);
+    assertThat(roles.get(0).getEdxRolePermissionEntities()).isNotNull().hasSize(1);
   }
 
   @Test

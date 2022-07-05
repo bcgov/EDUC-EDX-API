@@ -6,10 +6,7 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -88,6 +85,10 @@ public class EdxUsersService {
     } else {
       throw new EntityNotFoundException(EdxUser.class, EDX_USER_ID, edxUserID.toString());
     }
+  }
+
+  public List<EdxRoleEntity> getRolePermissionsList() {
+    return this.getEdxRoleRepository().findAll();
   }
 
   public List<String> getEdxUserSchoolsList(String permissionCode) {

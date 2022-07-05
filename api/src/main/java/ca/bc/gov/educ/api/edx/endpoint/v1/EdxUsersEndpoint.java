@@ -56,6 +56,15 @@ public interface EdxUsersEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   EdxUser retrieveEdxUser(@PathVariable String id);
 
+  /**
+   * Gets secure Exchange status codes.
+   *
+   * @return the secure Exchange status codes
+   */
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_CODES')")
+  @GetMapping(URL.ROLE_PERMISSIONS)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<EdxRole> getAllRolePermissions();
 
   /**
    *   This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.

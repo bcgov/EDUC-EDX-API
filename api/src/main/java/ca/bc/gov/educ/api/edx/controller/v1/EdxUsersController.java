@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -74,6 +75,13 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   @Override
   public EdxUser retrieveEdxUser(String id) {
     return userMapper.toStructure(getService().retrieveEdxUserByID(UUIDUtil.fromString(id)));
+  }
+
+  @Override
+  public List<EdxRole> getAllRolePermissions() {
+    val roles = new ArrayList<EdxRole>();
+    getService().getRolePermissionsList().forEach(element -> roles.add(EDX_ROLE_MAPPER.toStructure(element)));
+    return roles;
   }
 
   @Override

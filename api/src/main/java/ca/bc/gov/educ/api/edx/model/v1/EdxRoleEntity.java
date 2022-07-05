@@ -49,7 +49,7 @@ public class EdxRoleEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "edxRoleCode", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxRolePermissionEntity.class)
+  @OneToMany(mappedBy = "edxRoleCode", fetch = FetchType.EAGER, cascade = CascadeType.ALL, targetEntity = EdxRolePermissionEntity.class)
   private Set<EdxRolePermissionEntity> edxRolePermissionEntities;
 
 }

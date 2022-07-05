@@ -127,6 +127,14 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testReadRolePermissions_Always_ShouldReturnStatusOkAndAllDataFromDB() throws Exception {
+    val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.ROLE_PERMISSIONS)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_CODES"))))
+      .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
+  }
+
+  @Test
   public void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
