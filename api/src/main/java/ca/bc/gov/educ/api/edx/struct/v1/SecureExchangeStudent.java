@@ -16,7 +16,7 @@ public class SecureExchangeStudent implements Serializable {
 
     UUID secureExchangeStudentId;
     @NotNull
-    String studentId;
+    UUID studentId;
     @Size(max = 32)
     String createUser;
     @Null(message = "createDate should be null.")

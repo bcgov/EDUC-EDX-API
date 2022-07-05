@@ -24,7 +24,7 @@ public class SecureExchangeStudentEntity {
 
     @NotNull(message = "student id cannot be null")
     @Column(name = "STUDENT_ID", updatable = false)
-    String studentId;
+    UUID studentId;
 
     @NotNull(message = "createUser cannot be null")
     @Column(name = "CREATE_USER", updatable = false)
@@ -35,7 +35,7 @@ public class SecureExchangeStudentEntity {
     @Column(name = "CREATE_DATE", updatable = false)
     LocalDateTime createDate;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
+    @ManyToOne(optional = false, targetEntity = SecureExchangeEntity.class)
     @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
     private SecureExchangeEntity secureExchangeEntity;
 
