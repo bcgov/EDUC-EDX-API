@@ -16,7 +16,7 @@ public class SecureExchangeDocumentTypeCode implements Serializable {
 
   private static final long serialVersionUID = 6118916290604876032L;
 
-  private String documentTypeCode;
+  private String secureExchangeDocumentTypeCode;
 
   private String label;
 
