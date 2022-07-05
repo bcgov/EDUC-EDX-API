@@ -124,7 +124,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[0].digitalIdentityID", is(digitalIdentityID.toString())));
-
   }
 
   @Test

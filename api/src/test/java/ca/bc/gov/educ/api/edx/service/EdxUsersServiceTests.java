@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +71,28 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity));
     final List<EdxUserSchoolEntity> edxUserSchoolEntities = this.service.getEdxUserSchoolsList();
     assertThat(edxUserSchoolEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  public void findEdxUserByDigitalID() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    var schoolEntity = getEdxUserSchoolEntity(entity);
+    schoolEntity.setMincode("98765432");
+    edxUserSchoolRepository.save(schoolEntity);
+
+    var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),null, null, null);
+    assertThat(edxUserEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  public void findEdxUserByMincodeID() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    var schoolEntity = getEdxUserSchoolEntity(entity);
+    schoolEntity.setMincode("98765432");
+    edxUserSchoolRepository.save(schoolEntity);
+
+    var edxUserEntities = this.service.findEdxUsers(Optional.ofNullable(null),schoolEntity.getMincode(), null, null);
+    assertThat(edxUserEntities).isNotNull().hasSize(1);
   }
 
   @Test
