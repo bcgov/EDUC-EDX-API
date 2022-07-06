@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.hibernate.annotations.Type;
 
 @Getter
 @Setter
@@ -46,7 +47,7 @@ public class SecureExchangeDocumentEntity {
   UUID edxUserID;
 
   @Column(name = "STAFF_USER_IDENTIFIER")
-  String staffUserIdentifier;
+  UUID staffUserIdentifier;
 
   @NotNull(message = "commentUserName cannot be null")
   @Column(name = "FILE_NAME")
@@ -78,6 +79,7 @@ public class SecureExchangeDocumentEntity {
 
   @Basic(fetch = FetchType.LAZY)
   @Lob
+  @Type(type = "org.hibernate.type.BinaryType")
   @Column(name = "DOCUMENT_DATA")
   byte[] documentData;
 }
