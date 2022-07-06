@@ -19,43 +19,43 @@ import static org.springframework.http.HttpStatus.CREATED;
 public interface SecureExchangeDocumentEndpoint {
 
   @GetMapping(URL.SECURE_EXCHANGE_ID_DOCUMENTS + URL.DOCUMENT_ID)
-  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   SecureExchangeDocument readDocument(@PathVariable String secureExchangeID, @PathVariable String documentID, @RequestParam(value = "includeDocData", defaultValue = "Y") String includeDocData);
 
   @PostMapping(URL.SECURE_EXCHANGE_ID_DOCUMENTS)
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
   SecureExchangeDocMetadata createDocument(@PathVariable String secureExchangeID, @Validated @RequestBody SecureExchangeDocument secureExchangeDocument);
 
   @PutMapping(URL.SECURE_EXCHANGE_ID_DOCUMENTS + URL.DOCUMENT_ID)
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   SecureExchangeDocMetadata updateDocument(@PathVariable UUID secureExchangeID, @PathVariable UUID documentID, @Validated @RequestBody SecureExchangeDocument secureExchangeDocument);
 
   @DeleteMapping(URL.SECURE_EXCHANGE_ID_DOCUMENTS + URL.DOCUMENT_ID)
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   SecureExchangeDocMetadata deleteDocument(@PathVariable String secureExchangeID, @PathVariable String documentID);
 
   @GetMapping(URL.SECURE_EXCHANGE_ID_DOCUMENTS)
-  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<SecureExchangeDocMetadata> readAllDocumentMetadata(@PathVariable String secureExchangeID);
 
   @GetMapping(URL.FILE_REQUIREMENTS)
-  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_REQUIREMENTS')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_DOCUMENT_REQUIREMENTS')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   SecureExchangeDocRequirement getDocumentRequirements();
 
-  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT_TYPES')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_DOCUMENT_TYPES')")
   @GetMapping(URL.DOCUMENT_TYPES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   Iterable<SecureExchangeDocumentTypeCode> getDocumentTypeCodes();
 
   @GetMapping(URL.ALL_DOCUMENTS)
-  @PreAuthorize("hasAuthority('SCOPE_READ_DOCUMENT')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_DOCUMENT')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<SecureExchangeDocumentMetadata> readAllDocumentsMetadata();
 }
