@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest {
@@ -46,8 +47,13 @@ public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(
                 addStudentToSecureExchangeEntity(createSecureExchange(), UUID.fromString(LEGIT_STUDENT_ID))
         );
-        assertThat(entity.getSecureExchangeStudents()).hasSize(1);
-        this.secureExchangeStudentService.deleteStudentFromExchange(entity.getSecureExchangeID(), UUID.fromString(LEGIT_STUDENT_ID));
+        Set<SecureExchangeStudentEntity> students = entity.getSecureExchangeStudents();
+        assertThat(students).hasSize(1);
+        SecureExchangeStudentEntity student = students.stream()
+                .filter(s -> s.getStudentId().equals(LEGIT_STUDENT_ID))
+                .findAny()
+                .orElse(null);
+        this.secureExchangeStudentService.deleteStudentFromExchange(student.getSecureExchangeStudentId());
         entity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).orElse(null);
         assertThat(entity.getSecureExchangeStudents()).hasSize(0);
     }
