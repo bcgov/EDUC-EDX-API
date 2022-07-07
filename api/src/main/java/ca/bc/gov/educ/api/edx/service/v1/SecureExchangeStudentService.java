@@ -23,6 +23,7 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
+
     private RESTService restService;
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     private final SecureExchangeStudentRepository repository;
@@ -40,6 +41,8 @@ public class SecureExchangeStudentService {
         // get secure exchange
         // entity not found will fire if not found
         SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
+        // TODO check repo for exchange student with studentID and secureExchangeID
+
         if(secureExchange.getSecureExchangeStudents() == null){
             secureExchange.setSecureExchangeStudents(new HashSet<>());
         }
@@ -62,23 +65,9 @@ public class SecureExchangeStudentService {
         return mapper.toStructure(secureExchange);
     }
 
-    public void deleteStudentFromExchange(UUID secureExchangeID, UUID studentID) {
-        // get secure exchange
-        try {
-            SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
-            Set<SecureExchangeStudentEntity> students = secureExchange.getSecureExchangeStudents();
-            if(students != null && !students.isEmpty()){
-                SecureExchangeStudentEntity student = students.stream()
-                        .filter(s -> studentID.equals(s.getStudentId()))
-                        .findAny()
-                        .orElse(null);
-                if(student != null){
-                    students.remove(student);
-                    this.exchangeService.updateSecureExchange(secureExchange);
-                }
-            }
-        } catch (EntityNotFoundException e) {
-            // ignore, they want deletion anyway
+    public void deleteStudentFromExchange(UUID secureExchangeStudentId) {
+        if (repository.existsById(secureExchangeStudentId)) {
+            repository.deleteById(secureExchangeStudentId);
         }
     }
 
