@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import lombok.AccessLevel;
@@ -12,7 +13,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,15 +23,15 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
-    private WebClient webClient;
     private RESTService restService;
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
+    private final SecureExchangeStudentRepository repository;
 
     @Autowired
-    public SecureExchangeStudentService(SecureExchangeService exchangeService, WebClient webClient, RESTService restService) {
+    public SecureExchangeStudentService(SecureExchangeService exchangeService, RESTService restService, SecureExchangeStudentRepository repository) {
         this.exchangeService = exchangeService;
-        this.webClient = webClient;
         this.restService = restService;
+        this.repository = repository;
     }
 
     public SecureExchange addStudentToExchange(UUID secureExchangeID, UUID studentID)  {
@@ -40,6 +40,9 @@ public class SecureExchangeStudentService {
         // get secure exchange
         // entity not found will fire if not found
         SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
+        if(secureExchange.getSecureExchangeStudents() == null){
+            secureExchange.setSecureExchangeStudents(new HashSet<>());
+        }
         SecureExchangeStudentEntity student = secureExchange.getSecureExchangeStudents()
                 .stream()
                 .filter(s -> studentID.equals(s.getStudentId()))
@@ -64,7 +67,7 @@ public class SecureExchangeStudentService {
         try {
             SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
             Set<SecureExchangeStudentEntity> students = secureExchange.getSecureExchangeStudents();
-            if(!students.isEmpty()){
+            if(students != null && !students.isEmpty()){
                 SecureExchangeStudentEntity student = students.stream()
                         .filter(s -> studentID.equals(s.getStudentId()))
                         .findAny()
