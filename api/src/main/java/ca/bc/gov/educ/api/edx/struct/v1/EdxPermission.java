@@ -15,8 +15,6 @@ public class EdxPermission extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
   String edxPermissionCode;
-  @Size(max = 30)
-  String permissionName;
   @Size(max = 255)
   String permissionDescription;
   @Size(max = 30)

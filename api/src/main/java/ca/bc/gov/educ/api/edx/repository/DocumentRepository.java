@@ -9,8 +9,8 @@ import java.util.UUID;
 
 @Repository
 public interface DocumentRepository extends JpaRepository<SecureExchangeDocumentEntity, UUID> {
-  List<SecureExchangeDocumentEntity> findBySecureExchangeSecureExchangeID(UUID secureExchangeId);
+  List<SecureExchangeDocumentEntity> findBySecureExchangeEntitySecureExchangeID(UUID secureExchangeId);
 
   // this query will only filter where document data is not null and file size greater than zero, so that system is not pulling a lot of records from db.
-  List<SecureExchangeDocumentEntity> findAllBySecureExchangeSecureExchangeStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(List<String> secureExchangeStatusCodes, int fileSize);
+  List<SecureExchangeDocumentEntity> findAllBySecureExchangeEntitySecureExchangeStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(List<String> secureExchangeStatusCodes, int fileSize);
 }

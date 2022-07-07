@@ -4,13 +4,11 @@ import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
@@ -100,4 +98,9 @@ public class SecureExchangeEntity {
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "secureExchangeEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = SecureExchangeCommentEntity.class)
   private Set<SecureExchangeCommentEntity> secureExchangeComment;
+
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
+  @OneToMany(mappedBy = "secureExchangeEntity", fetch = FetchType.LAZY, targetEntity = SecureExchangeDocumentEntity.class)
+  private Set<SecureExchangeDocumentEntity> secureExchangeDocument;
 }

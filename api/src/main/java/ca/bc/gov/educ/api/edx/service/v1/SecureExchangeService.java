@@ -152,7 +152,7 @@ public class SecureExchangeService {
   }
 
   private void deleteAssociatedDocumentsAndComments(final SecureExchangeEntity entity) {
-    val documents = this.getDocumentRepository().findBySecureExchangeSecureExchangeID(entity.getSecureExchangeID());
+    val documents = this.getDocumentRepository().findBySecureExchangeEntitySecureExchangeID(entity.getSecureExchangeID());
     if (documents != null && !documents.isEmpty()) {
       this.getDocumentRepository().deleteAll(documents);
     }

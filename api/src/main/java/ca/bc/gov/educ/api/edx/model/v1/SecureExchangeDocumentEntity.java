@@ -37,7 +37,7 @@ public class SecureExchangeDocumentEntity {
 
   @ManyToOne
   @JoinColumn(name = "SECURE_EXCHANGE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  SecureExchangeEntity secureExchange;
+  SecureExchangeEntity secureExchangeEntity;
 
   @NotNull(message = "documentTypeCode cannot be null")
   @Column(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE")

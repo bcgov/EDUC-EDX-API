@@ -98,7 +98,7 @@ public class DocumentBuilder {
         doc.setCreateDate(LocalDateTime.now());
         doc.setUpdateUser(this.updateUser);
         doc.setUpdateDate(LocalDateTime.now());
-        doc.setSecureExchange(this.secureExchange);
+        doc.setSecureExchangeEntity(this.secureExchange);
 
         return doc;
     }
