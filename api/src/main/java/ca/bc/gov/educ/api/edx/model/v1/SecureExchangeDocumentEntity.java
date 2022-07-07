@@ -47,7 +47,7 @@ public class SecureExchangeDocumentEntity {
   UUID edxUserID;
 
   @Column(name = "STAFF_USER_IDENTIFIER")
-  UUID staffUserIdentifier;
+  String staffUserIdentifier;
 
   @NotNull(message = "commentUserName cannot be null")
   @Column(name = "FILE_NAME")
