@@ -10,12 +10,10 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SecureExchange extends SecureExchangeBase implements Serializable {
+public class SecureExchangeCreate extends SecureExchangeBase implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  private List<SecureExchangeStudent> studentsList;
-
-  private List<SecureExchangeDocMetadata> documentList;
+  private List<SecureExchangeDocument> documentList;
 }
 
 

@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStatusCodeTableRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeBase;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class SecureExchangePayloadValidator {
     this.secureExchangeStatusCodeTableRepository = secureExchangeStatusCodeTableRepository;
   }
 
-  public List<FieldError> validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
+  public List<FieldError> validatePayload(SecureExchangeBase secureExchange, boolean isCreateOperation) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (isCreateOperation && secureExchange.getSecureExchangeID() != null) {
       apiValidationErrors.add(createFieldError("secureExchangeID", secureExchange.getSecureExchangeID(), "secureExchangeID should be null for post operation."));
