@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.endpoint.v1;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeContactTypeCode;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStatusCode;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -54,7 +55,7 @@ public interface SecureExchangeEndpoint {
   /**
    * Create secure exchange request.
    *
-   * @param secureExchange Secure Exchange
+   * @param secureExchangeCreate Secure Exchange
    * @return the Secure Exchange request
    */
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
@@ -62,7 +63,7 @@ public interface SecureExchangeEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "200", description = "OK")})
   @ResponseStatus(CREATED)
   @Transactional
-  SecureExchange createSecureExchange(@Validated @RequestBody SecureExchange secureExchange);
+  SecureExchange createSecureExchange(@Validated @RequestBody SecureExchangeCreate secureExchangeCreate);
 
   /**
    * Update Secure Exchange request.

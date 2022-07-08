@@ -73,10 +73,10 @@ public class SecureExchangeController extends BaseController implements SecureEx
   }
 
   @Override
-  public SecureExchange createSecureExchange(SecureExchange secureExchange) {
-    validatePayload(secureExchange, true);
-    setAuditColumns(secureExchange);
-    return mapper.toStructure(getService().createSecureExchange(mapper.toModel(secureExchange)));
+  public SecureExchange createSecureExchange(SecureExchangeCreate secureExchangeCreate) {
+    validatePayload(secureExchangeCreate, true);
+    setAuditColumns(secureExchangeCreate);
+    return mapper.toStructure(getService().createSecureExchange(mapper.toModel(secureExchangeCreate)));
   }
 
   @Override
@@ -98,7 +98,7 @@ public class SecureExchangeController extends BaseController implements SecureEx
     return secureExchangeContactTypeCode;
   }
 
-  private void validatePayload(SecureExchange secureExchange, boolean isCreateOperation) {
+  private void validatePayload(SecureExchangeBase secureExchange, boolean isCreateOperation) {
     val validationResult = getPayloadValidator().validatePayload(secureExchange, isCreateOperation);
     if (!validationResult.isEmpty()) {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Payload contains invalid data.").status(BAD_REQUEST).build();
