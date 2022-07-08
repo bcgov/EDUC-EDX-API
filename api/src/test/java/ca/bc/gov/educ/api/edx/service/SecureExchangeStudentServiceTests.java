@@ -1,22 +1,22 @@
 package ca.bc.gov.educ.api.edx.service;
 
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
-import ca.bc.gov.educ.api.edx.exception.NotFoundException;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
-import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
-import org.junit.Assert;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.fail;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -30,6 +30,8 @@ public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest
 
     @Autowired
     SecureExchangeRequestRepository secureExchangeRequestRepository;
+    @Autowired
+    SecureExchangeStudentRepository secureExchangeStudentRepository;
     private static final String LEGIT_STUDENT_ID = "ac339d70-7649-1a2e-8176-49fbef5e0059";
 
 
@@ -51,12 +53,15 @@ public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest
         Set<SecureExchangeStudentEntity> students = entity.getSecureExchangeStudents();
         assertThat(students).hasSize(1);
         SecureExchangeStudentEntity student = students.stream()
-                .filter(s -> s.getStudentId().equals(LEGIT_STUDENT_ID))
+                .filter(s -> s.getStudentId().equals(UUID.fromString(LEGIT_STUDENT_ID)))
                 .findAny()
                 .orElse(null);
+        if(student == null){
+            fail("Student not found");
+        }
         this.secureExchangeStudentService.deleteStudentFromExchange(student.getSecureExchangeStudentId());
-        entity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).orElse(null);
-        assertThat(entity.getSecureExchangeStudents()).hasSize(0);
+        SecureExchangeStudentEntity studentThatShouldBeNull = secureExchangeStudentRepository.findById(student.getSecureExchangeStudentId()).orElse(null);
+        MatcherAssert.assertThat(studentThatShouldBeNull, equalTo(null));
     }
 
     @Test

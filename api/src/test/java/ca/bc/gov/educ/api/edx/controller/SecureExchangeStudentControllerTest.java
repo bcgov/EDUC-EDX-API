@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
-import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeStudentController;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
@@ -37,8 +36,6 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
-    private SecureExchangeStudentController secureExchangeStudentController;
     @Autowired
     SecureExchangeRequestRepository secureExchangeRequestRepository;
     @Autowired
