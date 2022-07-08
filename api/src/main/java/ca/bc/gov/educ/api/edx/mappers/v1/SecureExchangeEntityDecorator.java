@@ -118,6 +118,8 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         newDocument.setFileName(document.getFileName());
         newDocument.setFileSize(document.getFileSize());
 
+        newDocument.setDocumentTypeCode(document.getDocumentTypeCode());
+
         if(StringUtils.isNotBlank(document.getEdxUserID())) {
           newDocument.setEdxUserID(UUID.fromString(document.getEdxUserID()));
         }
