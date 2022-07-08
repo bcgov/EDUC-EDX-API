@@ -31,6 +31,10 @@ public class SecureExchangeDocMetadata implements Serializable {
   @NotNull(message = "fileSize cannot be null")
   private Integer fileSize;
 
+  private String edxUserID;
+
+  private String staffUserIdentifier;
+
   @Null(message = "Create Date Should be null")
   private String createDate;
 }
