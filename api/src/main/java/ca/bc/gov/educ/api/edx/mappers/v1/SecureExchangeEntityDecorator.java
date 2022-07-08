@@ -116,13 +116,16 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
       for(val student : students){
         SecureExchangeStudentEntity secureExchangeStudentEntity = new SecureExchangeStudentEntity();
         secureExchangeStudentEntity.setSecureExchangeEntity(postedEntity);
-        secureExchangeStudentEntity.setSecureExchangeStudentId(uUIDMapper.map(student.getSecureExchangeStudentId()));
+        if(!StringUtils.isBlank(student.getSecureExchangeStudentId())){
+          secureExchangeStudentEntity.setSecureExchangeStudentId(uUIDMapper.map(student.getSecureExchangeStudentId()));
+        }
         secureExchangeStudentEntity.setCreateUser(
                 (StringUtils.isBlank(student.getCreateUser())) ? ApplicationProperties.CLIENT_ID : student.getCreateUser()
         );
         secureExchangeStudentEntity.setCreateDate(
                 (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : localDateTimeMapper.map(student.getCreateDate())
         );
+        secureExchangeStudentEntity.setStudentId(uUIDMapper.map(student.getStudentId()));
         postedEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
       }
     }

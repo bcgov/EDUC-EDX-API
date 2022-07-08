@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest
     @Transactional
     public void testAddStudentToExchange() {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(createSecureExchange());
-        this.secureExchangeStudentService.addStudentToExchange(entity.getSecureExchangeID(), UUID.fromString(LEGIT_STUDENT_ID));
+        this.secureExchangeStudentService.addStudentToExchange(entity.getSecureExchangeID(), createSecureExchangeStudent(LEGIT_STUDENT_ID));
         entity = this.secureExchangeRequestRepository.findById(entity.getSecureExchangeID()).orElse(null);
         assertThat(entity.getSecureExchangeStudents()).hasSize(1);
     }
@@ -82,6 +83,12 @@ public class SecureExchangeStudentServiceTests extends BaseSecureExchangeAPITest
         student.setCreateDate(LocalDateTime.now());
         secureExchange.getSecureExchangeStudents().add(student);
         return secureExchange;
+    }
+
+    private SecureExchangeStudent createSecureExchangeStudent(String studentId){
+        SecureExchangeStudent student = new SecureExchangeStudent();
+        student.setStudentId(studentId);
+        return student;
     }
 
 }

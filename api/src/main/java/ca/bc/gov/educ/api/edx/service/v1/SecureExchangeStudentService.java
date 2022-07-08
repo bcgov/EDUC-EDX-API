@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStudentMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
@@ -25,7 +26,8 @@ public class SecureExchangeStudentService {
     private final SecureExchangeService exchangeService;
 
     private RESTService restService;
-    private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
+    private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
+    private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
 
     @Autowired
@@ -35,34 +37,33 @@ public class SecureExchangeStudentService {
         this.repository = repository;
     }
 
-    public SecureExchange addStudentToExchange(UUID secureExchangeID, UUID studentID)  {
+    public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent)  {
         // not found exception handler will fire if student not found
-        restService.get("https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/" + studentID, String.class);
-        // get secure exchange
+        restService.get("https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/" + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found
-        SecureExchangeEntity secureExchange = this.exchangeService.retrieveSecureExchange(secureExchangeID);
-        // TODO check repo for exchange student with studentID and secureExchangeID
+        SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
 
-        if(secureExchange.getSecureExchangeStudents() == null){
-            secureExchange.setSecureExchangeStudents(new HashSet<>());
+        if(secureExchangeEntity.getSecureExchangeStudents() == null){
+            secureExchangeEntity.setSecureExchangeStudents(new HashSet<>());
         }
-        SecureExchangeStudentEntity student = secureExchange.getSecureExchangeStudents()
+        SecureExchangeStudentEntity student = secureExchangeEntity.getSecureExchangeStudents()
                 .stream()
-                .filter(s -> studentID.equals(s.getStudentId()))
+                .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
                 .findAny()
                 .orElse(null);
         if(student != null){
             // do nothing, student exists
         } else {
-            student = new SecureExchangeStudentEntity();
-            student.setSecureExchangeEntity(secureExchange);
-            student.setStudentId(studentID);
-            student.setCreateUser(ApplicationProperties.CLIENT_ID);
-            student.setCreateDate(LocalDateTime.now());
-            secureExchange.getSecureExchangeStudents().add(student);
-            this.exchangeService.updateSecureExchange(secureExchange);
+            SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
+            secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
+            if(secureExchangeStudentEntity.getCreateUser() == null){
+                secureExchangeStudentEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
+            }
+            secureExchangeStudentEntity.setCreateDate(LocalDateTime.now());
+            secureExchangeEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
+            secureExchangeEntity = this.exchangeService.updateSecureExchange(secureExchangeEntity);
         }
-        return mapper.toStructure(secureExchange);
+        return secureExchangeMapper.toStructure(secureExchangeEntity);
     }
 
     public void deleteStudentFromExchange(UUID secureExchangeStudentId) {
@@ -73,7 +74,7 @@ public class SecureExchangeStudentService {
 
     public List<SecureExchangeStudent> getStudentIDsFromExchange(UUID secureExchangeID) throws EntityNotFoundException {
         SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
-        SecureExchange secureExchange = mapper.toStructure(secureExchangeEntity);
+        SecureExchange secureExchange = secureExchangeMapper.toStructure(secureExchangeEntity);
         return secureExchange.getStudentsList();
     }
 }

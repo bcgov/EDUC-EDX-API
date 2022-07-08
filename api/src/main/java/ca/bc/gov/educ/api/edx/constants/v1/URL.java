@@ -8,7 +8,7 @@ public final class URL {
   public static final String SECURE_EXCHANGE_ID_COMMENTS = "/{secureExchangeId}/comments";
   public static final String SECURE_EXCHANGE_ID_DOCUMENTS = "/{secureExchangeID}/documents";
 
-  public static final String SECURE_EXCHANGE_ID_STUDENTS = "/{secureExchangeID}/students";
+  public static final String SECURE_EXCHANGE_ID_STUDENTS = "/{secureExchangeId}/students";
   public static final String ALL_DOCUMENTS = "/documents";
   public static final String DOCUMENT_ID = "/{documentID}";
   public static final String DOCUMENT_TYPES = "/document-types";

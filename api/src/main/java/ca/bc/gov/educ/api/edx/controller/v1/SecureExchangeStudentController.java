@@ -26,17 +26,18 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
     }
 
     @Override
-    public SecureExchange addStudent(String studentId, String secureExchangeID) {
-        return studentService.addStudentToExchange(UUID.fromString(secureExchangeID), UUID.fromString(studentId));
+    public SecureExchange addStudent(String secureExchangeId, SecureExchangeStudent secureExchangeStudent) {
+        return studentService.addStudentToExchange(UUID.fromString(secureExchangeId), secureExchangeStudent);
     }
 
     @Override
-    public void deleteStudent(String studentId, String secureExchangeID) {
-        studentService.deleteStudentFromExchange(UUID.fromString(secureExchangeID), UUID.fromString(studentId));
+    public List<SecureExchangeStudent> getStudents(String secureExchangeId) {
+        return studentService.getStudentIDsFromExchange(UUID.fromString(secureExchangeId));
     }
 
     @Override
-    public List<SecureExchangeStudent> getStudents(String secureExchangeID) {
-        return studentService.getStudentIDsFromExchange(UUID.fromString(secureExchangeID));
+    public void deleteStudent(String secureExchangeStudentId, String secureExchangeId) {
+        studentService.deleteStudentFromExchange(UUID.fromString(secureExchangeStudentId));
     }
+
 }
