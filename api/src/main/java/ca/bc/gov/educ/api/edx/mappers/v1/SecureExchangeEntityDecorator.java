@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,6 +70,26 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
       }
     }
 
+    var documents = entity.getSecureExchangeDocument();
+
+    if(documents != null && !documents.isEmpty()) {
+      secureExchange.setDocumentList(new ArrayList<>());
+
+      for (val document : documents) {
+        SecureExchangeDocMetadata doc = new SecureExchangeDocMetadata();
+        doc.setDocumentTypeCode(document.getDocumentTypeCode());
+        doc.setDocumentID(document.getDocumentID().toString());
+        doc.setFileExtension(document.getFileExtension());
+        doc.setFileSize(document.getFileSize());
+        doc.setFileName(document.getFileName());
+        if(document.getEdxUserID() != null) {
+          doc.setEdxUserID(document.getEdxUserID().toString());
+        }
+        doc.setStaffUserIdentifier(document.getStaffUserIdentifier());
+        doc.setCreateDate(document.getCreateDate().toString());
+        secureExchange.getDocumentList().add(doc);
+      }
+    }
     return secureExchange;
   }
 

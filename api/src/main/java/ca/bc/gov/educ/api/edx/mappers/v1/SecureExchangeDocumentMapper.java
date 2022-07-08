@@ -19,12 +19,12 @@ public interface SecureExchangeDocumentMapper {
 
   SecureExchangeDocument toStructure(SecureExchangeDocumentEntity entity);
 
-  @Mapping(target = "secureExchange", ignore = true)
+  @Mapping(target = "secureExchangeEntity", ignore = true)
   SecureExchangeDocumentEntity toModel(SecureExchangeDocument struct);
 
   SecureExchangeDocMetadata toMetadataStructure(SecureExchangeDocumentEntity entity);
 
   @Mapping(target = "edxUserID", source = "edxUserID")
-  @Mapping(target = "secureExchangeID", source = "secureExchange.secureExchangeID")
+  @Mapping(target = "secureExchangeID", source = "secureExchangeEntity.secureExchangeID")
   SecureExchangeDocumentMetadata toMetaData(SecureExchangeDocumentEntity entity);
 }

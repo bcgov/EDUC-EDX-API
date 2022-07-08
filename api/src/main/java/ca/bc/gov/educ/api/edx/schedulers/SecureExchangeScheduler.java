@@ -33,10 +33,10 @@ public class SecureExchangeScheduler {
   public void removeBlobContentsFromUploadedDocuments() {
     val dateTimeToCompare = LocalDateTime.now().minusHours(24);
     LockAssert.assertLocked();
-    val records = this.documentRepository.findAllBySecureExchangeSecureExchangeStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(SecureExchangeStatusCode.CLOSED.toString()), 0);
+    val records = this.documentRepository.findAllBySecureExchangeEntitySecureExchangeStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(SecureExchangeStatusCode.CLOSED.toString()), 0);
     if (!records.isEmpty()) {
       for (val document : records) {
-        if(document.getSecureExchange().getStatusUpdateDate().isBefore(dateTimeToCompare)){
+        if(document.getSecureExchangeEntity().getStatusUpdateDate().isBefore(dateTimeToCompare)){
           document.setDocumentData(null); // empty the document data.
           document.setFileSize(0);
         }

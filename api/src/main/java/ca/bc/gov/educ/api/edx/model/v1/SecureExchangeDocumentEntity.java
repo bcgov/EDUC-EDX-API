@@ -11,6 +11,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.hibernate.annotations.Type;
 
 @Getter
 @Setter
@@ -36,7 +37,7 @@ public class SecureExchangeDocumentEntity {
 
   @ManyToOne
   @JoinColumn(name = "SECURE_EXCHANGE_ID", updatable = false, columnDefinition = "BINARY(16)")
-  SecureExchangeEntity secureExchange;
+  SecureExchangeEntity secureExchangeEntity;
 
   @NotNull(message = "documentTypeCode cannot be null")
   @Column(name = "SECURE_EXCHANGE_DOCUMENT_TYPE_CODE")
@@ -78,6 +79,7 @@ public class SecureExchangeDocumentEntity {
 
   @Basic(fetch = FetchType.LAZY)
   @Lob
+  @Type(type = "org.hibernate.type.BinaryType")
   @Column(name = "DOCUMENT_DATA")
   byte[] documentData;
 }

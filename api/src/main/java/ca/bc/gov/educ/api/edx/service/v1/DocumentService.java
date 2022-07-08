@@ -61,7 +61,7 @@ public class DocumentService {
 
     val document = result.get();
 
-    if (!document.getSecureExchange().getSecureExchangeID().equals(secureExchangeId)) {
+    if (!document.getSecureExchangeEntity().getSecureExchangeID().equals(secureExchangeId)) {
       throw new EntityNotFoundException(SecureExchangeDocumentEntity.class, SECURE_EXCHANGE_ID, secureExchangeId.toString());
     }
 
@@ -94,11 +94,9 @@ public class DocumentService {
 
   /**
    * Search for all document metadata by secureExchangeId
-   *
-   * @return {@link List< SecureExchangeDocumentEntity > }
    */
   public List<SecureExchangeDocumentEntity> retrieveAllDocumentMetadata(final UUID secureExchangeId) {
-    return this.documentRepository.findBySecureExchangeSecureExchangeID(secureExchangeId);
+    return this.documentRepository.findBySecureExchangeEntitySecureExchangeID(secureExchangeId);
   }
 
   public List<SecureExchangeDocumentEntity> retrieveAllDocumentsMetadata(){
@@ -117,7 +115,7 @@ public class DocumentService {
     val option = this.secureExchangeRequestRepository.findById(secureExchangeId);
     if (option.isPresent()) {
       val secureExchange = option.get();
-      document.setSecureExchange(secureExchange);
+      document.setSecureExchangeEntity(secureExchange);
       return this.documentRepository.save(document);
     } else {
       throw new EntityNotFoundException(SecureExchange.class, SECURE_EXCHANGE_ID, secureExchangeId.toString());
@@ -166,7 +164,7 @@ public class DocumentService {
     final Optional<SecureExchangeDocumentEntity> documentEntityOptional = this.documentRepository.findById(documentId);
     if (documentEntityOptional.isPresent()) {
       val documentEntity = documentEntityOptional.get();
-      val secureExchangeEntity = documentEntity.getSecureExchange();
+      val secureExchangeEntity = documentEntity.getSecureExchangeEntity();
       if (!secureExchangeEntity.getSecureExchangeID().equals(secureExchangeId)) {
         throw new EntityNotFoundException(SecureExchange.class, SECURE_EXCHANGE_ID, secureExchangeId.toString());
       }

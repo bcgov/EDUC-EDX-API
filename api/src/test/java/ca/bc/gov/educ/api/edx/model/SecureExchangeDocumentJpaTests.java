@@ -4,6 +4,7 @@ package ca.bc.gov.educ.api.edx.model;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
+import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.junit.Before;
@@ -27,6 +28,9 @@ public class SecureExchangeDocumentJpaTests {
 
     @Autowired
     private DocumentRepository repository;
+
+    @Autowired
+    private SecureExchangeRequestRepository secureExchangeRequestRepository;
 
     private SecureExchangeDocumentEntity document;
 
@@ -61,7 +65,7 @@ public class SecureExchangeDocumentJpaTests {
                                         .withSecureExchange(this.secureExchange).build();
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
         assertThat(savedDocument.getDocumentID()).isNotEqualTo(this.document.getDocumentID());
-        assertThat(savedDocument.getSecureExchange()).isNotNull();
+        assertThat(savedDocument.getSecureExchangeEntity()).isNotNull();
 
         assertThat(this.repository.findById(savedDocument.getDocumentID())).isPresent();
     }
@@ -74,7 +78,7 @@ public class SecureExchangeDocumentJpaTests {
         SecureExchangeDocumentEntity savedDocument = this.repository.save(myDocument);
         assertThat(savedDocument.getDocumentID()).isNotEqualTo(this.document.getDocumentID());
 
-        assertThat(this.repository.findBySecureExchangeSecureExchangeID(this.secureExchange.getSecureExchangeID())).hasSize(2);
+        assertThat(this.repository.findBySecureExchangeEntitySecureExchangeID(this.secureExchange.getSecureExchangeID())).hasSize(2);
     }
 
     @Test

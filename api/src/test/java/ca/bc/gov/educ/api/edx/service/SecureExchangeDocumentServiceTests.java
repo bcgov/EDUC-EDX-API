@@ -67,7 +67,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
     assertThat(document).isNotNull();
     assertThat(document.getDocumentID()).isNotNull();
-    assertThat(document.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
+    assertThat(document.getSecureExchangeEntity().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
 
   @Test
@@ -76,7 +76,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
 
-    assertThat(retrievedDocument.getSecureExchange().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
+    assertThat(retrievedDocument.getSecureExchangeEntity().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
   }
 
   @Test

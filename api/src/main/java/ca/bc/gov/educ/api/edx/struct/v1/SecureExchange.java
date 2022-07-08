@@ -45,6 +45,7 @@ public class SecureExchange extends BaseRequest implements Serializable {
 
   private List<SecureExchangeStudent> studentsList;
 
+  private List<SecureExchangeDocMetadata> documentList;
 }
 
 
