@@ -26,20 +26,22 @@ public class SecureExchangeStudentService {
     private final SecureExchangeService exchangeService;
 
     private RESTService restService;
+    private ApplicationProperties applicationProperties;
     private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
     private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
 
     @Autowired
-    public SecureExchangeStudentService(SecureExchangeService exchangeService, RESTService restService, SecureExchangeStudentRepository repository) {
+    public SecureExchangeStudentService(SecureExchangeService exchangeService, RESTService restService, ApplicationProperties applicationProperties, SecureExchangeStudentRepository repository) {
         this.exchangeService = exchangeService;
         this.restService = restService;
+        this.applicationProperties = applicationProperties;
         this.repository = repository;
     }
 
     public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent)  {
         // not found exception handler will fire if student not found
-        restService.get("https://student-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/student/" + secureExchangeStudent.getStudentId(), String.class);
+        restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found
         SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
 
