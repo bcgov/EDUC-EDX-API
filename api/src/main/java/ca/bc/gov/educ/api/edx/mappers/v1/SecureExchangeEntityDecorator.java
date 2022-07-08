@@ -1,10 +1,13 @@
 package ca.bc.gov.educ.api.edx.mappers.v1;
 
+import ca.bc.gov.educ.api.edx.mappers.Base64Mapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
@@ -12,10 +15,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
 
 public abstract class SecureExchangeEntityDecorator implements SecureExchangeEntityMapper {
   private final SecureExchangeEntityMapper delegate;
+
+  private final Base64Mapper base64Mapper = new Base64Mapper();
 
   protected SecureExchangeEntityDecorator(final SecureExchangeEntityMapper delegate) {
     this.delegate = delegate;
@@ -78,6 +84,57 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
 
     var comments = struct.getCommentsList();
 
+    setupComments(comments, postedEntity);
+    return postedEntity;
+  }
+
+  @Override
+  public SecureExchangeEntity toModel(SecureExchangeCreate struct) {
+    val postedEntity = this.delegate.toModel(struct);
+
+    var comments = struct.getCommentsList();
+
+    setupComments(comments, postedEntity);
+
+    var documents = struct.getDocumentList();
+
+    if(documents != null && !documents.isEmpty()) {
+      postedEntity.setSecureExchangeDocument(new HashSet<>());
+
+      for (val document : documents) {
+        SecureExchangeDocumentEntity newDocument = new SecureExchangeDocumentEntity();
+        newDocument.setStaffUserIdentifier(document.getStaffUserIdentifier());
+        newDocument.setDocumentData(base64Mapper.map(document.getDocumentData()));
+
+        newDocument.setSecureExchangeEntity(postedEntity);
+
+        newDocument.setCreateDate(LocalDateTime.now());
+        newDocument.setUpdateDate(LocalDateTime.now());
+
+        newDocument.setUpdateUser(document.getUpdateUser());
+        newDocument.setCreateUser(document.getCreateUser());
+
+        newDocument.setFileExtension(document.getFileExtension());
+        newDocument.setFileName(document.getFileName());
+        newDocument.setFileSize(document.getFileSize());
+
+        if(StringUtils.isNotBlank(document.getEdxUserID())) {
+          newDocument.setEdxUserID(UUID.fromString(document.getEdxUserID()));
+        }
+
+        if (StringUtils.isBlank(document.getCreateUser())) {
+          newDocument.setCreateUser(ApplicationProperties.CLIENT_ID);
+        }
+        if (StringUtils.isBlank(document.getUpdateUser())) {
+          newDocument.setUpdateUser(ApplicationProperties.CLIENT_ID);
+        }
+        postedEntity.getSecureExchangeDocument().add(newDocument);
+      }
+    }
+    return postedEntity;
+  }
+
+  private void setupComments(List<SecureExchangeComment> comments, SecureExchangeEntity postedEntity){
     if(comments != null && !comments.isEmpty()) {
       postedEntity.setSecureExchangeComment(new HashSet<>());
 
@@ -108,7 +165,6 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         postedEntity.getSecureExchangeComment().add(newComment);
       }
     }
-    return postedEntity;
   }
 
 }

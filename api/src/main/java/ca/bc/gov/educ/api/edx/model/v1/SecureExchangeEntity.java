@@ -101,6 +101,6 @@ public class SecureExchangeEntity {
 
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
-  @OneToMany(mappedBy = "secureExchangeEntity", fetch = FetchType.LAZY, targetEntity = SecureExchangeDocumentEntity.class)
+  @OneToMany(mappedBy = "secureExchangeEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SecureExchangeDocumentEntity.class)
   private Set<SecureExchangeDocumentEntity> secureExchangeDocument;
 }

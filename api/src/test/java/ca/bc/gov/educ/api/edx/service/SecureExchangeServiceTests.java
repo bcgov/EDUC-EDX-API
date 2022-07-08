@@ -4,10 +4,12 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.repository.MinistryOwnershipTeamRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeContactTypeCodeTableRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
+import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hibernate.Hibernate;
 import org.junit.After;
@@ -64,6 +66,34 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
     var savedExchange = this.service.createSecureExchange(secureExchange);
     assertThat(savedExchange).isNotNull();
     assertThat(savedExchange.getSecureExchangeComment()).hasSize(1);
+
+    var pulledExchange = secureExchangeRequestRepository.findById(savedExchange.getSecureExchangeID());
+    assertThat(pulledExchange.get()).isNotNull();
+    Hibernate.initialize(pulledExchange.get());
+  }
+
+  @Test
+  @Transactional
+  public void createSecureExchangeWithDocuments() {
+    var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
+    var secureExchange = new SecureExchangeBuilder()
+      .withoutSecureExchangeID().build();
+    secureExchange.setMinistryOwnershipTeamID(ministryTeam.getMinistryOwnershipTeamId());
+    var comment = getSecureExchangeCommentEntity();
+    comment.setSecureExchangeEntity(secureExchange);
+    secureExchange.setSecureExchangeComment(new HashSet<>());
+    secureExchange.getSecureExchangeComment().add(comment);
+
+    SecureExchangeDocumentEntity myDocument = new DocumentBuilder()
+      .withoutDocumentID()
+      .withSecureExchange(secureExchange).build();
+    secureExchange.setSecureExchangeDocument(new HashSet<>());
+    secureExchange.getSecureExchangeDocument().add(myDocument);
+
+    var savedExchange = this.service.createSecureExchange(secureExchange);
+    assertThat(savedExchange).isNotNull();
+    assertThat(savedExchange.getSecureExchangeComment()).hasSize(1);
+    assertThat(savedExchange.getSecureExchangeDocument()).hasSize(1);
 
     var pulledExchange = secureExchangeRequestRepository.findById(savedExchange.getSecureExchangeID());
     assertThat(pulledExchange.get()).isNotNull();
