@@ -1,12 +1,16 @@
 package ca.bc.gov.educ.api.edx.mappers.v1;
 
+import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
+import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.mappers.Base64Mapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocMetadata;
 import lombok.val;
@@ -20,7 +24,8 @@ import java.util.UUID;
 
 public abstract class SecureExchangeEntityDecorator implements SecureExchangeEntityMapper {
   private final SecureExchangeEntityMapper delegate;
-
+  private final UUIDMapper uUIDMapper = new UUIDMapper();
+  private final LocalDateTimeMapper localDateTimeMapper = new LocalDateTimeMapper();
   private final Base64Mapper base64Mapper = new Base64Mapper();
 
   protected SecureExchangeEntityDecorator(final SecureExchangeEntityMapper delegate) {
@@ -55,6 +60,20 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
       }
     }
 
+    var students = entity.getSecureExchangeStudents();
+    if(students != null && !students.isEmpty()){
+      secureExchange.setStudentsList(new ArrayList<>());
+      for (val student : students) {
+        SecureExchangeStudent secureExchangeStudent = new SecureExchangeStudent();
+        secureExchangeStudent.setSecureExchangeId(entity.getSecureExchangeID().toString());
+        secureExchangeStudent.setSecureExchangeStudentId(student.getSecureExchangeStudentId().toString());
+        secureExchangeStudent.setStudentId(student.getStudentId().toString());
+        secureExchangeStudent.setCreateUser(student.getCreateUser());
+        secureExchangeStudent.setCreateDate(student.getCreateDate().toString());
+        secureExchange.getStudentsList().add(secureExchangeStudent);
+      }
+    }
+
     var documents = entity.getSecureExchangeDocument();
 
     if(documents != null && !documents.isEmpty()) {
@@ -85,7 +104,29 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
     var comments = struct.getCommentsList();
 
     setupComments(comments, postedEntity);
+    setupStudents(struct.getStudentsList(), postedEntity);
     return postedEntity;
+  }
+
+  private void setupStudents(List<SecureExchangeStudent> studentsList, SecureExchangeEntity postedEntity) {
+    if(studentsList != null && !studentsList.isEmpty()) {
+      postedEntity.setSecureExchangeStudents(new HashSet<>());
+      for(val student : studentsList){
+        SecureExchangeStudentEntity secureExchangeStudentEntity = new SecureExchangeStudentEntity();
+        secureExchangeStudentEntity.setSecureExchangeEntity(postedEntity);
+        if(!StringUtils.isBlank(student.getSecureExchangeStudentId())){
+          secureExchangeStudentEntity.setSecureExchangeStudentId(uUIDMapper.map(student.getSecureExchangeStudentId()));
+        }
+        secureExchangeStudentEntity.setCreateUser(
+                (StringUtils.isBlank(student.getCreateUser())) ? ApplicationProperties.CLIENT_ID : student.getCreateUser()
+        );
+        secureExchangeStudentEntity.setCreateDate(
+                (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : localDateTimeMapper.map(student.getCreateDate())
+        );
+        secureExchangeStudentEntity.setStudentId(uUIDMapper.map(student.getStudentId()));
+        postedEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
+      }
+    }
   }
 
   @Override
@@ -133,6 +174,7 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         postedEntity.getSecureExchangeDocument().add(newDocument);
       }
     }
+
     return postedEntity;
   }
 
@@ -167,6 +209,7 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         postedEntity.getSecureExchangeComment().add(newComment);
       }
     }
+
   }
 
 }

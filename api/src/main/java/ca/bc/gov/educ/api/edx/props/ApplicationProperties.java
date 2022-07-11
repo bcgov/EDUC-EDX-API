@@ -52,4 +52,6 @@ public class ApplicationProperties {
   private String edxSchoolUserActivationInviteAppendUrl;
   @Value("${edx.school.user.activation.invite.validity.hours}")
   private Long edxSchoolUserActivationInviteValidity;
+  @Value("${apis.endpoints.student.api}")
+  private String studentApiEndpoint;
 }

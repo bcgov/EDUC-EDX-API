@@ -13,6 +13,8 @@ import java.util.List;
 public class SecureExchange extends SecureExchangeBase implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
+  private List<SecureExchangeStudent> studentsList;
+
   private List<SecureExchangeDocMetadata> documentList;
 }
 
