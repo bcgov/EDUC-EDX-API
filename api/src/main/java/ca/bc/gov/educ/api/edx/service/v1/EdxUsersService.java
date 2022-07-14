@@ -212,7 +212,7 @@ public class EdxUsersService {
     val activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
     if (activationCodes.size() == 2) {
       activationCodes.forEach(activationCode -> {
-        if (activationCode.getExpiryDate().isBefore(LocalDateTime.now())) {
+        if (activationCode.getExpiryDate() != null && activationCode.getExpiryDate().isBefore(LocalDateTime.now())) {
           ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This Activation Code has expired").status(BAD_REQUEST).build();
           throw new InvalidPayloadException(error);
         }
