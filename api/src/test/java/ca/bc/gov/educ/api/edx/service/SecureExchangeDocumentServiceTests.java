@@ -71,6 +71,36 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
+  public void createValidDocumentCheckUnreadStatusExchangeContactTest() {
+    SecureExchangeDocumentEntity document = new DocumentBuilder()
+      .withoutDocumentID()
+      .build();
+    document = this.service.createDocument(this.secureExchangeID, document);
+
+    assertThat(document).isNotNull();
+    assertThat(document.getDocumentID()).isNotNull();
+    assertThat(document.getSecureExchangeEntity().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
+    assertThat(document.getSecureExchangeEntity().getIsReadByExchangeContact()).isTrue();
+    assertThat(document.getSecureExchangeEntity().getIsReadByMinistry()).isFalse();
+  }
+
+  @Test
+  public void createValidDocumentCheckUnreadStatusMinContactTest() {
+    SecureExchangeDocumentEntity document = new DocumentBuilder()
+      .withoutDocumentID()
+      .build();
+    document.setEdxUserID(null);
+    document.setStaffUserIdentifier("BILLY");
+    document = this.service.createDocument(this.secureExchangeID, document);
+
+    assertThat(document).isNotNull();
+    assertThat(document.getDocumentID()).isNotNull();
+    assertThat(document.getSecureExchangeEntity().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
+    assertThat(document.getSecureExchangeEntity().getIsReadByExchangeContact()).isTrue();
+    assertThat(document.getSecureExchangeEntity().getIsReadByMinistry()).isFalse();
+  }
+
+  @Test
   public void retrieveDocumentMetadataTest() {
     final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.secureExchangeID, this.bcscPhoto.getDocumentID());
     assertThat(retrievedDocument).isNotNull();
