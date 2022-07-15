@@ -96,8 +96,8 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
     assertThat(document).isNotNull();
     assertThat(document.getDocumentID()).isNotNull();
     assertThat(document.getSecureExchangeEntity().getSecureExchangeID()).isEqualTo(this.secureExchangeID);
-    assertThat(document.getSecureExchangeEntity().getIsReadByExchangeContact()).isTrue();
-    assertThat(document.getSecureExchangeEntity().getIsReadByMinistry()).isFalse();
+    assertThat(document.getSecureExchangeEntity().getIsReadByExchangeContact()).isFalse();
+    assertThat(document.getSecureExchangeEntity().getIsReadByMinistry()).isTrue();
   }
 
   @Test
