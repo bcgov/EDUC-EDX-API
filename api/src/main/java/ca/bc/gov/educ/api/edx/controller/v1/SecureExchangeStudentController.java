@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.edx.controller.v1;
 import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeStudentEndpoint;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.NotFoundException;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
