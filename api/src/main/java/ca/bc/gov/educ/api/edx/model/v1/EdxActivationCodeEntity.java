@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
+import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,12 +77,15 @@ public class EdxActivationCodeEntity {
   private Set<EdxActivationRoleEntity> edxActivationRoleEntities;
 
   @Column(name = "FIRST_NAME")
+  @UpperCase
   String firstName;
 
   @Column(name = "LAST_NAME")
+  @UpperCase
   String lastName;
 
   @Column(name = "EMAIL")
+  @UpperCase
   String email;
 
   @Column(name = "VALIDATION_CODE", columnDefinition = "BINARY(16)")

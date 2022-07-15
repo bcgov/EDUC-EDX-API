@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
+import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -31,9 +32,11 @@ public class EdxUserEntity {
   UUID digitalIdentityID;
 
   @Column(name = "FIRST_NAME")
+  @UpperCase
   String firstName;
 
   @Column(name = "LAST_NAME")
+  @UpperCase
   String lastName;
 
   @Column(name = "CREATE_USER", updatable = false)
@@ -61,6 +64,7 @@ public class EdxUserEntity {
   private Set<EdxUserDistrictEntity> edxUserDistrictEntities;
 
   @Column(name = "EMAIL")
+  @UpperCase
   String email;
 
   public Set<EdxUserDistrictEntity> getEdxUserDistrictEntities() {
