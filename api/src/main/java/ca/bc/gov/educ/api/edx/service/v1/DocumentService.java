@@ -115,6 +115,19 @@ public class DocumentService {
     val option = this.secureExchangeRequestRepository.findById(secureExchangeId);
     if (option.isPresent()) {
       val secureExchange = option.get();
+
+      if ( document.getEdxUserID() == null && document.getStaffUserIdentifier() != null) {
+        // EdxUserID doesn't exists implies call is from Ministry Side
+        secureExchange.setIsReadByExchangeContact(false);
+        secureExchange.setIsReadByMinistry(true);
+      } else {
+        // EdxUserID exists implies call is from School Side
+        secureExchange.setIsReadByMinistry(false);
+        secureExchange.setIsReadByExchangeContact(true);
+      }
+
+      this.secureExchangeRequestRepository.save(secureExchange);
+
       document.setSecureExchangeEntity(secureExchange);
       return this.documentRepository.save(document);
     } else {
