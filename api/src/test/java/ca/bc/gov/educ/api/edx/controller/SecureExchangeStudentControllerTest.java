@@ -1,14 +1,23 @@
 package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
+import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStudentMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
-import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +25,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.hamcrest.Matchers.*;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -40,10 +50,10 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     SecureExchangeRequestRepository secureExchangeRequestRepository;
     @Autowired
     SecureExchangeStudentRepository secureExchangeStudentRepository;
-    @Autowired
-    SecureExchangeService secureExchangeService;
-    @Autowired
-    SecureExchangeStudentService secureExchangeStudentService;
+
+    @MockBean
+    SecureExchangeStudentService studentServiceMock;
+
     private static final String LEGIT_STUDENT_ID = "ac339d70-7649-1a2e-8176-49fbef5e0059";
 
     @Before
@@ -59,8 +69,9 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     public void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
-        final SecureExchangeEntity entity = createSecureExchangeWithStudents(null);
+        final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
         final String sid = entity.getSecureExchangeID().toString();
+        when(studentServiceMock.addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class))).thenThrow(EntityNotFoundException.class);
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(MediaType.APPLICATION_JSON)
@@ -72,6 +83,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     public void testAddExchangeStudents_GivenInvalidExchangeID_ShouldReturnStatusNotFound() throws Exception {
+        when(studentServiceMock.addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class))).thenThrow(EntityNotFoundException.class);
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(MediaType.APPLICATION_JSON)
@@ -83,8 +95,10 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     public void testAddSecureExchangeStudents_ShouldReturnStatusCreatedWithUpdatedExchangeObject() throws Exception {
-        final SecureExchangeEntity entity = createSecureExchangeWithStudents(null);
+        final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
         final String sid = entity.getSecureExchangeID().toString();
+        final SecureExchange exchange = createSecureExchangeFromEntityWithStudent(LEGIT_STUDENT_ID, entity);
+        when(studentServiceMock.addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class))).thenReturn(exchange);
         final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
@@ -101,7 +115,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     @Test
     @Transactional
     public void testDeleteSecureExchangeStudents_ShouldReturnStatusOK_AndShouldDeleteFromExchange() throws Exception {
-        SecureExchangeEntity entity = createSecureExchangeWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
+        SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
         final String sid = entity.getSecureExchangeID().toString();
         List<SecureExchangeStudentEntity> students = new ArrayList<>();
         students.addAll(entity.getSecureExchangeStudents());
@@ -110,13 +124,15 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE"))))
             .andDo(print())
             .andExpect(status().isOk());
-        SecureExchangeStudentEntity student = secureExchangeStudentRepository.findById(UUID.fromString(secureExchangeStudentID)).orElse(null);
-        assertThat(student, equalTo(null));
     }
 
+    @Test
+    @Transactional
     public void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
-        final SecureExchangeEntity entity = createSecureExchangeWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
+        final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
         final String sid = entity.getSecureExchangeID().toString();
+        final SecureExchange secureExchange = mapper.toStructure(entity);
+        when(studentServiceMock.getStudentIDsFromExchange(any(UUID.class))).thenReturn(secureExchange.getStudentsList());
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print())
@@ -126,6 +142,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     public void testGetStudentsFromExchange_GivenInvalidExchangeID_ShouldReturnNotFound() throws Exception {
+        when(studentServiceMock.getStudentIDsFromExchange(any(UUID.class))).thenThrow(EntityNotFoundException.class);
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isNotFound());
@@ -134,7 +151,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     /**
      * Convenience method for creating an exchange entity with n students
      */
-    private SecureExchangeEntity createSecureExchangeWithStudents(List<String> studentIDs){
+    private SecureExchangeEntity createSecureExchangeEntityWithStudents(List<String> studentIDs){
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         if(studentIDs != null && studentIDs.size() > 0){
             entity.setSecureExchangeStudents(new HashSet<>());
@@ -149,6 +166,21 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
             this.secureExchangeRequestRepository.save(entity);
         }
         return entity;
+    }
+
+    /**
+     * Convenience method for adding a mock student to an existing entity. Does not persist.
+     */
+    private SecureExchange createSecureExchangeFromEntityWithStudent(String studentId, SecureExchangeEntity secureExchangeEntity){
+        SecureExchangeStudentEntity secureExchangeStudentEntity = new SecureExchangeStudentEntity();
+        secureExchangeStudentEntity.setStudentId(UUID.fromString(studentId));
+        secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
+        secureExchangeStudentEntity.setSecureExchangeStudentId(UUID.randomUUID());
+        secureExchangeStudentEntity.setCreateDate(LocalDateTime.now());
+        secureExchangeStudentEntity.setCreateUser("test");
+        secureExchangeEntity.setSecureExchangeStudents(new HashSet<>());
+        secureExchangeEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
+        return mapper.toStructure(secureExchangeEntity);
     }
 
     private String getStudentJson(String studentId){
