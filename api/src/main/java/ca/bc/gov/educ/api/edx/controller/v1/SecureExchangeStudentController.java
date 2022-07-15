@@ -20,7 +20,6 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeStudentService studentService;
-    private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 
     @Autowired
     public SecureExchangeStudentController(SecureExchangeStudentService studentService) {
