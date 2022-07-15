@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -338,6 +339,7 @@ public class EdxUsersService {
     edxUser.setLastName(activationCode.getLastName());
     edxUser.setEmail(activationCode.getEmail());
     edxUser.setDigitalIdentityID(UUID.fromString(edxActivateUser.getDigitalId()));
+    TransformUtil.uppercaseFields(edxUser);
     updateAuditColumnsForEdxUserEntityCreate(edxUser, edxActivateUser);
     return edxUser;
   }
@@ -402,6 +404,7 @@ public class EdxUsersService {
         throw new InvalidPayloadException(error);
       }
     }
+    TransformUtil.uppercaseFields(edxActivationCodeEntity);
     return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
   }
 
