@@ -136,7 +136,7 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
     var comments = struct.getCommentsList();
 
     setupComments(comments, postedEntity);
-
+    setupStudents(struct.getStudentList(), postedEntity);
     var documents = struct.getDocumentList();
 
     if(documents != null && !documents.isEmpty()) {
