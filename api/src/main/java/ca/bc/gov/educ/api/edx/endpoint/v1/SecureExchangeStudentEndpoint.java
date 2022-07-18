@@ -33,7 +33,7 @@ public interface SecureExchangeStudentEndpoint {
 
     @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
     @DeleteMapping(URL.SECURE_EXCHANGE_ID_STUDENTS + "/{secureExchangeStudentId}")
-    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT")})
     @Transactional
     void deleteStudent(@PathVariable String secureExchangeStudentId, @PathVariable String secureExchangeId);
 
