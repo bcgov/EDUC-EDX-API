@@ -14,6 +14,8 @@ public class SecureExchangeCreate extends SecureExchangeBase implements Serializ
   private static final long serialVersionUID = 583620260139143932L;
 
   private List<SecureExchangeDocument> documentList;
+
+  private List<SecureExchangeStudent> studentList;
 }
 
 
