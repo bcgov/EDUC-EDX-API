@@ -49,10 +49,10 @@ public class SecureExchangeStudentService {
             secureExchangeEntity.setSecureExchangeStudents(new HashSet<>());
         }
         SecureExchangeStudentEntity student = secureExchangeEntity.getSecureExchangeStudents()
-          .stream()
-          .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
-          .findAny()
-          .orElse(null);
+                .stream()
+                .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
+                .findAny()
+                .orElse(null);
         if(student != null){
             // do nothing, student exists
         } else {
