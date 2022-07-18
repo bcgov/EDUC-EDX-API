@@ -48,11 +48,14 @@ public class SecureExchangeStudentService {
         if(secureExchangeEntity.getSecureExchangeStudents() == null){
             secureExchangeEntity.setSecureExchangeStudents(new HashSet<>());
         }
-        boolean studentExists = secureExchangeEntity.getSecureExchangeStudents()
+        SecureExchangeStudentEntity student = secureExchangeEntity.getSecureExchangeStudents()
           .stream()
-          .anyMatch(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()));
-
-        if(!studentExists) {
+          .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
+          .findAny()
+          .orElse(null);
+        if(student != null){
+            // do nothing, student exists
+        } else {
             SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
             secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
             if(secureExchangeStudentEntity.getCreateUser() == null){
