@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStudentMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
@@ -16,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -25,8 +28,8 @@ public class SecureExchangeStudentService {
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
 
-    private RESTService restService;
-    private ApplicationProperties applicationProperties;
+    private final RESTService restService;
+    private final ApplicationProperties applicationProperties;
     private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
     private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
@@ -39,7 +42,7 @@ public class SecureExchangeStudentService {
         this.repository = repository;
     }
 
-    public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent)  {
+    public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
         // not found exception handler will fire if student not found
         restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found
@@ -53,9 +56,8 @@ public class SecureExchangeStudentService {
                 .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
                 .findAny()
                 .orElse(null);
-        if(student != null){
-            // do nothing, student exists
-        } else {
+        // if student != null, do nothing as student already exists
+        if(student == null){
             SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
             secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
             if(secureExchangeStudentEntity.getCreateUser() == null){
