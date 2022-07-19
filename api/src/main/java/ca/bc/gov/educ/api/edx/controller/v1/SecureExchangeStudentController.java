@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -36,8 +37,9 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
     }
 
     @Override
-    public void deleteStudent(String secureExchangeStudentId, String secureExchangeId) {
+    public ResponseEntity<Void> deleteStudent(String secureExchangeStudentId, String secureExchangeId) {
         studentService.deleteStudentFromExchange(UUID.fromString(secureExchangeStudentId));
+        return ResponseEntity.noContent().build();
     }
 
 }
