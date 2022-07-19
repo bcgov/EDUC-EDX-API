@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
-import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
@@ -70,8 +70,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     public void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
         final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
         final String sid = entity.getSecureExchangeID().toString();
-        // TODO: Use mockRestService to throw exception somehow
-        //when(studentService.addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class))).thenThrow(EntityNotFoundException.class);
+        when(restServiceMock.get(anyString(), any(Class.class))).thenThrow(NotFoundException.class);
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(MediaType.APPLICATION_JSON)
@@ -113,7 +112,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     @Transactional
-    public void testDeleteSecureExchangeStudents_ShouldReturnStatusOK_AndShouldDeleteFromExchange() throws Exception {
+    public void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
         SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
         final String sid = entity.getSecureExchangeID().toString();
         List<SecureExchangeStudentEntity> students = new ArrayList<>();
@@ -122,7 +121,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
         this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS+"/"+secureExchangeStudentID, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE"))))
             .andDo(print())
-            .andExpect(status().isOk());
+            .andExpect(status().isNoContent());
     }
 
     @Test
@@ -130,8 +129,6 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     public void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
         final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
         final String sid = entity.getSecureExchangeID().toString();
-        final SecureExchange secureExchange = mapper.toStructure(entity);
-        when(studentService.getStudentIDsFromExchange(any(UUID.class))).thenReturn(secureExchange.getStudentsList());
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print())
@@ -141,7 +138,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
     @Test
     public void testGetStudentsFromExchange_GivenInvalidExchangeID_ShouldReturnNotFound() throws Exception {
-        when(studentService.getStudentIDsFromExchange(any(UUID.class))).thenThrow(EntityNotFoundException.class);
+        when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
             .andDo(print()).andExpect(status().isNotFound());
