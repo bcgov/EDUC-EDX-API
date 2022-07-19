@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +36,6 @@ public interface SecureExchangeStudentEndpoint {
     @DeleteMapping(URL.SECURE_EXCHANGE_ID_STUDENTS + "/{secureExchangeStudentId}")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT")})
     @Transactional
-    void deleteStudent(@PathVariable String secureExchangeStudentId, @PathVariable String secureExchangeId);
+    ResponseEntity<Void> deleteStudent(@PathVariable String secureExchangeStudentId, @PathVariable String secureExchangeId);
 
 }
