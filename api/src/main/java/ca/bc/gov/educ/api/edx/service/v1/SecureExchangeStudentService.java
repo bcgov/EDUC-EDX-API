@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeStudentMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
@@ -41,7 +42,7 @@ public class SecureExchangeStudentService {
         this.repository = repository;
     }
 
-    public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent) throws Exception {
+    public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
         // not found exception handler will fire if student not found
         restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found

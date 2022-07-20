@@ -16,7 +16,7 @@ public class RESTService {
         this.webClient = webClient;
     }
 
-    public <T> T get(String url, Class<T> clazz) throws Exception {
+    public <T> T get(String url, Class<T> clazz) throws NotFoundException {
         return webClient
                 .get()
                 .uri(url)
