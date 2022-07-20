@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -27,17 +28,18 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
 
     @Override
     public SecureExchange addStudent(String secureExchangeId, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
-        return studentService.addStudentToExchange(UUID.fromString(secureExchangeId), secureExchangeStudent);
+        return this.getStudentService().addStudentToExchange(UUID.fromString(secureExchangeId), secureExchangeStudent);
     }
 
     @Override
     public List<SecureExchangeStudent> getStudents(String secureExchangeId) {
-        return studentService.getStudentIDsFromExchange(UUID.fromString(secureExchangeId));
+        return this.getStudentService().getStudentIDsFromExchange(UUID.fromString(secureExchangeId));
     }
 
     @Override
-    public void deleteStudent(String secureExchangeStudentId, String secureExchangeId) {
-        studentService.deleteStudentFromExchange(UUID.fromString(secureExchangeStudentId));
+    public ResponseEntity<Void> deleteStudent(String secureExchangeStudentId, String secureExchangeId) {
+        this.getStudentService().deleteStudentFromExchange(UUID.fromString(secureExchangeStudentId));
+        return ResponseEntity.noContent().build();
     }
 
 }
