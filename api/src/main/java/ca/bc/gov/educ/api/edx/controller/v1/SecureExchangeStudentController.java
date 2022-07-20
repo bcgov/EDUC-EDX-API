@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.edx.controller.v1;
 
 import ca.bc.gov.educ.api.edx.endpoint.v1.SecureExchangeStudentEndpoint;
-import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
@@ -27,7 +25,7 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
     }
 
     @Override
-    public SecureExchange addStudent(String secureExchangeId, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
+    public SecureExchange addStudent(String secureExchangeId, SecureExchangeStudent secureExchangeStudent) throws Exception {
         return studentService.addStudentToExchange(UUID.fromString(secureExchangeId), secureExchangeStudent);
     }
 

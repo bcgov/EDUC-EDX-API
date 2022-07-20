@@ -24,7 +24,7 @@ public interface SecureExchangeStudentEndpoint {
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "404", description = "NOT FOUND"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     @ResponseStatus(CREATED)
     @Transactional
-    SecureExchange addStudent(@PathVariable String secureExchangeId, @Validated @RequestBody SecureExchangeStudent secureExchangeStudent) throws NotFoundException;
+    SecureExchange addStudent(@PathVariable String secureExchangeId, @Validated @RequestBody SecureExchangeStudent secureExchangeStudent) throws Exception;
 
     @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
     @GetMapping(URL.SECURE_EXCHANGE_ID_STUDENTS)

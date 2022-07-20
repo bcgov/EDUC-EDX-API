@@ -70,7 +70,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     public void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
         final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
         final String sid = entity.getSecureExchangeID().toString();
-        when(restServiceMock.get(anyString(), any(Class.class))).thenThrow(NotFoundException.class);
+        when(restServiceMock.get(anyString(), any(Class.class))).thenThrow(new NotFoundException());
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/"+URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(MediaType.APPLICATION_JSON)
