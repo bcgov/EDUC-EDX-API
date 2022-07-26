@@ -126,6 +126,21 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
+  public void testAddSecureExchangeStudents_BothIdentifiersShouldReturnStatusBadRequest() throws Exception {
+    final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
+    final String sid = entity.getSecureExchangeID().toString();
+    when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
+    final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getStudentJsonBothStaffAndEDXUser(LEGIT_STUDENT_ID))
+        .accept(MediaType.APPLICATION_JSON))
+      .andDo(print())
+      .andExpect(status().isBadRequest());
+  }
+
+  @Test
   @Transactional
   public void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
     SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
@@ -196,6 +211,10 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
   private String getStudentJson(String studentId) {
     return "{\"studentId\": \"" + studentId + "\", \"staffUserIdentifier\": \"" + "TESTUSER" + "\" }";
+  }
+
+  private String getStudentJsonBothStaffAndEDXUser(String studentId) {
+    return "{\"studentId\": \"" + studentId + "\", \"staffUserIdentifier\": \"" + "TESTUSER" + "\" , \"edxUserID\": \"" + UUID.randomUUID().toString() + "\" }";
   }
 
   private String getStudentJsonNoStaff(String studentId) {

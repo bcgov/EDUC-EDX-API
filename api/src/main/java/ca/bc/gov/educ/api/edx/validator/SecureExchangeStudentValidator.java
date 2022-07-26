@@ -17,6 +17,10 @@ public class SecureExchangeStudentValidator {
       apiValidationErrors.add(createFieldError("staffUserIdentifier", student.getStaffUserIdentifier(), "staffUserIdentifier and edxUserID are both null, one must be provided"));
     }
 
+    if (!StringUtils.isEmpty(student.getStaffUserIdentifier()) && student.getEdxUserID() != null) {
+      apiValidationErrors.add(createFieldError("staffUserIdentifier", student.getStaffUserIdentifier(), "staffUserIdentifier and edxUserID both have values, only one must be provided"));
+    }
+
     return apiValidationErrors;
   }
 
