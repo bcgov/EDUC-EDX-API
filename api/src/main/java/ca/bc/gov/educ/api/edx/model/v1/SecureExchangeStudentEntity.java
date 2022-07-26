@@ -15,28 +15,34 @@ import java.util.UUID;
 @Table(name = "SECURE_EXCHANGE_STUDENT")
 public class SecureExchangeStudentEntity {
 
-    @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
-            @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
-    @Column(name = "SECURE_EXCHANGE_STUDENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
-    UUID secureExchangeStudentId;
+  @Id
+  @GeneratedValue(generator = "UUID")
+  @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
+          @Parameter(name = "uuid_gen_strategy_class", value = "org.hibernate.id.uuid.CustomVersionOneStrategy")})
+  @Column(name = "SECURE_EXCHANGE_STUDENT_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
+  UUID secureExchangeStudentId;
 
-    @NotNull(message = "student id cannot be null")
-    @Column(name = "STUDENT_ID", updatable = false)
-    UUID studentId;
+  @NotNull(message = "student id cannot be null")
+  @Column(name = "STUDENT_ID", updatable = false)
+  UUID studentId;
 
-    @NotNull(message = "createUser cannot be null")
-    @Column(name = "CREATE_USER", updatable = false)
-    String createUser;
+  @Column(name = "STAFF_USER_IDENTIFIER")
+  String staffUserIdentifier;
 
-    @NotNull(message = "createDate cannot be null")
-    @PastOrPresent
-    @Column(name = "CREATE_DATE", updatable = false)
-    LocalDateTime createDate;
+  @Column(name = "EDX_USER_ID")
+  UUID edxUserID;
 
-    @ManyToOne(optional = false, targetEntity = SecureExchangeEntity.class)
-    @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
-    private SecureExchangeEntity secureExchangeEntity;
+  @NotNull(message = "createUser cannot be null")
+  @Column(name = "CREATE_USER", updatable = false)
+  String createUser;
+
+  @NotNull(message = "createDate cannot be null")
+  @PastOrPresent
+  @Column(name = "CREATE_DATE", updatable = false)
+  LocalDateTime createDate;
+
+  @ManyToOne(optional = false, targetEntity = SecureExchangeEntity.class)
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
+  private SecureExchangeEntity secureExchangeEntity;
 
 }

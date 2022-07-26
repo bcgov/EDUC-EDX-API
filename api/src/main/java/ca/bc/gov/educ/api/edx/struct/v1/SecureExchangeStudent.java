@@ -17,6 +17,9 @@ public class SecureExchangeStudent implements Serializable {
     String secureExchangeId;
     @Null(message = "secureExchangeStudentId should be null.")
     String secureExchangeStudentId;
+    @Size(max = 32)
+    String staffUserIdentifier;
+    String edxUserID;
     @NotNull
     @UUIDValidator
     String studentId;
