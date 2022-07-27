@@ -242,6 +242,14 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
     -H "Authorization: Bearer $TKN" \
     -d "{\"description\": \"Write SCHOOL_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+     echo
+      echo Writing scope CREATE_SECURE_EXCHANGE_SAGA
+      curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+
 ###########################################################
 #Setup for config-map
 ###########################################################
