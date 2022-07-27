@@ -546,7 +546,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", UUID.randomUUID(), UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound());
 
 
@@ -580,7 +580,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), randomId)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserSchoolEntity was not found for parameters {edxUserSchoolID=" + randomId + "}")));
   }
@@ -615,7 +615,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", randomId, edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserEntity was not found for parameters {edxUserID=" + randomId + "}")));
   }
@@ -648,7 +648,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
 
     ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNoContent());
   }
 

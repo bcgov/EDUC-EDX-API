@@ -95,7 +95,7 @@ public interface EdxUsersEndpoint {
   EdxUserSchool updateEdxUserSchool(@PathVariable UUID id, @Validated @RequestBody  EdxUserSchool edxUserSchool);
 
   @Transactional
-  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USERS_SCHOOL')")
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER_SCHOOL')")
   @DeleteMapping("/{id}/school/{edxUserSchoolId}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @ResponseStatus(NO_CONTENT)
