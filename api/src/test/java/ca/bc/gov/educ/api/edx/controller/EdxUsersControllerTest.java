@@ -14,6 +14,7 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -650,6 +651,13 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNoContent());
+
+    ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk());
+
+    val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+    Assertions.assertTrue(edxUsrResponse.getEdxUserSchools().isEmpty());
   }
 
 

@@ -187,7 +187,7 @@ public class EdxUsersService {
     val entityOptional = getEdxUserSchoolsRepository().findById(edxUserSchoolId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserSchoolEntity.class, "edxUserSchoolID", edxUserSchoolId.toString()));
     if (entity.getEdxUserEntity().getEdxUserID().equals(edxUserID)) {
-      this.getEdxUserSchoolsRepository().delete(entity);
+      this.getEdxUserRepository().deleteEdxUserSchool(entity.getEdxUserSchoolID().toString());
     } else {
       throw new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString());
     }

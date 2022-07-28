@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface EdxUserRepositoryCustom {
   List<EdxUserEntity> findEdxUsers(final Optional<UUID> digitalId, final String mincode,final String firstName, final String lastName);
+
 }
