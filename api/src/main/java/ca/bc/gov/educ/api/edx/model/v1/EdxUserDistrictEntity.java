@@ -27,8 +27,8 @@ public class EdxUserDistrictEntity {
   UUID edxUserDistrictID;
 
   @ManyToOne(optional = false, targetEntity = EdxUserEntity.class)
-  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
-  EdxUserEntity edxUserEntity;
+  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID", updatable = false)
+  private EdxUserEntity edxUserEntity;
 
   @Column(name = "DISTRICT_CODE")
   String districtCode;
