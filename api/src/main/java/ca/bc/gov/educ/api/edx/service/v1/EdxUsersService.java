@@ -111,6 +111,7 @@ public class EdxUsersService {
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
     val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
     if (optionalSchool.isEmpty()) {
+      edxUserSchoolEntity.getEdxUserSchoolRoleEntities().forEach(schoolRole -> schoolRole.setEdxUserSchoolEntity(edxUserSchoolEntity));
       return getEdxUserSchoolsRepository().save(edxUserSchoolEntity);
     } else {
       throw new EntityExistsException("EdxUser to EdxUserSchool association already exists");
@@ -187,7 +188,7 @@ public class EdxUsersService {
     val entityOptional = getEdxUserSchoolsRepository().findById(edxUserSchoolId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserSchoolEntity.class, "edxUserSchoolID", edxUserSchoolId.toString()));
     if (entity.getEdxUserEntity().getEdxUserID().equals(edxUserID)) {
-      this.getEdxUserSchoolsRepository().deleteEdxUserSchool(entity.getEdxUserSchoolID().toString());
+      this.getEdxUserSchoolsRepository().delete(entity);
     } else {
       throw new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString());
     }

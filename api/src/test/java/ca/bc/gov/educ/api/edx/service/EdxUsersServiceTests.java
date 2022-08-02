@@ -47,8 +47,8 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @After
   public void tearDown() {
-    this.edxUserRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
+    this.edxUserRepository.deleteAll();
     this.ministryOwnershipTeamRepository.deleteAll();
     this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
@@ -67,6 +67,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   public void getAllEdxUserSchools() {
+    this.edxUserSchoolRepository.deleteAll();
     var entity = this.edxUserRepository.save(getEdxUserEntity());
     this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity));
     final List<EdxUserSchoolEntity> edxUserSchoolEntities = this.service.getEdxUserSchoolsList();
