@@ -68,6 +68,10 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         secureExchangeStudent.setSecureExchangeId(entity.getSecureExchangeID().toString());
         secureExchangeStudent.setSecureExchangeStudentId(student.getSecureExchangeStudentId().toString());
         secureExchangeStudent.setStudentId(student.getStudentId().toString());
+        secureExchangeStudent.setStaffUserIdentifier(student.getStaffUserIdentifier());
+        if(student.getEdxUserID() != null) {
+          secureExchangeStudent.setEdxUserID(student.getEdxUserID().toString());
+        }
         secureExchangeStudent.setCreateUser(student.getCreateUser());
         secureExchangeStudent.setCreateDate(student.getCreateDate().toString());
         secureExchange.getStudentsList().add(secureExchangeStudent);
@@ -124,6 +128,12 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
                 (StringUtils.isBlank(student.getCreateDate())) ? LocalDateTime.now() : localDateTimeMapper.map(student.getCreateDate())
         );
         secureExchangeStudentEntity.setStudentId(uUIDMapper.map(student.getStudentId()));
+        if(student.getEdxUserID() != null) {
+          secureExchangeStudentEntity.setEdxUserID(UUID.fromString(student.getEdxUserID()));
+        }
+        if(StringUtils.isNotBlank(student.getStaffUserIdentifier())) {
+          secureExchangeStudentEntity.setStaffUserIdentifier(student.getStaffUserIdentifier());
+        }
         postedEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
       }
     }

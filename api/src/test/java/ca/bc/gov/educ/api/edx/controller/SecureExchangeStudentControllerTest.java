@@ -98,6 +98,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
+    final String studentEdxUserJsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].staffUserIdentifier";
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
         .contentType(MediaType.APPLICATION_JSON)
@@ -107,7 +108,10 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
       .andExpect(status().isCreated())
       .andExpect(
         MockMvcResultMatchers.jsonPath(jsonPath)
-          .value(LEGIT_STUDENT_ID));
+          .value(LEGIT_STUDENT_ID))
+      .andExpect(
+        MockMvcResultMatchers.jsonPath(studentEdxUserJsonPath)
+          .value("TESTUSER"));
   }
 
   @Test
@@ -185,6 +189,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
         SecureExchangeStudentEntity student = new SecureExchangeStudentEntity();
         student.setSecureExchangeEntity(entity);
         student.setStudentId(UUID.fromString(s));
+        student.setEdxUserID(UUID.randomUUID());
         student.setCreateUser(ApplicationProperties.CLIENT_ID);
         student.setCreateDate(LocalDateTime.now());
         entity.getSecureExchangeStudents().add(student);
