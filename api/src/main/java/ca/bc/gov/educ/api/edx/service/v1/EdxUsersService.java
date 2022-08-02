@@ -464,4 +464,8 @@ public class EdxUsersService {
     toUpdate.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
     toUpdate.setUpdateDate(LocalDateTime.now());
   }
+
+  public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode){
+    return getEdxUserRepository().findEdxUserEmailByMincodeAndPermissionCode(mincode, permissionCode);
+  }
 }

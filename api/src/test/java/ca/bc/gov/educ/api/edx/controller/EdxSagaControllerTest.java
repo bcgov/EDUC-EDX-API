@@ -3,10 +3,12 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxSagaController;
+import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import lombok.val;
 import org.junit.After;
 import org.junit.Before;
@@ -28,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
+public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -52,9 +54,30 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxPermissionRepository edxPermissionRepository;
 
+  @Autowired
+  MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
+
+  @Autowired
+  SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
+
+  @Autowired
+  SecureExchangeStatusCodeTableRepository secureExchangeStatusCodeTableRepo;
+
+  @Autowired
+  DocumentRepository documentRepository;
+
+  @Autowired
+  SecureExchangeRequestRepository secureExchangeRequestRepository;
+
+  MinistryOwnershipTeamEntity ministryOwnershipTeamEntity;
+
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
+    this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
+    ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    this.ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.secureExchangeStatusCodeTableRepo.save(createNewStatus());
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(), any());
   }
 
@@ -65,6 +88,11 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
     edxActivationCodeRepository.deleteAll();
     edxRoleRepository.deleteAll();
     edxPermissionRepository.deleteAll();
+    documentRepository.deleteAll();
+    secureExchangeRequestRepository.deleteAll();
+    ministryOwnershipTeamRepository.deleteAll();
+    secureExchangeStatusCodeTableRepo.deleteAll();
+    secureExchangeContactTypeCodeTableRepository.deleteAll();
   }
 
   @Test
@@ -176,14 +204,14 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
   public void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    createSagaEntity(jsonString,sagaData);
+    createSagaEntity(jsonString, sagaData);
 
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-          .andDo(print()).andExpect(status().isConflict());
+      .andDo(print()).andExpect(status().isConflict());
   }
 
   @Test
@@ -195,6 +223,85 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
+
+
+  @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, "schoolName", "MinTeam");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(this.ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", null, "MinTeam");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", "WildFlower", null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Ministry Team Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingSecureExchangeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createSecureExchangeCreateSagaData(null, "123456789", "WildFlower", "ABC Team");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("SecureExchange cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+
+  @Test
+  public void testCreateNewSecureExchange_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", "WildFlower", "Min Team");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -212,10 +319,12 @@ public class EdxSagaControllerTest extends BaseSecureExchangeControllerTest {
     sagaData.setEdxActivationRoleCodes(rolesList);
     return sagaData;
   }
-private void createSagaEntity(String sagaDataStr,EdxUserActivationInviteSagaData sagaData){
 
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(),"TestEdx",sagaDataStr,null,null,sagaData.getMincode(),sagaData.getEmail());
+  private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
 
-}
+    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+
+  }
+
 
 }

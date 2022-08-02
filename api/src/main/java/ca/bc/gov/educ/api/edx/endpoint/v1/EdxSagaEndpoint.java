@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -33,4 +34,17 @@ public interface EdxSagaEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> edxSchoolUserActivationInvite(@Validated @RequestBody EdxUserActivationInviteSagaData edxUserActivationInviteSagaData);
+
+
+  /**
+   * Endpoint for creating creating new secure exchange and sending email notification to the edx_users
+   * @param secureExchangeCreateSagaData
+   * @return
+   */
+  @PostMapping("/new-secure-exchange-saga")
+  @PreAuthorize("hasAuthority('SCOPE_CREATE_SECURE_EXCHANGE_SAGA')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT")})
+  @ResponseStatus(ACCEPTED)
+  ResponseEntity<String> createNewSecureExchange(@Validated @RequestBody SecureExchangeCreateSagaData secureExchangeCreateSagaData);
+
 }
