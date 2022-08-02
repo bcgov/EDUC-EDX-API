@@ -472,6 +472,12 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
     return this.sagaService.createSagaRecordInDB(this.sagaName, userName, payload, edxUserId, secureExchangeId, mincode, emailId);
   }
 
+  @Override
+  @Transactional
+  public SagaEntity createSaga(@NotNull final String payload) {
+    return this.sagaService.createSagaRecordInDB(this.sagaName, null, payload, null, null, null, null);
+  }
+
 
   /**
    * DONT DO ANYTHING the message was broad-casted for the frontend listeners, that a saga process has initiated, completed.

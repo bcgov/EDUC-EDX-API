@@ -37,6 +37,7 @@ public interface Orchestrator {
    */
   SagaEntity createSaga(String payload, final UUID edxUserId, final String userName,final String mincode, final String emailId,final UUID secureExchangeId);
 
+  SagaEntity createSaga(String payload);
 
   /**
    * Replay saga.
