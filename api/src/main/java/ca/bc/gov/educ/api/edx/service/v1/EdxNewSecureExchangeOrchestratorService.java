@@ -101,7 +101,7 @@ public class EdxNewSecureExchangeOrchestratorService {
         .fromEmail(from)
         .toEmail(emailId)
         .subject(subject)
-        .templateName("edx.school.user.activation.invite")
+        .templateName("edx.new.secure.exchange.notification")
         .emailFields(Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getSchoolName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
         .build();
 
