@@ -21,27 +21,61 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * The type Edx new secure exchange orchestrator service.
+ */
 @Service
 @Slf4j
 public class EdxNewSecureExchangeOrchestratorService {
 
+  /**
+   * The Email properties.
+   */
   private final EmailProperties emailProperties;
 
+  /**
+   * The Secure exchange service.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeService secureExchangeService;
 
+  /**
+   * The Props.
+   */
   private final ApplicationProperties props;
 
+  /**
+   * The constant mapper.
+   */
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 
+  /**
+   * The Email notification service.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EmailNotificationService emailNotificationService;
 
+  /**
+   * The Saga service.
+   */
   protected final SagaService sagaService;
 
+  /**
+   * The Edx users service.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService edxUsersService;
 
+  /**
+   * Instantiates a new Edx new secure exchange orchestrator service.
+   *
+   * @param emailProperties          the email properties
+   * @param secureExchangeService    the secure exchange service
+   * @param props                    the props
+   * @param emailNotificationService the email notification service
+   * @param sagaService              the saga service
+   * @param edxUsersService          the edx users service
+   */
   public EdxNewSecureExchangeOrchestratorService(EmailProperties emailProperties, SecureExchangeService secureExchangeService, ApplicationProperties props, EmailNotificationService emailNotificationService, SagaService sagaService, EdxUsersService edxUsersService) {
     this.emailProperties = emailProperties;
     this.secureExchangeService = secureExchangeService;
@@ -51,6 +85,11 @@ public class EdxNewSecureExchangeOrchestratorService {
     this.edxUsersService = edxUsersService;
   }
 
+  /**
+   * Send email.
+   *
+   * @param secureExchangeCreateSagaData the secure exchange create saga data
+   */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
     // query to find all the users to whom it should be sent
@@ -72,6 +111,12 @@ public class EdxNewSecureExchangeOrchestratorService {
 
   }
 
+  /**
+   * Create new secure exchange.
+   *
+   * @param secureExchangeCreateSagaData the secure exchange create saga data
+   * @param saga                         the saga
+   */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void createNewSecureExchange(SecureExchangeCreateSagaData secureExchangeCreateSagaData, SagaEntity saga) {
     RequestUtil.setAuditColumnsForCreate(secureExchangeCreateSagaData.getSecureExchangeCreate());
@@ -84,6 +129,14 @@ public class EdxNewSecureExchangeOrchestratorService {
 
   }
 
+  /**
+   * Update saga data internal.
+   *
+   * @param secureExchangeEntity         the secure exchange entity
+   * @param secureExchangeCreateSagaData the secure exchange create saga data
+   * @param sagaEntity                   the saga entity
+   * @throws JsonProcessingException the json processing exception
+   */
   private void updateSagaDataInternal(SecureExchangeEntity secureExchangeEntity, SecureExchangeCreateSagaData secureExchangeCreateSagaData, SagaEntity sagaEntity) throws JsonProcessingException {
     secureExchangeCreateSagaData.setSecureExchangeId(secureExchangeEntity.getSecureExchangeID());
     sagaEntity.setSecureExchangeId(secureExchangeEntity.getSecureExchangeID());
@@ -91,6 +144,14 @@ public class EdxNewSecureExchangeOrchestratorService {
     this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
   }
 
+  /**
+   * Update saga data.
+   *
+   * @param secureExchangeEntity         the secure exchange entity
+   * @param secureExchangeCreateSagaData the secure exchange create saga data
+   * @param sagaEntity                   the saga entity
+   * @throws JsonProcessingException the json processing exception
+   */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void updateSagaData(SecureExchangeEntity secureExchangeEntity, SecureExchangeCreateSagaData secureExchangeCreateSagaData, SagaEntity sagaEntity) throws JsonProcessingException {
    updateSagaDataInternal(secureExchangeEntity,secureExchangeCreateSagaData,sagaEntity);

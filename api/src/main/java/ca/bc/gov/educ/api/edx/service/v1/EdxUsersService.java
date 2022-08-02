@@ -28,40 +28,88 @@ import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
 
+/**
+ * The type Edx users service.
+ */
 @Service
 @Slf4j
 public class EdxUsersService {
 
+  /**
+   * The Ministry ownership team repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
 
+  /**
+   * The Edx user repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserRepository edxUserRepository;
 
+  /**
+   * The Edx user schools repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRepository edxUserSchoolsRepository;
 
+  /**
+   * The Edx user school role repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
 
+  /**
+   * The Edx role repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxRoleRepository edxRoleRepository;
 
 
+  /**
+   * The Edx activation code repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodeRepository edxActivationCodeRepository;
 
+  /**
+   * The Edx activation role repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationRoleRepository edxActivationRoleRepository;
 
+  /**
+   * The constant EDX_USER_ID.
+   */
   private static final String EDX_USER_ID = "edxUserID";
 
+  /**
+   * The constant EDX_ACTIVATION_CODE_ID.
+   */
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
 
+  /**
+   * The constant MINCODE.
+   */
   private static final String MINCODE = "mincode";
+  /**
+   * The Props.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final ApplicationProperties props;
 
+  /**
+   * Instantiates a new Edx users service.
+   *
+   * @param ministryOwnershipTeamRepository the ministry ownership team repository
+   * @param edxUserSchoolsRepository        the edx user schools repository
+   * @param edxUserRepository               the edx user repository
+   * @param edxUserSchoolRoleRepository     the edx user school role repository
+   * @param edxRoleRepository               the edx role repository
+   * @param edxActivationCodeRepository     the edx activation code repository
+   * @param edxActivationRoleRepository     the edx activation role repository
+   * @param props                           the props
+   */
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, ApplicationProperties props) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
@@ -74,14 +122,30 @@ public class EdxUsersService {
     this.props = props;
   }
 
+  /**
+   * Gets ministry teams list.
+   *
+   * @return the ministry teams list
+   */
   public List<MinistryOwnershipTeamEntity> getMinistryTeamsList() {
     return this.getMinistryOwnershipTeamRepository().findAll();
   }
 
+  /**
+   * Gets edx user schools list.
+   *
+   * @return the edx user schools list
+   */
   public List<EdxUserSchoolEntity> getEdxUserSchoolsList() {
     return this.getEdxUserSchoolsRepository().findAll();
   }
 
+  /**
+   * Retrieve edx user by id edx user entity.
+   *
+   * @param edxUserID the edx user id
+   * @return the edx user entity
+   */
   public EdxUserEntity retrieveEdxUserByID(final UUID edxUserID) {
     var res = this.getEdxUserRepository().findById(edxUserID);
     if (res.isPresent()) {
@@ -91,14 +155,35 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Gets edx user schools list.
+   *
+   * @param permissionCode the permission code
+   * @return the edx user schools list
+   */
   public List<String> getEdxUserSchoolsList(String permissionCode) {
     return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
   }
 
+  /**
+   * Find edx users list.
+   *
+   * @param digitalId the digital id
+   * @param mincode   the mincode
+   * @param firstName the first name
+   * @param lastName  the last name
+   * @return the list
+   */
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
     return this.getEdxUserRepository().findEdxUsers(digitalId, mincode, firstName, lastName);
   }
 
+  /**
+   * Create edx user edx user entity.
+   *
+   * @param edxUserEntity the edx user entity
+   * @return the edx user entity
+   */
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
     for (var entity : edxUserEntity.getEdxUserSchoolEntities()) {
       entity.setEdxUserEntity(edxUserEntity);
@@ -106,6 +191,13 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
+  /**
+   * Create edx user school edx user school entity.
+   *
+   * @param edxUserID           the edx user id
+   * @param edxUserSchoolEntity the edx user school entity
+   * @return the edx user school entity
+   */
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -118,6 +210,13 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Update edx user school edx user school entity.
+   *
+   * @param edxUserID           the edx user id
+   * @param edxUserSchoolEntity the edx user school entity
+   * @return the edx user school entity
+   */
   public EdxUserSchoolEntity updateEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -151,12 +250,26 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Log updates edx user school.
+   *
+   * @param currentEdxUserSchoolEntity the current edx user school entity
+   * @param newEdxUserSchoolEntity     the new edx user school entity
+   */
   private void logUpdatesEdxUserSchool(final EdxUserSchoolEntity currentEdxUserSchoolEntity, final EdxUserSchoolEntity newEdxUserSchoolEntity) {
     if (log.isDebugEnabled()) {
       log.debug("Edx User update, current :: {}, new :: {}", currentEdxUserSchoolEntity, newEdxUserSchoolEntity);
     }
   }
 
+  /**
+   * Create edx user school role edx user school role entity.
+   *
+   * @param edxUserID               the edx user id
+   * @param edxUserSchoolId         the edx user school id
+   * @param edxUserSchoolRoleEntity the edx user school role entity
+   * @return the edx user school role entity
+   */
   public EdxUserSchoolRoleEntity createEdxUserSchoolRole(UUID edxUserID, UUID edxUserSchoolId, EdxUserSchoolRoleEntity edxUserSchoolRoleEntity) {
     val optionalUserSchoolRoleEntity = getEdxUserSchoolRoleRepository().findEdxUserSchoolRoleEntityByEdxUserSchoolEntity_EdxUserSchoolIDAndEdxRoleCode(edxUserSchoolRoleEntity.getEdxUserSchoolEntity().getEdxUserSchoolID(), edxUserSchoolRoleEntity.getEdxRoleCode());
     if (optionalUserSchoolRoleEntity.isEmpty()) {
@@ -177,6 +290,11 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Delete edx user by id.
+   *
+   * @param edxUserID the edx user id
+   */
   public void deleteEdxUserById(UUID edxUserID) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -184,6 +302,12 @@ public class EdxUsersService {
 
   }
 
+  /**
+   * Delete edx school user by id.
+   *
+   * @param edxUserID       the edx user id
+   * @param edxUserSchoolId the edx user school id
+   */
   public void deleteEdxSchoolUserById(UUID edxUserID, UUID edxUserSchoolId) {
     val entityOptional = getEdxUserSchoolsRepository().findById(edxUserSchoolId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserSchoolEntity.class, "edxUserSchoolID", edxUserSchoolId.toString()));
@@ -194,6 +318,12 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Delete edx school user role by id.
+   *
+   * @param edxUserID           the edx user id
+   * @param edxUserSchoolRoleId the edx user school role id
+   */
   public void deleteEdxSchoolUserRoleById(UUID edxUserID, UUID edxUserSchoolRoleId) {
     val entityOptional = getEdxUserSchoolRoleRepository().findById(edxUserSchoolRoleId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserSchoolRoleEntity.class, "edxUserSchoolRoleID", edxUserSchoolRoleId.toString()));
@@ -205,10 +335,21 @@ public class EdxUsersService {
 
   }
 
+  /**
+   * Find all edx roles list.
+   *
+   * @return the list
+   */
   public List<EdxRoleEntity> findAllEdxRoles() {
     return this.getEdxRoleRepository().findAll();
   }
 
+  /**
+   * Activate school user edx user entity.
+   *
+   * @param edxActivateUser the edx activate user
+   * @return the edx user entity
+   */
   public EdxUserEntity activateSchoolUser(EdxActivateUser edxActivateUser) {
     val acCodes = Arrays.asList(edxActivateUser.getPersonalActivationCode(), edxActivateUser.getPrimaryEdxCode());
     val activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
@@ -248,6 +389,12 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Verify existing user mincode association.
+   *
+   * @param edxActivateUser the edx activate user
+   * @param edxUsers        the edx users
+   */
   private void verifyExistingUserMincodeAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
     val existingUser = edxUsers.get(0);
     if (!CollectionUtils.isEmpty(existingUser.getEdxUserSchoolEntities())) {
@@ -260,6 +407,13 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Relink edx user edx user entity.
+   *
+   * @param edxActivateUser         the edx activate user
+   * @param edxActivationCodeEntity the edx activation code entity
+   * @return the edx user entity
+   */
   private EdxUserEntity relinkEdxUser(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity) {
     val optionalEdxUserEntity = getEdxUserRepository().findById(UUID.fromString(edxActivateUser.getEdxUserId()));
     val edxUserEntity = optionalEdxUserEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxActivateUser.getEdxUserId()));
@@ -270,6 +424,14 @@ public class EdxUsersService {
 
   }
 
+  /**
+   * Update edx user details from activation code details edx user entity.
+   *
+   * @param edxUsers                the edx users
+   * @param edxActivationCodeEntity the edx activation code entity
+   * @param edxActivateUser         the edx activate user
+   * @return the edx user entity
+   */
   private EdxUserEntity updateEdxUserDetailsFromActivationCodeDetails(List<EdxUserEntity> edxUsers, EdxActivationCodeEntity edxActivationCodeEntity, EdxActivateUser edxActivateUser) {
     val edxUserEntity = getEdxUserRepository().findById(edxUsers.get(0).getEdxUserID()).get();
     val edxUserSchoolEntity = createEdxUserSchoolFromActivationCodeDetails(edxActivationCodeEntity, edxUserEntity, edxActivateUser);
@@ -282,6 +444,13 @@ public class EdxUsersService {
     return updatedUser;
   }
 
+  /**
+   * Create edx user details from activation code details edx user entity.
+   *
+   * @param edxActivateUser         the edx activate user
+   * @param edxActivationCodeEntity the edx activation code entity
+   * @return the edx user entity
+   */
   private EdxUserEntity createEdxUserDetailsFromActivationCodeDetails(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity) {
     EdxUserEntity edxUser = new EdxUserEntity();
     val edxUserEntity = createEdxUserFromActivationCodeDetails(edxUser, edxActivateUser, edxActivationCodeEntity);
@@ -295,6 +464,13 @@ public class EdxUsersService {
     return savedEntity;
   }
 
+  /**
+   * Update edx user associations.
+   *
+   * @param edxUserEntity             the edx user entity
+   * @param edxUserSchoolEntity       the edx user school entity
+   * @param edxUserSchoolRoleEntities the edx user school role entities
+   */
   private void updateEdxUserAssociations(EdxUserEntity edxUserEntity, EdxUserSchoolEntity edxUserSchoolEntity, Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntities) {
     for (EdxUserSchoolRoleEntity edxUserSchoolRole : edxUserSchoolRoleEntities) {
       edxUserSchoolRole.setEdxUserSchoolEntity(edxUserSchoolEntity);
@@ -304,6 +480,12 @@ public class EdxUsersService {
     edxUserEntity.getEdxUserSchoolEntities().add(edxUserSchoolEntity);
   }
 
+  /**
+   * Expire activation codes.
+   *
+   * @param edxActivationCode the edx activation code
+   * @param edxActivateUser   the edx activate user
+   */
   private void expireActivationCodes(EdxActivationCodeEntity edxActivationCode, EdxActivateUser edxActivateUser) {
     val optionalEdxActivationCodeEntity = getEdxActivationCodeRepository().findById(edxActivationCode.getEdxActivationCodeId());
     val activationCodeEntity = optionalEdxActivationCodeEntity.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class, EDX_ACTIVATION_CODE_ID, edxActivationCode.getEdxActivationCodeId().toString()));
@@ -315,6 +497,14 @@ public class EdxUsersService {
     }
   }
 
+  /**
+   * Create edx user school roles from activation code details set.
+   *
+   * @param edxActivationRoleEntities the edx activation role entities
+   * @param edxUserSchoolEntity       the edx user school entity
+   * @param edxActivateUser           the edx activate user
+   * @return the set
+   */
   private Set<EdxUserSchoolRoleEntity> createEdxUserSchoolRolesFromActivationCodeDetails(Set<EdxActivationRoleEntity> edxActivationRoleEntities, EdxUserSchoolEntity edxUserSchoolEntity, EdxActivateUser edxActivateUser) {
     Set<EdxUserSchoolRoleEntity> schoolRoleEntitySet = new HashSet<>();
     edxActivationRoleEntities.forEach(edxActivationRoleEntity -> {
@@ -327,6 +517,14 @@ public class EdxUsersService {
     return schoolRoleEntitySet;
   }
 
+  /**
+   * Create edx user school from activation code details edx user school entity.
+   *
+   * @param activationCode  the activation code
+   * @param edxUser         the edx user
+   * @param edxActivateUser the edx activate user
+   * @return the edx user school entity
+   */
   private EdxUserSchoolEntity createEdxUserSchoolFromActivationCodeDetails(EdxActivationCodeEntity activationCode, EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
     EdxUserSchoolEntity userSchoolEntity = new EdxUserSchoolEntity();
     userSchoolEntity.setEdxUserEntity(edxUser);
@@ -335,6 +533,14 @@ public class EdxUsersService {
     return userSchoolEntity;
   }
 
+  /**
+   * Create edx user from activation code details edx user entity.
+   *
+   * @param edxUser         the edx user
+   * @param edxActivateUser the edx activate user
+   * @param activationCode  the activation code
+   * @return the edx user entity
+   */
   private EdxUserEntity createEdxUserFromActivationCodeDetails(EdxUserEntity edxUser, EdxActivateUser edxActivateUser, EdxActivationCodeEntity activationCode) {
     edxUser.setFirstName(activationCode.getFirstName());
     edxUser.setLastName(activationCode.getLastName());
@@ -345,17 +551,35 @@ public class EdxUsersService {
     return edxUser;
   }
 
+  /**
+   * Update audit columns for edx user entity create.
+   *
+   * @param edxUser         the edx user
+   * @param edxActivateUser the edx activate user
+   */
   private void updateAuditColumnsForEdxUserEntityCreate(EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
     edxUser.setCreateUser(edxActivateUser.getCreateUser());
     edxUser.setCreateDate(LocalDateTime.now());
     updateAuditColumnsForEdxUserEntityUpdate(edxUser, edxActivateUser);
   }
 
+  /**
+   * Update audit columns for edx user entity update.
+   *
+   * @param edxUser         the edx user
+   * @param edxActivateUser the edx activate user
+   */
   private void updateAuditColumnsForEdxUserEntityUpdate(EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
     edxUser.setUpdateUser(edxActivateUser.getUpdateUser());
     edxUser.setUpdateDate(LocalDateTime.now());
   }
 
+  /**
+   * Update audit columns for edx user school entity.
+   *
+   * @param edxActivateUser  the edx activate user
+   * @param userSchoolEntity the user school entity
+   */
   private void updateAuditColumnsForEdxUserSchoolEntity(EdxActivateUser edxActivateUser, EdxUserSchoolEntity userSchoolEntity) {
     userSchoolEntity.setCreateUser(edxActivateUser.getCreateUser());
     userSchoolEntity.setUpdateUser(edxActivateUser.getUpdateUser());
@@ -363,6 +587,12 @@ public class EdxUsersService {
     userSchoolEntity.setUpdateDate(LocalDateTime.now());
   }
 
+  /**
+   * Update audit columns for edx user school role entity.
+   *
+   * @param edxActivateUser  the edx activate user
+   * @param schoolRoleEntity the school role entity
+   */
   private void updateAuditColumnsForEdxUserSchoolRoleEntity(EdxActivateUser edxActivateUser, EdxUserSchoolRoleEntity schoolRoleEntity) {
     schoolRoleEntity.setCreateUser(edxActivateUser.getCreateUser());
     schoolRoleEntity.setUpdateUser(edxActivateUser.getUpdateUser());
@@ -370,6 +600,11 @@ public class EdxUsersService {
     schoolRoleEntity.setUpdateDate(LocalDateTime.now());
   }
 
+  /**
+   * Expire user activation url.
+   *
+   * @param userActivationValidationCode the user activation validation code
+   */
   public void expireUserActivationUrl(UUID userActivationValidationCode) {
     List<EdxActivationCodeEntity> activationCodeEntities = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByValidationCode(userActivationValidationCode);
     if (activationCodeEntities.isEmpty()) {
@@ -391,6 +626,13 @@ public class EdxUsersService {
     });
   }
 
+  /**
+   * Create edx activation code edx activation code entity.
+   *
+   * @param edxActivationCodeEntity the edx activation code entity
+   * @return the edx activation code entity
+   * @throws NoSuchAlgorithmException the no such algorithm exception
+   */
   public EdxActivationCodeEntity createEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
     edxActivationCodeEntity.setValidationCode(UUID.randomUUID());
     if (!CollectionUtils.isEmpty(edxActivationCodeEntity.getEdxActivationRoleEntities())) {
@@ -409,6 +651,13 @@ public class EdxUsersService {
     return getEdxActivationCodeRepository().save(edxActivationCodeEntity);
   }
 
+  /**
+   * Create personal edx activation code edx activation code entity.
+   *
+   * @param edxActivationCodeEntity the edx activation code entity
+   * @return the edx activation code entity
+   * @throws NoSuchAlgorithmException the no such algorithm exception
+   */
   public EdxActivationCodeEntity createPersonalEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
     edxActivationCodeEntity.setActivationCode(generateActivationCode());
     edxActivationCodeEntity.setExpiryDate(LocalDateTime.now().plusHours(props.getEdxSchoolUserActivationInviteValidity()));
@@ -417,12 +666,23 @@ public class EdxUsersService {
     return createEdxActivationCode(edxActivationCodeEntity);
   }
 
+  /**
+   * Delete activation code.
+   *
+   * @param activationCodeId the activation code id
+   */
   public void deleteActivationCode(UUID activationCodeId) {
     val entityOptional = getEdxActivationCodeRepository().findById(activationCodeId);
     val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class, EDX_ACTIVATION_CODE_ID, activationCodeId.toString()));
     this.getEdxActivationCodeRepository().delete(entity);
   }
 
+  /**
+   * Find primary edx activation code edx activation code entity.
+   *
+   * @param mincode the mincode
+   * @return the edx activation code entity
+   */
   public EdxActivationCodeEntity findPrimaryEdxActivationCode(String mincode) {
     Optional<EdxActivationCodeEntity> primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode);
     if (primaryEdxActivationCode.isEmpty()) {
@@ -431,6 +691,12 @@ public class EdxUsersService {
     return primaryEdxActivationCode.get();
   }
 
+  /**
+   * Generate or regenerate primary edx activation code edx activation code entity.
+   *
+   * @param edxPrimaryActivationCode the edx primary activation code
+   * @return the edx activation code entity
+   */
   public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
     EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(edxPrimaryActivationCode.getMincode()).orElseGet(() -> this.newPrimaryActivationCode(edxPrimaryActivationCode));
     try {
@@ -442,6 +708,12 @@ public class EdxUsersService {
     return this.getEdxActivationCodeRepository().save(primaryEdxActivationCode);
   }
 
+  /**
+   * Generate activation code string.
+   *
+   * @return the string
+   * @throws NoSuchAlgorithmException the no such algorithm exception
+   */
   private String generateActivationCode() throws NoSuchAlgorithmException {
     int byteLength = 6; //Base64 encoding an input of 6 bytes will generate a string of 8 characters.
     byte[] randomBytes = new byte[byteLength];
@@ -449,6 +721,12 @@ public class EdxUsersService {
     return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes).toUpperCase();
   }
 
+  /**
+   * New primary activation code edx activation code entity.
+   *
+   * @param edxPrimaryActivationCode the edx primary activation code
+   * @return the edx activation code entity
+   */
   private EdxActivationCodeEntity newPrimaryActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
@@ -461,11 +739,25 @@ public class EdxUsersService {
     toReturn.setValidationCode(UUID.randomUUID());
     return toReturn;
   }
+
+  /**
+   * Update audit columns for primary edx activation code.
+   *
+   * @param edxPrimaryActivationCode the edx primary activation code
+   * @param toUpdate                 the to update
+   */
   private void updateAuditColumnsForPrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode, EdxActivationCodeEntity toUpdate) {
     toUpdate.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
     toUpdate.setUpdateDate(LocalDateTime.now());
   }
 
+  /**
+   * Find edx user email by mincode and permission code set.
+   *
+   * @param mincode        the mincode
+   * @param permissionCode the permission code
+   * @return the set
+   */
   public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode){
     return getEdxUserRepository().findEdxUserEmailByMincodeAndPermissionCode(mincode, permissionCode);
   }
