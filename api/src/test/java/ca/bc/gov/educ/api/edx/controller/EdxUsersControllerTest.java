@@ -14,6 +14,7 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -74,8 +75,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @After
   public void after() {
     this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxUserRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
+    this.edxUserRepository.deleteAll();
     this.ministryOwnershipTeamRepository.deleteAll();
     this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
@@ -546,7 +547,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", UUID.randomUUID(), UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound());
 
 
@@ -580,7 +581,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), randomId)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserSchoolEntity was not found for parameters {edxUserSchoolID=" + randomId + "}")));
   }
@@ -615,13 +616,13 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", randomId, edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserEntity was not found for parameters {edxUserID=" + randomId + "}")));
   }
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecord_AndReturnResultNoContentStatus() throws Exception {
+  public void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -635,6 +636,10 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
+    var role = new EdxUserSchoolRole();
+    role.setEdxRoleCode("EDX_ADMIN");
+    edxUserSchool.setEdxUserSchoolRoles(new ArrayList<>());
+    edxUserSchool.getEdxUserSchoolRoles().add(role);
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
@@ -648,8 +653,15 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
 
     ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USERS_SCHOOL"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNoContent());
+
+    ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk());
+
+    val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+    Assertions.assertTrue(edxUsrResponse.getEdxUserSchools().isEmpty());
   }
 
 
@@ -1325,7 +1337,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindPrimaryEdxActivationCode_GivenInvalidInput_WillReturnNotFound() throws Exception {
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON)
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());

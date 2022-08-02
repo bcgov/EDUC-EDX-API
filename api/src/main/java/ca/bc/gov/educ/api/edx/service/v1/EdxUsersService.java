@@ -111,6 +111,7 @@ public class EdxUsersService {
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
     val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
     if (optionalSchool.isEmpty()) {
+      edxUserSchoolEntity.getEdxUserSchoolRoleEntities().forEach(schoolRole -> schoolRole.setEdxUserSchoolEntity(edxUserSchoolEntity));
       return getEdxUserSchoolsRepository().save(edxUserSchoolEntity);
     } else {
       throw new EntityExistsException("EdxUser to EdxUserSchool association already exists");
