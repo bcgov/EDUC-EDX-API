@@ -75,8 +75,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @After
   public void after() {
     this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxUserRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
+    this.edxUserRepository.deleteAll();
     this.ministryOwnershipTeamRepository.deleteAll();
     this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
@@ -636,6 +636,10 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
+    var role = new EdxUserSchoolRole();
+    role.setEdxRoleCode("EDX_ADMIN");
+    edxUserSchool.setEdxUserSchoolRoles(new ArrayList<>());
+    edxUserSchool.getEdxUserSchoolRoles().add(role);
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
@@ -1333,7 +1337,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindPrimaryEdxActivationCode_GivenInvalidInput_WillReturnNotFound() throws Exception {
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + UUID.randomUUID().toString()).contentType(MediaType.APPLICATION_JSON)
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());

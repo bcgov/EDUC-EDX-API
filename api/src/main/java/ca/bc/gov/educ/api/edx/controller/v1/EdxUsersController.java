@@ -108,6 +108,9 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public EdxUserSchool createEdxSchoolUser(UUID id, EdxUserSchool edxUserSchool) {
     validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserSchoolPayload(id, edxUserSchool));
     RequestUtil.setAuditColumnsForCreate(edxUserSchool);
+    if (!CollectionUtils.isEmpty(edxUserSchool.getEdxUserSchoolRoles())) {
+      edxUserSchool.getEdxUserSchoolRoles().forEach(RequestUtil::setAuditColumnsForCreate);
+    }
     return USER_SCHOOL_MAPPER.toStructure(getService().createEdxUserSchool(id, USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
   }
 

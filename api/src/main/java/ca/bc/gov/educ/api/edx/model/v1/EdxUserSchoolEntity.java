@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.model.v1;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -27,9 +28,10 @@ public class EdxUserSchoolEntity {
   @Column(name = "EDX_USER_SCHOOL_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserSchoolID;
 
-  @ManyToOne(optional = false, targetEntity = EdxUserEntity.class)
-  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID", updatable = false)
-  private EdxUserEntity edxUserEntity;
+  @ManyToOne(targetEntity = EdxUserEntity.class)
+  @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+  @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
+  EdxUserEntity edxUserEntity;
 
   @Column(name = "MINCODE")
   String mincode;
@@ -58,5 +60,13 @@ public class EdxUserSchoolEntity {
       this.edxUserSchoolRoleEntities = new HashSet<>();
     }
     return this.edxUserSchoolRoleEntities;
+  }
+
+  @PreRemove
+  public void preRemove() {
+    if(this.edxUserEntity != null) {
+      this.edxUserEntity.getEdxUserSchoolEntities().remove(this);
+      this.edxUserEntity = null;
+    }
   }
 }
