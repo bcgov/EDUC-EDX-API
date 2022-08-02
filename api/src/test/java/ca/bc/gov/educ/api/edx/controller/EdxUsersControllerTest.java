@@ -622,7 +622,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecord_AndReturnResultNoContentStatus() throws Exception {
+  public void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
