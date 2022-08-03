@@ -36,7 +36,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-public class EdxSchoolUserActivationInviteOrchestratorServiceTest extends BaseSecureExchangeAPITest {
+public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExchangeAPITest {
 
   /**
    * The Repository.

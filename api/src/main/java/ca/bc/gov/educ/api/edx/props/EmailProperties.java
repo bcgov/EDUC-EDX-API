@@ -13,6 +13,9 @@ public class EmailProperties {
   @Value("${email.from.edx.school.user.activation.invite}")
   private String edxSchoolUserActivationInviteEmailFrom;
 
+  @Value("${email.subject.edx.new.secure.exchange.notification}")
+  private String edxNewSecureExchangeNotificationEmailSubject;
+
 }
 
 
