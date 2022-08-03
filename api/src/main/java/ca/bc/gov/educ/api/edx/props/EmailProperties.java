@@ -16,7 +16,6 @@ public class EmailProperties {
   @Value("${email.subject.edx.new.secure.exchange.notification}")
   private String edxNewSecureExchangeNotificationEmailSubject;
 
-
 }
 
 

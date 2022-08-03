@@ -25,16 +25,6 @@ public interface Orchestrator {
    */
   void startSaga(SagaEntity saga);
 
-  /**
-   * Create a saga
-   * @param payload
-   * @param edxUserId
-   * @param userName
-   * @param mincode
-   * @param emailId
-   * @param secureExchangeId
-   * @return SagaEntity
-   */
   SagaEntity createSaga(String payload, final UUID edxUserId, final String userName,final String mincode, final String emailId,final UUID secureExchangeId);
 
   SagaEntity createSaga(String payload);

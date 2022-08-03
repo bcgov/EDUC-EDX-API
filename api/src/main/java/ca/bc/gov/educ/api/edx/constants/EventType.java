@@ -15,6 +15,10 @@ public enum EventType {
   /**
    *
    */
+  REMOVE_USER_SCHOOL_ACCESS,
+  /**
+   *
+   */
   CREATE_PERSONAL_ACTIVATION_CODE,
   /**
    *

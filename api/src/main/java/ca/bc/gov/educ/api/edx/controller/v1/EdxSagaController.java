@@ -8,8 +8,9 @@ import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
@@ -27,8 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.NEW_SECURE_EXCHANGE_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -64,6 +64,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   @Override
+  public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationRelinkSagaData));
+    RequestUtil.setAuditColumnsForCreate(edxUserActivationRelinkSagaData);
+    return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
+  }
+
+  @Override
   public ResponseEntity<String> createNewSecureExchange(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
     validatePayload(() -> getSecureExchangePayloadValidator().validatePayload(secureExchangeCreateSagaData.getSecureExchangeCreate(),true));
     RequestUtil.setAuditColumnsForCreate(secureExchangeCreateSagaData);
@@ -82,7 +89,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private ResponseEntity<String> processNewSecureExchangeMessageSaga(final SagaEnum sagaName, final SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
       return processServicesSaga(sagaName, secureExchangeCreateSagaData, secureExchangeCreateSagaData.getCreateUser(), secureExchangeCreateSagaData.getMincode(), null,null,null);
-
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
