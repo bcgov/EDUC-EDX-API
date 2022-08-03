@@ -102,7 +102,7 @@ public class EdxNewSecureExchangeOrchestratorService {
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.new.secure.exchange.notification")
-        .emailFields(Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getSchoolName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
+        .emailFields(Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
