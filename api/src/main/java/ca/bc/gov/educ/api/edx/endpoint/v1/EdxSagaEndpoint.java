@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -47,6 +48,17 @@ public interface EdxSagaEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT")})
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> createNewSecureExchange(@Validated @RequestBody SecureExchangeCreateSagaData secureExchangeCreateSagaData);
+
+  /**
+   * End point for relinking personal activaton code and sending email invite.
+   * @param edxUserActivationRelinkSagaData
+   * @return
+   */
+  @PostMapping("/school-user-activation-relink-saga")
+  @PreAuthorize("hasAuthority('SCOPE_SCHOOL_USER_ACTIVATION_INVITE_SAGA')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
+  @ResponseStatus(ACCEPTED)
+  ResponseEntity<String> edxSchoolUserActivationRelink(@Validated @RequestBody EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData);
 
   @PostMapping("/secure-exchange-comment-saga")
   @PreAuthorize("hasAuthority('SCOPE_CREATE_SECURE_EXCHANGE_COMMENT_SAGA')")

@@ -2,8 +2,10 @@ package ca.bc.gov.educ.api.edx.validator;
 
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 

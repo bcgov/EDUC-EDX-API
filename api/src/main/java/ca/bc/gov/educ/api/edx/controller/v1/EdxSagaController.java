@@ -11,6 +11,8 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
@@ -90,6 +92,12 @@ public class EdxSagaController implements EdxSagaEndpoint {
     validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationInviteSagaData));
     RequestUtil.setAuditColumnsForCreate(edxUserActivationInviteSagaData);
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA, edxUserActivationInviteSagaData);
+  }
+  @Override
+  public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationRelinkSagaData));
+    RequestUtil.setAuditColumnsForCreate(edxUserActivationRelinkSagaData);
+    return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
   }
 
   /**

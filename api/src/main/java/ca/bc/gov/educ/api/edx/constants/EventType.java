@@ -15,6 +15,10 @@ public enum EventType {
   /**
    * Create personal activation code event type.
    */
+  REMOVE_USER_SCHOOL_ACCESS,
+  /**
+   *
+   */
   CREATE_PERSONAL_ACTIVATION_CODE,
   /**
    * Send edx user activation email event type.

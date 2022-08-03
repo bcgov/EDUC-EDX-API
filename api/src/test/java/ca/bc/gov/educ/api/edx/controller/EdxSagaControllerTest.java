@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
 import lombok.val;
 import org.junit.After;
 import org.junit.Before;
@@ -51,6 +52,15 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   SagaService sagaService;
   @Autowired
   EdxSagaController edxSagaController;
+
+  @Autowired
+  EdxUserRepository edxUserRepository;
+
+  @Autowired
+  EdxUserSchoolRepository edxUserSchoolRepository;
+
+  @Autowired
+  EdxUserDistrictRepository edxUserDistrictRepository;
 
   @Autowired
   private EdxRoleRepository edxRoleRepository;
@@ -213,14 +223,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    createSagaEntity(jsonString, sagaData);
+    createSagaEntity(jsonString,sagaData);
 
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andDo(print()).andExpect(status().isConflict());
+          .andDo(print()).andExpect(status().isConflict());
   }
 
   @Test
@@ -235,6 +245,151 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
       .andDo(print()).andExpect(status().isAccepted());
   }
 
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationRelinkSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.setLastName(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.setFirstName(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.setEmail(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.setSchoolName(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.setMincode(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.getEdxActivationRoleCodes().clear();
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    sagaData.getEdxActivationRoleCodes().add("ABCD");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Invalid Edx Roles in the payload")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
+    EdxUserActivationRelinkSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    String jsonString = getJsonString(sagaData);
+    createSagaRelinkEntity(jsonString, sagaData);
+
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isConflict());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
+
+  @Test
+  public void testEdxSchoolUserActivationRelink_GivenValidInputAndValidSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
+    List<String> mincodes = new ArrayList<>();
+    mincodes.add("0889966");
+    var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, mincodes);
+    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", edxUser.getEdxUserID().toString(), edxUser.getEdxUserSchoolEntities().iterator().next().getEdxUserSchoolID().toString());
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
 
   @Test
   public void testCreateNewSecureExchange_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
@@ -440,11 +595,28 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     return sagaData;
   }
 
-  private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
-
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
-
+  private EdxUserActivationRelinkSagaData createUserActivationRelinkData(String firstName, String lastName, String email, String edxUserID, String edxUserSchoolID) {
+    EdxUserActivationRelinkSagaData sagaData = new EdxUserActivationRelinkSagaData();
+    val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    sagaData.setFirstName(firstName);
+    sagaData.setLastName(lastName);
+    sagaData.setEmail(email);
+    sagaData.setEdxUserID(edxUserID);
+    sagaData.setEdxUserSchoolID(edxUserSchoolID);
+    sagaData.setSchoolName("Test School");
+    sagaData.setMincode("00899178");
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
+    return sagaData;
   }
 
+  private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
+    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+  }
+
+  private void createSagaRelinkEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
+    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+  }
 
 }
