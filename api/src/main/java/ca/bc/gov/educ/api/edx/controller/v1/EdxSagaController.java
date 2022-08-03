@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
@@ -16,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
@@ -57,6 +58,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA, edxUserActivationInviteSagaData);
   }
 
+  @Override
+  public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeRelinkSagaDataPayload(edxUserActivationRelinkSagaData));
+    RequestUtil.setAuditColumnsForCreate(edxUserActivationRelinkSagaData);
+    return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
+  }
+
   private ResponseEntity<String> processEdxSchoolUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
     final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByMincodeAndEmailId(edxUserActivationInviteSagaData.getMincode(), edxUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
@@ -82,7 +90,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return statuses;
   }
 
-  private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, final Object sagaPayload, final String createUser,final String mincode, final String emailId,final UUID edxUserId,final UUID secureExchangeId) {
+  private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, final Object sagaPayload, final String createUser,final String mincode, final String emailId, final UUID edxUserId, final UUID secureExchangeId) {
     try {
 
       final String payload = JsonUtil.getJsonStringFromObject(sagaPayload);

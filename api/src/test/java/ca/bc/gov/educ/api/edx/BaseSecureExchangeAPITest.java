@@ -81,7 +81,7 @@ public abstract class BaseSecureExchangeAPITest {
     userDistrictEntity.setEdxUserDistrictRoleEntities(Set.of(userDistrictRoleEntity));
     edxUserDistrictRepository.save(userDistrictEntity);
 
-    return edxUserRepository.getById(entity.getEdxUserID());
+    return edxUserRepository.findById(entity.getEdxUserID()).get();
   }
 
   protected EdxUserEntity getEdxUserEntity() {

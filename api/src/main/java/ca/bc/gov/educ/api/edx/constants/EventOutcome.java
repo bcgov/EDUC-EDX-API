@@ -14,6 +14,10 @@ public enum EventOutcome {
    */
   SAGA_COMPLETED,
   /**
+   * EDX User School removed outcome
+   */
+  EDX_USER_SCHOOL_REMOVED,
+  /**
    * Personal Activation code creation outcome
    */
   PERSONAL_ACTIVATION_CODE_CREATED,
