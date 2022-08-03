@@ -13,10 +13,10 @@ import java.io.Serializable;
 public class EdxUserActivationRelinkSagaData extends EdxUserActivationInviteSagaData implements Serializable {
   private static final long serialVersionUID = -7847063658732692951L;
 
-  @NotNull(message = "EdxUser cannot be null")
+  @NotNull(message = "edxUserID cannot be null")
   String edxUserID;
 
-  @NotNull(message = "EdxUser cannot be null")
+  @NotNull(message = "edxUserSchoolID cannot be null")
   String edxUserSchoolID;
 
 }
