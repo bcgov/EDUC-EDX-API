@@ -16,6 +16,10 @@ public class EmailProperties {
   @Value("${email.subject.edx.new.secure.exchange.notification}")
   private String edxNewSecureExchangeNotificationEmailSubject;
 
+  @Value("${email.subject.edx.secure.exchange.comment.notification}")
+  private String edxSecureExchangeCommentNotificationEmailSubject;
+
+
 }
 
 

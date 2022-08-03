@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -10,7 +11,8 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,13 +31,13 @@ import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.NEW_SECURE_EXCHANGE_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.SECURE_EXCHANGE_COMMENT_SAGA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest {
+public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.
@@ -72,10 +74,10 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
 
   String sagaPayload;
 
-  SecureExchangeCreateSagaData sagaData;
+  SecureExchangeCommentSagaData sagaData;
 
   @Autowired
-  EdxNewSecureExchangeOrchestrator orchestrator;
+  EdxSecureExchangeCommentOrchestrator orchestrator;
 
   @Autowired
   MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
@@ -83,6 +85,11 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   @Autowired
   SecureExchangeRequestRepository secureExchangeRequestRepository;
 
+  @Autowired
+  SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
+
+  SecureExchangeEntity secureExchangeEntity;
+  private static final SecureExchangeEntityMapper SECURE_EXCHANGE_ENTITY_MAPPER = SecureExchangeEntityMapper.mapper;
 
   @After
   public void after() {
@@ -90,32 +97,31 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     sagaRepository.deleteAll();
     edxRoleRepository.deleteAll();
     edxPermissionRepository.deleteAll();
+    secureExchangeRequestCommentRepository.deleteAll();
+    secureExchangeRequestRepository.deleteAll();
     ministryOwnershipTeamRepository.deleteAll();
   }
 
   @Before
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
-    sagaData = createNewSecureExchangeSagaData();
+    sagaData = createCommentSagaData();
     sagaPayload = getJsonString(sagaData);
-    saga = sagaService.createSagaRecordInDB(NEW_SECURE_EXCHANGE_SAGA.toString(), "Test",
-      sagaPayload, null, null, sagaData.getMincode(), null);
+    saga = sagaService.createSagaRecordInDB(SECURE_EXCHANGE_COMMENT_SAGA.toString(), "Test",
+      sagaPayload, null, sagaData.getSecureExchangeId(), sagaData.getMincode(), null);
   }
 
-  private SecureExchangeCreateSagaData createNewSecureExchangeSagaData() throws JsonProcessingException {
+  private SecureExchangeCommentSagaData createCommentSagaData() throws JsonProcessingException {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
-    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    SecureExchangeCreateSagaData sagaData = new SecureExchangeCreateSagaData();
-    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
-    sagaData.setSecureExchangeCreate(secureExchangeCreate);
-    sagaData.setMincode("123456789");
-    sagaData.setSchoolName("ABC School");
-    sagaData.setMinistryTeamName("Min Team");
-    return sagaData;
+    MinistryOwnershipTeamEntity ministryEntity = ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.secureExchangeEntity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString(ministryEntity.getMinistryOwnershipTeamId().toString())));
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(secureExchangeEntity.getSecureExchangeID().toString()), SecureExchangeComment.class);
+    return createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", secureExchangeEntity.getSecureExchangeID(),"10");
+
   }
 
   @Test
-  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -127,17 +133,18 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
-    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
     var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class,newEvent.getEventPayload());
     assertThat(payload.getMincode()).isNotBlank();
     assertThat(payload.getSchoolName()).isNotBlank();
-    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(),payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
+    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(),secureExchangeEntity.getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
+    assertThat(secureExchangeRequestCommentRepository.findSecureExchangeCommentEntitiesBySecureExchangeEntitySecureExchangeID(secureExchangeEntities.get(0).getSecureExchangeID())).hasSize(2);
     final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
     assertThat(sagaStates).hasSize(1);
     assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
@@ -146,7 +153,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  public void testSendEmailEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -159,16 +166,16 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
-    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
 
     final var nextEvent = Event.builder()
-      .eventType(CREATE_NEW_SECURE_EXCHANGE)
-      .eventOutcome(EventOutcome.NEW_SECURE_EXCHANGE_CREATED)
+      .eventType(CREATE_SECURE_EXCHANGE_COMMENT)
+      .eventOutcome(EventOutcome.SECURE_EXCHANGE_COMMENT_CREATED)
       .sagaId(this.saga.getSagaId())
       .eventPayload(newEvent.getEventPayload())
       .build();
@@ -176,17 +183,17 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE);
-    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT);
+    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT);
+    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT);
 
   }
 
   @Test
-  public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  public void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE)
-      .eventOutcome(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT)
+      .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT)
+      .eventOutcome(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT)
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -198,4 +205,6 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
 
   }
+
+
 }

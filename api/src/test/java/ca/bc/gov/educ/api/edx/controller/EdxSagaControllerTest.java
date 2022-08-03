@@ -3,11 +3,14 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxSagaController;
+import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
 import lombok.val;
@@ -81,6 +84,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   SecureExchangeRequestRepository secureExchangeRequestRepository;
 
   MinistryOwnershipTeamEntity ministryOwnershipTeamEntity;
+
+  @Autowired
+  SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
+
+  private static final SecureExchangeEntityMapper SECURE_EXCHANGE_ENTITY_MAPPER = SecureExchangeEntityMapper.mapper;
 
   @Before
   public void setUp() {
@@ -460,6 +468,117 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, "WildFlower", "ABC Team", UUID.randomUUID(),"10");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", null, "ABC Team", UUID.randomUUID(),"10");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingMinistryTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", null, UUID.randomUUID(),"10");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("MinistryTeamName cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingSecureExchangeIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", null,"10");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("SecureExchangeId cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingSequenceNumberRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(),null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Sequence Number cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenInputWithMissingCommentRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createSecureExchangeCommentSagaData(null, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(),"12");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Secure Exchange Comment cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateSecureExchangeComment_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+    final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString()));
+    SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(entity.getSecureExchangeID().toString()), SecureExchangeComment.class);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", entity.getSecureExchangeID(),"10");
+
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
+
+
 
   private EdxUserActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
 
