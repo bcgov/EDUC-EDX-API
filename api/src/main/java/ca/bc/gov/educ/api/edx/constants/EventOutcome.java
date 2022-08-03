@@ -29,7 +29,17 @@ public enum EventOutcome {
   /**
    * Email notification for new secure exchange sent event outcome.
    */
-  EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT
+  EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT,
+
+  /**
+   * Secure exchange comment created event outcome.
+   */
+  SECURE_EXCHANGE_COMMENT_CREATED,
+  /**
+   * Email notification for secure exchange comment sent event outcome.
+   */
+  EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT
+
 
 
   }
