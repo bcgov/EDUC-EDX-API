@@ -28,8 +28,9 @@ public interface EdxSagaEndpoint {
 
   /**
    * End point for creating personal activaton code and sending email invite.
-   * @param edxUserActivationInviteSagaData
-   * @return
+   *
+   * @param edxUserActivationInviteSagaData the edx user activation invite saga data
+   * @return response entity
    */
   @PostMapping("/school-user-activation-invite-saga")
   @PreAuthorize("hasAuthority('SCOPE_SCHOOL_USER_ACTIVATION_INVITE_SAGA')")
@@ -40,8 +41,9 @@ public interface EdxSagaEndpoint {
 
   /**
    * Endpoint for creating creating new secure exchange and sending email notification to the edx_users
-   * @param secureExchangeCreateSagaData
-   * @return
+   *
+   * @param secureExchangeCreateSagaData the secure exchange create saga data
+   * @return response entity
    */
   @PostMapping("/new-secure-exchange-saga")
   @PreAuthorize("hasAuthority('SCOPE_CREATE_SECURE_EXCHANGE_SAGA')")
@@ -51,8 +53,9 @@ public interface EdxSagaEndpoint {
 
   /**
    * End point for relinking personal activaton code and sending email invite.
-   * @param edxUserActivationRelinkSagaData
-   * @return
+   *
+   * @param edxUserActivationRelinkSagaData the edx user activation relink saga data
+   * @return response entity
    */
   @PostMapping("/school-user-activation-relink-saga")
   @PreAuthorize("hasAuthority('SCOPE_SCHOOL_USER_ACTIVATION_INVITE_SAGA')")
@@ -60,6 +63,12 @@ public interface EdxSagaEndpoint {
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> edxSchoolUserActivationRelink(@Validated @RequestBody EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData);
 
+  /**
+   * Create secure exchange comment response entity.
+   *
+   * @param secureExchangeCommentSagaData the secure exchange comment saga data
+   * @return the response entity
+   */
   @PostMapping("/secure-exchange-comment-saga")
   @PreAuthorize("hasAuthority('SCOPE_CREATE_SECURE_EXCHANGE_COMMENT_SAGA')")
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT")})
