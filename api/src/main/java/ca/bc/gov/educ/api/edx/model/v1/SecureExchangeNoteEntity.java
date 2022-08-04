@@ -24,9 +24,6 @@ public class SecureExchangeNoteEntity {
   @Column(name = "SECURE_EXCHANGE_NOTE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeNoteID;
 
-  @Column(name = "SECURE_EXCHANGE_ID")
-  UUID secureExchangeID;
-
   @NotNull(message = "staffUserIdentifier cannot be null")
   @Column(name = "STAFF_USER_IDENTIFIER")
   String staffUserIdentifier;
