@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,5 +12,7 @@ import java.util.UUID;
 @Repository
 public interface SecureExchangeRequestCommentRepository extends JpaRepository<SecureExchangeCommentEntity, UUID> {
   Optional<SecureExchangeCommentEntity> findByContent(String content);
+
+  Optional<SecureExchangeCommentEntity> findByCommentTimestampAndCommentUserNameAndSecureExchangeEntity_SecureExchangeIDAndContent(LocalDateTime commentTimestamp,String commentUserName,UUID secureExchangeID,String content);
   List<SecureExchangeCommentEntity> findSecureExchangeCommentEntitiesBySecureExchangeEntitySecureExchangeID(UUID secureExchangeID);
 }
