@@ -39,6 +39,11 @@ public class SecureExchangeNoteEntity {
   @Column(name = "NOTE_CONTENT")
   String content;
 
+  @NotNull(message = "noteTimestamp cannot be null")
+  @PastOrPresent
+  @Column(name = "NOTE_TIMESTAMP")
+  LocalDateTime noteTimestamp;
+
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
