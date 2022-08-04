@@ -107,4 +107,7 @@ public class SecureExchangeEntity {
   @OneToMany(mappedBy = "secureExchangeEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SecureExchangeDocumentEntity.class)
   private Set<SecureExchangeDocumentEntity> secureExchangeDocument;
 
+  @OneToMany(mappedBy = "secureExchangeEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SecureExchangeNoteEntity.class)
+  private Set<SecureExchangeNoteEntity> secureExchangeNotes;
+
 }
