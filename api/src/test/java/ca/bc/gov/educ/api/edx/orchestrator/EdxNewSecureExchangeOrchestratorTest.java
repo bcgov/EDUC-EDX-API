@@ -133,10 +133,41 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
-    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class,newEvent.getEventPayload());
+    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
     assertThat(payload.getMincode()).isNotBlank();
     assertThat(payload.getSchoolName()).isNotBlank();
-    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(),payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
+    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(), payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
+    assertThat(secureExchangeEntities).hasSize(1);
+    final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
+    assertThat(sagaStates).hasSize(1);
+    assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
+    assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
+
+  }
+
+  @Test
+  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+    final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+    final var event = Event.builder()
+      .eventType(INITIATED)
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .sagaId(this.saga.getSagaId())
+      .eventPayload(sagaPayload)
+      .build();
+    this.orchestrator.handleEvent(event);
+    this.orchestrator.replaySaga(this.sagaRepository.findById(this.saga.getSagaId()).orElseThrow());
+    verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+    final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
+    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+
+    final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
+    assertThat(sagaFromDB).isPresent();
+    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
+    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolName()).isNotBlank();
+    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(), payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
     final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
     assertThat(sagaStates).hasSize(1);

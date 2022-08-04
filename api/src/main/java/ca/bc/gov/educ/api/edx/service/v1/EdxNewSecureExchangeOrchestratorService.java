@@ -6,8 +6,8 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The type Edx new secure exchange orchestrator service.
@@ -122,11 +123,13 @@ public class EdxNewSecureExchangeOrchestratorService {
     RequestUtil.setAuditColumnsForCreate(secureExchangeCreateSagaData.getSecureExchangeCreate());
     SecureExchangeEntity secureExchangeEntity = getSecureExchangeService().createSecureExchange(mapper.toModel(secureExchangeCreateSagaData.getSecureExchangeCreate()));
     try {
-      updateSagaData(secureExchangeEntity,secureExchangeCreateSagaData,saga);
+      updateSagaDataInternal(secureExchangeEntity,secureExchangeCreateSagaData,saga);
     } catch (JsonProcessingException e) {
       throw new SagaRuntimeException(e);
     }
-
+  }
+  public SecureExchangeEntity getSecureExchangeById(UUID secureExchangeID){
+    return this.getSecureExchangeService().retrieveSecureExchange(secureExchangeID);
   }
 
   /**

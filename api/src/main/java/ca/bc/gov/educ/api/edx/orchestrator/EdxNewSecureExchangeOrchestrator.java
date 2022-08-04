@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Component;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
@@ -72,7 +73,12 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_NEW_SECURE_EXCHANGE.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-    getEdxNewSecureExchangeOrchestratorService().createNewSecureExchange(secureExchangeCreateSagaData, saga);
+    if (secureExchangeCreateSagaData.getSecureExchangeId() == null) {// handle repeat scenario and deal with skipping the creation.
+      getEdxNewSecureExchangeOrchestratorService().createNewSecureExchange(secureExchangeCreateSagaData, saga);
+    } else {
+      val existingSEEntity = getEdxNewSecureExchangeOrchestratorService().getSecureExchangeById(secureExchangeCreateSagaData.getSecureExchangeId());
+      getEdxNewSecureExchangeOrchestratorService().updateSagaData(existingSEEntity, secureExchangeCreateSagaData, saga);
+    }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
       .eventType(CREATE_NEW_SECURE_EXCHANGE).eventOutcome(NEW_SECURE_EXCHANGE_CREATED)
