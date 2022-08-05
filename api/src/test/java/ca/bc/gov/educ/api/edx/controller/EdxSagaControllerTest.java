@@ -601,7 +601,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
     sagaData.setEmail(email);
-    sagaData.setEdxUserID(edxUserID);
+    sagaData.setEdxUserId(edxUserID);
     sagaData.setEdxUserSchoolID(edxUserSchoolID);
     sagaData.setSchoolName("Test School");
     sagaData.setMincode("00899178");

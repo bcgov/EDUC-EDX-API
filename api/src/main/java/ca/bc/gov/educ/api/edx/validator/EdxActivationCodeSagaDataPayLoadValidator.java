@@ -30,6 +30,15 @@ public class EdxActivationCodeSagaDataPayLoadValidator {
     return apiValidationErrors;
   }
 
+  public List<FieldError> validateEdxActivationCodeRelinkSagaDataPayload(EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    final List<FieldError> apiValidationErrors = new ArrayList<>();
+    if(StringUtils.isBlank(edxUserActivationRelinkSagaData.getEdxUserId())){
+      apiValidationErrors.add(createFieldError("edxUserID", edxUserActivationRelinkSagaData.getEdxUserId(), "EDX User ID must be provided for re-link"));
+    }
+    apiValidationErrors.addAll(validateEdxActivationCodeSagaDataPayload(edxUserActivationRelinkSagaData));
+    return apiValidationErrors;
+  }
+
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
     return new FieldError("EdxActivationCodeSagaData", fieldName, rejectedValue, false, null, null, message);
   }

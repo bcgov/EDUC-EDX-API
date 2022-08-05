@@ -58,4 +58,6 @@ public class EdxUserActivationInviteSagaData extends BaseRequest implements Seri
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   LocalDateTime expiryDate;
 
+  String edxUserId;
+
 }

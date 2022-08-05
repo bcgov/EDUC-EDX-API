@@ -359,7 +359,9 @@ public class EdxUsersService {
       for(val activationCode: activationCodes){
         if(!activationCode.getIsPrimary()){
           userCodeEntity = activationCode;
-          edxActivateUser.setEdxUserId(activationCode.getEdxUserID().toString());
+          if(activationCode.getEdxUserId() != null) {
+            edxActivateUser.setEdxUserId(activationCode.getEdxUserId().toString());
+          }
         }
         if (activationCode.getExpiryDate() != null && activationCode.getExpiryDate().isBefore(LocalDateTime.now())) {
           ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This Activation Code has expired").status(BAD_REQUEST).build();

@@ -40,7 +40,7 @@ public class EdxActivationCodeEntity {
   String activationCode;
 
   @Column(name = "EDX_USER_ID")
-  UUID edxUserID;
+  UUID edxUserId;
 
   @NotNull(message = "isPrimary cannot be null")
   @Column(name = "IS_PRIMARY")

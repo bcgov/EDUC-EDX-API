@@ -169,13 +169,13 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   public void generateEdxActivationCode() throws NoSuchAlgorithmException {
     var edxActivationCodeEntity = this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, UUID.randomUUID().toString());
     UUID user = UUID.randomUUID();
-    edxActivationCodeEntity.setEdxUserID(user);
+    edxActivationCodeEntity.setEdxUserId(user);
     EdxActivationCodeEntity activationCode = this.edxActivationCodeRepository.save(edxActivationCodeEntity);
     EdxActivationCodeEntity generated = this.service.createPersonalEdxActivationCode(activationCode);
     assertThat(generated.getMincode()).isNotNull().isNotEmpty().isEqualTo(edxActivationCodeEntity.getMincode());
     assertThat(generated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8);
     assertThat(generated.getIsPrimary()).isFalse();
-    assertThat(generated.getEdxUserID()).isEqualTo(user);
+    assertThat(generated.getEdxUserId()).isEqualTo(user);
     assertThat(generated.getCreateUser()).isEqualTo(edxActivationCodeEntity.getCreateUser());
     assertThat(generated.getUpdateUser()).isEqualTo(edxActivationCodeEntity.getUpdateUser());
   }
