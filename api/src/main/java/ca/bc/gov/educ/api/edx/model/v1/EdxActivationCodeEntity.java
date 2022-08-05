@@ -39,6 +39,9 @@ public class EdxActivationCodeEntity {
   @Column(name = "ACTIVATION_CODE")
   String activationCode;
 
+  @Column(name = "EDX_USER_ID")
+  UUID edxUserId;
+
   @NotNull(message = "isPrimary cannot be null")
   @Column(name = "IS_PRIMARY")
   Boolean isPrimary;

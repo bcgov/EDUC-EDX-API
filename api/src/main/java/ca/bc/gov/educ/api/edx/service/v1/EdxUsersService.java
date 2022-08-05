@@ -15,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -358,6 +359,9 @@ public class EdxUsersService {
       for(val activationCode: activationCodes){
         if(!activationCode.getIsPrimary()){
           userCodeEntity = activationCode;
+          if(activationCode.getEdxUserId() != null) {
+            edxActivateUser.setEdxUserId(activationCode.getEdxUserId().toString());
+          }
         }
         if (activationCode.getExpiryDate() != null && activationCode.getExpiryDate().isBefore(LocalDateTime.now())) {
           ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This Activation Code has expired").status(BAD_REQUEST).build();
@@ -366,10 +370,9 @@ public class EdxUsersService {
       }
 
       //Activate User
-      if (edxActivateUser.getEdxUserId() != null) {
+      if (StringUtils.isNotBlank(edxActivateUser.getEdxUserId())) {
         //relink user logic
         return relinkEdxUser(edxActivateUser, userCodeEntity);
-
       } else {
         //activate user logic
         val edxUsers = getEdxUserRepository().findEdxUserEntitiesByDigitalIdentityID(UUID.fromString(edxActivateUser.getDigitalId()));
@@ -421,7 +424,6 @@ public class EdxUsersService {
     val savedEdxUser = getEdxUserRepository().save(updatedEdxUser);
     expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
     return savedEdxUser;
-
   }
 
   /**

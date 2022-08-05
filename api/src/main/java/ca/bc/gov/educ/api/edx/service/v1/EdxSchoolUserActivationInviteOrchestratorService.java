@@ -83,7 +83,6 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     } catch (NoSuchAlgorithmException | JsonProcessingException e) {
       throw new SagaRuntimeException(e);
     }
-
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW) // this makes sure it is done in a new transaction when used through proxy, so call on line#84 won't have a new transaction.

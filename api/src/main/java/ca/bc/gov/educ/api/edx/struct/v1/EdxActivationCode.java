@@ -47,4 +47,6 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
   String validationCode;
 
   String isUrlClicked;
+
+  String edxUserId;
 }

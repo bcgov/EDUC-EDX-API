@@ -67,7 +67,7 @@ public class EdxSchoolUserActivationRelinkOrchestrator extends UserActivationBas
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
     try {
-      getEdxUsersService().deleteEdxSchoolUserById(UUID.fromString(edxUserActivationRelinkSagaData.getEdxUserID()), UUID.fromString(edxUserActivationRelinkSagaData.getEdxUserSchoolID()));
+      getEdxUsersService().deleteEdxSchoolUserById(UUID.fromString(edxUserActivationRelinkSagaData.getEdxUserId()), UUID.fromString(edxUserActivationRelinkSagaData.getEdxUserSchoolID()));
     }catch (EntityNotFoundException e){
       //Idempotent - this is ok
     }
