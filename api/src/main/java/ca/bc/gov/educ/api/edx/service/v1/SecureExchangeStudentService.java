@@ -47,8 +47,7 @@ public class SecureExchangeStudentService {
         restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found
         SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
-
-        if(secureExchangeEntity.getSecureExchangeStudents() == null){
+        if (secureExchangeEntity.getSecureExchangeStudents() == null) {
             secureExchangeEntity.setSecureExchangeStudents(new HashSet<>());
         }
         SecureExchangeStudentEntity student = secureExchangeEntity.getSecureExchangeStudents()
@@ -56,17 +55,20 @@ public class SecureExchangeStudentService {
                 .filter(s -> UUID.fromString(secureExchangeStudent.getStudentId()).equals(s.getStudentId()))
                 .findAny()
                 .orElse(null);
-        // if student != null, do nothing as student already exists
-        if(student == null){
-            SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
-            secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
-            if(secureExchangeStudentEntity.getCreateUser() == null){
-                secureExchangeStudentEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
-            }
-            secureExchangeStudentEntity.setCreateDate(LocalDateTime.now());
-            secureExchangeEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
-            secureExchangeEntity = this.exchangeService.updateSecureExchange(secureExchangeEntity);
+        if (student != null) {
+            //do nothing as student already exists
+            return secureExchangeMapper.toStructure(secureExchangeEntity);
         }
+        secureExchangeEntity.setIsReadByMinistry(secureExchangeStudent.getStaffUserIdentifier() != null);
+        secureExchangeEntity.setIsReadByExchangeContact(secureExchangeStudent.getEdxUserID() != null);
+        SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
+        secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
+        if (secureExchangeStudentEntity.getCreateUser() == null) {
+            secureExchangeStudentEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
+        }
+        secureExchangeStudentEntity.setCreateDate(LocalDateTime.now());
+        secureExchangeEntity.getSecureExchangeStudents().add(secureExchangeStudentEntity);
+        secureExchangeEntity = this.exchangeService.updateSecureExchange(secureExchangeEntity);
         return secureExchangeMapper.toStructure(secureExchangeEntity);
     }
 
