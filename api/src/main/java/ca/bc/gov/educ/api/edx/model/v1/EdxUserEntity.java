@@ -28,7 +28,7 @@ public class EdxUserEntity {
   @Column(name = "EDX_USER_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserID;
 
-  @Column(name = "DIGITAL_IDENTITY_ID", updatable = false, columnDefinition = "BINARY(16)")
+  @Column(name = "DIGITAL_IDENTITY_ID", columnDefinition = "BINARY(16)")
   UUID digitalIdentityID;
 
   @Column(name = "FIRST_NAME")
