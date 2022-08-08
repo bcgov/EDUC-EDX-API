@@ -105,6 +105,8 @@ public class SecureExchangeEntity {
   private Set<SecureExchangeStudentEntity> secureExchangeStudents;
 
   @OneToMany(mappedBy = "secureExchangeEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, targetEntity = SecureExchangeDocumentEntity.class)
+  @ToString.Exclude
+  @EqualsAndHashCode.Exclude
   private Set<SecureExchangeDocumentEntity> secureExchangeDocument;
 
 }

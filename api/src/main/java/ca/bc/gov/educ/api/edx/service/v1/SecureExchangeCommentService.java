@@ -12,6 +12,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -69,4 +70,8 @@ public class SecureExchangeCommentService {
     throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
   }
 
+
+  public Optional<SecureExchangeCommentEntity> findCommentForSecureExchange(LocalDateTime commentTimestamp, String commentUserName, UUID secureExchangeID, String content){
+   return getSecureExchangeRequestCommentRepository().findByCommentTimestampAndCommentUserNameAndSecureExchangeEntity_SecureExchangeIDAndContent(commentTimestamp,commentUserName,secureExchangeID,content);
+  }
 }
