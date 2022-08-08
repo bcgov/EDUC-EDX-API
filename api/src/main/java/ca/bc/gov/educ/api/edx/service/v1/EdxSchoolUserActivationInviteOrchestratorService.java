@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -56,18 +57,6 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     this.props = props;
     this.emailNotificationService = emailNotificationService;
     this.sagaService = sagaService;
-  }
-
-  public Optional<EdxActivationCodeEntity> checkIfActivationSagaDataExists(EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
-    List<EdxActivationCodeEntity> existingPersonalCodes = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByEmailAndMincodeAndIsPrimaryIsFalseAndIsUrlClickedIsFalse(edxUserActivationInviteSagaData.getEmail(), edxUserActivationInviteSagaData.getMincode());
-    if (!existingPersonalCodes.isEmpty()) {
-      for (EdxActivationCodeEntity personalCode : existingPersonalCodes) {
-        if (personalCode.getExpiryDate().isAfter(LocalDateTime.now())) {
-          return Optional.of(personalCode);
-        }
-      }
-    }
-    return Optional.empty();
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -119,5 +108,9 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
       edxUserActivationInviteSagaData.getValidationCode();
+  }
+
+  public EdxActivationCodeEntity getActivationCodeById(UUID edxActivationCodeId) {
+    return getEdxActivationCodeRepository().findById(edxActivationCodeId).orElseThrow();
   }
 }

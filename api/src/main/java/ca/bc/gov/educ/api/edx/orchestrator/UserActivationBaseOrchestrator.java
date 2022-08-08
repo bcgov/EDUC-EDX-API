@@ -17,6 +17,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED;
@@ -65,11 +66,11 @@ public abstract class UserActivationBaseOrchestrator<T> extends BaseOrchestrator
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_PERSONAL_ACTIVATION_CODE.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-    Optional<EdxActivationCodeEntity> edxActivationCodeEntityOptional = getEdxSchoolUserActivationInviteOrchestratorService().checkIfActivationSagaDataExists(edxUserActivationInviteSagaData);
-    if (edxActivationCodeEntityOptional.isEmpty()) {//idempotency check
+    if (edxUserActivationInviteSagaData.getEdxActivationCodeId() == null ) {//idempotency check
       getEdxSchoolUserActivationInviteOrchestratorService().createPersonalActivationCodeAndUpdateSagaData(edxUserActivationInviteSagaData, saga); // one transaction updates three tables.
     } else {
-      getEdxSchoolUserActivationInviteOrchestratorService().updateSagaData(edxUserActivationInviteSagaData, edxActivationCodeEntityOptional.get(), saga);
+      EdxActivationCodeEntity edxActivationCodeEntity = getEdxSchoolUserActivationInviteOrchestratorService().getActivationCodeById(UUID.fromString(edxUserActivationInviteSagaData.getEdxActivationCodeId()));
+      getEdxSchoolUserActivationInviteOrchestratorService().updateSagaData(edxUserActivationInviteSagaData, edxActivationCodeEntity, saga);
     }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
