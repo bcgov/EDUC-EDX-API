@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
  * The type Edx secure exchange comment orchestrator service.
@@ -97,7 +97,7 @@ public class EdxSecureExchangeCommentOrchestratorService {
     RequestUtil.setAuditColumnsForCreate(secureExchangeCommentSagaData.getSecureExchangeComment());
     SecureExchangeCommentEntity secureExchangeCommentEntity = getCommentService().save(secureExchangeCommentSagaData.getSecureExchangeId(), SECURE_EXCHANGE_COMMENT_MAPPER.toModel(secureExchangeCommentSagaData.getSecureExchangeComment()));
     try {
-      updateSagaData(secureExchangeCommentEntity, secureExchangeCommentSagaData, saga);
+      updateSagaDataInternal(secureExchangeCommentEntity, secureExchangeCommentSagaData, saga);
     } catch (JsonProcessingException e) {
       throw new SagaRuntimeException(e);
     }
@@ -114,7 +114,7 @@ public class EdxSecureExchangeCommentOrchestratorService {
   public void sendEmail(SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
     // query to find all the users to whom it should be sent
     Set<String> emailIds = getEdxUsersService().findEdxUserEmailByMincodeAndPermissionCode(secureExchangeCommentSagaData.getMincode(), "SECURE_EXCHANGE");
-    final var subject = emailProperties.getEdxNewSecureExchangeNotificationEmailSubject();
+    final var subject = emailProperties.getEdxSecureExchangeCommentNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     for (String emailId : emailIds) {
       final var emailNotification = EmailNotification.builder()
@@ -154,5 +154,9 @@ public class EdxSecureExchangeCommentOrchestratorService {
     secureExchangeCommentSagaData.setSecureExchangeComment(SECURE_EXCHANGE_COMMENT_MAPPER.toStructure(secureExchangeCommentEntity));
     sagaEntity.setPayload(JsonUtil.getJsonStringFromObject(secureExchangeCommentSagaData)); // update the payload which will be updated in DB.
     this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
+  }
+
+  public Optional<SecureExchangeCommentEntity> findCommentForSecureExchange(SecureExchangeCommentSagaData secureExchangeCommentSagaData) {
+   return commentService.findCommentForSecureExchange(LocalDateTime.parse(secureExchangeCommentSagaData.getSecureExchangeComment().getCommentTimestamp()), secureExchangeCommentSagaData.getSecureExchangeComment().getCommentUserName(), UUID.fromString(secureExchangeCommentSagaData.getSecureExchangeComment().getSecureExchangeID()), secureExchangeCommentSagaData.getSecureExchangeComment().getContent());
   }
 }

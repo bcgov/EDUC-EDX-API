@@ -116,7 +116,7 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     MinistryOwnershipTeamEntity ministryEntity = ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
     this.secureExchangeEntity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString(ministryEntity.getMinistryOwnershipTeamId().toString())));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(secureExchangeEntity.getSecureExchangeID().toString()), SecureExchangeComment.class);
-    return createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", secureExchangeEntity.getSecureExchangeID(),"10");
+    return createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", secureExchangeEntity.getSecureExchangeID(), "10");
 
   }
 
@@ -139,10 +139,10 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
-    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class,newEvent.getEventPayload());
+    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
     assertThat(payload.getMincode()).isNotBlank();
     assertThat(payload.getSchoolName()).isNotBlank();
-    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(),secureExchangeEntity.getSecureExchangeContactTypeCode());
+    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(), secureExchangeEntity.getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
     assertThat(secureExchangeRequestCommentRepository.findSecureExchangeCommentEntitiesBySecureExchangeEntitySecureExchangeID(secureExchangeEntities.get(0).getSecureExchangeID())).hasSize(2);
     final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
@@ -150,6 +150,39 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
     assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
 
+  }
+
+  @Test
+  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+    final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+    final var event = Event.builder()
+      .eventType(INITIATED)
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .sagaId(this.saga.getSagaId())
+      .eventPayload(sagaPayload)
+      .build();
+    this.orchestrator.handleEvent(event);
+
+    this.orchestrator.replaySaga(this.saga);
+
+    verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+    final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
+
+    final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
+    assertThat(sagaFromDB).isPresent();
+    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
+    var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
+    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolName()).isNotBlank();
+    List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(), secureExchangeEntity.getSecureExchangeContactTypeCode());
+    assertThat(secureExchangeEntities).hasSize(1);
+    assertThat(secureExchangeRequestCommentRepository.findSecureExchangeCommentEntitiesBySecureExchangeEntitySecureExchangeID(secureExchangeEntities.get(0).getSecureExchangeID())).hasSize(2);
+    final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
+    assertThat(sagaStates).hasSize(1);
+    assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
+    assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
   }
 
   @Test

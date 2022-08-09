@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Component;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
@@ -100,8 +101,12 @@ public class EdxSecureExchangeCommentOrchestrator extends BaseOrchestrator<Secur
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_SECURE_EXCHANGE_COMMENT.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-    getEdxSecureExchangeCommentOrchestratorService().createSecureExchangeComment(secureExchangeCommentSagaData, saga);
-
+    val secureExchangeCommentEntityOptional = getEdxSecureExchangeCommentOrchestratorService().findCommentForSecureExchange(secureExchangeCommentSagaData);
+    if (secureExchangeCommentEntityOptional.isPresent()) { // handle repeat scenario and deal with skipping the creation.
+      getEdxSecureExchangeCommentOrchestratorService().updateSagaData(secureExchangeCommentEntityOptional.get(), secureExchangeCommentSagaData, saga);
+    } else {
+      getEdxSecureExchangeCommentOrchestratorService().createSecureExchangeComment(secureExchangeCommentSagaData, saga);
+    }
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
       .eventType(CREATE_SECURE_EXCHANGE_COMMENT).eventOutcome(SECURE_EXCHANGE_COMMENT_CREATED)
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCommentSagaData))
