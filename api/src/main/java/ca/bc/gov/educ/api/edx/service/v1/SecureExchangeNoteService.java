@@ -45,8 +45,7 @@ public class SecureExchangeNoteService {
     if (result.isPresent()) {
       SecureExchangeEntity secureExchangeEntity = result.get();
       secureExchangeNote.setSecureExchangeEntity(secureExchangeEntity);
-      secureExchangeEntity.getSecureExchangeNotes().add(secureExchangeNote);
-      this.getSecureExchangeRequestRepository().save(secureExchangeEntity);
+      this.getSecureExchangeRequestNoteRepository().save(secureExchangeNote);
       return secureExchangeNote;
     }
     throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
