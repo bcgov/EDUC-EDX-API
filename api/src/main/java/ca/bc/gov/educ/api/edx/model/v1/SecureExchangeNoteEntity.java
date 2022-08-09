@@ -24,7 +24,6 @@ public class SecureExchangeNoteEntity {
   @Column(name = "SECURE_EXCHANGE_NOTE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeNoteID;
 
-  @NotNull(message = "staffUserIdentifier cannot be null")
   @Column(name = "STAFF_USER_IDENTIFIER")
   String staffUserIdentifier;
 
@@ -60,7 +59,7 @@ public class SecureExchangeNoteEntity {
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
-  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false, insertable = false)
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
   private SecureExchangeEntity secureExchangeEntity;
 
 }
