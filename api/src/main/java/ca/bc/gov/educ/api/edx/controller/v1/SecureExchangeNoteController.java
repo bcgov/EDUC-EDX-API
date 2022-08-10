@@ -8,6 +8,8 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeNote;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,8 +28,9 @@ public class SecureExchangeNoteController extends BaseController implements Secu
   }
 
   @Override
-  public List<SecureExchangeNote> retrieveNotes(String secureExchangeId) {
-    return this.getSecureExchangeNoteService().retrieveNotes(UUID.fromString(secureExchangeId)).stream().map(mapper::toStructure).collect(Collectors.toList());
+  public ResponseEntity<?> retrieveNotes(String secureExchangeId) {
+    List<SecureExchangeNote> notes = this.getSecureExchangeNoteService().retrieveNotes(UUID.fromString(secureExchangeId)).stream().map(mapper::toStructure).collect(Collectors.toList());
+    return (notes != null && notes.size()>0) ? new ResponseEntity<>(notes, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Override
