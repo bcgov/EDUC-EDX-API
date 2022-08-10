@@ -121,7 +121,12 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         this.secureExchangeRequestRepository.save(entity);
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, entity.getSecureExchangeID().toString())
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
-                .andDo(print()).andExpect(status().isOk());
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(
+                        MockMvcResultMatchers.jsonPath("$[0].secureExchangeNoteID",
+                        Matchers.containsString(note.getSecureExchangeNoteID().toString()))
+                );
     }
 
     // test getting a valid exchange that contains no notes, expect no content
