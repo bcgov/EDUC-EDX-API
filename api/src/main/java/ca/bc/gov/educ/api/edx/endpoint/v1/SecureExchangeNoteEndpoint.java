@@ -4,12 +4,11 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeNote;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.CREATED;
 
@@ -21,7 +20,7 @@ public interface SecureExchangeNoteEndpoint {
   @GetMapping(URL.SECURE_EXCHANGE_ID_NOTES)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional
-  List<SecureExchangeNote> retrieveNotes(@PathVariable String secureExchangeId);
+  ResponseEntity<?> retrieveNotes(@PathVariable String secureExchangeId);
 
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
   @PostMapping(URL.SECURE_EXCHANGE_ID_NOTES)
