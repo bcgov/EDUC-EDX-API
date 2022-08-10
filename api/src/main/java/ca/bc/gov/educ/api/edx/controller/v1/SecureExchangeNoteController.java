@@ -30,7 +30,7 @@ public class SecureExchangeNoteController extends BaseController implements Secu
   @Override
   public ResponseEntity<?> retrieveNotes(String secureExchangeId) {
     List<SecureExchangeNote> notes = this.getSecureExchangeNoteService().retrieveNotes(UUID.fromString(secureExchangeId)).stream().map(mapper::toStructure).collect(Collectors.toList());
-    return (notes != null && notes.size()>0) ? new ResponseEntity<>(notes, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    return (notes != null && !notes.isEmpty()) ? new ResponseEntity<>(notes, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Override
