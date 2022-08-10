@@ -21,10 +21,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public abstract class SecureExchangeEntityDecorator implements SecureExchangeEntityMapper {
   private final SecureExchangeEntityMapper delegate;
   private final UUIDMapper uUIDMapper = new UUIDMapper();
+
+  private static final SecureExchangeNoteMapper noteMapper = SecureExchangeNoteMapper.mapper;
   private final LocalDateTimeMapper localDateTimeMapper = new LocalDateTimeMapper();
   private final Base64Mapper base64Mapper = new Base64Mapper();
 
@@ -98,7 +101,17 @@ public abstract class SecureExchangeEntityDecorator implements SecureExchangeEnt
         secureExchange.getDocumentList().add(doc);
       }
     }
+
+    setSecureExchangeNotesToStruct(entity, secureExchange);
+
     return secureExchange;
+  }
+
+  private void setSecureExchangeNotesToStruct(SecureExchangeEntity secureExchangeEntity, SecureExchange secureExchange) {
+    val notes = secureExchangeEntity.getSecureExchangeNotes();
+    if(notes != null){
+      secureExchange.setNoteList(notes.stream().map(noteMapper::toStructure).collect(Collectors.toList()));
+    }
   }
 
   @Override

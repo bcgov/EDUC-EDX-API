@@ -15,6 +15,8 @@ public class SecureExchange extends SecureExchangeBase implements Serializable {
 
   private List<SecureExchangeStudent> studentsList;
 
+  private List<SecureExchangeNote> noteList;
+
   private List<SecureExchangeDocMetadata> documentList;
 }
 
