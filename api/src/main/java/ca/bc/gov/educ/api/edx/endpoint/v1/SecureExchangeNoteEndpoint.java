@@ -18,7 +18,7 @@ public interface SecureExchangeNoteEndpoint {
 
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
   @GetMapping(URL.SECURE_EXCHANGE_ID_NOTES)
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND"), @ApiResponse(responseCode = "204", description = "NO CONTENT")})
   @Transactional
   ResponseEntity<?> retrieveNotes(@PathVariable String secureExchangeId);
 
