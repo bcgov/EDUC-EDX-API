@@ -12,6 +12,7 @@ import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -35,7 +36,7 @@ public class SecureExchangeNoteService {
   public Set<SecureExchangeNoteEntity> retrieveNotes(UUID secureExchangeRequestId) {
     final Optional<SecureExchangeEntity> entity = this.getSecureExchangeRequestRepository().findById(secureExchangeRequestId);
     if (entity.isPresent()) {
-      return entity.get().getSecureExchangeNotes();
+      return (entity.get().getSecureExchangeNotes() == null) ? new HashSet<>() : entity.get().getSecureExchangeNotes();
     }
     throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
   }
