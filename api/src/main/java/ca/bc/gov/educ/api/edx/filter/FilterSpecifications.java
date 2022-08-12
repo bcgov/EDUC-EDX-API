@@ -25,8 +25,13 @@ public class FilterSpecifications<E, T extends Comparable<T>> {
 		map = new EnumMap<>(FilterOperation.class);
 
 		// Equal
-		map.put(FilterOperation.EQUAL, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
-				.equal(root.get(filterCriteria.getFieldName()), filterCriteria.getConvertedSingleValue()));
+		map.put(FilterOperation.EQUAL, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> {
+      if(filterCriteria.getFieldName().contains(".")){
+        String[] splits = filterCriteria.getFieldName().split("\\.");
+        return criteriaBuilder.equal(root.join(splits[0]).get(splits[1]), filterCriteria.getConvertedSingleValue());
+      }
+      return criteriaBuilder.equal(root.get(filterCriteria.getFieldName()), filterCriteria.getConvertedSingleValue());
+    });
 
 		map.put(FilterOperation.NOT_EQUAL, filterCriteria -> (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder
 				.notEqual(root.get(filterCriteria.getFieldName()), filterCriteria.getConvertedSingleValue()));
