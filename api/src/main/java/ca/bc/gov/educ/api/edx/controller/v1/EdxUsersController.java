@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.controller.v1;
 
+import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.controller.BaseController;
 import ca.bc.gov.educ.api.edx.endpoint.v1.EdxUsersEndpoint;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
@@ -141,8 +142,13 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxRole> findAllEdxRoles() {
-    return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+  public List<EdxRole> findAllEdxRoles(InstituteTypeCode instituteTypeCode) {
+    if (instituteTypeCode == null) {
+      return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+    } else {
+      return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+    }
+
   }
 
   @Override

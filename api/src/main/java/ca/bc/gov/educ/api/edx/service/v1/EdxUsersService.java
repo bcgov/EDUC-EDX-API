@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
+import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
@@ -17,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -762,5 +766,14 @@ public class EdxUsersService {
    */
   public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode){
     return getEdxUserRepository().findEdxUserEmailByMincodeAndPermissionCode(mincode, permissionCode);
+  }
+
+  public List<EdxRoleEntity> findAllEdxRolesForInstituteTypeCode(InstituteTypeCode instituteTypeCode) {
+    Boolean isDistrictRole = InstituteTypeCode.DISTRICT.equals(instituteTypeCode);
+    ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
+      .withMatcher("isDistrictRole", ExampleMatcher.GenericPropertyMatchers.exact());
+    EdxRoleEntity entity = new EdxRoleEntity();
+    entity.setIsDistrictRole(isDistrictRole);
+    return this.getEdxRoleRepository().findAll(Example.of(entity, customExampleMatcher));
   }
 }
