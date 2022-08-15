@@ -24,20 +24,18 @@ public class SecureExchangeNoteEntity {
   @Column(name = "SECURE_EXCHANGE_NOTE_ID", unique = true, updatable = false, columnDefinition = "BINARY(16)")
   UUID secureExchangeNoteID;
 
-  @Column(name = "SECURE_EXCHANGE_ID")
-  UUID secureExchangeID;
-
   @NotNull(message = "staffUserIdentifier cannot be null")
   @Column(name = "STAFF_USER_IDENTIFIER")
   String staffUserIdentifier;
 
-  @NotNull(message = "staffUserName cannot be null")
-  @Column(name = "STAFF_USER_NAME")
-  String staffUserName;
-
   @NotNull(message = "content cannot be null")
   @Column(name = "NOTE_CONTENT")
   String content;
+
+  @NotNull(message = "noteTimestamp cannot be null")
+  @PastOrPresent
+  @Column(name = "NOTE_TIMESTAMP")
+  LocalDateTime noteTimestamp;
 
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
@@ -58,7 +56,7 @@ public class SecureExchangeNoteEntity {
   LocalDateTime updateDate;
 
   @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
-  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false, insertable = false)
+  @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
   private SecureExchangeEntity secureExchangeEntity;
 
 }

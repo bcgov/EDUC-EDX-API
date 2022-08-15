@@ -425,7 +425,7 @@ public class EdxUsersService {
     val edxUserEntity = optionalEdxUserEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxActivateUser.getEdxUserId()));
     val updatedEdxUser = createEdxUserFromActivationCodeDetails(edxUserEntity, edxActivateUser, edxActivationCodeEntity);
     val savedEdxUser = getEdxUserRepository().save(updatedEdxUser);
-    expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
+    updateEdxUserDetailsFromActivationCodeDetails(Arrays.asList(edxUserEntity), edxActivationCodeEntity, edxActivateUser);
     return savedEdxUser;
   }
 
