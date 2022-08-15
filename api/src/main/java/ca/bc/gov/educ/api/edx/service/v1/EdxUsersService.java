@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
+import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
@@ -18,6 +19,8 @@ import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -233,7 +236,7 @@ public class EdxUsersService {
       currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities().addAll(edxUserSchoolEntity.getEdxUserSchoolRoleEntities());
 
       //If we add a new role, we need to set the audit fields
-      for(var schoolRole: currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
+      for (var schoolRole : currentEdxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
         if (schoolRole.getEdxUserSchoolRoleID() == null) {
           schoolRole.setCreateDate(LocalDateTime.now());
           schoolRole.setCreateUser(edxUserSchoolEntity.getUpdateUser());
@@ -356,10 +359,10 @@ public class EdxUsersService {
     val activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
     if (activationCodes.size() == 2) {
       EdxActivationCodeEntity userCodeEntity = null;
-      for(val activationCode: activationCodes){
-        if(!activationCode.getIsPrimary()){
+      for (val activationCode : activationCodes) {
+        if (!activationCode.getIsPrimary()) {
           userCodeEntity = activationCode;
-          if(activationCode.getEdxUserId() != null) {
+          if (activationCode.getEdxUserId() != null) {
             edxActivateUser.setEdxUserId(activationCode.getEdxUserId().toString());
           }
         }
@@ -760,7 +763,16 @@ public class EdxUsersService {
    * @param permissionCode the permission code
    * @return the set
    */
-  public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode){
+  public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode) {
     return getEdxUserRepository().findEdxUserEmailByMincodeAndPermissionCode(mincode, permissionCode);
+  }
+
+  public List<EdxRoleEntity> findAllEdxRolesForInstituteTypeCode(InstituteTypeCode instituteTypeCode) {
+    Boolean isDistrictRole = InstituteTypeCode.DISTRICT.equals(instituteTypeCode);
+    ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
+      .withMatcher("isDistrictRole", ExampleMatcher.GenericPropertyMatchers.exact());
+    EdxRoleEntity entity = new EdxRoleEntity();
+    entity.setIsDistrictRole(isDistrictRole);
+    return this.getEdxRoleRepository().findAll(Example.of(entity, customExampleMatcher));
   }
 }

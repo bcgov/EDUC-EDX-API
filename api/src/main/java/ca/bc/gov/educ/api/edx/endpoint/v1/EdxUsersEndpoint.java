@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.endpoint.v1;
 
+import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -119,7 +120,7 @@ public interface EdxUsersEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping("/roles")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<EdxRole> findAllEdxRoles();
+  List<EdxRole> findAllEdxRoles(@RequestParam(name="instituteType", required = false) InstituteTypeCode instituteType);
 
 
   @Transactional

@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.controller;
 
+import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
@@ -1427,6 +1428,55 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.activationCode", not(equalTo(secondaryActivationCode.getActivationCode()))))
       .andExpect(jsonPath("$.isPrimary", equalTo("true")))
       .andDo(print()).andExpect(status().isCreated());
+  }
+
+
+  @Test
+  public void testFindEdxRoles_GivenNoTypeCode_ShouldReturnOkStatusWithResult() throws Exception {
+    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$",  hasSize(3)))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE")))
+      .andExpect(jsonPath("$.[0].edxRolePermissions.[0].edxPermissionCode", is("SECURE_EXCHANGE")))
+      .andExpect(jsonPath("$.[1].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
+      .andExpect(jsonPath("$.[1].edxRolePermissions", hasSize(2)))
+      .andExpect(jsonPath("$.[2].edxRoleCode", is("EDX_DISTRICT_ADMIN")))
+      .andExpect(jsonPath("$.[2].edxRolePermissions", hasSize(2)))   ;
+  }
+
+
+  @Test
+  public void testFindEdxRoles_ForSchoolTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
+    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
+        .param("instituteType",InstituteTypeCode.SCHOOL.toString())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$",  hasSize(2)))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE")))
+      .andExpect(jsonPath("$.[0].edxRolePermissions", hasSize(1)))
+      .andExpect(jsonPath("$.[1].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
+      .andExpect(jsonPath("$.[1].edxRolePermissions",  hasSize(2)));
+
+  }
+
+
+  @Test
+  public void testFindEdxRoles_ForDistrictTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
+    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
+        .param("instituteType",InstituteTypeCode.DISTRICT.toString())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$",  hasSize(1)))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("EDX_DISTRICT_ADMIN")))
+      .andExpect(jsonPath("$.[0].edxRolePermissions",  hasSize(2)));
+
   }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {

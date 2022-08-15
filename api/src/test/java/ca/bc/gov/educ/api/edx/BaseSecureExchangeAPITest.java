@@ -305,4 +305,56 @@ public abstract class BaseSecureExchangeAPITest {
   protected String getJsonString(Object obj) throws JsonProcessingException {
     return objectMapper.writeValueAsString(obj);
   }
+
+  /**
+   * Creates 3 Roles and their associated Permissions and Role Permissions
+   * @param edxRoleRepository
+   * @param edxPermissionRepository
+   */
+  protected void createEdxRoleForSchoolAndDistrict(EdxRoleRepository edxRoleRepository, EdxPermissionRepository edxPermissionRepository) {
+
+    EdxPermissionEntity secureExchangePermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("SECURE_EXCHANGE"));
+    EdxPermissionEntity adminPermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("EDX_USER_ADMIN"));
+
+    EdxRoleEntity secureExchangeRole = createEdxRoleForSchoolAndDistrict("SECURE_EXCHANGE","Secure Exchange",false);
+
+    var secureExchangeRolePermissionEntity = getEdxRolePermissionEntity(secureExchangeRole, secureExchangePermissionEntity);
+    secureExchangeRole.setEdxRolePermissionEntities(Set.of(secureExchangeRolePermissionEntity));
+    edxRoleRepository.save(secureExchangeRole);
+
+    EdxRoleEntity schoolAdminRole = createEdxRoleForSchoolAndDistrict("EDX_SCHOOL_ADMIN","Edx School Administrator",false);
+    var schoolAdminSecureExchangeRolePermissionEntity = getEdxRolePermissionEntity(schoolAdminRole, secureExchangePermissionEntity);
+    var schoolAdminAdminPermissionRolePermissionEntity = getEdxRolePermissionEntity(schoolAdminRole, adminPermissionEntity);
+    schoolAdminRole.setEdxRolePermissionEntities(Set.of(schoolAdminSecureExchangeRolePermissionEntity,schoolAdminAdminPermissionRolePermissionEntity));
+    edxRoleRepository.save(schoolAdminRole);
+
+    EdxRoleEntity districtAdminRole = createEdxRoleForSchoolAndDistrict("EDX_DISTRICT_ADMIN","Edx District Administrator",true);
+    var districtAdminSecureExchangeRolePermissionEntity = getEdxRolePermissionEntity(districtAdminRole, secureExchangePermissionEntity);
+    var districtAdminAdminRolePermissionEntity = getEdxRolePermissionEntity(districtAdminRole, adminPermissionEntity);
+    districtAdminRole.setEdxRolePermissionEntities(Set.of(districtAdminSecureExchangeRolePermissionEntity,districtAdminAdminRolePermissionEntity));
+    edxRoleRepository.save(districtAdminRole);
+
+  }
+
+  private  EdxRoleEntity createEdxRoleForSchoolAndDistrict(String roleCode, String label,boolean isDistrict) {
+    EdxRoleEntity entity = new EdxRoleEntity();
+    entity.setEdxRoleCode(roleCode);
+    entity.setLabel(label);
+    entity.setIsDistrictRole(isDistrict);
+    entity.setCreateUser("test");
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setUpdateUser("test");
+    entity.setUpdateDate(LocalDateTime.now());
+    return entity;
+  }
+
+  private  EdxPermissionEntity createEdxPermissionForSchoolAndDistrict(String permissionCode){
+    EdxPermissionEntity entity = new EdxPermissionEntity();
+    entity.setEdxPermissionCode(permissionCode);
+    entity.setCreateUser("test");
+    entity.setCreateDate(LocalDateTime.now());
+    entity.setUpdateUser("test");
+    entity.setUpdateDate(LocalDateTime.now());
+    return entity;
+  }
 }
