@@ -1,6 +1,6 @@
 INSERT INTO EDX_ROLE (EDX_ROLE_CODE, IS_DISTRICT_ROLE, DESCRIPTION, CREATE_USER, CREATE_DATE, UPDATE_USER, UPDATE_DATE,
                       LABEL)
-VALUES ('EDX_SCHOOL_ADMIN', true, 'EDX School Administrator Role.', 'IDIR/SRATH',
+VALUES ('EDX_SCHOOL_ADMIN', true, 'EDX School Administrator Role', 'IDIR/SRATH',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/SRATH', to_date('2019-11-07', 'YYYY-MM-DD'),
         'EDX School Administrator');
 
@@ -34,12 +34,12 @@ WHERE EDX_PERMISSION_CODE = 'EDX_USER_ADMIN';
 
 INSERT INTO EDX_ROLE (EDX_ROLE_CODE, IS_DISTRICT_ROLE, DESCRIPTION, CREATE_USER, CREATE_DATE, UPDATE_USER, UPDATE_DATE,
                       LABEL)
-VALUES ('EDX_DISTRICT_ADMIN', true, 'EDX District Administrator Role.', 'IDIR/SRATH',
+VALUES ('EDX_DISTRICT_ADMIN', true, 'EDX District Admin Role', 'IDIR/SRATH',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/SRATH', to_date('2019-11-07', 'YYYY-MM-DD'),
         'EDX District Administrator');
 
 INSERT INTO EDX_PERMISSION (EDX_PERMISSION_CODE, LABEL, DESCRIPTION, CREATE_USER, CREATE_DATE, UPDATE_USER, UPDATE_DATE)
-VALUES ('EDX_USER_DISTRICT_ADMIN', 'EDX User District Administrator', 'EDX User Administrator Permission.',
+VALUES ('EDX_USER_DISTRICT_ADMIN', 'EDX User District Admin', 'EDX User Administrator Permission.',
         'IDIR/SRATH',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/SRATH', to_date('2019-11-07', 'YYYY-MM-DD'));
 
