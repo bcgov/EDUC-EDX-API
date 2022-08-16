@@ -21,7 +21,7 @@ public class SecureExchangeNote extends BaseRequest implements Serializable {
   @NotNull
   @Size(max = 255)
   String staffUserIdentifier;
-  @Size(max = 255)
+  @Size(max = 4000)
   @NotNull(message = "Comment content can not be null")
   String content;
   @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}T\\d{1,2}:\\d{1,2}:\\d{1,2}", message = "Expected pattern is yyyy-mm-ddTHH:MM:SS")
