@@ -154,7 +154,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         this.secureExchangeRequestRepository.save(entity);
 
         this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES + "/{secureExchangeNoteId}", entity.getSecureExchangeID().toString(), noteEntity.getSecureExchangeNoteID().toString())
-                        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE"))))
+                        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL_NOTE"))))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

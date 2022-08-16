@@ -43,10 +43,6 @@ public class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeA
         );
         Set<SecureExchangeNoteEntity> notes = entity.getSecureExchangeNotes();
         assertThat(notes).hasSize(1);
-    /*    SecureExchangeNoteEntity note = notes.stream()
-                .filter(s -> s.getSecureExchangeNoteID().equals(UUID.fromString("")))
-                .findAny()
-                .orElse(null);*/
         SecureExchangeNoteEntity note = notes.stream()
                 .findAny()
                 .orElse(null);
