@@ -38,4 +38,11 @@ public class SecureExchangeNoteController extends BaseController implements Secu
     setAuditColumns(secureExchangeNote);
     return mapper.toStructure(this.getSecureExchangeNoteService().save(UUID.fromString(secureExchangeId), mapper.toModel(secureExchangeNote)));
   }
+
+  @Override
+  public ResponseEntity<Void> deleteNote(String secureExchangeId, String secureExchangeNoteId) {
+    this.getSecureExchangeNoteService().deleteNoteFromExchange(UUID.fromString(secureExchangeNoteId));
+    return ResponseEntity.noContent().build();
+  }
+
 }

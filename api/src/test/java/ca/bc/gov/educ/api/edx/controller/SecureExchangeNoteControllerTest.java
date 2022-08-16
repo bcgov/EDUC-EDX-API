@@ -22,8 +22,7 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -137,6 +136,27 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, exchangeId)
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
                 .andDo(print()).andExpect(status().isNoContent());
+    }
+
+    @Test
+    @Transactional
+    public void testDeleteNotes_GivenValidExchangeId_ExpectReturns204NoContentWithoutNotes() throws Exception {
+        ObjectMapper objectMapper1 = new ObjectMapper();
+        SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(exchangeMapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+        SecureExchangeNoteEntity note = noteMapper.toModel(objectMapper1.readValue(
+                this.createDummyNoteJsonWithAuditColumns(entity.getSecureExchangeID().toString(), "Test", "TOSSE", "2020-02-09T00:00:00"),
+                SecureExchangeNote.class
+        ));
+        note.setSecureExchangeEntity(entity);
+        SecureExchangeNoteEntity noteEntity = this.secureExchangeRequestNoteRepository.save(note);
+        entity.setSecureExchangeNotes(new HashSet<>());
+        entity.getSecureExchangeNotes().add(note);
+        this.secureExchangeRequestRepository.save(entity);
+
+        this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES + "/{secureExchangeNoteId}", entity.getSecureExchangeID().toString(), noteEntity.getSecureExchangeNoteID().toString())
+                        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE"))))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 
     private String createDummyNoteJson(String secureExchangeID, String content, String user, String timeStamp){
