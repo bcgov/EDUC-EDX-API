@@ -28,6 +28,7 @@ public class Converters {
 		map.put(ChronoLocalDate.class, LocalDate::parse);
 		map.put(ChronoLocalDateTime.class, LocalDateTime::parse);
     map.put(UUID.class, UUID::fromString);
+		map.put(Boolean.class, Boolean::valueOf);
 	}
 
 	@SuppressWarnings("unchecked")

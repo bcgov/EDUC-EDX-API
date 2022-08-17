@@ -325,8 +325,12 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
     });
     final SearchCriteria criteria = SearchCriteria.builder().key("ministryOwnershipTeamID").operation(FilterOperation.EQUAL).value("ef4bd106-32a6-402f-9dd8-cf70b69a5ecb").valueType(ValueType.UUID).build();
+    final SearchCriteria criteria2 = SearchCriteria.builder().key("isReadByMinistry").operation(FilterOperation.EQUAL).value("false").valueType(ValueType.BOOLEAN).build();
+
     final List<SearchCriteria> criteriaList = new ArrayList<>();
     criteriaList.add(criteria);
+    criteriaList.add(criteria2);
+
     final var objectMapper = new ObjectMapper();
     final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
     this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));

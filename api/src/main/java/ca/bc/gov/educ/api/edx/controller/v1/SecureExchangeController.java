@@ -197,6 +197,9 @@ public class SecureExchangeController extends BaseController implements SecureEx
       case UUID:
         secureExchangeSpecs = secureExchangeFilterSpecs.getUUIDTypeSpecification(key, value, filterOperation);
         break;
+      case BOOLEAN:
+        secureExchangeSpecs = secureExchangeFilterSpecs.getBooleanTypeSpecification(key, value, filterOperation);
+        break;
       default:
         break;
     }
