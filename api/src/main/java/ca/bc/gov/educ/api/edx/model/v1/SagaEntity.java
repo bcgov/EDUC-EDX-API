@@ -84,6 +84,9 @@ public class SagaEntity {
   @Column(name = "RETRY_COUNT")
   private Integer retryCount;
 
+  @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
+  UUID districtId;
+
   public Boolean getSagaCompensated() {
     return this.sagaCompensated == null ?Boolean.FALSE:this.sagaCompensated;
   }
