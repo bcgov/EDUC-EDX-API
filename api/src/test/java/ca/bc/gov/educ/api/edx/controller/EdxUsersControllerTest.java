@@ -1092,6 +1092,35 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testEdxActivateUsers_GivenValidInput_PresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.createActivationCodeTableData(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, true, "1234567");
+    String edxUserId = userEntity.getEdxUserID().toString();
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setMincode("1234567");
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(UUID.randomUUID().toString());
+    edxActivateUser.setEdxUserId(edxUserId);
+    edxActivateUser.setUpdateUser("ABC");
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+
+      .andExpect(jsonPath("$.updateUser", is("ABC")))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
+      .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
+      .andDo(print()).andExpect(status().isCreated());
+
+  }
+
+  @Test
   public void testEdxActivateUsers_GivenInValidInput_EdxUserAlreadyExistsWithTheMincodeInDB_EdxUserIsNotUpdated_WithConflictErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
