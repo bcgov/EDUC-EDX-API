@@ -20,6 +20,7 @@ public class Saga {
   private String status;
   private Boolean sagaCompensated;
   private String mincode;
+  private String districtId;
   private String emailId;
   private String edxUserId;
   private String secureExchangeId;
