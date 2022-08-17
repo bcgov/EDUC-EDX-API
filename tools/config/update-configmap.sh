@@ -249,6 +249,13 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
       -H "Authorization: Bearer $TKN" \
       -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_COMMENT_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+    echo
+    echo Writing scope DISTRICT_USER_ACTIVATION_INVITE_SAGA
+    curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+        -H "Content-Type: application/json" \
+        -H "Authorization: Bearer $TKN" \
+        -d "{\"description\": \"Write DISTRICT_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
      echo
       echo Writing scope CREATE_SECURE_EXCHANGE_SAGA
       curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
