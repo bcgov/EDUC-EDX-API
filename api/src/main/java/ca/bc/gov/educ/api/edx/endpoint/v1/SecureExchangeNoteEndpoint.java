@@ -29,5 +29,10 @@ public interface SecureExchangeNoteEndpoint {
   @Transactional
   SecureExchangeNote save(@PathVariable String secureExchangeId, @Validated @RequestBody SecureExchangeNote secureExchangeNote);
 
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_SCHOOL_NOTE')")
+  @DeleteMapping(URL.SECURE_EXCHANGE_ID_NOTES + "/{secureExchangeNoteId}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT")})
+  @Transactional
+  ResponseEntity<Void> deleteNote(@PathVariable String secureExchangeId, @PathVariable String secureExchangeNoteId);
 
 }

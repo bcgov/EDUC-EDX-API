@@ -52,4 +52,10 @@ public class SecureExchangeNoteService {
     throw new EntityNotFoundException(SecureExchangeEntity.class, "SecureExchange", secureExchangeRequestId.toString());
   }
 
+  public void deleteNoteFromExchange(UUID secureExchangeNoteId){
+    if(this.secureExchangeRequestNoteRepository.existsById(secureExchangeNoteId)){
+      this.secureExchangeRequestNoteRepository.deleteById(secureExchangeNoteId);
+    }
+  }
+
 }

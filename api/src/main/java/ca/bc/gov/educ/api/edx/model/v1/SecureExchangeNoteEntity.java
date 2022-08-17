@@ -55,7 +55,7 @@ public class SecureExchangeNoteEntity {
   @Column(name = "UPDATE_DATE")
   LocalDateTime updateDate;
 
-  @ManyToOne(cascade = CascadeType.ALL, optional = false, targetEntity = SecureExchangeEntity.class)
+  @ManyToOne(optional = false, targetEntity = SecureExchangeEntity.class)
   @JoinColumn(name = "SECURE_EXCHANGE_ID", referencedColumnName = "SECURE_EXCHANGE_ID", updatable = false)
   private SecureExchangeEntity secureExchangeEntity;
 
