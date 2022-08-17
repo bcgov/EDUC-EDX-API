@@ -20,15 +20,17 @@ public class SecureExchangeFilterSpecs {
   private final FilterSpecifications<SecureExchangeEntity, String> stringFilterSpecifications;
   private final FilterSpecifications<SecureExchangeEntity, Long> longFilterSpecifications;
   private final FilterSpecifications<SecureExchangeEntity, UUID> uuidFilterSpecifications;
+  private final FilterSpecifications<SecureExchangeEntity, Boolean> booleanFilterSpecifications;
   private final Converters converters;
 
-  public SecureExchangeFilterSpecs(FilterSpecifications<SecureExchangeEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<SecureExchangeEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<SecureExchangeEntity, Integer> integerFilterSpecifications, FilterSpecifications<SecureExchangeEntity, String> stringFilterSpecifications, FilterSpecifications<SecureExchangeEntity, Long> longFilterSpecifications, FilterSpecifications<SecureExchangeEntity, UUID> uuidFilterSpecifications, Converters converters) {
+  public SecureExchangeFilterSpecs(FilterSpecifications<SecureExchangeEntity, ChronoLocalDate> dateFilterSpecifications, FilterSpecifications<SecureExchangeEntity, ChronoLocalDateTime<?>> dateTimeFilterSpecifications, FilterSpecifications<SecureExchangeEntity, Integer> integerFilterSpecifications, FilterSpecifications<SecureExchangeEntity, String> stringFilterSpecifications, FilterSpecifications<SecureExchangeEntity, Long> longFilterSpecifications, FilterSpecifications<SecureExchangeEntity, UUID> uuidFilterSpecifications, FilterSpecifications<SecureExchangeEntity, Boolean> booleanFilterSpecifications, Converters converters) {
     this.dateFilterSpecifications = dateFilterSpecifications;
     this.dateTimeFilterSpecifications = dateTimeFilterSpecifications;
     this.integerFilterSpecifications = integerFilterSpecifications;
     this.stringFilterSpecifications = stringFilterSpecifications;
     this.longFilterSpecifications = longFilterSpecifications;
     this.uuidFilterSpecifications = uuidFilterSpecifications;
+    this.booleanFilterSpecifications = booleanFilterSpecifications;
     this.converters = converters;
   }
 
@@ -50,6 +52,10 @@ public class SecureExchangeFilterSpecs {
 
   public Specification<SecureExchangeEntity> getStringTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
     return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(String.class), stringFilterSpecifications);
+  }
+
+  public Specification<SecureExchangeEntity> getBooleanTypeSpecification(String fieldName, String filterValue, FilterOperation filterOperation) {
+    return getSpecification(fieldName, filterValue, filterOperation, converters.getFunction(Boolean.class), booleanFilterSpecifications);
   }
 
   private <T extends Comparable<T>> Specification<SecureExchangeEntity> getSpecification(String fieldName,
