@@ -422,8 +422,15 @@ public class EdxUsersService {
    * @return the edx user entity
    */
   private EdxUserEntity relinkEdxUser(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity) {
-    val optionalEdxUserEntity = getEdxUserRepository().findById(UUID.fromString(edxActivateUser.getEdxUserId()));
-    val edxUserEntity = optionalEdxUserEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxActivateUser.getEdxUserId()));
+    EdxUserEntity edxUserEntity;
+    val digitalIdentityEdxUserList = getEdxUserRepository().findEdxUserEntitiesByDigitalIdentityID(UUID.fromString(edxActivateUser.getDigitalId()));
+    if(digitalIdentityEdxUserList != null && digitalIdentityEdxUserList.size() > 0){
+      edxUserEntity = digitalIdentityEdxUserList.get(0);
+    }else{
+      val optionalEdxUserEntity = getEdxUserRepository().findById(UUID.fromString(edxActivateUser.getEdxUserId()));
+      edxUserEntity = optionalEdxUserEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxActivateUser.getEdxUserId()));
+    }
+
     val updatedEdxUser = createEdxUserFromActivationCodeDetails(edxUserEntity, edxActivateUser, edxActivationCodeEntity);
     val savedEdxUser = getEdxUserRepository().save(updatedEdxUser);
     updateEdxUserDetailsFromActivationCodeDetails(Arrays.asList(edxUserEntity), edxActivationCodeEntity, edxActivateUser);
