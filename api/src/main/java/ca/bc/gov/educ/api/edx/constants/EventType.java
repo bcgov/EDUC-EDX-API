@@ -56,7 +56,9 @@ public enum EventType {
   /**
    * Secure exchange comment complete event type.
    */
-  SECURE_EXCHANGE_COMMENT_COMPLETE
+  SECURE_EXCHANGE_COMMENT_COMPLETE,
+
+  SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL,
 
 
 

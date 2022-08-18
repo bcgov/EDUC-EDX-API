@@ -17,6 +17,7 @@ public enum TopicsEnum {
   /**
    * Edx secure exchange comment topic topics enum.
    */
-  EDX_SECURE_EXCHANGE_COMMENT_TOPIC
+  EDX_SECURE_EXCHANGE_COMMENT_TOPIC,
+  EDX_DISTRICT_USER_ACTIVATION_INVITE_TOPIC,
 
 }

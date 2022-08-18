@@ -22,6 +22,9 @@ public enum SagaEnum {
   /**
    * Secure exchange comment saga saga enum.
    */
-  SECURE_EXCHANGE_COMMENT_SAGA
+  SECURE_EXCHANGE_COMMENT_SAGA,
+
+  EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA
+
 
 }

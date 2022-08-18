@@ -128,6 +128,10 @@ public class SagaService {
     return this.getSagaRepository().findAllByMincodeAndEmailIdAndSagaNameAndStatusIn(mincode, emailId, sagaName, statuses);
   }
 
+  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasByDistrictIdAndEmailId(final UUID districtId, final String emailId, final String sagaName, final List<String> statuses) {
+    return this.getSagaRepository().findAllByDistrictIdAndEmailIdAndSagaNameAndStatusIn(districtId, emailId, sagaName, statuses);
+  }
+
   /**
    * Update attached entity during saga process.
    *
@@ -148,7 +152,7 @@ public class SagaService {
    * @return the saga
    */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public SagaEntity createSagaRecordInDB(final String sagaName, final String userName, final String payload, final UUID edxUserId, final UUID secureExchangeId, final String mincode, final String emailId) {
+  public SagaEntity createSagaRecordInDB(final String sagaName, final String userName, final String payload, final UUID edxUserId, final UUID secureExchangeId, final String mincode, final String emailId,final UUID districtId ) {
     final var saga = SagaEntity
       .builder()
       .payload(payload)
@@ -159,6 +163,7 @@ public class SagaService {
       .emailId(emailId)
       .status(STARTED.toString())
       .sagaState(INITIATED.toString())
+      .districtId(districtId)
       .createDate(LocalDateTime.now())
       .createUser(userName)
       .updateUser(userName)

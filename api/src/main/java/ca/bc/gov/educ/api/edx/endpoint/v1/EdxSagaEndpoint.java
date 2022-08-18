@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -74,6 +71,13 @@ public interface EdxSagaEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT")})
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> createSecureExchangeComment(@Validated @RequestBody SecureExchangeCommentSagaData secureExchangeCommentSagaData);
+
+
+  @PostMapping("/district-user-activation-invite-saga")
+  @PreAuthorize("hasAuthority('SCOPE_DISTRICT_USER_ACTIVATION_INVITE_SAGA')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
+  @ResponseStatus(ACCEPTED)
+  ResponseEntity<String> edxDistrictUserActivationInvite(@Validated @RequestBody EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData);
 
 
 }

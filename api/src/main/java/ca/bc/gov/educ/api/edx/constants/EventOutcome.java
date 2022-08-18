@@ -26,6 +26,8 @@ public enum EventOutcome {
    */
   EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT,
 
+  EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT,
+
   /**
    * New secure exchange created event outcome.
    */
