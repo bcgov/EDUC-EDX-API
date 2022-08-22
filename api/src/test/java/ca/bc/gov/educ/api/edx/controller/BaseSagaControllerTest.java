@@ -93,6 +93,7 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     secureExchangeCommentSagaData.setMinistryTeamName(ministryTeamName);
     secureExchangeCommentSagaData.setSecureExchangeId(secureExchangeID);
     secureExchangeCommentSagaData.setSequenceNumber(sequence);
+    secureExchangeCommentSagaData.setCreateUser("Test");
     return secureExchangeCommentSagaData;
   }
 

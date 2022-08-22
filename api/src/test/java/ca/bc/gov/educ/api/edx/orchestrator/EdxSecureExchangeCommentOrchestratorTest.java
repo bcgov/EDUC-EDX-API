@@ -2,7 +2,10 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
+import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
+import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
@@ -17,6 +20,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +95,8 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
   SecureExchangeEntity secureExchangeEntity;
   private static final SecureExchangeEntityMapper SECURE_EXCHANGE_ENTITY_MAPPER = SecureExchangeEntityMapper.mapper;
 
+  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
+
   @After
   public void after() {
     sagaEventStateRepository.deleteAll();
@@ -107,8 +113,13 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     MockitoAnnotations.openMocks(this);
     sagaData = createCommentSagaData();
     sagaPayload = getJsonString(sagaData);
-    saga = sagaService.createSagaRecordInDB(SECURE_EXCHANGE_COMMENT_SAGA.toString(), "Test",
-      sagaPayload, null, sagaData.getSecureExchangeId(), sagaData.getMincode(), null,null);
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.SECURE_EXCHANGE_COMMENT_SAGA), sagaData);
+      saga = this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
+
   }
 
   private SecureExchangeCommentSagaData createCommentSagaData() throws JsonProcessingException {

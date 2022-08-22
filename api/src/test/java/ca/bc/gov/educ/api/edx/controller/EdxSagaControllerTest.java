@@ -597,6 +597,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 
@@ -613,6 +615,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 

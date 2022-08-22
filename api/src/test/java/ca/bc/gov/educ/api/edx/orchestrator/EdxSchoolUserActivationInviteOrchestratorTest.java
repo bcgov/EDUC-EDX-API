@@ -3,6 +3,9 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.constants.SagaEnum;
+import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
+import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -79,13 +82,21 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   @Autowired
   EdxSchoolUserActivationInviteOrchestrator orchestrator;
 
+  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
+
   @Before
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
     sagaData = createUserActivationInviteData("Test", "User", "testuser@bcgov.ca");
     sagaPayload = getJsonString(sagaData);
-    saga = sagaService.createSagaRecordInDB(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "Test",
-      sagaPayload, null, null, sagaData.getMincode(), sagaData.getEmail(),null);
+
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA), sagaData);
+      saga = this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
+
   }
 
   /**
