@@ -29,7 +29,7 @@ env:
   IMAGE_TAGS: ""
 
   SPRING_BOOT_IMAGE_NAME: edx-api-master
-  DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
+  DOCKER_ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca/docker-remote
   ARTIFACTORY_REPO: artifacts.developer.gov.bc.ca
 
   APP_NAME: 'edx-api'
