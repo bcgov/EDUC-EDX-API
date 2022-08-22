@@ -123,6 +123,8 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setUpdateUser("Test");
+    sagaData.setCreateUser("Test");
     return sagaData;
   }
 

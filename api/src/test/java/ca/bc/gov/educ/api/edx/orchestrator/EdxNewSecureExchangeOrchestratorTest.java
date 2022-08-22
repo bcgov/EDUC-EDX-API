@@ -123,6 +123,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     sagaData.setSchoolName("ABC School");
     sagaData.setMinistryTeamName("Min Team");
     sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 

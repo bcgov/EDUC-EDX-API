@@ -94,6 +94,7 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     secureExchangeCommentSagaData.setSecureExchangeId(secureExchangeID);
     secureExchangeCommentSagaData.setSequenceNumber(sequence);
     secureExchangeCommentSagaData.setCreateUser("Test");
+    secureExchangeCommentSagaData.setUpdateUser("Test");
     return secureExchangeCommentSagaData;
   }
 
