@@ -618,7 +618,7 @@ public class EdxUsersService {
    *
    * @param userActivationValidationCode the user activation validation code
    */
-  public void expireUserActivationUrl(UUID userActivationValidationCode) {
+  public InstituteTypeCode expireUserActivationUrl(UUID userActivationValidationCode) {
     List<EdxActivationCodeEntity> activationCodeEntities = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByValidationCode(userActivationValidationCode);
     if (activationCodeEntities.isEmpty()) {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid Link Provided").status(BAD_REQUEST).build();
@@ -637,6 +637,11 @@ public class EdxUsersService {
       activationCode.setUpdateDate(LocalDateTime.now());
       getEdxActivationCodeRepository().save(activationCode);
     });
+    if(activationCodeEntities.get(0).getMincode() != null){
+      return  InstituteTypeCode.SCHOOL;
+    }else{
+      return  InstituteTypeCode.DISTRICT;
+    }
   }
 
   /**

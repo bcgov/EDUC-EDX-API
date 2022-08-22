@@ -158,9 +158,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public ResponseEntity<Void> updateIsUrlClicked(EdxActivationCode edxActivationCode) {
-    getService().expireUserActivationUrl(UUID.fromString(edxActivationCode.getValidationCode()));
-    return ResponseEntity.ok().build();
+  public InstituteTypeCode updateIsUrlClicked(EdxActivationCode edxActivationCode) {
+    return getService().expireUserActivationUrl(UUID.fromString(edxActivationCode.getValidationCode()));
   }
 
   @Override
