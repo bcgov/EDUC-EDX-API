@@ -18,6 +18,7 @@ env:
   CHES_TOKEN_URL: ${{ secrets.CHES_TOKEN_URL }}
   CHES_ENDPOINT_URL: ${{ secrets.CHES_ENDPOINT_URL }}
   SITE_URL: ${{ secrets.SITE_URL }}
+
   # 🖊️ EDIT to change the image registry settings.
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
   IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
@@ -119,19 +120,13 @@ jobs:
         oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
         || true && echo "No rollout in progress"
         
-        oc tag ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-prod/${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ steps.get-latest-tag.outputs.tag }}
-        
-        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode)"
-        echo "::add-mask::$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode)"
-        
-        DB_USERNAME=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"username-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
-        DB_PASS=$(oc -n ${{ env.OPENSHIFT_NAMESPACE }} -o json get secret ${{ env.APP_NAME }}-patroni | sed -n 's/.*"password-appuser": "\(.*\)",/\1/p' | base64 --decode) >> /dev/null 2>&1
+        oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}-${{ env.BRANCH }}:${{ env.TAG }}
         
         # Process and apply deployment template
         oc process -f tools/openshift/api.dc.yaml -p APP_NAME=${{ env.APP_NAME }} -p REPO_NAME=${{ env.REPO_NAME }} -p BRANCH=${{ env.BRANCH }} -p NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p TAG=${{ steps.get-latest-tag.outputs.tag }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }} \
         | oc apply -f -
         
-        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/${{ steps.get-latest-tag.outputs.tag }}/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} jdbc:postgresql://${{ env.APP_NAME }}-patroni.${{ env.OPENSHIFT_NAMESPACE }}.svc.cluster.local:5432/${{ env.DB_NAME }} $DB_PASS $DB_USERNAME ${{ env.SPLUNK_TOKEN }} ${{ env.CHES_CLIENT_ID }} ${{ env.CHES_CLIENT_SECRET }} ${{ env.CHES_TOKEN_URL }} ${{ env.CHES_ENDPOINT_URL }} ${{ env.SITE_URL }}
+        curl -s https://raw.githubusercontent.com/bcgov/${{ env.REPO_NAME }}/master/tools/config/update-configmap.sh | bash /dev/stdin ${{ env.TARGET_ENV }} ${{ env.APP_NAME }} ${{ env.NAMESPACE }} ${{ env.COMMON_NAMESPACE }} ${{ env.DB_JDBC_CONNECT_STRING }} ${{ env.DB_PWD }} ${{ env.DB_USER }} ${{ env.SPLUNK_TOKEN }} ${{ env.CHES_CLIENT_ID }} ${{ env.CHES_CLIENT_SECRET }} ${{ env.CHES_TOKEN_URL }} ${{ env.CHES_ENDPOINT_URL }} ${{ env.SITE_URL }}
         
         # Start rollout (if necessary) and follow it
         oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
