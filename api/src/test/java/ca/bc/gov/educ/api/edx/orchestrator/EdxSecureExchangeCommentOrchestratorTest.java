@@ -108,7 +108,7 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     sagaData = createCommentSagaData();
     sagaPayload = getJsonString(sagaData);
     saga = sagaService.createSagaRecordInDB(SECURE_EXCHANGE_COMMENT_SAGA.toString(), "Test",
-      sagaPayload, null, sagaData.getSecureExchangeId(), sagaData.getMincode(), null);
+      sagaPayload, null, sagaData.getSecureExchangeId(), sagaData.getMincode(), null,null);
   }
 
   private SecureExchangeCommentSagaData createCommentSagaData() throws JsonProcessingException {

@@ -85,7 +85,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
     sagaData = createUserActivationInviteData("Test", "User", "testuser@bcgov.ca");
     sagaPayload = getJsonString(sagaData);
     saga = sagaService.createSagaRecordInDB(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "Test",
-      sagaPayload, null, null, sagaData.getMincode(), sagaData.getEmail());
+      sagaPayload, null, null, sagaData.getMincode(), sagaData.getEmail(),null);
   }
 
   /**

@@ -99,7 +99,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     sagaData = createNewSecureExchangeSagaData();
     sagaPayload = getJsonString(sagaData);
     saga = sagaService.createSagaRecordInDB(NEW_SECURE_EXCHANGE_SAGA.toString(), "Test",
-      sagaPayload, null, null, sagaData.getMincode(), null);
+      sagaPayload, null, null, sagaData.getMincode(), null,null);
   }
 
   private SecureExchangeCreateSagaData createNewSecureExchangeSagaData() throws JsonProcessingException {

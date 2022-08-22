@@ -612,11 +612,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail(),null);
   }
 
   private void createSagaRelinkEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail(),null);
   }
 
 }
