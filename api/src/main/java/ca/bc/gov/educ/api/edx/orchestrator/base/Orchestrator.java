@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.edx.orchestrator.base;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -25,9 +24,8 @@ public interface Orchestrator {
    */
   void startSaga(SagaEntity saga);
 
-  SagaEntity createSaga(String payload, final UUID edxUserId, final String userName,final String mincode, final String emailId,final UUID secureExchangeId);
+  SagaEntity createSaga(SagaEntity sagaEntity);
 
-  SagaEntity createSaga(String payload);
 
   /**
    * Replay saga.

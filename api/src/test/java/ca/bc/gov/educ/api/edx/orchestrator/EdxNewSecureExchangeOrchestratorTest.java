@@ -2,7 +2,10 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
+import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
+import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -15,6 +18,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -83,6 +87,8 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   @Autowired
   SecureExchangeRequestRepository secureExchangeRequestRepository;
 
+  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
+
 
   @After
   public void after() {
@@ -98,8 +104,13 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     MockitoAnnotations.openMocks(this);
     sagaData = createNewSecureExchangeSagaData();
     sagaPayload = getJsonString(sagaData);
-    saga = sagaService.createSagaRecordInDB(NEW_SECURE_EXCHANGE_SAGA.toString(), "Test",
-      sagaPayload, null, null, sagaData.getMincode(), null);
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.NEW_SECURE_EXCHANGE_SAGA), sagaData);
+      saga = this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
+
   }
 
   private SecureExchangeCreateSagaData createNewSecureExchangeSagaData() throws JsonProcessingException {
@@ -111,6 +122,8 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     sagaData.setMincode("123456789");
     sagaData.setSchoolName("ABC School");
     sagaData.setMinistryTeamName("Min Team");
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 

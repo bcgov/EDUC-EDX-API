@@ -3,16 +3,16 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxSagaController;
+import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
+import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeComment;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.val;
 import org.junit.After;
 import org.junit.Before;
@@ -89,6 +89,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
 
   private static final SecureExchangeEntityMapper SECURE_EXCHANGE_ENTITY_MAPPER = SecureExchangeEntityMapper.mapper;
+
+  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
   @Before
   public void setUp() {
@@ -223,14 +225,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    createSagaEntity(jsonString,sagaData);
+    createSagaEntity(jsonString, sagaData);
 
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-          .andDo(print()).andExpect(status().isConflict());
+      .andDo(print()).andExpect(status().isConflict());
   }
 
   @Test
@@ -473,7 +475,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, "WildFlower", "ABC Team", UUID.randomUUID(),"10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, "WildFlower", "ABC Team", UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -484,11 +486,12 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
       .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
+
   @Test
   public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", null, "ABC Team", UUID.randomUUID(),"10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", null, "ABC Team", UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -504,7 +507,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingMinistryTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", null, UUID.randomUUID(),"10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", null, UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -520,7 +523,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingSecureExchangeIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", null,"10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", null, "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -536,7 +539,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingSequenceNumberRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(),null);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(), null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -551,7 +554,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   @Test
   public void testCreateSecureExchangeComment_GivenInputWithMissingCommentRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
-    val sagaData = createSecureExchangeCommentSagaData(null, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(),"12");
+    val sagaData = createSecureExchangeCommentSagaData(null, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(), "12");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -563,11 +566,13 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
+
+
   @Test
   public void testCreateSecureExchangeComment_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString()));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(entity.getSecureExchangeID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", entity.getSecureExchangeID(),"10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", entity.getSecureExchangeID(), "10");
 
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
@@ -577,8 +582,142 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
+    val sagaData = createDistrictUserActivationInviteData(null, "lastName", "test@bcgov.ca");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
 
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", null, "test@bcgov.ca");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithInvalidEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test.abc");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Email address should be a valid email address")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    sagaData.setDistrictId(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("DistrictId cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    sagaData.setDistrictName(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("District Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictCodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    sagaData.setDistrictCode(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("District code cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingEdxActivationRoleCodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    sagaData.setEdxActivationRoleCodes(null);
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testEdxDistrictUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+
+    val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
 
   private EdxUserActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
 
@@ -592,6 +731,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 
@@ -608,15 +749,46 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
     return sagaData;
   }
 
   private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA), sagaData);
+      this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
   }
 
   private void createSagaRelinkEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
-    this.sagaService.createSagaRecordInDB(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), "TestEdx", sagaDataStr, null, null, sagaData.getMincode(), sagaData.getEmail());
+
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA), sagaData);
+      this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
   }
 
+
+  private EdxDistrictUserActivationInviteSagaData createDistrictUserActivationInviteData(String firstName, String lastName, String email) {
+
+    EdxDistrictUserActivationInviteSagaData sagaData = new EdxDistrictUserActivationInviteSagaData();
+    val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    sagaData.setFirstName(firstName);
+    sagaData.setLastName(lastName);
+    sagaData.setEmail(email);
+    sagaData.setDistrictId(UUID.randomUUID().toString());
+    sagaData.setDistrictCode("003");
+    sagaData.setDistrictName("Test District");
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
+    return sagaData;
+  }
 }

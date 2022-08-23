@@ -128,6 +128,10 @@ public class SagaService {
     return this.getSagaRepository().findAllByMincodeAndEmailIdAndSagaNameAndStatusIn(mincode, emailId, sagaName, statuses);
   }
 
+  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasByDistrictIdAndEmailId(final UUID districtId, final String emailId, final String sagaName, final List<String> statuses) {
+    return this.getSagaRepository().findAllByDistrictIdAndEmailIdAndSagaNameAndStatusIn(districtId, emailId, sagaName, statuses);
+  }
+
   /**
    * Update attached entity during saga process.
    *
@@ -139,33 +143,28 @@ public class SagaService {
     this.getSagaRepository().save(saga);
   }
 
-  /**
-   * Create saga record in db saga.
-   *
-   * @param sagaName the saga name
-   * @param userName the user name
-   * @param payload  the payload
-   * @return the saga
-   */
+
+
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public SagaEntity createSagaRecordInDB(final String sagaName, final String userName, final String payload, final UUID edxUserId, final UUID secureExchangeId, final String mincode, final String emailId) {
-    final var saga = SagaEntity
+  public SagaEntity createSagaRecordInDB(final SagaEntity saga) {
+    final var sagaEntity = SagaEntity
       .builder()
-      .payload(payload)
-      .sagaName(sagaName)
-      .edxUserId(edxUserId)
-      .secureExchangeId(secureExchangeId)
-      .mincode(mincode)
-      .emailId(emailId)
+      .payload(saga.getPayload())
+      .sagaName(saga.getSagaName())
+      .edxUserId(saga.getEdxUserId())
+      .secureExchangeId(saga.getSecureExchangeId())
+      .mincode(saga.getMincode())
+      .emailId(saga.getEmailId())
       .status(STARTED.toString())
       .sagaState(INITIATED.toString())
+      .districtId(saga.getDistrictId())
       .createDate(LocalDateTime.now())
-      .createUser(userName)
-      .updateUser(userName)
+      .createUser(saga.getCreateUser())
+      .updateUser(saga.getUpdateUser())
       .updateDate(LocalDateTime.now())
       .sagaCompensated(false)
       .build();
-    return this.createSagaRecord(saga);
+    return this.createSagaRecord(sagaEntity);
   }
 
 }

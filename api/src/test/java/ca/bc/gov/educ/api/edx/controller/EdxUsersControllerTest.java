@@ -33,8 +33,7 @@ import static org.hamcrest.core.IsNull.notNullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
@@ -1153,7 +1152,9 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andDo(print()).andExpect(status().isOk());
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(content().string("\"SCHOOL\""));
+
 
   }
 

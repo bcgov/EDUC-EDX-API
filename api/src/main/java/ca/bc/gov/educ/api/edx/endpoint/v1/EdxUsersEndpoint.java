@@ -135,7 +135,7 @@ public interface EdxUsersEndpoint {
   @PostMapping("/activation-code/url")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(OK)
-  ResponseEntity<Void> updateIsUrlClicked(@RequestBody EdxActivationCode edxActivationCode);
+  InstituteTypeCode updateIsUrlClicked(@RequestBody EdxActivationCode edxActivationCode);
 
 
   @Transactional

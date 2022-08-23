@@ -6,16 +6,15 @@ import ca.bc.gov.educ.api.edx.endpoint.v1.EdxSagaEndpoint;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
+import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
+import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
-import ca.bc.gov.educ.api.edx.utils.JsonUtil;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +62,8 @@ public class EdxSagaController implements EdxSagaEndpoint {
    */
   @Getter(PRIVATE)
   private final Map<String, Orchestrator> orchestratorMap = new HashMap<>();
+
+  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
   /**
    * Instantiates a new Edx saga controller.
@@ -125,6 +126,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return this.processSecureExchangeCommentSaga(SECURE_EXCHANGE_COMMENT_SAGA,secureExchangeCommentSagaData);
   }
 
+  @Override
+  public ResponseEntity<String> edxDistrictUserActivationInvite(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateDistrictUserEdxActivationCodeSagaDataPayload(edxDistrictUserActivationInviteSagaData));
+    RequestUtil.setAuditColumnsForCreate(edxDistrictUserActivationInviteSagaData);
+    return this.processEdxDistrictUserActivationLinkSaga(EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA, edxDistrictUserActivationInviteSagaData);
+  }
+
   /**
    * Process secure exchange comment saga response entity.
    *
@@ -133,7 +141,12 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @return the response entity
    */
   private ResponseEntity<String> processSecureExchangeCommentSaga(SagaEnum sagaName, SecureExchangeCommentSagaData secureExchangeCommentSagaData) {
-    return processServicesSaga(sagaName, secureExchangeCommentSagaData, secureExchangeCommentSagaData.getCreateUser(), secureExchangeCommentSagaData.getMincode(), null,null,secureExchangeCommentSagaData.getSecureExchangeId());
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),secureExchangeCommentSagaData);
+      return processServicesSaga(sagaName,sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
   }
 
   /**
@@ -148,7 +161,28 @@ public class EdxSagaController implements EdxSagaEndpoint {
     if (sagaInProgress.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } else {
-      return processServicesSaga(sagaName, edxUserActivationInviteSagaData, edxUserActivationInviteSagaData.getCreateUser(), edxUserActivationInviteSagaData.getMincode(), edxUserActivationInviteSagaData.getEmail(),null,null);
+      try {
+        val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),edxUserActivationInviteSagaData);
+        return processServicesSaga(sagaName,sagaEntity);
+      } catch (JsonProcessingException e) {
+        throw new SagaRuntimeException(e);
+      }
+    }
+  }
+
+
+  private ResponseEntity<String> processEdxDistrictUserActivationLinkSaga(final SagaEnum sagaName, final EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIdAndEmailId(UUID.fromString(edxDistrictUserActivationInviteSagaData.getDistrictId()), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
+    if (sagaInProgress.isPresent()) {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    } else {
+      try {
+        val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),edxDistrictUserActivationInviteSagaData);
+        return processServicesSaga(sagaName,sagaEntity);
+      } catch (JsonProcessingException e) {
+        throw new SagaRuntimeException(e);
+      }
+
     }
   }
 
@@ -160,7 +194,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @return the response entity
    */
   private ResponseEntity<String> processNewSecureExchangeMessageSaga(final SagaEnum sagaName, final SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
-      return processServicesSaga(sagaName, secureExchangeCreateSagaData, secureExchangeCreateSagaData.getCreateUser(), secureExchangeCreateSagaData.getMincode(), null,null,null);
+
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),secureExchangeCreateSagaData);
+      return processServicesSaga(sagaName,sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
 
   }
 
@@ -190,26 +230,14 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return statuses;
   }
 
-  /**
-   * Process services saga response entity.
-   *
-   * @param sagaName         the saga name
-   * @param sagaPayload      the saga payload
-   * @param createUser       the create user
-   * @param mincode          the mincode
-   * @param emailId          the email id
-   * @param edxUserId        the edx user id
-   * @param secureExchangeId the secure exchange id
-   * @return the response entity
-   */
-  private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, final Object sagaPayload, final String createUser,final String mincode, final String emailId,final UUID edxUserId,final UUID secureExchangeId) {
+
+  private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, SagaEntity sagaEntity) {
     try {
 
-      final String payload = JsonUtil.getJsonStringFromObject(sagaPayload);
       final var orchestrator = this.getOrchestratorMap().get(sagaName.toString());
       final var saga = this.getOrchestratorMap()
         .get(sagaName.toString())
-        .createSaga(payload, edxUserId,createUser,mincode,emailId,secureExchangeId);
+        .createSaga(sagaEntity);
       orchestrator.startSaga(saga);
       return ResponseEntity.status(HttpStatus.ACCEPTED).body(saga.getSagaId().toString());
     } catch (final Exception e) {
