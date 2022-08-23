@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodePayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxPrimaryActivationCodeValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxUserPayLoadValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -45,6 +46,10 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator;
+
   private static final MinistryTeamMapper mapper = MinistryTeamMapper.mapper;
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
 
@@ -54,12 +59,12 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   private static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
-
   @Autowired
-  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator) {
+  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator, EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator) {
     this.service = secureExchange;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
     this.edxActivationCodePayLoadValidator = edxActivationCodePayLoadValidator;
+    this.edxPrimaryActivationCodeValidator = edxPrimaryActivationCodeValidator;
   }
 
   @Override
@@ -183,13 +188,14 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public EdxActivationCode findPrimaryEdxActivationCode(String mincode) {
-    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().findPrimaryEdxActivationCode(mincode));
+  public EdxActivationCode findPrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier) {
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().findPrimaryEdxActivationCode(instituteType, instituteIdentifier));
   }
 
   @Override
-  public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
-    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(edxPrimaryActivationCode));
+  public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier, EdxPrimaryActivationCode edxPrimaryActivationCode) {
+    validatePayload(() -> getEdxPrimaryActivationCodeValidator().validateEdxPrimaryActivationCode(instituteType, instituteIdentifier, edxPrimaryActivationCode));
+    return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(instituteType, instituteIdentifier, edxPrimaryActivationCode));
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
