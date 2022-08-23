@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -34,10 +33,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Slf4j
 public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrator<EdxDistrictUserActivationInviteSagaData> {
 
-  /**
-   * The constant EDX_ACTIVATION_CODE_MAPPER.
-   */
-  protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
   /**
    * The Edx district user activation invite orchestrator service.
@@ -119,6 +114,5 @@ public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrato
       .eventPayload(JsonUtil.getJsonStringFromObject(edxDistrictUserActivationInviteSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    log.info("message sent to EDX_API_TOPIC for SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL Event.");
   }
 }
