@@ -27,12 +27,21 @@ import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_DISTRICT_USER_ACTIVATION_INVITE_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
 
+/**
+ * The type Edx district user activation invite orchestrator.
+ */
 @Component
 @Slf4j
 public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrator<EdxDistrictUserActivationInviteSagaData> {
 
+  /**
+   * The constant EDX_ACTIVATION_CODE_MAPPER.
+   */
   protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
+  /**
+   * The Edx district user activation invite orchestrator service.
+   */
   @Getter(PRIVATE)
   private final EdxDistrictUserActivationInviteOrchestratorService edxDistrictUserActivationInviteOrchestratorService;
 
@@ -41,13 +50,16 @@ public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrato
    *
    * @param sagaService                                        the saga service
    * @param messagePublisher                                   the message publisher
-   * @param edxDistrictUserActivationInviteOrchestratorService
+   * @param edxDistrictUserActivationInviteOrchestratorService the edx district user activation invite orchestrator service
    */
   protected EdxDistrictUserActivationInviteOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, EdxDistrictUserActivationInviteOrchestratorService edxDistrictUserActivationInviteOrchestratorService) {
     super(sagaService, messagePublisher, EdxDistrictUserActivationInviteSagaData.class, EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA.toString(), EDX_DISTRICT_USER_ACTIVATION_INVITE_TOPIC.toString());
     this.edxDistrictUserActivationInviteOrchestratorService = edxDistrictUserActivationInviteOrchestratorService;
   }
 
+  /**
+   * Populate steps to execute map.
+   */
   @Override
   public void populateStepsToExecuteMap() {
     this.stepBuilder()
@@ -56,6 +68,14 @@ public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrato
       .end(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL, EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT);
   }
 
+  /**
+   * Create personal activation code.
+   *
+   * @param event                                   the event
+   * @param saga                                    the saga
+   * @param edxDistrictUserActivationInviteSagaData the edx district user activation invite saga data
+   * @throws JsonProcessingException the json processing exception
+   */
   protected void createPersonalActivationCode(Event event, SagaEntity saga, EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
@@ -77,6 +97,14 @@ public class EdxDistrictUserActivationInviteOrchestrator extends BaseOrchestrato
   }
 
 
+  /**
+   * Send edx user activation email.
+   *
+   * @param event                                   the event
+   * @param saga                                    the saga
+   * @param edxDistrictUserActivationInviteSagaData the edx district user activation invite saga data
+   * @throws JsonProcessingException the json processing exception
+   */
   protected void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
