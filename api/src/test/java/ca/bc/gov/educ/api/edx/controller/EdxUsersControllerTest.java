@@ -59,6 +59,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   private EdxUserDistrictRepository edxUserDistrictRepository;
 
   @Autowired
+  private EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
+
+  @Autowired
+  private EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
+
+  @Autowired
   private EdxActivationCodeRepository edxActivationCodeRepository;
 
   @Autowired
@@ -72,6 +78,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @After
   public void after() {
     this.ministryOwnershipTeamRepository.deleteAll();
+    this.edxUserSchoolRoleRepository.deleteAll();
+    this.edxUserDistrictRoleRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
     this.edxUserDistrictRepository.deleteAll();
     this.edxUserRepository.deleteAll();

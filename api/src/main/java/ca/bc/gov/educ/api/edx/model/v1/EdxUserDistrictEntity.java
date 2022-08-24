@@ -60,12 +60,6 @@ public class EdxUserDistrictEntity {
   @OneToMany(mappedBy = "edxUserDistrictEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictRoleEntity.class)
   private Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities;
 
-  @PreRemove
-  public void preRemove() {
-    if(this.edxUserEntity != null) {
-      this.edxUserEntity.getEdxUserDistrictEntities().remove(this);
-      this.edxUserEntity = null;
-    }
-  }
+
 
 }

@@ -65,6 +65,7 @@ public interface EdxUsersEndpoint {
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping
+  @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = false) Optional<UUID> digitalId, @RequestParam(name = "mincode", required = false) String mincode, @RequestParam(name = "firstName", required = false) String firstName, @RequestParam(name = "lastName", required = false) String lastName, @RequestParam(name = "districtId", required = false) Optional<UUID> districtId);
 
