@@ -153,15 +153,15 @@ public interface EdxUsersEndpoint {
   ResponseEntity<Void> deleteActivationCode(@PathVariable UUID activationCodeId);
 
   @PreAuthorize("hasAuthority('SCOPE_READ_PRIMARY_ACTIVATION_CODE')")
-  @GetMapping("/activation-code/primary/{mincode}")
+  @GetMapping("/activation-code/primary/{instituteType}/{instituteIdentifier}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
-  EdxActivationCode findPrimaryEdxActivationCode(@PathVariable String mincode);
+  EdxActivationCode findPrimaryEdxActivationCode(@PathVariable InstituteTypeCode instituteType, @PathVariable String instituteIdentifier);
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_PRIMARY_ACTIVATION_CODE')")
-  @PostMapping("/activation-code/primary/{mincode}")
+  @PostMapping("/activation-code/primary/{instituteType}/{instituteIdentifier}")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
-  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
+  EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@PathVariable InstituteTypeCode instituteType, @PathVariable String instituteIdentifier, @RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
 
 }
