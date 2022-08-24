@@ -30,8 +30,8 @@ public class EdxUserDistrictEntity {
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
   EdxUserEntity edxUserEntity;
 
-  @Column(name = "DISTRICT_CODE")
-  String districtCode;
+  @Column(name = "DISTRICT_ID")
+  UUID districtId;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
