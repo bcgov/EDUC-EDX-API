@@ -40,11 +40,11 @@ public class EdxPrimaryActivationCodeValidator {
 
     private List<FieldError> validateEdxPrimaryActivationCodeForSchool(String instituteIdentifier, EdxPrimaryActivationCode toValidate) {
         List<FieldError> toReturn = new ArrayList<>();
-        if (!toValidate.getMincode().equals(instituteIdentifier)) {
-            toReturn.add(createFieldError(MINCODE_FIELD, toValidate.getMincode(), "The mincode value is expected to match the value specified from the instituteIdentifier parameter."));
-        }
         if (toValidate.getMincode() == null) {
             toReturn.add(createFieldError(MINCODE_FIELD, toValidate.getMincode(), "The mincode field is expected to be not null for an EdxPrimaryActivationCode meant for a school."));
+        }
+        if (!instituteIdentifier.equals(toValidate.getMincode())) {
+            toReturn.add(createFieldError(MINCODE_FIELD, toValidate.getMincode(), "The mincode value is expected to match the value specified from the instituteIdentifier parameter."));
         }
         if (toValidate.getDistrictCode() != null) {
             toReturn.add(createFieldError(DISTRICT_CODE_FIELD, toValidate.getDistrictCode(), "The districtCode field is expected to be null for an EdxPrimaryActivationCode meant for a school."));
@@ -53,11 +53,11 @@ public class EdxPrimaryActivationCodeValidator {
     }
     private List<FieldError> validateEdxPrimaryActivationCodeForDistrict(String instituteIdentifier, EdxPrimaryActivationCode toValidate) {
         List<FieldError> toReturn = new ArrayList<>();
-        if (!toValidate.getDistrictCode().equals(instituteIdentifier)) {
-            toReturn.add(createFieldError(DISTRICT_CODE_FIELD, toValidate.getMincode(), "The districtCode value is expected to match the value specified from the instituteIdentifier parameter."));
-        }
         if (toValidate.getDistrictCode() == null) {
             toReturn.add(createFieldError(DISTRICT_CODE_FIELD, toValidate.getMincode(), "The districtCode field is expected to be not null for an EdxPrimaryActivationCode meant for a district."));
+        }
+        if (!instituteIdentifier.equals(toValidate.getDistrictCode())) {
+            toReturn.add(createFieldError(DISTRICT_CODE_FIELD, toValidate.getMincode(), "The districtCode value is expected to match the value specified from the instituteIdentifier parameter."));
         }
         if (toValidate.getMincode() != null) {
             toReturn.add(createFieldError(MINCODE_FIELD, toValidate.getDistrictCode(), "The mincode field is expected to be null for an EdxPrimaryActivationCode meant for a district."));
