@@ -82,7 +82,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     schoolEntity.setMincode("98765432");
     edxUserSchoolRepository.save(schoolEntity);
 
-    var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),null, null, null);
+    var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),null, null, null,Optional.empty());
     assertThat(edxUserEntities).isNotNull().hasSize(1);
   }
 
@@ -93,7 +93,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     schoolEntity.setMincode("98765432");
     edxUserSchoolRepository.save(schoolEntity);
 
-    var edxUserEntities = this.service.findEdxUsers(Optional.ofNullable(null),schoolEntity.getMincode(), null, null);
+    var edxUserEntities = this.service.findEdxUsers(Optional.empty(),schoolEntity.getMincode(), null, null,Optional.empty());
     assertThat(edxUserEntities).isNotNull().hasSize(1);
   }
 

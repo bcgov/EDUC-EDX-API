@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.PropertyValues;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -179,8 +178,8 @@ public class EdxUsersService {
    * @param lastName  the last name
    * @return the list
    */
-  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
-    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode, firstName, lastName);
+  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName,Optional<UUID> districtId) {
+    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode, firstName, lastName,districtId);
   }
 
   /**
@@ -355,15 +354,20 @@ public class EdxUsersService {
    * @param edxActivateUser the edx activate user
    * @return the edx user entity
    */
-  public EdxUserEntity activateSchoolUser(EdxActivateUser edxActivateUser) {
+  public EdxUserEntity activateEdxUser(EdxActivateUser edxActivateUser) {
     val acCodes = Arrays.asList(edxActivateUser.getPersonalActivationCode(), edxActivateUser.getPrimaryEdxCode());
-    val activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
-    if (activationCodes.size() == 2) {
+    List<EdxActivationCodeEntity> activationCodes;
+    if (edxActivateUser.getMincode() != null) {
+      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
+    } else {
+      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndDistrictId(acCodes, UUID.fromString(edxActivateUser.getDistrictId()));
+    }
+    if (!CollectionUtils.isEmpty(activationCodes) && activationCodes.size() == 2) {
       EdxActivationCodeEntity userCodeEntity = null;
-      for(val activationCode: activationCodes){
-        if(!activationCode.getIsPrimary()){
+      for (val activationCode : activationCodes) {
+        if (!activationCode.getIsPrimary()) {
           userCodeEntity = activationCode;
-          if(activationCode.getEdxUserId() != null) {
+          if (activationCode.getEdxUserId() != null) {
             edxActivateUser.setEdxUserId(activationCode.getEdxUserId().toString());
           }
         }
@@ -382,10 +386,10 @@ public class EdxUsersService {
         val edxUsers = getEdxUserRepository().findEdxUserEntitiesByDigitalIdentityID(UUID.fromString(edxActivateUser.getDigitalId()));
         if (edxUsers.isEmpty()) {
           //create completely new user
-
           return createEdxUserDetailsFromActivationCodeDetails(edxActivateUser, userCodeEntity);
         } else {
-          verifyExistingUserMincodeAssociation(edxActivateUser, edxUsers);
+
+          verifyExistingUserMincodeOrDistrictAssociation(edxActivateUser, edxUsers);
 
           //add the user_school and school_role to user to the edx_user
           return updateEdxUserDetailsFromActivationCodeDetails(edxUsers, userCodeEntity, edxActivateUser);
@@ -402,16 +406,28 @@ public class EdxUsersService {
    * @param edxActivateUser the edx activate user
    * @param edxUsers        the edx users
    */
-  private void verifyExistingUserMincodeAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
+  private void verifyExistingUserMincodeOrDistrictAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
     val existingUser = edxUsers.get(0);
-    if (!CollectionUtils.isEmpty(existingUser.getEdxUserSchoolEntities())) {
-      for (EdxUserSchoolEntity schoolEntity : existingUser.getEdxUserSchoolEntities()) {
-        if (schoolEntity.getMincode().equalsIgnoreCase(edxActivateUser.getMincode())) {
-          ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the school").status(CONFLICT).build();
-          throw new InvalidPayloadException(error);
+    if(edxActivateUser.getMincode()!=null){
+      if (!CollectionUtils.isEmpty(existingUser.getEdxUserSchoolEntities())) {
+        for (EdxUserSchoolEntity schoolEntity : existingUser.getEdxUserSchoolEntities()) {
+          if (schoolEntity.getMincode().equalsIgnoreCase(edxActivateUser.getMincode())) {
+            ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the school").status(CONFLICT).build();
+            throw new InvalidPayloadException(error);
+          }
+        }
+      }
+    }else{
+      if (!CollectionUtils.isEmpty(existingUser.getEdxUserDistrictEntities())) {
+        for (EdxUserDistrictEntity userDistrictEntity : existingUser.getEdxUserDistrictEntities()) {
+          if (userDistrictEntity.getDistrictId().equals(UUID.fromString(edxActivateUser.getDistrictId()))) {
+            ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the district").status(CONFLICT).build();
+            throw new InvalidPayloadException(error);
+          }
         }
       }
     }
+
   }
 
   /**
@@ -447,10 +463,7 @@ public class EdxUsersService {
    */
   private EdxUserEntity updateEdxUserDetailsFromActivationCodeDetails(List<EdxUserEntity> edxUsers, EdxActivationCodeEntity edxActivationCodeEntity, EdxActivateUser edxActivateUser) {
     val edxUserEntity = getEdxUserRepository().findById(edxUsers.get(0).getEdxUserID()).get();
-    val edxUserSchoolEntity = createEdxUserSchoolFromActivationCodeDetails(edxActivationCodeEntity, edxUserEntity, edxActivateUser);
-    val edxUserSchoolRoleEntities = createEdxUserSchoolRolesFromActivationCodeDetails(edxActivationCodeEntity.getEdxActivationRoleEntities(), edxUserSchoolEntity, edxActivateUser);
-    //updating associations
-    updateEdxUserAssociations(edxUserEntity, edxUserSchoolEntity, edxUserSchoolRoleEntities);
+    createEdxUserDetails(edxActivateUser, edxActivationCodeEntity, edxUserEntity);
     updateAuditColumnsForEdxUserEntityUpdate(edxUserEntity, edxActivateUser);
     val updatedUser = edxUserRepository.save(edxUserEntity);
     expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
@@ -467,14 +480,28 @@ public class EdxUsersService {
   private EdxUserEntity createEdxUserDetailsFromActivationCodeDetails(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity) {
     EdxUserEntity edxUser = new EdxUserEntity();
     val edxUserEntity = createEdxUserFromActivationCodeDetails(edxUser, edxActivateUser, edxActivationCodeEntity);
-    val edxUserSchoolEntity = createEdxUserSchoolFromActivationCodeDetails(edxActivationCodeEntity, edxUserEntity, edxActivateUser);
-    val edxUserSchoolRoleEntities = createEdxUserSchoolRolesFromActivationCodeDetails(edxActivationCodeEntity.getEdxActivationRoleEntities(), edxUserSchoolEntity, edxActivateUser);
-    //updating associations
-    updateEdxUserAssociations(edxUserEntity, edxUserSchoolEntity, edxUserSchoolRoleEntities);
+    createEdxUserDetails(edxActivateUser, edxActivationCodeEntity, edxUserEntity);
+
     val savedEntity = edxUserRepository.save(edxUserEntity);
     //expire the activationCodes
     expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
     return savedEntity;
+  }
+
+  private void createEdxUserDetails(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity, EdxUserEntity edxUserEntity) {
+    if(edxActivateUser.getMincode()!= null){
+      //set up school user
+      val edxUserSchoolEntity = createEdxUserSchoolFromActivationCodeDetails(edxActivationCodeEntity, edxUserEntity, edxActivateUser);
+      val edxUserSchoolRoleEntities = createEdxUserSchoolRolesFromActivationCodeDetails(edxActivationCodeEntity.getEdxActivationRoleEntities(), edxUserSchoolEntity, edxActivateUser);
+      //updating associations
+      updateEdxUserAssociations(edxUserEntity, edxUserSchoolEntity, edxUserSchoolRoleEntities);
+    }else{
+      //set up district user
+      val edxUserDistrictEntity = createEdxUserDistrictFromActivationCodeDetails(edxActivationCodeEntity,edxUserEntity,edxActivateUser);
+      val edxUserDistrictRoleEntities = createEdxUserDistrictRolesFromActivationCodeDetails(edxActivationCodeEntity.getEdxActivationRoleEntities(), edxUserDistrictEntity, edxActivateUser);
+      //updating associations
+      updateEdxUserAssociationsForDistrict(edxUserEntity, edxUserDistrictEntity, edxUserDistrictRoleEntities);
+    }
   }
 
   /**
@@ -491,6 +518,15 @@ public class EdxUsersService {
     }
     edxUserSchoolEntity.setEdxUserEntity(edxUserEntity);
     edxUserEntity.getEdxUserSchoolEntities().add(edxUserSchoolEntity);
+  }
+
+  private void updateEdxUserAssociationsForDistrict(EdxUserEntity edxUserEntity, EdxUserDistrictEntity edxUserDistrictEntity, Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities) {
+    for (EdxUserDistrictRoleEntity edxUserDistrictRole : edxUserDistrictRoleEntities) {
+      edxUserDistrictRole.setEdxUserDistrictEntity(edxUserDistrictEntity);
+      edxUserDistrictEntity.getEdxUserDistrictRoleEntities().add(edxUserDistrictRole);
+    }
+    edxUserDistrictEntity.setEdxUserEntity(edxUserEntity);
+    edxUserEntity.getEdxUserDistrictEntities().add(edxUserDistrictEntity);
   }
 
   /**
@@ -530,6 +566,18 @@ public class EdxUsersService {
     return schoolRoleEntitySet;
   }
 
+  private Set<EdxUserDistrictRoleEntity> createEdxUserDistrictRolesFromActivationCodeDetails(Set<EdxActivationRoleEntity> edxActivationRoleEntities, EdxUserDistrictEntity edxUserDistrictEntity, EdxActivateUser edxActivateUser) {
+    Set<EdxUserDistrictRoleEntity> districtRoleEntitySet = new HashSet<>();
+    edxActivationRoleEntities.forEach(edxActivationRoleEntity -> {
+      EdxUserDistrictRoleEntity districtRoleEntity = new EdxUserDistrictRoleEntity();
+      districtRoleEntity.setEdxUserDistrictEntity(edxUserDistrictEntity);
+      districtRoleEntity.setEdxRoleCode(edxActivationRoleEntity.getEdxRoleCode());
+      updateAuditColumnsForEdxUserDistrictRoleEntity(edxActivateUser, districtRoleEntity);
+      districtRoleEntitySet.add(districtRoleEntity);
+    });
+    return districtRoleEntitySet;
+  }
+
   /**
    * Create edx user school from activation code details edx user school entity.
    *
@@ -544,6 +592,14 @@ public class EdxUsersService {
     userSchoolEntity.setMincode(activationCode.getMincode());
     updateAuditColumnsForEdxUserSchoolEntity(edxActivateUser, userSchoolEntity);
     return userSchoolEntity;
+  }
+
+  private EdxUserDistrictEntity createEdxUserDistrictFromActivationCodeDetails(EdxActivationCodeEntity activationCode, EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
+    EdxUserDistrictEntity userDistrictEntity = new EdxUserDistrictEntity();
+    userDistrictEntity.setEdxUserEntity(edxUser);
+    userDistrictEntity.setDistrictId(activationCode.getDistrictId());
+    updateAuditColumnsForEdxUserDistrictEntity(edxActivateUser, userDistrictEntity);
+    return userDistrictEntity;
   }
 
   /**
@@ -600,6 +656,13 @@ public class EdxUsersService {
     userSchoolEntity.setUpdateDate(LocalDateTime.now());
   }
 
+  private void updateAuditColumnsForEdxUserDistrictEntity(EdxActivateUser edxActivateUser, EdxUserDistrictEntity userDistrictEntity) {
+    userDistrictEntity.setCreateUser(edxActivateUser.getCreateUser());
+    userDistrictEntity.setUpdateUser(edxActivateUser.getUpdateUser());
+    userDistrictEntity.setCreateDate(LocalDateTime.now());
+    userDistrictEntity.setUpdateDate(LocalDateTime.now());
+  }
+
   /**
    * Update audit columns for edx user school role entity.
    *
@@ -611,6 +674,13 @@ public class EdxUsersService {
     schoolRoleEntity.setUpdateUser(edxActivateUser.getUpdateUser());
     schoolRoleEntity.setCreateDate(LocalDateTime.now());
     schoolRoleEntity.setUpdateDate(LocalDateTime.now());
+  }
+
+  private void updateAuditColumnsForEdxUserDistrictRoleEntity(EdxActivateUser edxActivateUser, EdxUserDistrictRoleEntity userDistrictRoleEntity) {
+    userDistrictRoleEntity.setCreateUser(edxActivateUser.getCreateUser());
+    userDistrictRoleEntity.setUpdateUser(edxActivateUser.getUpdateUser());
+    userDistrictRoleEntity.setCreateDate(LocalDateTime.now());
+    userDistrictRoleEntity.setUpdateDate(LocalDateTime.now());
   }
 
   /**

@@ -78,8 +78,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName) {
-    return getService().findEdxUsers(digitalId, mincode,firstName,lastName).stream().map(userMapper::toStructure).collect(Collectors.toList());
+  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName, Optional<UUID> districtId) {
+    return getService().findEdxUsers(digitalId, mincode,firstName,lastName,districtId).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override
@@ -153,8 +153,9 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   @Override
   public EdxUser activateUser(EdxActivateUser edxActivateUser) {
+    validatePayload(() -> getEdxActivationCodePayLoadValidator().validateEdxActivateUserPayload(edxActivateUser));
     RequestUtil.setAuditColumnsForCreateIfBlank(edxActivateUser);
-    return userMapper.toStructure(getService().activateSchoolUser(edxActivateUser));
+    return userMapper.toStructure(getService().activateEdxUser(edxActivateUser));
   }
 
   @Override

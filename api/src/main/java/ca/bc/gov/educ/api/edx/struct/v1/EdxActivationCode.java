@@ -21,7 +21,7 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
 
   String mincode;
 
-  String districtCode;
+  String districtId;
 
   String activationCode;
 

@@ -13,6 +13,8 @@ public interface EdxActivationCodeRepository extends JpaRepository<EdxActivation
 
   List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndMincode(List<String> activationCode, String mincode);
 
+  List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndDistrictId(List<String> activationCode, UUID districtId);
+
   List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByValidationCode(UUID userActivationValidationCode);
 
   Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(String mincode);

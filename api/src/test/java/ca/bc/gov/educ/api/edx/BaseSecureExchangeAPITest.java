@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.val;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -123,7 +124,7 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxUserDistrictEntity getEdxUserDistrictEntity(EdxUserEntity edxUserEntity) {
     EdxUserDistrictEntity entity = new EdxUserDistrictEntity();
     entity.setEdxUserEntity(edxUserEntity);
-    entity.setDistrictCode("006");
+    entity.setDistrictId(UUID.randomUUID());
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -203,13 +204,27 @@ public abstract class BaseSecureExchangeAPITest {
     return edxUserSchool;
   }
 
-  protected List<EdxActivationCodeEntity> createActivationCodeTableData(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
+  protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
     EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
 
     var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked,mincode));
 
     var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, mincode));
+    edxActivationCodeEntityList.add(savedActivationCode);
+    edxActivationCodeEntityList.add(savedActivationCode1);
+    return edxActivationCodeEntityList;
+  }
+
+  protected List<EdxActivationCodeEntity> createActivationCodeTableDataForDistrictUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, UUID districtID) {
+    List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
+    EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
+    val primaryDistrictActivationCode = createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked,null);
+    primaryDistrictActivationCode.setDistrictId(districtID);
+    var savedActivationCode = edxActivationCodeRepository.save(primaryDistrictActivationCode);
+    val personalDistrictActivationCode = createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, null);
+    personalDistrictActivationCode.setDistrictId(districtID);
+    var savedActivationCode1 = edxActivationCodeRepository.save(personalDistrictActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
