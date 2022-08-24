@@ -93,9 +93,9 @@ public class EdxUsersService {
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
 
   /**
-   * The constant MINCODE.
+   * The constant INSTITUTE_IDENTIFIER.
    */
-  private static final String MINCODE = "mincode";
+  private static final String INSTITUTE_IDENTIFIER = "institute_identifier";
   /**
    * The Props.
    */
@@ -768,13 +768,14 @@ public class EdxUsersService {
   /**
    * Find primary edx activation code edx activation code entity.
    *
-   * @param mincode the mincode
+   * @param instituteType the instituteType
+   * @param instituteIdentifier the instituteIdentifier
    * @return the edx activation code entity
    */
-  public EdxActivationCodeEntity findPrimaryEdxActivationCode(String mincode) {
-    Optional<EdxActivationCodeEntity> primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(mincode);
+  public EdxActivationCodeEntity findPrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier) {
+    Optional<EdxActivationCodeEntity> primaryEdxActivationCode = this.findPrimaryEdxActivationCodeForInstitute(instituteType, instituteIdentifier);
     if (primaryEdxActivationCode.isEmpty()) {
-      throw new EntityNotFoundException(EdxActivationCodeEntity.class, MINCODE, mincode);
+      throw new EntityNotFoundException(EdxActivationCodeEntity.class, INSTITUTE_IDENTIFIER, instituteIdentifier);
     }
     return primaryEdxActivationCode.get();
   }
@@ -782,11 +783,13 @@ public class EdxUsersService {
   /**
    * Generate or regenerate primary edx activation code edx activation code entity.
    *
+   * @param instituteType the instituteType
+   * @param instituteIdentifier the instituteIdentifier
    * @param edxPrimaryActivationCode the edx primary activation code
    * @return the edx activation code entity
    */
-  public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
-    EdxActivationCodeEntity primaryEdxActivationCode = getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(edxPrimaryActivationCode.getMincode()).orElseGet(() -> this.newPrimaryActivationCode(edxPrimaryActivationCode));
+  public EdxActivationCodeEntity generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier, EdxPrimaryActivationCode edxPrimaryActivationCode) {
+    EdxActivationCodeEntity primaryEdxActivationCode = this.findPrimaryEdxActivationCodeForInstitute(instituteType, instituteIdentifier).orElseGet(() -> this.newPrimaryActivationCode(edxPrimaryActivationCode));
     try {
       primaryEdxActivationCode.setActivationCode(this.generateActivationCode());
     } catch (NoSuchAlgorithmException e) {
@@ -794,6 +797,17 @@ public class EdxUsersService {
     }
     this.updateAuditColumnsForPrimaryEdxActivationCode(edxPrimaryActivationCode, primaryEdxActivationCode);
     return this.getEdxActivationCodeRepository().save(primaryEdxActivationCode);
+  }
+
+  private Optional<EdxActivationCodeEntity> findPrimaryEdxActivationCodeForInstitute(InstituteTypeCode instituteType, String contactIdentifier) {
+    switch (instituteType) {
+      case SCHOOL:
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(contactIdentifier);
+      case DISTRICT:
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictCodeAndIsPrimaryTrue(contactIdentifier);
+      default:
+        return Optional.empty();
+    }
   }
 
   /**
@@ -819,6 +833,7 @@ public class EdxUsersService {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
     toReturn.setMincode(edxPrimaryActivationCode.getMincode());
+    toReturn.setDistrictCode(edxPrimaryActivationCode.getDistrictCode());
     toReturn.setIsPrimary(true);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);
