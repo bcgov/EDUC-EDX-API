@@ -202,7 +202,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     EdxPrimaryActivationCode toGenerate = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID().toString(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     EdxActivationCodeEntity generated = this.service.generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, toGenerate.getDistrictId(), toGenerate);
     assertThat(generated.getMincode()).isNull();
-    assertThat(generated.getDistrictId()).isNotNull().isEqualTo(toGenerate.getDistrictId());
+    assertThat(generated.getDistrictId().toString()).isNotNull().isEqualTo(toGenerate.getDistrictId());
     assertThat(generated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8);
     assertThat(generated.getIsPrimary()).isTrue();
     assertThat(generated.getCreateUser()).isEqualTo(toGenerate.getCreateUser());
@@ -247,7 +247,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     EdxActivationCodeEntity regenerated = this.service.generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, districtCode, toRegenerate);
     assertThat(regenerated.getEdxActivationCodeId()).isNotNull().isEqualTo(existing.getEdxActivationCodeId());
     assertThat(regenerated.getMincode()).isNull();
-    assertThat(regenerated.getDistrictId()).isNotNull().isEqualTo(toRegenerate.getDistrictId()).isEqualTo(existing.getDistrictId());
+    assertThat(regenerated.getDistrictId().toString()).isNotNull().isEqualTo(toRegenerate.getDistrictId()).isEqualTo(existing.getDistrictId().toString());
     assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(existing.getActivationCode());
     assertThat(regenerated.getIsPrimary()).isTrue();
     assertThat(regenerated.getCreateUser()).isEqualTo(existing.getCreateUser());
@@ -279,7 +279,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     EdxActivationCodeEntity regenerated = this.service.generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, districtCode, toRegenerate);
     assertThat(regenerated.getEdxActivationCodeId()).isNotNull().isEqualTo(existingPrimaryEdxActivationCode.getEdxActivationCodeId()).isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
     assertThat(regenerated.getMincode()).isNull();
-    assertThat(regenerated.getDistrictId()).isNotNull().isEqualTo(toRegenerate.getDistrictId()).isEqualTo(existingPrimaryEdxActivationCode.getDistrictId()).isEqualTo(secondaryEdxActivationCode.getDistrictId());
+    assertThat(regenerated.getDistrictId().toString()).isNotNull().isEqualTo(toRegenerate.getDistrictId()).isEqualTo(existingPrimaryEdxActivationCode.getDistrictId().toString()).isEqualTo(secondaryEdxActivationCode.getDistrictId().toString());
     assertThat(regenerated.getActivationCode()).isNotNull().isNotEmpty().hasSize(8).isNotEqualTo(existingPrimaryEdxActivationCode.getActivationCode());
     assertThat(regenerated.getIsPrimary()).isTrue();
     assertThat(regenerated.getCreateUser()).isEqualTo(existingPrimaryEdxActivationCode.getCreateUser());

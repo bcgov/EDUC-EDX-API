@@ -77,7 +77,10 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @After
   public void after() {
+
     this.ministryOwnershipTeamRepository.deleteAll();
+    this.edxUserSchoolRepository.deleteAll();
+    this.edxUserDistrictRepository.deleteAll();
     this.edxUserRepository.deleteAll();
     this.ministryOwnershipTeamRepository.deleteAll();
     this.edxRoleRepository.deleteAll();
@@ -1412,7 +1415,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.mincode", is(nullValue())))
       .andExpect(jsonPath("$.districtId", not(emptyOrNullString())))
-      .andExpect(jsonPath("$.districtId", equalTo(primaryActivationCode.getDistrictId())))
+      .andExpect(jsonPath("$.districtId", equalTo(primaryActivationCode.getDistrictId().toString())))
       .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
       .andExpect(jsonPath("$.isPrimary", equalTo("true")))
       .andDo(print()).andExpect(status().isOk());
@@ -1423,7 +1426,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     String mincode = UUID.randomUUID().toString();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), false, mincode));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), false, mincode));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/" + secondaryActivationCode.getMincode()).contentType(MediaType.APPLICATION_JSON)
+    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + secondaryActivationCode.getMincode()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
@@ -1448,7 +1451,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
       .andExpect(jsonPath("$.mincode", is(nullValue())))
       .andExpect(jsonPath("$.districtId", not(emptyOrNullString())))
-      .andExpect(jsonPath("$.districtId", equalTo(primaryActivationCode.getDistrictId())))
+      .andExpect(jsonPath("$.districtId", equalTo(primaryActivationCode.getDistrictId().toString())))
       .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
       .andExpect(jsonPath("$.isPrimary", equalTo("true")))
       .andDo(print()).andExpect(status().isOk());

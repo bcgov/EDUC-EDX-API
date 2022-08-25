@@ -833,7 +833,9 @@ public class EdxUsersService {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
     toReturn.setMincode(edxPrimaryActivationCode.getMincode());
-    toReturn.setDistrictId(UUID.fromString(edxPrimaryActivationCode.getDistrictId()));
+    if(StringUtils.isNotBlank(edxPrimaryActivationCode.getDistrictId())){
+      toReturn.setDistrictId(UUID.fromString(edxPrimaryActivationCode.getDistrictId()));
+    }
     toReturn.setIsPrimary(true);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);
