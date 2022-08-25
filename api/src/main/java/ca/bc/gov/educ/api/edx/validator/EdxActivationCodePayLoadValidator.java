@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
 import org.springframework.stereotype.Component;
@@ -48,5 +49,16 @@ public class EdxActivationCodePayLoadValidator {
 
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
     return new FieldError("EdxActivationCode", fieldName, rejectedValue, false, null, null, message);
+  }
+
+  public List<FieldError> validateEdxActivateUserPayload(EdxActivateUser edxActivateUser) {
+    final List<FieldError> apiValidationErrors = new ArrayList<>();
+    if (edxActivateUser.getMincode() == null && edxActivateUser.getDistrictId() == null) {
+      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getMincode(), "Mincode or District Information is required for User Activation"));
+    }
+    if (edxActivateUser.getMincode() != null && edxActivateUser.getDistrictId() != null) {
+      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getMincode(), "Either Mincode or District Information should be present per User Activation Request"));
+    }
+    return apiValidationErrors;
   }
 }

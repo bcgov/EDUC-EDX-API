@@ -10,6 +10,7 @@ import org.hibernate.annotations.Parameter;
 import javax.persistence.*;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -30,8 +31,8 @@ public class EdxUserDistrictEntity {
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
   EdxUserEntity edxUserEntity;
 
-  @Column(name = "DISTRICT_CODE")
-  String districtCode;
+  @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
+  UUID districtId;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
@@ -47,8 +48,18 @@ public class EdxUserDistrictEntity {
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
+  public Set<EdxUserDistrictRoleEntity> getEdxUserDistrictRoleEntities() {
+    if(this.edxUserDistrictRoleEntities == null){
+      this.edxUserDistrictRoleEntities = new HashSet<>();
+    }
+    return this.edxUserDistrictRoleEntities;
+  }
+
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "edxUserDistrictEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictRoleEntity.class)
   private Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities;
+
+
+
 }

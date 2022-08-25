@@ -19,8 +19,9 @@ public class EdxActivateUser extends BaseRequest implements Serializable {
   @NotNull
   String personalActivationCode;
 
-  @NotNull
   String mincode;
+
+  String districtId;
 
   @NotNull
   String digitalId;

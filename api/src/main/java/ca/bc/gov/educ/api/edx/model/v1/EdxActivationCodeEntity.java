@@ -32,8 +32,8 @@ public class EdxActivationCodeEntity {
   @Column(name = "MINCODE")
   String mincode;
 
-  @Column(name = "DISTRICT_CODE")
-  String districtCode;
+  @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
+  UUID districtId;
 
   @NotNull(message = "activationCode cannot be null")
   @Column(name = "ACTIVATION_CODE")

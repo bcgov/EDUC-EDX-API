@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.repository.impl;
 
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserDistrictEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepositoryCustom;
@@ -31,14 +32,17 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
   }
 
   @Override
-  public List<EdxUserEntity> findEdxUsers(final Optional<UUID> digitalId, final String mincode,final String firstName, final String lastName) {
+  public List<EdxUserEntity> findEdxUsers(final Optional<UUID> digitalId, final String mincode,final String firstName, final String lastName,final Optional<UUID> districtId) {
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<EdxUserEntity> criteriaQuery = criteriaBuilder.createQuery(EdxUserEntity.class);
     Root<EdxUserEntity> edxUserEntityRoot = criteriaQuery.from(EdxUserEntity.class);
 
     digitalId.ifPresent(uuid -> predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("digitalIdentityID"), uuid)));
-
+    districtId.ifPresent(uuid -> {
+      Join<EdxUserEntity, EdxUserDistrictEntity> edxUserEntityDistrictJoin = edxUserEntityRoot.join("edxUserDistrictEntities");
+      predicates.add(criteriaBuilder.equal(edxUserEntityDistrictJoin.get("districtId"), uuid));
+    });
     if (StringUtils.isNotBlank(mincode)) {
       Join<EdxUserEntity, EdxUserSchoolEntity> edxUserSchoolEntitySchoolJoin = edxUserEntityRoot.join("edxUserSchoolEntities");
       predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("mincode"), mincode));
