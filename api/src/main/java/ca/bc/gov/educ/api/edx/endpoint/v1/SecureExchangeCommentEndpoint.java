@@ -17,13 +17,13 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 public interface SecureExchangeCommentEndpoint {
 
-  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_COMMENT')")
   @GetMapping(URL.SECURE_EXCHANGE_ID_COMMENTS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
   @Transactional
   List<SecureExchangeComment> retrieveComments(@PathVariable String secureExchangeId);
 
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE_COMMENT')")
   @PostMapping(URL.SECURE_EXCHANGE_ID_COMMENTS)
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
