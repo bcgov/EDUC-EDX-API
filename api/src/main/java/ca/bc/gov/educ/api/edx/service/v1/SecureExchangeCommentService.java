@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,8 @@ public class SecureExchangeCommentService {
         secureExchangeEntity.setIsReadByExchangeContact(false);
         secureExchangeEntity.setIsReadByMinistry(true);
         secureExchangeEntity.setReviewer(secureExchangeComment.getStaffUserIdentifier());
+        TransformUtil.uppercaseFields(secureExchangeEntity);
+        TransformUtil.uppercaseFields(secureExchangeComment);
       } else {
         // EdxUserID exists implies call is from School Side
         secureExchangeEntity.setIsReadByMinistry(false);

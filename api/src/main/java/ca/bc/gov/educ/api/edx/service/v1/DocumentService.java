@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocRequirement;
+import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +127,8 @@ public class DocumentService {
         secureExchange.setIsReadByMinistry(false);
         secureExchange.setIsReadByExchangeContact(true);
       }
-
+      TransformUtil.uppercaseFields(secureExchange);
+      TransformUtil.uppercaseFields(document);
       this.secureExchangeRequestRepository.save(secureExchange);
 
       document.setSecureExchangeEntity(secureExchange);
