@@ -804,7 +804,7 @@ public class EdxUsersService {
       case SCHOOL:
         return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(contactIdentifier);
       case DISTRICT:
-        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictCodeAndIsPrimaryTrue(contactIdentifier);
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictIdAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
       default:
         return Optional.empty();
     }
@@ -833,7 +833,7 @@ public class EdxUsersService {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
     toReturn.setMincode(edxPrimaryActivationCode.getMincode());
-    toReturn.setDistrictCode(edxPrimaryActivationCode.getDistrictCode());
+    toReturn.setDistrictId(UUID.fromString(edxPrimaryActivationCode.getDistrictId()));
     toReturn.setIsPrimary(true);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);

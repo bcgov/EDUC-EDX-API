@@ -19,7 +19,7 @@ public interface EdxActivationCodeRepository extends JpaRepository<EdxActivation
 
   Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(String mincode);
 
-  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByDistrictCodeAndIsPrimaryTrue(String districtCode);
+  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByDistrictIdAndIsPrimaryTrue(UUID districtId);
 
   List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByEmailAndMincodeAndIsPrimaryIsFalseAndIsUrlClickedIsFalse(String emailId, String mincode);
 
