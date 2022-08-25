@@ -61,7 +61,10 @@ public class SecureExchangeStudentService {
         }
         secureExchangeEntity.setIsReadByMinistry(secureExchangeStudent.getStaffUserIdentifier() != null);
         secureExchangeEntity.setIsReadByExchangeContact(secureExchangeStudent.getEdxUserID() != null);
-        SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
+        if(secureExchangeEntity.getReviewer() != secureExchangeStudent.getStaffUserIdentifier()){
+            secureExchangeEntity.setReviewer(secureExchangeStudent.getStaffUserIdentifier());
+        }
+            SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
         secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
         if (secureExchangeStudentEntity.getCreateUser() == null) {
             secureExchangeStudentEntity.setCreateUser(ApplicationProperties.CLIENT_ID);

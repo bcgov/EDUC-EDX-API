@@ -118,6 +118,7 @@ public class DocumentService {
 
       if ( document.getEdxUserID() == null && document.getStaffUserIdentifier() != null) {
         // EdxUserID doesn't exists implies call is from Ministry Side
+        secureExchange.setReviewer(document.getStaffUserIdentifier());
         secureExchange.setIsReadByExchangeContact(false);
         secureExchange.setIsReadByMinistry(true);
       } else {

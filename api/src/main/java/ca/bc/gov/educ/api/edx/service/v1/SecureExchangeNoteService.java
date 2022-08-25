@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeNoteEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestNoteRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
+import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +47,9 @@ public class SecureExchangeNoteService {
     if (result.isPresent()) {
       SecureExchangeEntity secureExchangeEntity = result.get();
       secureExchangeNote.setSecureExchangeEntity(secureExchangeEntity);
+      secureExchangeEntity.setReviewer(secureExchangeNote.getStaffUserIdentifier());
+      TransformUtil.uppercaseFields(secureExchangeEntity);
+      TransformUtil.uppercaseFields(secureExchangeNote);
       this.getSecureExchangeRequestNoteRepository().save(secureExchangeNote);
       return secureExchangeNote;
     }

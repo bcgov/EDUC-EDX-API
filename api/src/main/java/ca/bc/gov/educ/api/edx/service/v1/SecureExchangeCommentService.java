@@ -57,6 +57,7 @@ public class SecureExchangeCommentService {
         // EdxUserID doesn't exists implies call is from Ministry Side
         secureExchangeEntity.setIsReadByExchangeContact(false);
         secureExchangeEntity.setIsReadByMinistry(true);
+        secureExchangeEntity.setReviewer(secureExchangeComment.getStaffUserIdentifier());
       } else {
         // EdxUserID exists implies call is from School Side
         secureExchangeEntity.setIsReadByMinistry(false);
