@@ -19,20 +19,20 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 public interface SecureExchangeStudentEndpoint {
 
-    @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
+    @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE_STUDENT')")
     @PostMapping(URL.SECURE_EXCHANGE_ID_STUDENTS)
     @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "404", description = "NOT FOUND"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
     @ResponseStatus(CREATED)
     @Transactional
     SecureExchange addStudent(@PathVariable String secureExchangeId, @Validated @RequestBody SecureExchangeStudent secureExchangeStudent) throws NotFoundException;
 
-    @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
+    @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE_STUDENT')")
     @GetMapping(URL.SECURE_EXCHANGE_ID_STUDENTS)
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
     @Transactional
     List<SecureExchangeStudent> getStudents(@PathVariable String secureExchangeId);
 
-    @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
+    @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE_STUDENT')")
     @DeleteMapping(URL.SECURE_EXCHANGE_ID_STUDENTS + "/{secureExchangeStudentId}")
     @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT")})
     @Transactional

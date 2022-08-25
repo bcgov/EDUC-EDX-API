@@ -235,35 +235,96 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -H "Authorization: Bearer $TKN" \
   -d "{\"description\": \"Write EDX_PRIMARY_ACTIVATION_CODE \",\"id\": \"WRITE_PRIMARY_ACTIVATION_CODE\",\"name\": \"WRITE_PRIMARY_ACTIVATION_CODE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
-  echo
-  echo Writing scope SCHOOL_USER_ACTIVATION_INVITE_SAGA
-  curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+echo
+echo Writing scope SCHOOL_USER_ACTIVATION_INVITE_SAGA
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write SCHOOL_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope CREATE_SECURE_EXCHANGE_COMMENT_SAGA
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $TKN" \
-    -d "{\"description\": \"Write SCHOOL_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"SCHOOL_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+    -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_COMMENT_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
-  echo
-  echo Writing scope CREATE_SECURE_EXCHANGE_COMMENT_SAGA
-  curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-      -H "Content-Type: application/json" \
-      -H "Authorization: Bearer $TKN" \
-      -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_COMMENT_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_COMMENT_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+echo
+echo Writing scope DISTRICT_USER_ACTIVATION_INVITE_SAGA
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TKN" \
+    -d "{\"description\": \"Write DISTRICT_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
-    echo
-    echo Writing scope DISTRICT_USER_ACTIVATION_INVITE_SAGA
-    curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN" \
-        -d "{\"description\": \"Write DISTRICT_USER_ACTIVATION_INVITE_SAGA \",\"id\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"name\": \"DISTRICT_USER_ACTIVATION_INVITE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+echo
+echo Writing scope CREATE_SECURE_EXCHANGE_SAGA
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
-     echo
-      echo Writing scope CREATE_SECURE_EXCHANGE_SAGA
-      curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-        -H "Content-Type: application/json" \
-        -H "Authorization: Bearer $TKN" \
-        -d "{\"description\": \"Write CREATE_SECURE_EXCHANGE_SAGA \",\"id\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"name\": \"CREATE_SECURE_EXCHANGE_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+echo
+echo Writing scope READ_SECURE_EXCHANGE_COMMENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read scope for secure exchange comment\",\"id\": \"READ_SECURE_EXCHANGE_COMMENT\",\"name\": \"READ_SECURE_EXCHANGE_COMMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+echo
+echo Writing scope WRITE_SECURE_EXCHANGE_COMMENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for secure exchange comment\",\"id\": \"WRITE_SECURE_EXCHANGE_COMMENT\",\"name\": \"WRITE_SECURE_EXCHANGE_COMMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
+echo
+echo Writing scope DELETE_SECURE_EXCHANGE_COMMENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Delete scope for secure exchange comment\",\"id\": \"DELETE_SECURE_EXCHANGE_COMMENT\",\"name\": \"DELETE_SECURE_EXCHANGE_COMMENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope READ_SECURE_EXCHANGE_NOTE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read scope for secure exchange note\",\"id\": \"READ_SECURE_EXCHANGE_NOTE\",\"name\": \"READ_SECURE_EXCHANGE_NOTE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_SECURE_EXCHANGE_NOTE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for secure exchange note\",\"id\": \"WRITE_SECURE_EXCHANGE_NOTE\",\"name\": \"WRITE_SECURE_EXCHANGE_NOTE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_SECURE_EXCHANGE_NOTE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Delete scope for secure exchange note\",\"id\": \"DELETE_SECURE_EXCHANGE_NOTE\",\"name\": \"DELETE_SECURE_EXCHANGE_NOTE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope READ_SECURE_EXCHANGE_STUDENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read scope for secure exchange student\",\"id\": \"READ_SECURE_EXCHANGE_STUDENT\",\"name\": \"READ_SECURE_EXCHANGE_STUDENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_SECURE_EXCHANGE_STUDENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for secure exchange student\",\"id\": \"WRITE_SECURE_EXCHANGE_STUDENT\",\"name\": \"WRITE_SECURE_EXCHANGE_STUDENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_SECURE_EXCHANGE_STUDENT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Delete scope for secure exchange student\",\"id\": \"DELETE_SECURE_EXCHANGE_STUDENT\",\"name\": \"DELETE_SECURE_EXCHANGE_STUDENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 ###########################################################
 #Setup for config-map
 ###########################################################

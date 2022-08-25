@@ -72,7 +72,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenThrow(NotFoundException.class);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJson(UUID.randomUUID().toString()))
         .accept(MediaType.APPLICATION_JSON))
@@ -84,7 +84,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   public void testAddExchangeStudents_GivenInvalidExchangeID_ShouldReturnStatusNotFound() throws Exception {
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJson(LEGIT_STUDENT_ID))
         .accept(MediaType.APPLICATION_JSON))
@@ -100,7 +100,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
     final String studentEdxUserJsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].staffUserIdentifier";
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJson(LEGIT_STUDENT_ID))
         .accept(MediaType.APPLICATION_JSON))
@@ -121,7 +121,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJsonNoStaff(LEGIT_STUDENT_ID))
         .accept(MediaType.APPLICATION_JSON))
@@ -136,7 +136,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     final String jsonPath = "$.studentsList[?(@.studentId=='" + LEGIT_STUDENT_ID + "')].studentId";
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJsonBothStaffAndEDXUser(LEGIT_STUDENT_ID))
         .accept(MediaType.APPLICATION_JSON))
@@ -153,7 +153,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     students.addAll(entity.getSecureExchangeStudents());
     String secureExchangeStudentID = String.valueOf(students.get(0).getSecureExchangeStudentId());
     this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS + "/" + secureExchangeStudentID, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT"))))
       .andDo(print())
       .andExpect(status().isNoContent());
   }
@@ -164,7 +164,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
     final String sid = entity.getSecureExchangeID().toString();
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_STUDENT"))))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.jsonPath("$", hasSize(2)));
@@ -174,7 +174,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   public void testGetStudentsFromExchange_GivenInvalidExchangeID_ShouldReturnNotFound() throws Exception {
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_STUDENT"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 

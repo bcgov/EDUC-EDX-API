@@ -53,7 +53,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
     public void testAddNote_GivenInvalidTimestampField_ExpectReturns400ValidationError() throws Exception {
         final String noteJson = this.createDummyNoteJson(testExchangeID, "test content", "Chris", "2020-02-09T00:00:00r");
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, testExchangeID)
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_NOTE")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(noteJson)
                 .accept(MediaType.APPLICATION_JSON))
@@ -70,7 +70,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
     public void testAddNote_GivenInvalidExchangeId_ExpectReturns404NotFoundError() throws Exception {
         final String noteJson = this.createDummyNoteJson(testExchangeID, "test content", "Chris", "2020-02-09T00:00:00");
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, UUID.randomUUID().toString())
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_NOTE")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(noteJson)
                 .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +85,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         String testId = entity.getSecureExchangeID().toString();
         final String noteJson = this.createDummyNoteJson(testId, "test content", "Chris", "2020-02-09T00:00:00");
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, testId)
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_NOTE")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(noteJson)
                 .accept(MediaType.APPLICATION_JSON))
@@ -99,7 +99,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
     @Test
     public void testGetNotes_GivenInvalidExchangeId_ExpectReturns404NotFound() throws Exception {
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, UUID.randomUUID())
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_NOTE"))))
                 .andDo(print()).andExpect(status().isNotFound());
     }
 
@@ -119,7 +119,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         entity.getSecureExchangeNotes().add(note);
         this.secureExchangeRequestRepository.save(entity);
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, entity.getSecureExchangeID().toString())
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_NOTE"))))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(
@@ -134,7 +134,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(exchangeMapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         String exchangeId = entity.getSecureExchangeID().toString();
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES, exchangeId)
-                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
+                .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_NOTE"))))
                 .andDo(print()).andExpect(status().isNoContent());
     }
 
@@ -154,7 +154,7 @@ public class SecureExchangeNoteControllerTest extends BaseSecureExchangeControll
         this.secureExchangeRequestRepository.save(entity);
 
         this.mockMvc.perform(delete(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_NOTES + "/{secureExchangeNoteId}", entity.getSecureExchangeID().toString(), noteEntity.getSecureExchangeNoteID().toString())
-                        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SCHOOL_NOTE"))))
+                        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_SECURE_EXCHANGE_NOTE"))))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
