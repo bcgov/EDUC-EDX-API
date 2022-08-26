@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
+import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,10 @@ public class SecureExchangeStudentService {
         }
         secureExchangeEntity.setIsReadByMinistry(secureExchangeStudent.getStaffUserIdentifier() != null);
         secureExchangeEntity.setIsReadByExchangeContact(secureExchangeStudent.getEdxUserID() != null);
-        SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
+            secureExchangeEntity.setReviewer(secureExchangeStudent.getStaffUserIdentifier());
+            TransformUtil.uppercaseFields(secureExchangeEntity);
+            TransformUtil.uppercaseFields(secureExchangeStudent);
+            SecureExchangeStudentEntity secureExchangeStudentEntity = studentMapper.toModel(secureExchangeStudent);
         secureExchangeStudentEntity.setSecureExchangeEntity(secureExchangeEntity);
         if (secureExchangeStudentEntity.getCreateUser() == null) {
             secureExchangeStudentEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
