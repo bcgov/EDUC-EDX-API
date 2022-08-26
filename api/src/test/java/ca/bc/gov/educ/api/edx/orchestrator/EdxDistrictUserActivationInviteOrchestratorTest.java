@@ -117,9 +117,8 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
       sagaData.setFirstName(firstName);
       sagaData.setLastName(lastName);
       sagaData.setEmail(email);
-      sagaData.setDistrictId(UUID.randomUUID().toString());
+      sagaData.setDistrictID(UUID.randomUUID().toString());
       sagaData.setDistrictName("Test District");
-      sagaData.setDistrictCode("001");
       List<String> rolesList = new ArrayList<>();
       rolesList.add(edxRoleEntity.getEdxRoleCode());
       sagaData.setEdxActivationRoleCodes(rolesList);

@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
+import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -166,20 +169,21 @@ public class EdxUsersService {
    * @return the edx user schools list
    */
   public List<String> getEdxUserSchoolsList(String permissionCode) {
-    return this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
+    List<byte[]> schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
+    return schoolIDBytes.stream().map(schoolID -> UUIDUtil.asUuid(schoolID).toString()).collect(Collectors.toList());
   }
 
   /**
    * Find edx users list.
    *
    * @param digitalId the digital id
-   * @param mincode   the mincode
+   * @param schoolID   the schoolID
    * @param firstName the first name
    * @param lastName  the last name
    * @return the list
    */
-  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName, Optional<UUID> districtId) {
-    return this.getEdxUserRepository().findEdxUsers(digitalId, mincode, firstName, lastName, districtId);
+  public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, Optional<UUID> schoolID, String firstName, String lastName, Optional<UUID> districtID) {
+    return this.getEdxUserRepository().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID);
   }
 
   /**
@@ -205,7 +209,7 @@ public class EdxUsersService {
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
-    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
+    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesBySchoolIDAndEdxUserEntity(edxUserSchoolEntity.getSchoolID(), userEntity);
     if (optionalSchool.isEmpty()) {
       edxUserSchoolEntity.getEdxUserSchoolRoleEntities().forEach(schoolRole -> schoolRole.setEdxUserSchoolEntity(edxUserSchoolEntity));
       return getEdxUserSchoolsRepository().save(edxUserSchoolEntity);
@@ -226,7 +230,7 @@ public class EdxUsersService {
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
 
     //check for school
-    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesByMincodeAndEdxUserEntity(edxUserSchoolEntity.getMincode(), userEntity);
+    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesBySchoolIDAndEdxUserEntity(edxUserSchoolEntity.getSchoolID(), userEntity);
     if (optionalSchool.isPresent()) {
       EdxUserSchoolEntity currentEdxUserSchoolEntity = optionalSchool.get();
       logUpdatesEdxUserSchool(currentEdxUserSchoolEntity, edxUserSchoolEntity);
@@ -357,10 +361,10 @@ public class EdxUsersService {
   public EdxUserEntity activateEdxUser(EdxActivateUser edxActivateUser) {
     val acCodes = Arrays.asList(edxActivateUser.getPersonalActivationCode(), edxActivateUser.getPrimaryEdxCode());
     List<EdxActivationCodeEntity> activationCodes;
-    if (edxActivateUser.getMincode() != null) {
-      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndMincode(acCodes, edxActivateUser.getMincode());
+    if (edxActivateUser.getSchoolID() != null) {
+      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndSchoolID(acCodes, edxActivateUser.getSchoolID());
     } else {
-      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndDistrictId(acCodes, UUID.fromString(edxActivateUser.getDistrictId()));
+      activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndDistrictID(acCodes, edxActivateUser.getDistrictID());
     }
     if (!CollectionUtils.isEmpty(activationCodes) && activationCodes.size() == 2) {
       EdxActivationCodeEntity userCodeEntity = validateExpiryAndSetEdxUserIdForPersonalActivationCode(edxActivateUser, activationCodes);
@@ -405,7 +409,7 @@ public class EdxUsersService {
         return createEdxUserDetailsFromActivationCodeDetails(edxActivateUser, userCodeEntity);
       } else {
 
-        verifyExistingUserMincodeOrDistrictAssociation(edxActivateUser, edxUsers);
+        verifyExistingUserSchoolOrDistrictAssociation(edxActivateUser, edxUsers);
 
         //add the user_school and school_role to user to the edx_user
         return updateEdxUserDetailsFromActivationCodeDetails(edxUsers, userCodeEntity, edxActivateUser);
@@ -414,14 +418,14 @@ public class EdxUsersService {
   }
 
   /**
-   * Verify existing user mincode association.
+   * Verify existing user schoolID association.
    *
    * @param edxActivateUser the edx activate user
    * @param edxUsers        the edx users
    */
-  private void verifyExistingUserMincodeOrDistrictAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
+  private void verifyExistingUserSchoolOrDistrictAssociation(EdxActivateUser edxActivateUser, List<EdxUserEntity> edxUsers) {
     val existingUser = edxUsers.get(0);
-    if (edxActivateUser.getMincode() != null) {
+    if (edxActivateUser.getSchoolID() != null) {
       verifyExistingUserForSchoolAssociation(edxActivateUser, existingUser);
     } else {
       verifyExistingUserForDistrictAssociation(edxActivateUser, existingUser);
@@ -432,7 +436,7 @@ public class EdxUsersService {
   private void verifyExistingUserForDistrictAssociation(EdxActivateUser edxActivateUser, EdxUserEntity existingUser) {
     if (!CollectionUtils.isEmpty(existingUser.getEdxUserDistrictEntities())) {
       for (EdxUserDistrictEntity userDistrictEntity : existingUser.getEdxUserDistrictEntities()) {
-        if (userDistrictEntity.getDistrictId().equals(UUID.fromString(edxActivateUser.getDistrictId()))) {
+        if (userDistrictEntity.getDistrictID().equals(edxActivateUser.getDistrictID())) {
           ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the district").status(CONFLICT).build();
           throw new InvalidPayloadException(error);
         }
@@ -443,7 +447,7 @@ public class EdxUsersService {
   private void verifyExistingUserForSchoolAssociation(EdxActivateUser edxActivateUser, EdxUserEntity existingUser) {
     if (!CollectionUtils.isEmpty(existingUser.getEdxUserSchoolEntities())) {
       for (EdxUserSchoolEntity schoolEntity : existingUser.getEdxUserSchoolEntities()) {
-        if (schoolEntity.getMincode().equalsIgnoreCase(edxActivateUser.getMincode())) {
+        if (schoolEntity.getSchoolID().equals(edxActivateUser.getSchoolID())) {
           ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This user is already associated to the school").status(CONFLICT).build();
           throw new InvalidPayloadException(error);
         }
@@ -510,7 +514,7 @@ public class EdxUsersService {
   }
 
   private void createEdxUserDetails(EdxActivateUser edxActivateUser, EdxActivationCodeEntity edxActivationCodeEntity, EdxUserEntity edxUserEntity) {
-    if (edxActivateUser.getMincode() != null) {
+    if (edxActivateUser.getSchoolID() != null) {
       //set up school user
       val edxUserSchoolEntity = createEdxUserSchoolFromActivationCodeDetails(edxActivationCodeEntity, edxUserEntity, edxActivateUser);
       val edxUserSchoolRoleEntities = createEdxUserSchoolRolesFromActivationCodeDetails(edxActivationCodeEntity.getEdxActivationRoleEntities(), edxUserSchoolEntity, edxActivateUser);
@@ -610,7 +614,7 @@ public class EdxUsersService {
   private EdxUserSchoolEntity createEdxUserSchoolFromActivationCodeDetails(EdxActivationCodeEntity activationCode, EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
     EdxUserSchoolEntity userSchoolEntity = new EdxUserSchoolEntity();
     userSchoolEntity.setEdxUserEntity(edxUser);
-    userSchoolEntity.setMincode(activationCode.getMincode());
+    userSchoolEntity.setSchoolID(activationCode.getSchoolID());
     updateAuditColumnsForEdxUserSchoolEntity(edxActivateUser, userSchoolEntity);
     return userSchoolEntity;
   }
@@ -618,7 +622,7 @@ public class EdxUsersService {
   private EdxUserDistrictEntity createEdxUserDistrictFromActivationCodeDetails(EdxActivationCodeEntity activationCode, EdxUserEntity edxUser, EdxActivateUser edxActivateUser) {
     EdxUserDistrictEntity userDistrictEntity = new EdxUserDistrictEntity();
     userDistrictEntity.setEdxUserEntity(edxUser);
-    userDistrictEntity.setDistrictId(activationCode.getDistrictId());
+    userDistrictEntity.setDistrictID(activationCode.getDistrictID());
     updateAuditColumnsForEdxUserDistrictEntity(edxActivateUser, userDistrictEntity);
     return userDistrictEntity;
   }
@@ -728,7 +732,7 @@ public class EdxUsersService {
       activationCode.setUpdateDate(LocalDateTime.now());
       getEdxActivationCodeRepository().save(activationCode);
     });
-    if (activationCodeEntities.get(0).getMincode() != null) {
+    if (activationCodeEntities.get(0).getSchoolID() != null) {
       return InstituteTypeCode.SCHOOL;
     } else {
       return InstituteTypeCode.DISTRICT;
@@ -823,9 +827,9 @@ public class EdxUsersService {
   private Optional<EdxActivationCodeEntity> findPrimaryEdxActivationCodeForInstitute(InstituteTypeCode instituteType, String contactIdentifier) {
     switch (instituteType) {
       case SCHOOL:
-        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(contactIdentifier);
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
       case DISTRICT:
-        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictIdAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
       default:
         return Optional.empty();
     }
@@ -853,9 +857,9 @@ public class EdxUsersService {
   private EdxActivationCodeEntity newPrimaryActivationCode(EdxPrimaryActivationCode edxPrimaryActivationCode) {
     EdxActivationCodeEntity toReturn = new EdxActivationCodeEntity();
     LocalDateTime currentTime = LocalDateTime.now();
-    toReturn.setMincode(edxPrimaryActivationCode.getMincode());
-    if (StringUtils.isNotBlank(edxPrimaryActivationCode.getDistrictId())) {
-      toReturn.setDistrictId(UUID.fromString(edxPrimaryActivationCode.getDistrictId()));
+    toReturn.setSchoolID(edxPrimaryActivationCode.getSchoolID());
+    if (edxPrimaryActivationCode.getDistrictID() != null) {
+      toReturn.setDistrictID(edxPrimaryActivationCode.getDistrictID());
     }
     toReturn.setIsPrimary(true);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
@@ -878,14 +882,14 @@ public class EdxUsersService {
   }
 
   /**
-   * Find edx user email by mincode and permission code set.
+   * Find edx user email by schoolID and permission code set.
    *
-   * @param mincode        the mincode
+   * @param schoolID        the schoolID
    * @param permissionCode the permission code
    * @return the set
    */
-  public Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode) {
-    return getEdxUserRepository().findEdxUserEmailByMincodeAndPermissionCode(mincode, permissionCode);
+  public Set<String> findEdxUserEmailBySchoolIDAndPermissionCode(UUID schoolID, String permissionCode) {
+    return getEdxUserRepository().findEdxUserEmailBySchoolIDAndPermissionCode(schoolID, permissionCode);
   }
 
   public List<EdxRoleEntity> findAllEdxRolesForInstituteTypeCode(InstituteTypeCode instituteTypeCode) {

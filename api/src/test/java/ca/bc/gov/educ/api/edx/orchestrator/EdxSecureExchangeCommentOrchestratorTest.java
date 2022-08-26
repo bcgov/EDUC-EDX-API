@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
@@ -127,7 +128,7 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     MinistryOwnershipTeamEntity ministryEntity = ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
     this.secureExchangeEntity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString(ministryEntity.getMinistryOwnershipTeamId().toString())));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(secureExchangeEntity.getSecureExchangeID().toString()), SecureExchangeComment.class);
-    return createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", secureExchangeEntity.getSecureExchangeID(), "10");
+    return createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), "WildFlower", "ABC Team", secureExchangeEntity.getSecureExchangeID(), "10");
 
   }
 
@@ -151,7 +152,7 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
     var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
-    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolID()).isNotNull();
     assertThat(payload.getSchoolName()).isNotBlank();
     List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(), secureExchangeEntity.getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
@@ -185,7 +186,7 @@ public class EdxSecureExchangeCommentOrchestratorTest extends BaseSagaController
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
     var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
-    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolID()).isNotNull();
     assertThat(payload.getSchoolName()).isNotBlank();
     List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(secureExchangeEntity.getContactIdentifier(), secureExchangeEntity.getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);

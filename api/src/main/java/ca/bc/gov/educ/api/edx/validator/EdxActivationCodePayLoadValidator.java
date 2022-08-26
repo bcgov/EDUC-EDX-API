@@ -53,11 +53,11 @@ public class EdxActivationCodePayLoadValidator {
 
   public List<FieldError> validateEdxActivateUserPayload(EdxActivateUser edxActivateUser) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
-    if (edxActivateUser.getMincode() == null && edxActivateUser.getDistrictId() == null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getMincode(), "Mincode or District Information is required for User Activation"));
+    if (edxActivateUser.getSchoolID() == null && edxActivateUser.getDistrictID() == null) {
+      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "SchoolID or DistrictID Information is required for User Activation"));
     }
-    if (edxActivateUser.getMincode() != null && edxActivateUser.getDistrictId() != null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getMincode(), "Either Mincode or District Information should be present per User Activation Request"));
+    if (edxActivateUser.getSchoolID() != null && edxActivateUser.getDistrictID() != null) {
+      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "Either SchoolID or DistrictID Information should be present per User Activation Request"));
     }
     return apiValidationErrors;
   }

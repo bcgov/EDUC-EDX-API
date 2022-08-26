@@ -59,7 +59,7 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
     sagaData.setLastName("test");
     sagaData.setEmail("test@gmail.com");
     sagaData.setSchoolName("Test School");
-    sagaData.setMincode("00899178");
+    sagaData.setSchoolID(UUID.randomUUID());
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);

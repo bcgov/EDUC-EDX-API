@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -16,7 +17,7 @@ public class EdxUserSchool extends BaseRequest implements Serializable {
 
   String edxUserSchoolID;
   String edxUserID;
-  String mincode;
+  UUID schoolID;
 
   private List<EdxUserSchoolRole> edxUserSchoolRoles;
 }

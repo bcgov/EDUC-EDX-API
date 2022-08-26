@@ -45,11 +45,11 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     return entity;
   }
 
-  protected SecureExchangeCreateSagaData createSecureExchangeCreateSagaData(SecureExchangeCreate secureExchangeCreate, String mincode, String schoolName, String ministryTeamName) {
+  protected SecureExchangeCreateSagaData createSecureExchangeCreateSagaData(SecureExchangeCreate secureExchangeCreate, UUID schoolID, String schoolName, String ministryTeamName) {
     SecureExchangeCreateSagaData sagaData = new SecureExchangeCreateSagaData();
     sagaData.setSecureExchangeCreate(secureExchangeCreate);
     sagaData.setSecureExchangeCreate(secureExchangeCreate);
-    sagaData.setMincode(mincode);
+    sagaData.setSchoolID(schoolID);
     sagaData.setSchoolName(schoolName);
     sagaData.setMinistryTeamName(ministryTeamName);
     return sagaData;
@@ -85,10 +85,10 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     return entity;
   }
 
-  protected SecureExchangeCommentSagaData createSecureExchangeCommentSagaData(SecureExchangeComment secureExchangeComment, String mincode, String schoolName, String ministryTeamName, UUID secureExchangeID, String sequence) {
+  protected SecureExchangeCommentSagaData createSecureExchangeCommentSagaData(SecureExchangeComment secureExchangeComment, UUID schoolID, String schoolName, String ministryTeamName, UUID secureExchangeID, String sequence) {
     SecureExchangeCommentSagaData secureExchangeCommentSagaData = new SecureExchangeCommentSagaData();
     secureExchangeCommentSagaData.setSecureExchangeComment(secureExchangeComment);
-    secureExchangeCommentSagaData.setMincode(mincode);
+    secureExchangeCommentSagaData.setSchoolID(schoolID);
     secureExchangeCommentSagaData.setSchoolName(schoolName);
     secureExchangeCommentSagaData.setMinistryTeamName(ministryTeamName);
     secureExchangeCommentSagaData.setSecureExchangeId(secureExchangeID);

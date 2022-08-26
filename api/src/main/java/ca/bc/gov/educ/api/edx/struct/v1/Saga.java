@@ -19,8 +19,8 @@ public class Saga {
   private String payload;
   private String status;
   private Boolean sagaCompensated;
-  private String mincode;
-  private String districtId;
+  private String schoolID;
+  private String districtID;
   private String emailId;
   private String edxUserId;
   private String secureExchangeId;

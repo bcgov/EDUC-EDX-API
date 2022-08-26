@@ -118,18 +118,18 @@ public class SagaService {
 
 
   /**
-   * @param mincode
+   * @param schoolID
    * @param emailId
    * @param sagaName
    * @param statuses
    * @return
    */
-  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasByMincodeAndEmailId(final String mincode, final String emailId, final String sagaName, final List<String> statuses) {
-    return this.getSagaRepository().findAllByMincodeAndEmailIdAndSagaNameAndStatusIn(mincode, emailId, sagaName, statuses);
+  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(final UUID schoolID, final String emailId, final String sagaName, final List<String> statuses) {
+    return this.getSagaRepository().findAllBySchoolIDAndEmailIdAndSagaNameAndStatusIn(schoolID, emailId, sagaName, statuses);
   }
 
-  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasByDistrictIdAndEmailId(final UUID districtId, final String emailId, final String sagaName, final List<String> statuses) {
-    return this.getSagaRepository().findAllByDistrictIdAndEmailIdAndSagaNameAndStatusIn(districtId, emailId, sagaName, statuses);
+  public Optional<SagaEntity> findAllActiveUserActivationInviteSagasByDistrictIDAndEmailId(final UUID districtID, final String emailId, final String sagaName, final List<String> statuses) {
+    return this.getSagaRepository().findAllByDistrictIDAndEmailIdAndSagaNameAndStatusIn(districtID, emailId, sagaName, statuses);
   }
 
   /**
@@ -153,11 +153,11 @@ public class SagaService {
       .sagaName(saga.getSagaName())
       .edxUserId(saga.getEdxUserId())
       .secureExchangeId(saga.getSecureExchangeId())
-      .mincode(saga.getMincode())
+      .schoolID(saga.getSchoolID())
       .emailId(saga.getEmailId())
       .status(STARTED.toString())
       .sagaState(INITIATED.toString())
-      .districtId(saga.getDistrictId())
+      .districtID(saga.getDistrictID())
       .createDate(LocalDateTime.now())
       .createUser(saga.getCreateUser())
       .updateUser(saga.getUpdateUser())

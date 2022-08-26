@@ -25,6 +25,6 @@ public interface EdxUserRepository extends JpaRepository<EdxUserEntity, UUID>, E
     "                        AND ES.EDX_USER_SCHOOL_ID = ESR.EDX_USER_SCHOOL_ID\n" +
     "                        AND ER.EDX_ROLE_CODE = ERP.EDX_ROLE_CODE\n" +
     "                        AND ERP.EDX_PERMISSION_CODE=:permissionCode\n" +
-    "                        AND ES.MINCODE = :mincode)", nativeQuery = true)
-  Set<String> findEdxUserEmailByMincodeAndPermissionCode(String mincode, String permissionCode);
+    "                        AND ES.SCHOOL_ID = :schoolID)", nativeQuery = true)
+  Set<String> findEdxUserEmailBySchoolIDAndPermissionCode(UUID schoolID, String permissionCode);
 }

@@ -32,7 +32,7 @@ public class EdxUserDistrictEntity {
   EdxUserEntity edxUserEntity;
 
   @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
-  UUID districtId;
+  UUID districtID;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

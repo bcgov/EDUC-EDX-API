@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,9 +20,9 @@ public class EdxActivateUser extends BaseRequest implements Serializable {
   @NotNull
   String personalActivationCode;
 
-  String mincode;
+  UUID schoolID;
 
-  String districtId;
+  UUID districtID;
 
   @NotNull
   String digitalId;

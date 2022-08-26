@@ -11,16 +11,16 @@ import java.util.UUID;
 @Repository
 public interface EdxActivationCodeRepository extends JpaRepository<EdxActivationCodeEntity, UUID> {
 
-  List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndMincode(List<String> activationCode, String mincode);
+  List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndSchoolID(List<String> activationCode, UUID schoolID);
 
-  List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndDistrictId(List<String> activationCode, UUID districtId);
+  List<EdxActivationCodeEntity> findEdxActivationCodeByActivationCodeInAndDistrictID(List<String> activationCode, UUID districtID);
 
   List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByValidationCode(UUID userActivationValidationCode);
 
-  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByMincodeAndIsPrimaryTrue(String mincode);
+  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(UUID schoolID);
 
-  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByDistrictIdAndIsPrimaryTrue(UUID districtId);
+  Optional<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrue(UUID districtID);
 
-  List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByEmailAndMincodeAndIsPrimaryIsFalseAndIsUrlClickedIsFalse(String emailId, String mincode);
+  List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByEmailAndSchoolIDAndIsPrimaryIsFalseAndIsUrlClickedIsFalse(String emailId, String schoolID);
 
 }

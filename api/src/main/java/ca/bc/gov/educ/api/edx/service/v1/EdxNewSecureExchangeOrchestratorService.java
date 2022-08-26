@@ -94,7 +94,7 @@ public class EdxNewSecureExchangeOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
     // query to find all the users to whom it should be sent
-    Set<String> emailIds = getEdxUsersService().findEdxUserEmailByMincodeAndPermissionCode(secureExchangeCreateSagaData.getMincode(),"SECURE_EXCHANGE");
+    Set<String> emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCreateSagaData.getSchoolID(),"SECURE_EXCHANGE");
     final var subject = emailProperties.getEdxNewSecureExchangeNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     for(String emailId : emailIds){

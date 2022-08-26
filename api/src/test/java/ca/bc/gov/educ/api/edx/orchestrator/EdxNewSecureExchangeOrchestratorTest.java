@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
@@ -119,7 +120,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     SecureExchangeCreateSagaData sagaData = new SecureExchangeCreateSagaData();
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
     sagaData.setSecureExchangeCreate(secureExchangeCreate);
-    sagaData.setMincode("123456789");
+    sagaData.setSchoolID(UUID.randomUUID());
     sagaData.setSchoolName("ABC School");
     sagaData.setMinistryTeamName("Min Team");
     sagaData.setCreateUser("Test");
@@ -147,7 +148,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
     var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
-    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolID()).isNotNull();
     assertThat(payload.getSchoolName()).isNotBlank();
     List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(), payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
@@ -178,7 +179,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
     var payload = JsonUtil.getJsonObjectFromString(SecureExchangeCreateSagaData.class, newEvent.getEventPayload());
-    assertThat(payload.getMincode()).isNotBlank();
+    assertThat(payload.getSchoolID()).isNotNull();
     assertThat(payload.getSchoolName()).isNotBlank();
     List<SecureExchangeEntity> secureExchangeEntities = secureExchangeRequestRepository.findSecureExchange(payload.getSecureExchangeCreate().getContactIdentifier(), payload.getSecureExchangeCreate().getSecureExchangeContactTypeCode());
     assertThat(secureExchangeEntities).hasSize(1);
