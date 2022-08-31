@@ -32,20 +32,20 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
   }
 
   @Override
-  public List<EdxUserEntity> findEdxUsers(final Optional<UUID> digitalId, final String mincode,final String firstName, final String lastName,final Optional<UUID> districtId) {
+  public List<EdxUserEntity> findEdxUsers(final Optional<UUID> digitalId, final Optional<UUID> schoolID, final String firstName, final String lastName, final Optional<UUID> districtID) {
     final List<Predicate> predicates = new ArrayList<>();
     final CriteriaBuilder criteriaBuilder = getEntityManager().getCriteriaBuilder();
     final CriteriaQuery<EdxUserEntity> criteriaQuery = criteriaBuilder.createQuery(EdxUserEntity.class);
     Root<EdxUserEntity> edxUserEntityRoot = criteriaQuery.from(EdxUserEntity.class);
 
     digitalId.ifPresent(uuid -> predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("digitalIdentityID"), uuid)));
-    districtId.ifPresent(uuid -> {
+    districtID.ifPresent(uuid -> {
       Join<EdxUserEntity, EdxUserDistrictEntity> edxUserEntityDistrictJoin = edxUserEntityRoot.join("edxUserDistrictEntities");
-      predicates.add(criteriaBuilder.equal(edxUserEntityDistrictJoin.get("districtId"), uuid));
+      predicates.add(criteriaBuilder.equal(edxUserEntityDistrictJoin.get("districtID"), uuid));
     });
-    if (StringUtils.isNotBlank(mincode)) {
+    if (schoolID.isPresent()) {
       Join<EdxUserEntity, EdxUserSchoolEntity> edxUserSchoolEntitySchoolJoin = edxUserEntityRoot.join("edxUserSchoolEntities");
-      predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("mincode"), mincode));
+      predicates.add(criteriaBuilder.equal(edxUserSchoolEntitySchoolJoin.get("schoolID"), schoolID.get()));
     }
     if (StringUtils.isNotBlank(firstName)) {
       predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("firstName"), firstName));

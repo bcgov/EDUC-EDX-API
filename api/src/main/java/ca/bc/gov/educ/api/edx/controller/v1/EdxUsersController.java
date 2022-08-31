@@ -73,7 +73,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<String> findAllEdxUserSchoolMincodes(String permissionCode) {
+  public List<String> findAllEdxUserSchoolIDs(String permissionCode) {
     return getService().getEdxUserSchoolsList(permissionCode);
   }
 
@@ -83,8 +83,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, String mincode, String firstName, String lastName, Optional<UUID> districtId) {
-    return getService().findEdxUsers(digitalId, mincode,firstName,lastName,districtId).stream().map(userMapper::toStructure).collect(Collectors.toList());
+  public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, Optional<UUID> schoolID, String firstName, String lastName, Optional<UUID> districtID) {
+    return getService().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }
 
   @Override

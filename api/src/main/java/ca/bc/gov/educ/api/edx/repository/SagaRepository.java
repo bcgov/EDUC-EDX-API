@@ -40,7 +40,7 @@ public interface SagaRepository extends JpaRepository<SagaEntity, UUID> {
 
 
 
-  Optional<SagaEntity> findAllByMincodeAndEmailIdAndSagaNameAndStatusIn(String mincode, String emailId, String sagaName, List<String> statuses);
+  Optional<SagaEntity> findAllBySchoolIDAndEmailIdAndSagaNameAndStatusIn(UUID schoolID, String emailId, String sagaName, List<String> statuses);
 
-  Optional<SagaEntity> findAllByDistrictIdAndEmailIdAndSagaNameAndStatusIn(UUID districtId, String emailId, String sagaName, List<String> statuses);
+  Optional<SagaEntity> findAllByDistrictIDAndEmailIdAndSagaNameAndStatusIn(UUID districtID, String emailId, String sagaName, List<String> statuses);
 }

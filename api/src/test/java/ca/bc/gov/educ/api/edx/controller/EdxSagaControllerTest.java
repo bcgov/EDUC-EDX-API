@@ -177,9 +177,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
-    sagaData.setMincode(null);
+    sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -187,7 +187,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -308,9 +308,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
-    sagaData.setMincode(null);
+    sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -318,7 +318,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -380,9 +380,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenValidInputAndValidSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
-    List<String> mincodes = new ArrayList<>();
-    mincodes.add("0889966");
-    var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, mincodes);
+    List<UUID> schoolIDs = new ArrayList<>();
+    schoolIDs.add(UUID.randomUUID());
+    var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, schoolIDs);
     EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", edxUser.getEdxUserID().toString(), edxUser.getEdxUserSchoolEntities().iterator().next().getEdxUserSchoolID().toString());
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -394,8 +394,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
+  public void testCreateNewSecureExchange_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, "schoolName", "MinTeam");
     String jsonString = getJsonString(sagaData);
@@ -405,15 +404,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School ID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
   public void testCreateNewSecureExchange_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(this.ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
-    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", null, "MinTeam");
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), null, "MinTeam");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -427,9 +425,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testCreateNewSecureExchange_GivenInputWithMissingTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
-    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", "WildFlower", null);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), "WildFlower", null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -443,8 +440,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testCreateNewSecureExchange_GivenInputWithMissingSecureExchangeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
-    val sagaData = createSecureExchangeCreateSagaData(null, "123456789", "WildFlower", "ABC Team");
+    val sagaData = createSecureExchangeCreateSagaData(null, UUID.randomUUID(), "WildFlower", "ABC Team");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -461,7 +457,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateNewSecureExchange_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
 
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
-    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, "123456789", "WildFlower", "Min Team");
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), "WildFlower", "Min Team");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -472,8 +468,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingMincodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
+  public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, "WildFlower", "ABC Team", UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
@@ -483,7 +478,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Mincode cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -491,7 +486,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", null, "ABC Team", UUID.randomUUID(), "10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), null, "ABC Team", UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -507,7 +502,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingMinistryTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", null, UUID.randomUUID(), "10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), "WildFlower", null, UUID.randomUUID(), "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -523,7 +518,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingSecureExchangeIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", null, "10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), "WildFlower", "ABC Team", null, "10");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -539,7 +534,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenInputWithMissingSequenceNumberRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(), null);
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), "WildFlower", "ABC Team", UUID.randomUUID(), null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -554,7 +549,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   @Test
   public void testCreateSecureExchangeComment_GivenInputWithMissingCommentRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
-    val sagaData = createSecureExchangeCommentSagaData(null, "123456789", "WildFlower", "ABC Team", UUID.randomUUID(), "12");
+    val sagaData = createSecureExchangeCommentSagaData(null, UUID.randomUUID(), "WildFlower", "ABC Team", UUID.randomUUID(), "12");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -572,7 +567,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateSecureExchangeComment_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString()));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(entity.getSecureExchangeID().toString()), SecureExchangeComment.class);
-    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, "123456789", "WildFlower", "ABC Team", entity.getSecureExchangeID(), "10");
+    val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), "WildFlower", "ABC Team", entity.getSecureExchangeID(), "10");
 
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
@@ -646,7 +641,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
-    sagaData.setDistrictId(null);
+    sagaData.setDistrictID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -654,7 +649,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("DistrictId cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("DistrictID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -675,10 +670,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictCodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-
+  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
-    sagaData.setDistrictCode(null);
+    sagaData.setDistrictID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -686,7 +680,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("District code cannot be null")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("DistrictID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -727,7 +721,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setLastName(lastName);
     sagaData.setEmail(email);
     sagaData.setSchoolName("Test School");
-    sagaData.setMincode("00899178");
+    sagaData.setSchoolID(UUID.randomUUID());
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
@@ -745,7 +739,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setEdxUserId(edxUserID);
     sagaData.setEdxUserSchoolID(edxUserSchoolID);
     sagaData.setSchoolName("Test School");
-    sagaData.setMincode("00899178");
+    sagaData.setSchoolID(UUID.randomUUID());
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);
@@ -781,8 +775,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
     sagaData.setEmail(email);
-    sagaData.setDistrictId(UUID.randomUUID().toString());
-    sagaData.setDistrictCode("003");
+    sagaData.setDistrictID(UUID.randomUUID().toString());
     sagaData.setDistrictName("Test District");
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());

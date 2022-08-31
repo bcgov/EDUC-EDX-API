@@ -31,7 +31,7 @@ public interface SagaDataMapper {
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
   @Mapping(target = "emailId", ignore = true)
   @Mapping(target = "edxUserId", ignore = true)
-  @Mapping(target = "districtId", ignore = true)
+  @Mapping(target = "districtID", ignore = true)
   SagaEntity toModel(String sagaName, SecureExchangeCreateSagaData sagaData) throws JsonProcessingException;
 
   @Mapping(target = "status", ignore = true)
@@ -42,7 +42,7 @@ public interface SagaDataMapper {
   @Mapping(target = "retryCount", ignore = true)
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
   @Mapping(target = "emailId", source = "sagaData.email")
-  @Mapping(target = "districtId", ignore = true)
+  @Mapping(target = "districtID", ignore = true)
   SagaEntity toModel(String sagaName, EdxUserActivationInviteSagaData sagaData) throws JsonProcessingException;
 
 
@@ -53,7 +53,7 @@ public interface SagaDataMapper {
   @Mapping(target = "sagaCompensated", ignore = true)
   @Mapping(target = "retryCount", ignore = true)
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
-  @Mapping(target = "mincode", ignore = true)
+  @Mapping(target = "schoolID", ignore = true)
   @Mapping(target = "emailId", source = "sagaData.email")
   SagaEntity toModel(String sagaName, EdxDistrictUserActivationInviteSagaData sagaData) throws JsonProcessingException;
 
@@ -66,6 +66,6 @@ public interface SagaDataMapper {
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
   @Mapping(target = "emailId", ignore = true)
   @Mapping(target = "edxUserId", ignore = true)
-  @Mapping(target = "districtId", ignore = true)
+  @Mapping(target = "districtID", ignore = true)
   SagaEntity toModel(String sagaName, SecureExchangeCommentSagaData sagaData) throws JsonProcessingException;
 }

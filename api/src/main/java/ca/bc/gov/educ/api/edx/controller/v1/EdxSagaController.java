@@ -157,7 +157,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @return the response entity
    */
   private ResponseEntity<String> processEdxSchoolUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
-    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByMincodeAndEmailId(edxUserActivationInviteSagaData.getMincode(), edxUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
+    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(edxUserActivationInviteSagaData.getSchoolID(), edxUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } else {
@@ -172,7 +172,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
 
   private ResponseEntity<String> processEdxDistrictUserActivationLinkSaga(final SagaEnum sagaName, final EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
-    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIdAndEmailId(UUID.fromString(edxDistrictUserActivationInviteSagaData.getDistrictId()), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
+    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIDAndEmailId(UUID.fromString(edxDistrictUserActivationInviteSagaData.getDistrictID()), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } else {

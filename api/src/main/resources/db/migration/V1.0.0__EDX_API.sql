@@ -79,7 +79,7 @@ CREATE TABLE EDX_PERMISSION
 CREATE TABLE EDX_USER_SCHOOL
 (
     EDX_USER_SCHOOL_ID UUID                 NOT NULL,
-    MINCODE            VARCHAR(8)          NOT NULL,
+    SCHOOL_ID          UUID                 NOT NULL,
     EDX_USER_ID        UUID                 NOT NULL,
     CREATE_USER        VARCHAR(32)         NOT NULL,
     CREATE_DATE        TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE EDX_USER_SCHOOL
 CREATE TABLE EDX_USER_DISTRICT
 (
     EDX_USER_DISTRICT_ID UUID                 NOT NULL,
-    DISTRICT_CODE        VARCHAR(3)          NOT NULL,
+    DISTRICT_ID          UUID                 NOT NULL,
     EDX_USER_ID          UUID                 NOT NULL,
     CREATE_USER          VARCHAR(32)         NOT NULL,
     CREATE_DATE          TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -165,8 +165,8 @@ CREATE TABLE EDX_USER_DISTRICT_ROLE
 CREATE TABLE EDX_ACTIVATION_CODE
 (
     EDX_ACTIVATION_CODE_ID UUID                 NOT NULL,
-    MINCODE                VARCHAR(8),
-    DISTRICT_CODE          VARCHAR(3),
+    SCHOOL_ID              UUID,
+    DISTRICT_ID            UUID,
     ACTIVATION_CODE        VARCHAR(10)         NOT NULL,
     IS_PRIMARY             BOOLEAN             NOT NULL,
     EXPIRY_DATE            TIMESTAMP                NOT NULL,
@@ -328,14 +328,14 @@ VALUES ('EDXUSER', 'EDX User', 'EDX User ID type.', 1,
 INSERT INTO SECURE_EXCHANGE_CONTACT_TYPE_CODE (SECURE_EXCHANGE_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
                                                EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
                                                UPDATE_DATE)
-VALUES ('SCHOOL', 'School', 'School type using mincode.', 2,
+VALUES ('SCHOOL', 'School', 'School type using school ID.', 2,
         to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
 
 INSERT INTO SECURE_EXCHANGE_CONTACT_TYPE_CODE (SECURE_EXCHANGE_CONTACT_TYPE_CODE, LABEL, DESCRIPTION, DISPLAY_ORDER,
                                                EFFECTIVE_DATE, EXPIRY_DATE, CREATE_USER, CREATE_DATE, UPDATE_USER,
                                                UPDATE_DATE)
-VALUES ('DISTRICT', 'District', 'District type using district code.', 3,
+VALUES ('DISTRICT', 'District', 'District type using district ID.', 3,
         to_date('2020-01-01', 'YYYY-MM-DD'), to_date('2099-12-31', 'YYYY-MM-DD'), 'IDIR/MVILLENE',
         to_date('2019-11-07', 'YYYY-MM-DD'), 'IDIR/MVILLENE', to_date('2019-11-07', 'YYYY-MM-DD'));
 

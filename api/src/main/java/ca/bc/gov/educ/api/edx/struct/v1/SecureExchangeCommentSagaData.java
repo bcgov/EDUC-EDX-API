@@ -24,10 +24,10 @@ public class SecureExchangeCommentSagaData extends BaseRequest implements Serial
   SecureExchangeComment secureExchangeComment;
 
   /**
-   * The Mincode.
+   * The schoolID.
    */
-  @NotNull(message = "Mincode cannot be null")
-  String mincode;
+  @NotNull(message = "schoolID cannot be null")
+  UUID schoolID;
 
   /**
    * The School name.

@@ -53,16 +53,18 @@ public abstract class BaseSecureExchangeAPITest {
     var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
     userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
     edxUserSchoolRepository.save(userSchoolEntity);
+    entity.getEdxUserSchoolEntities().add(userSchoolEntity);
 
     var userDistrictEntity = getEdxUserDistrictEntity(entity);
     var userDistrictRoleEntity = getEdxUserDistrictRoleEntity(userDistrictEntity, roleEntity);
     userDistrictEntity.setEdxUserDistrictRoleEntities(Set.of(userDistrictRoleEntity));
     edxUserDistrictRepository.save(userDistrictEntity);
+    entity.getEdxUserDistrictEntities().add(userDistrictEntity);
 
     return entity;
   }
 
-  protected EdxUserEntity createUserEntityWithMultipleSchools(EdxUserRepository edxUserRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxUserSchoolRepository edxUserSchoolRepository, EdxUserDistrictRepository edxUserDistrictRepository, List<String> mincodes) {
+  protected EdxUserEntity createUserEntityWithMultipleSchools(EdxUserRepository edxUserRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxUserSchoolRepository edxUserSchoolRepository, EdxUserDistrictRepository edxUserDistrictRepository, List<UUID> schoolIDs) {
     var entity = edxUserRepository.save(getEdxUserEntity());
 
     //creating and saving role/permission entities
@@ -72,8 +74,8 @@ public abstract class BaseSecureExchangeAPITest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     edxRoleRepository.save(roleEntity);
 
-    for (String mincode : mincodes) {
-      var userSchoolEntity = getEdxUserSchoolEntity(entity, mincode);
+    for (UUID schoolID : schoolIDs) {
+      var userSchoolEntity = getEdxUserSchoolEntity(entity, schoolID);
       var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
       userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
       edxUserSchoolRepository.save(userSchoolEntity);
@@ -104,7 +106,7 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxUserSchoolEntity getEdxUserSchoolEntity(EdxUserEntity edxUserEntity) {
     EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
     entity.setEdxUserEntity(edxUserEntity);
-    entity.setMincode("12345678");
+    entity.setSchoolID(UUID.randomUUID());
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -112,10 +114,10 @@ public abstract class BaseSecureExchangeAPITest {
     return entity;
   }
 
-  protected EdxUserSchoolEntity getEdxUserSchoolEntity(EdxUserEntity edxUserEntity, String mincode) {
+  protected EdxUserSchoolEntity getEdxUserSchoolEntity(EdxUserEntity edxUserEntity, UUID schoolID) {
     EdxUserSchoolEntity entity = new EdxUserSchoolEntity();
     entity.setEdxUserEntity(edxUserEntity);
-    entity.setMincode(mincode);
+    entity.setSchoolID(schoolID);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -126,7 +128,7 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxUserDistrictEntity getEdxUserDistrictEntity(EdxUserEntity edxUserEntity) {
     EdxUserDistrictEntity entity = new EdxUserDistrictEntity();
     entity.setEdxUserEntity(edxUserEntity);
-    entity.setDistrictId(UUID.randomUUID());
+    entity.setDistrictID(UUID.randomUUID());
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
@@ -202,17 +204,17 @@ public abstract class BaseSecureExchangeAPITest {
   protected EdxUserSchool createEdxUserSchool(EdxUser edxUsr) {
     EdxUserSchool edxUserSchool = new EdxUserSchool();
     edxUserSchool.setEdxUserID(edxUsr.getEdxUserID());
-    edxUserSchool.setMincode("123456");
+    edxUserSchool.setSchoolID(UUID.randomUUID());
     return edxUserSchool;
   }
 
-  protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
+  protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
     EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
 
-    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked,mincode));
+    var savedActivationCode = edxActivationCodeRepository.save(createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked, schoolID));
 
-    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, mincode));
+    var savedActivationCode1 = edxActivationCodeRepository.save(createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, schoolID));
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
@@ -223,10 +225,10 @@ public abstract class BaseSecureExchangeAPITest {
     EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
 
     val primaryDistrictActivationCode = createEdxActivationCodeEntity("ABCDE", true, savedRoleEntity, isActive,validationCode,isURLClicked,null);
-    primaryDistrictActivationCode.setDistrictId(districtID);
+    primaryDistrictActivationCode.setDistrictID(districtID);
     var savedActivationCode = edxActivationCodeRepository.save(primaryDistrictActivationCode);
     val personalDistrictActivationCode = createEdxActivationCodeEntity("WXYZ", false, savedRoleEntity, isActive,validationCode,isURLClicked, null);
-    personalDistrictActivationCode.setDistrictId(districtID);
+    personalDistrictActivationCode.setDistrictID(districtID);
     var savedActivationCode1 = edxActivationCodeRepository.save(personalDistrictActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode);
     edxActivationCodeEntityList.add(savedActivationCode1);
@@ -249,17 +251,17 @@ public abstract class BaseSecureExchangeAPITest {
     return edxActivationRoleEntity;
   }
 
-  protected EdxPrimaryActivationCode createEdxPrimaryActivationCodeForSchool(String mincode, String createUser, String updateUser) {
+  protected EdxPrimaryActivationCode createEdxPrimaryActivationCodeForSchool(UUID schoolID, String createUser, String updateUser) {
     EdxPrimaryActivationCode toReturn = this.createEdxPrimaryActivationCode(createUser, updateUser);
-    toReturn.setMincode(mincode);
-    toReturn.setDistrictId(null);
+    toReturn.setSchoolID(schoolID);
+    toReturn.setDistrictID(null);
     return toReturn;
   }
 
-  protected EdxPrimaryActivationCode createEdxPrimaryActivationCodeForDistrict(String districtCode, String createUser, String updateUser) {
+  protected EdxPrimaryActivationCode createEdxPrimaryActivationCodeForDistrict(UUID districtID, String createUser, String updateUser) {
     EdxPrimaryActivationCode toReturn = this.createEdxPrimaryActivationCode(createUser, updateUser);
-    toReturn.setMincode(null);
-    toReturn.setDistrictId(districtCode);
+    toReturn.setSchoolID(null);
+    toReturn.setDistrictID(districtID);
     return toReturn;
   }
 
@@ -273,9 +275,9 @@ public abstract class BaseSecureExchangeAPITest {
     return toReturn;
   }
 
-  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID) {
     EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
-    activationCodeEntity.setMincode(mincode);
+    activationCodeEntity.setSchoolID(schoolID);
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
     activationCodeEntity.setValidationCode(validationCode);
@@ -300,10 +302,10 @@ public abstract class BaseSecureExchangeAPITest {
     return activationCodeEntity;
   }
 
-  protected EdxPrimaryActivationCode createEdxPrimaryActivationCode(String mincode, String createUser, String updateUser) {
+  protected EdxPrimaryActivationCode createEdxPrimaryActivationCode(UUID schoolID, String createUser, String updateUser) {
     String currentTime = LocalDateTime.now().toString();
     EdxPrimaryActivationCode toReturn = new EdxPrimaryActivationCode();
-    toReturn.setMincode(mincode);
+    toReturn.setSchoolID(schoolID);
     toReturn.setCreateUser(createUser);
     toReturn.setUpdateUser(updateUser);
     toReturn.setCreateDate(currentTime);
@@ -311,8 +313,8 @@ public abstract class BaseSecureExchangeAPITest {
     return toReturn;
   }
 
-  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode) {
-    EdxActivationCodeEntity toReturn = createEdxActivationCodeEntity(activationCode, isPrimary, isActive, validationCode, isURLClicked, mincode);
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, EdxRoleEntity savedRoleEntity, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID) {
+    EdxActivationCodeEntity toReturn = createEdxActivationCodeEntity(activationCode, isPrimary, isActive, validationCode, isURLClicked, schoolID);
     EdxActivationRoleEntity edxActivationRoleEntity = new EdxActivationRoleEntity();
     edxActivationRoleEntity.setEdxActivationCodeEntity(toReturn);
     edxActivationRoleEntity.setEdxRoleCode(savedRoleEntity.getEdxRoleCode());
@@ -323,11 +325,11 @@ public abstract class BaseSecureExchangeAPITest {
     toReturn.getEdxActivationRoleEntities().add(edxActivationRoleEntity);
     return toReturn;
   }
-  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, boolean isActive, UUID validationCode, boolean isURLClicked, String mincode, String districtId) {
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(String activationCode, boolean isPrimary, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID, UUID districtID) {
     EdxActivationCodeEntity activationCodeEntity = new EdxActivationCodeEntity();
-    activationCodeEntity.setMincode(mincode);
-    if(StringUtils.isNotBlank(districtId)){
-      activationCodeEntity.setDistrictId(UUID.fromString(districtId));
+    activationCodeEntity.setSchoolID(schoolID);
+    if(districtID != null){
+      activationCodeEntity.setDistrictID(districtID);
     }
     activationCodeEntity.setActivationCode(activationCode);
     activationCodeEntity.setIsPrimary(isPrimary);
@@ -359,7 +361,7 @@ public abstract class BaseSecureExchangeAPITest {
     edxActivationCode.setIsPrimary(String.valueOf(isPrimary));
     edxActivationCode.setExpiryDate(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(1).toString());
     edxActivationCode.setIsUrlClicked(String.valueOf(false));
-    edxActivationCode.setMincode("12345678");
+    edxActivationCode.setSchoolID(UUID.randomUUID());
 
     EdxActivationRole edxActivationRole = new EdxActivationRole();
     edxActivationRole.setEdxRoleCode(edxRoleEntity.getEdxRoleCode());

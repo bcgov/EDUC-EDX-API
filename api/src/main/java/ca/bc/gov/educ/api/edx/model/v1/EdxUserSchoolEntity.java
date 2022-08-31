@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_SCHOOL", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_ID_MINCODE_UK", columnNames = {"EDX_USER_ID", "MINCODE"})})
+@Table(name = "EDX_USER_SCHOOL", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_ID_SCHOOL_ID_UK", columnNames = {"EDX_USER_ID", "SCHOOL_ID"})})
 @DynamicUpdate
 public class EdxUserSchoolEntity {
   @Id
@@ -33,8 +33,8 @@ public class EdxUserSchoolEntity {
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
   EdxUserEntity edxUserEntity;
 
-  @Column(name = "MINCODE")
-  String mincode;
+  @Column(name = "SCHOOL_ID", columnDefinition = "BINARY(16)")
+  UUID schoolID;
 
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

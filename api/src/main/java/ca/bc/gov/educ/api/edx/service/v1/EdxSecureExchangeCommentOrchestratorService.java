@@ -113,7 +113,7 @@ public class EdxSecureExchangeCommentOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
     // query to find all the users to whom it should be sent
-    Set<String> emailIds = getEdxUsersService().findEdxUserEmailByMincodeAndPermissionCode(secureExchangeCommentSagaData.getMincode(), "SECURE_EXCHANGE");
+    Set<String> emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCommentSagaData.getSchoolID(), "SECURE_EXCHANGE");
     final var subject = emailProperties.getEdxSecureExchangeCommentNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     for (String emailId : emailIds) {

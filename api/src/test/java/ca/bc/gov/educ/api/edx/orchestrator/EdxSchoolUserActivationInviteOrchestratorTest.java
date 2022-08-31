@@ -119,7 +119,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
     sagaData.setLastName(lastName);
     sagaData.setEmail(email);
     sagaData.setSchoolName("Test School");
-    sagaData.setMincode("00899178");
+    sagaData.setSchoolID(UUID.randomUUID());
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());
     sagaData.setEdxActivationRoleCodes(rolesList);

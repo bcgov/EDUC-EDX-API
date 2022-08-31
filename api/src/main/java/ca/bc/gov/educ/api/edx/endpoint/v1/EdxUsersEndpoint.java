@@ -38,14 +38,14 @@ public interface EdxUsersEndpoint {
   List<MinistryTeam> findAllMinistryTeams();
 
   /**
-   * Retrieve user school mincodes by permission name.
+   * Retrieve user school ID by permission name.
    *
    * @return list of user school codes
    */
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USER_SCHOOLS')")
-  @GetMapping(URL.USER_SCHOOL_MINCODES)
+  @GetMapping(URL.USER_SCHOOLS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<String> findAllEdxUserSchoolMincodes(@RequestParam(name = "permissionCode") String permissionCode);
+  List<String> findAllEdxUserSchoolIDs(@RequestParam(name = "permissionCode") String permissionCode);
 
   /**
    * Retrieve edx user.
@@ -67,7 +67,7 @@ public interface EdxUsersEndpoint {
   @GetMapping
   @Transactional(readOnly = true)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = false) Optional<UUID> digitalId, @RequestParam(name = "mincode", required = false) String mincode, @RequestParam(name = "firstName", required = false) String firstName, @RequestParam(name = "lastName", required = false) String lastName, @RequestParam(name = "districtId", required = false) Optional<UUID> districtId);
+  List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = false) Optional<UUID> digitalId, @RequestParam(name = "schoolID", required = false) Optional<UUID> schoolID, @RequestParam(name = "firstName", required = false) String firstName, @RequestParam(name = "lastName", required = false) String lastName, @RequestParam(name = "districtID", required = false) Optional<UUID> districtID);
 
 
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")

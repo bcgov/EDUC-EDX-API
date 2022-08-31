@@ -10,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,9 +20,9 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
 
   String edxActivationCodeId;
 
-  String mincode;
+  UUID schoolID;
 
-  String districtId;
+  UUID districtID;
 
   String activationCode;
 

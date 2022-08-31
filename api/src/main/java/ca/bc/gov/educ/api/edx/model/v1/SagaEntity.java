@@ -75,8 +75,8 @@ public class SagaEntity {
   @Column(name = "SECURE_EXCHANGE_ID", columnDefinition = "BINARY(16)")
   UUID secureExchangeId;
 
-  @Column(name = "MINCODE")
-  String mincode;
+  @Column(name = "SCHOOL_ID", columnDefinition = "BINARY(16)")
+  UUID schoolID;
 
   @Column(name = "EMAIL_ID")
   String emailId;
@@ -85,7 +85,7 @@ public class SagaEntity {
   private Integer retryCount;
 
   @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
-  UUID districtId;
+  UUID districtID;
 
   public Boolean getSagaCompensated() {
     return this.sagaCompensated == null ?Boolean.FALSE:this.sagaCompensated;

@@ -14,14 +14,15 @@ import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EdxUserActivationInviteSagaData extends BaseRequest implements Serializable {
   private static final long serialVersionUID = -7847063658732692951L;
-  @NotNull(message = "Mincode cannot be null")
-  String mincode;
+  @NotNull(message = "schoolID cannot be null")
+  UUID schoolID;
 
   @NotNull(message = "School Name cannot be null")
   String schoolName;
