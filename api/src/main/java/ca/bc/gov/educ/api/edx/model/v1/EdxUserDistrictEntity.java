@@ -37,7 +37,7 @@ public class EdxUserDistrictEntity {
   /**
    * The Edx user entity.
    */
-  @ManyToOne(optional = false, targetEntity = EdxUserEntity.class)
+  @ManyToOne(targetEntity = EdxUserEntity.class)
   @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
   EdxUserEntity edxUserEntity;
