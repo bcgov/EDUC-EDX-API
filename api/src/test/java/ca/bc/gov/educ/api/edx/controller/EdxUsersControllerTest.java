@@ -79,12 +79,9 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void after() {
 
     this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxUserSchoolRepository.deleteAll();
-    this.edxUserDistrictRepository.deleteAll();
     this.edxUserRepository.deleteAll();
-    this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxRoleRepository.deleteAll();
     this.edxPermissionRepository.deleteAll();
+    this.edxRoleRepository.deleteAll();
     this.edxActivationRoleRepository.deleteAll();
     this.edxActivationCodeRepository.deleteAll();
 
