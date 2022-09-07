@@ -165,4 +165,37 @@ public interface EdxUsersEndpoint {
   @ResponseStatus(CREATED)
   EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(@PathVariable InstituteTypeCode instituteType, @PathVariable String instituteIdentifier, @RequestBody EdxPrimaryActivationCode edxPrimaryActivationCode);
 
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_DISTRICT')")
+  @PostMapping("/{id}/district")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxUserDistrict createEdxDistrictUser(@PathVariable UUID id, @Validated @RequestBody  EdxUserDistrict edxUserDistrict);
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_DISTRICT')")
+  @PutMapping("/{id}/district")
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  EdxUserDistrict updateEdxUserDistrict(@PathVariable UUID id, @Validated @RequestBody  EdxUserDistrict edxUserDistrict);
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER_DISTRICT')")
+  @DeleteMapping("/{id}/district/{edxUserDistrictID}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @ResponseStatus(NO_CONTENT)
+  ResponseEntity<Void> deleteEdxDistrictUserByID(@PathVariable UUID id, @PathVariable UUID edxUserDistrictID );
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_DISTRICT_ROLE')")
+  @PostMapping("{id}/district/{edxUserDistrictID}/role")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @ResponseStatus(CREATED)
+  EdxUserDistrictRole createEdxDistrictUserRole(@PathVariable UUID id, @PathVariable UUID edxUserDistrictID, @Validated @RequestBody EdxUserDistrictRole edxUserDistrictRole);
+
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER_DISTRICT_ROLE')")
+  @DeleteMapping("{id}/district/role/{edxUserDistrictRoleID}")
+  @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
+  @ResponseStatus(NO_CONTENT)
+  ResponseEntity<Void> deleteEdxDistrictUserRoleByID(@PathVariable UUID id,@PathVariable UUID edxUserDistrictRoleID);
 }

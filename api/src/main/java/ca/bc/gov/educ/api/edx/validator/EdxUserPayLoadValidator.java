@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolRole;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
@@ -13,10 +11,12 @@ import java.util.UUID;
 @Component
 public class EdxUserPayLoadValidator {
 
+    private static final String EDX_USER_ID = "edxUserID";
+
     public List<FieldError> validateEdxUserPayload(EdxUser edxUser, boolean isCreateOperation) {
         final List<FieldError> apiValidationErrors = new ArrayList<>();
         if (isCreateOperation && edxUser.getEdxUserID() != null) {
-            apiValidationErrors.add(createFieldError("edxUserID", edxUser.getEdxUserID(), "edxUserID should be null for post operation."));
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUser.getEdxUserID(), "edxUserID should be null for post operation."));
         }
         return apiValidationErrors;
     }
@@ -39,10 +39,10 @@ public class EdxUserPayLoadValidator {
             apiValidationErrors.add(createFieldError("edxUserSchoolID", edxUserSchool.getEdxUserSchoolID(), "edxUserSchoolID should be null for post operation."));
         }
         if (isCreateOperation && edxUserSchool.getEdxUserID() == null) {
-            apiValidationErrors.add(createFieldError("edxUserID", edxUserSchool.getEdxUserID(), "edxUserID should not be null for post operation."));
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserID(), "edxUserID should not be null for post operation."));
         }
         if (!edxUserId.toString().equals(edxUserSchool.getEdxUserID())) {
-            apiValidationErrors.add(createFieldError("edxUserId", edxUserSchool.getEdxUserSchoolID(), "edxUserID in path and payload edxUserId mismatch."));
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserSchoolID(), "edxUserID in path and payload edxUserId mismatch."));
         }
         return apiValidationErrors;
     }
@@ -62,5 +62,37 @@ public class EdxUserPayLoadValidator {
         return apiValidationErrors;
     }
 
+    public List<FieldError> validateCreateEdxUserDistrictPayload(UUID edxUserId, EdxUserDistrict edxUserDistrict) {
+        return validateEdxUserDistrictPayload(edxUserId,edxUserDistrict, true);
+    }
+
+    public List<FieldError> validateEdxUserDistrictPayload(UUID edxUserId, EdxUserDistrict edxUserDistrict, boolean isCreateOperation) {
+        final List<FieldError> apiValidationErrors = new ArrayList<>();
+        if (isCreateOperation && edxUserDistrict.getEdxUserDistrictID() != null) {
+            apiValidationErrors.add(createFieldError("edxUserDistrictID", edxUserDistrict.getEdxUserDistrictID(), "edxUserDistrictID should be null for post operation."));
+        }
+        if (isCreateOperation && edxUserDistrict.getEdxUserID() == null) {
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserDistrict.getEdxUserID(), "edxUserID should not be null for post operation."));
+        }
+        if (!edxUserId.toString().equals(edxUserDistrict.getEdxUserID())) {
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserDistrict.getEdxUserDistrictID(), "edxUserID in path and payload edxUserId mismatch."));
+        }
+        return apiValidationErrors;
+    }
+
+    public List<FieldError> validateCreateEdxUserDistrictRolePayload(UUID edxUserDistrictId, EdxUserDistrictRole edxUserDistrictRole) {
+        return validateEdxUserDistrictRolePayload(edxUserDistrictId,edxUserDistrictRole, true);
+    }
+
+    public List<FieldError> validateEdxUserDistrictRolePayload(UUID edxUserDistrictID, EdxUserDistrictRole edxUserDistrictRole, boolean isCreateOperation) {
+        final List<FieldError> apiValidationErrors = new ArrayList<>();
+        if (isCreateOperation && edxUserDistrictRole.getEdxUserDistrictRoleID() != null) {
+            apiValidationErrors.add(createFieldError("edxUserDistrictRoleID", edxUserDistrictRole.getEdxUserDistrictRoleID(), "edxUserDistrictRoleID should be null for post operation."));
+        }
+        if(!edxUserDistrictID.toString().equals(edxUserDistrictRole.getEdxUserDistrictID())) {
+            apiValidationErrors.add(createFieldError("edxUserDistrictID",edxUserDistrictID, "edxUserDistrictId in path and payload mismatch."));
+        }
+        return apiValidationErrors;
+    }
 
 }

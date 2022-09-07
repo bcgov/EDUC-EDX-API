@@ -208,6 +208,13 @@ public abstract class BaseSecureExchangeAPITest {
     return edxUserSchool;
   }
 
+  protected EdxUserDistrict createEdxUserDistrict(EdxUser edxUsr) {
+    EdxUserDistrict edxUserDistrict = new EdxUserDistrict();
+    edxUserDistrict.setEdxUserID(edxUsr.getEdxUserID());
+    edxUserDistrict.setDistrictID(UUID.randomUUID().toString());
+    return edxUserDistrict;
+  }
+
   protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
     EdxRoleEntity savedRoleEntity = createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);

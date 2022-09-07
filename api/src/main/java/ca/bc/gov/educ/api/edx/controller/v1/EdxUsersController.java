@@ -54,7 +54,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
 
   private static final EdxUserSchoolMapper USER_SCHOOL_MAPPER = EdxUserSchoolMapper.mapper;
+
+  private static final EdxUserDistrictMapper USER_DISTRICT_MAPPER = EdxUserDistrictMapper.mapper;
   private static final EdxUserSchoolRoleMapper USER_SCHOOL_ROLE_MAPPER = EdxUserSchoolRoleMapper.mapper;
+
+  private static final EdxUserDistrictRoleMapper USER_DISTRICT_ROLE_MAPPER = EdxUserDistrictRoleMapper.mapper;
   private static final EdxRoleMapper EDX_ROLE_MAPPER = EdxRoleMapper.mapper;
 
   private static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
@@ -197,6 +201,43 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public EdxActivationCode generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier, EdxPrimaryActivationCode edxPrimaryActivationCode) {
     validatePayload(() -> getEdxPrimaryActivationCodeValidator().validateEdxPrimaryActivationCode(instituteType, instituteIdentifier, edxPrimaryActivationCode));
     return EDX_ACTIVATION_CODE_MAPPER.toStructure(getService().generateOrRegeneratePrimaryEdxActivationCode(instituteType, instituteIdentifier, edxPrimaryActivationCode));
+  }
+
+  @Override
+  public EdxUserDistrict createEdxDistrictUser(UUID id, EdxUserDistrict edxUserDistrict) {
+    validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserDistrictPayload(id, edxUserDistrict));
+    RequestUtil.setAuditColumnsForCreate(edxUserDistrict);
+    if (!CollectionUtils.isEmpty(edxUserDistrict.getEdxUserDistrictRoles())) {
+      edxUserDistrict.getEdxUserDistrictRoles().forEach(RequestUtil::setAuditColumnsForCreate);
+    }
+    return USER_DISTRICT_MAPPER.toStructure(getService().createEdxUserDistrict(id, USER_DISTRICT_MAPPER.toModel(edxUserDistrict)));
+  }
+
+  @Override
+  public EdxUserDistrict updateEdxUserDistrict(UUID id, EdxUserDistrict edxUserDistrict) {
+    validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserDistrictPayload(id, edxUserDistrict, false));
+    RequestUtil.setAuditColumnsForUpdate(edxUserDistrict);
+    return USER_DISTRICT_MAPPER.toStructure(getService().updateEdxUserSchool(id, USER_DISTRICT_MAPPER.toModel(edxUserDistrict)));
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxDistrictUserByID(UUID id, UUID edxUserDistrictID) {
+    getService().deleteEdxDistrictUserById(id, edxUserDistrictID);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
+  public EdxUserDistrictRole createEdxDistrictUserRole(UUID id, UUID edxUserDistrictID, EdxUserDistrictRole edxUserDistrictRole) {
+    validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserDistrictRolePayload(edxUserDistrictID, edxUserDistrictRole));
+    RequestUtil.setAuditColumnsForCreate(edxUserDistrictRole);
+    return USER_DISTRICT_ROLE_MAPPER.toStructure(getService().createEdxUserDistrictRole(id, edxUserDistrictID, USER_DISTRICT_ROLE_MAPPER.toModel(edxUserDistrictRole)));
+
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteEdxDistrictUserRoleByID(UUID id, UUID edxUserDistrictRoleID) {
+    getService().deleteEdxDistrictUserRoleById(id, edxUserDistrictRoleID);
+    return ResponseEntity.noContent().build();
   }
 
   private void validatePayload(Supplier<List<FieldError>> validator) {
