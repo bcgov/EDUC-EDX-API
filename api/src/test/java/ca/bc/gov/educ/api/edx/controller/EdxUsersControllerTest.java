@@ -1983,7 +1983,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
 
-    //create/save our role and permission to attach to the school we created
+    //create/save our role and permission to attach to the district we created
     var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
     var roleEntity = getEdxRoleEntity();
     var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);

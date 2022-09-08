@@ -59,9 +59,15 @@ public class EdxUsersService {
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRepository edxUserSchoolsRepository;
 
+  /**
+   * The Edx user district roles repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
 
+  /**
+   * The Edx user district repository.
+   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserDistrictRepository edxUserDistrictRepository;
 
@@ -118,8 +124,8 @@ public class EdxUsersService {
    * @param ministryOwnershipTeamRepository the ministry ownership team repository
    * @param edxUserSchoolsRepository        the edx user schools repository
    * @param edxUserRepository               the edx user repository
-   * @param edxUserDistrictRoleRepository
-   * @param edxUserDistrictRepository
+   * @param edxUserDistrictRoleRepository   the edx user district role repository
+   * @param edxUserDistrictRepository       the edx user district repository
    * @param edxUserSchoolRoleRepository     the edx user school role repository
    * @param edxRoleRepository               the edx role repository
    * @param edxActivationCodeRepository     the edx activation code repository
@@ -934,7 +940,7 @@ public class EdxUsersService {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
 
-    //check for school
+    //check for district
     val optionalDistrict = getEdxUserDistrictRepository().findEdxUserDistrictEntitiesByDistrictIDAndEdxUserEntity(edxUserDistrictEntity.getDistrictID(), userEntity);
     if (optionalDistrict.isPresent()) {
       EdxUserDistrictEntity currentEdxUserDistrictEntity = optionalDistrict.get();
@@ -952,7 +958,7 @@ public class EdxUsersService {
           districtRole.setUpdateDate(LocalDateTime.now());
           districtRole.setUpdateUser(edxUserDistrictEntity.getUpdateUser());
 
-          //since we are adding a new role, we need to link the role entity to the school entity (follows pattern from creating Edx User)
+          //since we are adding a new role, we need to link the role entity to the district entity (follows pattern from creating Edx User)
           districtRole.setEdxUserDistrictEntity(currentEdxUserDistrictEntity);
         }
       }
