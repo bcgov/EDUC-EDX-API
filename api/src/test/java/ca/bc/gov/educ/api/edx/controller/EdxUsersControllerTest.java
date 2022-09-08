@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
+import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -31,6 +33,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 
 public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
@@ -75,16 +78,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     MockitoAnnotations.openMocks(this);
   }
 
+  @Autowired
+  private EDXUserControllerTestUtils edxUserControllerTestUtils;
+
   @After
-  public void after() {
-
-    this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxUserRepository.deleteAll();
-    this.edxPermissionRepository.deleteAll();
-    this.edxRoleRepository.deleteAll();
-    this.edxActivationRoleRepository.deleteAll();
-    this.edxActivationCodeRepository.deleteAll();
-
+  public  void after() {
+    this.edxUserControllerTestUtils.cleanDB();
   }
 
   @Test
