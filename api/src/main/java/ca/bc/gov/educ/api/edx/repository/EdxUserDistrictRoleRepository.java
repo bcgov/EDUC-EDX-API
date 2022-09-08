@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface EdxUserDistrictRoleRepository extends JpaRepository<EdxUserDistrictRoleEntity, UUID> {
 
 
-    Optional<EdxUserDistrictRoleEntity> findEdxUserDistrictRoleEntityByEdxUserDistrictEntity_EdxUserDistrictIDAndEdxRoleCode(UUID exdUserDistrictID , String edxRoleCode);
+    Optional<EdxUserDistrictRoleEntity> findEdxUserDistrictRoleEntityByEdxUserDistrictEntityEdxUserDistrictIDAndEdxRoleCode(UUID exdUserDistrictID , String edxRoleCode);
 
 }

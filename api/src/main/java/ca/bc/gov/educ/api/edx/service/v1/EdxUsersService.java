@@ -991,7 +991,7 @@ public class EdxUsersService {
   }
 
   public EdxUserDistrictRoleEntity createEdxUserDistrictRole(UUID edxUserID, UUID edxUserDistrictID, EdxUserDistrictRoleEntity userDistrictRoleEntity) {
-    val optionalUserDistrictRoleEntity = getEdxUserDistrictRoleRepository().findEdxUserDistrictRoleEntityByEdxUserDistrictEntity_EdxUserDistrictIDAndEdxRoleCode(userDistrictRoleEntity.getEdxUserDistrictEntity().getEdxUserDistrictID(), userDistrictRoleEntity.getEdxRoleCode());
+    val optionalUserDistrictRoleEntity = getEdxUserDistrictRoleRepository().findEdxUserDistrictRoleEntityByEdxUserDistrictEntityEdxUserDistrictIDAndEdxRoleCode(userDistrictRoleEntity.getEdxUserDistrictEntity().getEdxUserDistrictID(), userDistrictRoleEntity.getEdxRoleCode());
     if (optionalUserDistrictRoleEntity.isEmpty()) {
       val optionalEdxUserDistrictEntity = getEdxUserDistrictRepository().findById(userDistrictRoleEntity.getEdxUserDistrictEntity().getEdxUserDistrictID());
       optionalEdxUserDistrictEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserDistrictEntity.class, EDX_USER_DISTRICT_ID, edxUserDistrictID.toString()));
