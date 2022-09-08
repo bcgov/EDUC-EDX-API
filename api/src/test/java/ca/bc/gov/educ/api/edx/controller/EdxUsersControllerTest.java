@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
+import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -75,19 +76,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     MockitoAnnotations.openMocks(this);
   }
 
+  @Autowired
+  private EDXUserControllerTestUtils edxUserControllerTestUtils;
+
   @After
-  public void after() {
-
-    this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxUserSchoolRepository.deleteAll();
-    this.edxUserDistrictRepository.deleteAll();
-    this.edxUserRepository.deleteAll();
-    this.ministryOwnershipTeamRepository.deleteAll();
-    this.edxRoleRepository.deleteAll();
-    this.edxPermissionRepository.deleteAll();
-    this.edxActivationRoleRepository.deleteAll();
-    this.edxActivationCodeRepository.deleteAll();
-
+  public  void after() {
+    this.edxUserControllerTestUtils.cleanDB();
   }
 
   @Test
@@ -1806,6 +1800,713 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
 
+  @Test
+  public void testCreateEdxUserDistrict_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+  }
+
+  @Test
+  public void testCreateEdxUserDistrict_GivenInValidData_PKColumnNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setEdxUserDistrictID(UUID.randomUUID().toString());
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonEdxUserDistrict)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+            .andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictID should be null for post operation.")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrict_GivenInValidData_EntityAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonEdxUserDistrict)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+            .andExpect(jsonPath("$.message", is("EdxUser to EdxUserDistrict association already exists")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdIsNullEdxUserSchool_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setEdxUserID(null);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonEdxUserDistrict)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+            .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID should not be null for post operation.")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setEdxUserID(UUID.randomUUID().toString());
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonEdxUserDistrict)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+            .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID in path and payload edxUserId mismatch.")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+  @Test
+  public void testUpdateEdxUserDistrict_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
+    //create and save EdxUser with a district
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    //create/save our role and permission to attach to the district we created
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    EdxUserDistrictRole edxUserDistrictRole = new EdxUserDistrictRole();
+    edxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    edxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+
+    //now we update our district with the new role data
+    userDistrict.getEdxUserDistrictRoles().add(edxUserDistrictRole);
+    userDistrict.setUpdateDate(null);
+    userDistrict.setCreateDate(null);
+    String jsonEdxUsrDistrict = getJsonString(userDistrict);
+
+    val resultActions2 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUsrDistrict).accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+
+    resultActions2.andExpect(jsonPath("$.edxUserDistrictRoles", hasSize(1))).andDo(print()).andExpect(status().isOk());
+
+    //now we update our district without any roles and it should remove the role
+    userDistrict.getEdxUserDistrictRoles().clear();
+    String jsonEdxUsrDistrictWithoutRole = getJsonString(userDistrict);
+    val resultActions3 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUsrDistrictWithoutRole).accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+
+    resultActions3.andExpect(jsonPath("$.edxUserDistrictRoles", hasSize(0))).andDo(print()).andExpect(status().isOk());
+  }
+
+  @Test
+  public void testDeleteEdxUserDistrict_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
+
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", UUID.randomUUID(), UUID.randomUUID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+            .andDo(print()).andExpect(status().isNotFound());
+
+
+  }
+
+  @Test
+  public void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserIdWithIncorrectEdxUserDistrictId_AndReturnResultWithNotFound() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+    UUID randomId = UUID.randomUUID();
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), randomId)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+            .andDo(print()).andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("EdxUserDistrictEntity was not found for parameters {edxUserDistrictID=" + randomId + "}")));
+  }
+
+  @Test
+  public void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserDistrictIdWithIncorrectEdxUserId_AndReturnResultWithNotFound() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    UUID randomId = UUID.randomUUID();
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", randomId, userDistrict.getEdxUserDistrictID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+            .andDo(print()).andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message", is("EdxUserEntity was not found for parameters {edxUserID=" + randomId + "}")));
+  }
+
+  @Test
+  public void testDeleteEdxUserDistrict_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    var role = new EdxUserDistrictRole();
+    role.setEdxRoleCode("EDX_ADMIN");
+    edxUserDistrict.setEdxUserDistrictRoles(new ArrayList<>());
+    edxUserDistrict.getEdxUserDistrictRoles().add(role);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+            .andDo(print()).andExpect(status().isNoContent());
+
+    ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk());
+
+    val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+    Assertions.assertTrue(edxUsrResponse.getEdxUserDistricts().isEmpty());
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    EdxUserDistrictRole edxUserDistrictRole = new EdxUserDistrictRole();
+    edxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    edxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(edxUserDistrictRole);
+
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictRoleIDNottNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictRoleID(UUID.randomUUID().toString());
+    EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictRoleID should be null for post operation.")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictIDMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictID(UUID.randomUUID().toString());
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictId in path and payload mismatch.")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    String guid = UUID.randomUUID().toString();
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictID(guid);
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), guid)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.message", is("EdxUserDistrictEntity was not found for parameters {edxUserDistrictID=" + guid + "}")))
+            .andDo(print()).andExpect(status().isNotFound());
+
+  }
+
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    String guid = UUID.randomUUID().toString();
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", guid, userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.message", is("This EdxUserDistrictRole cannot be added for this EdxUser " + guid)))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictRoleAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    String guid = UUID.randomUUID().toString();
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val resultActions3 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions3.andExpect(jsonPath("$.message", is("EdxUserDistrictRole to EdxUserDistrict association already exists")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+
+  @Test
+  public void testDeleteEdxUsersDistrictRole_GivenValidData_EdxUserDistrictRoleIsDeleted() throws Exception {
+    EdxUser edxUser = createEdxUser();
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+
+    EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
+    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonEdxUserDistrict)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+    resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    var savedRoleEntity = edxRoleRepository.save(roleEntity);
+
+    String guid = UUID.randomUUID().toString();
+    EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
+    EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
+    EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
+    String jsonRole = getJsonString(EdxUserDistrictRole);
+
+    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}" + "/role", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(jsonRole)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+    resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
+            .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
+            .andDo(print()).andExpect(status().isCreated());
+
+    val userDistrictRole = objectMapper.readValue(resultActions2.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrictRole.class);
+
+   this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/role/" + "{edxUserDistrictRoleID}", edxUsr.getEdxUserID(), userDistrictRole.getEdxUserDistrictRoleID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT_ROLE"))))
+            .andDo(print()).andExpect(status().isNoContent());
+
+    ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk());
+    val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+    Assertions.assertFalse(edxUsrResponse.getEdxUserDistricts().isEmpty());
+    Assertions.assertTrue(edxUsrResponse.getEdxUserDistricts().get(0).getEdxUserDistrictRoles().isEmpty());
+
+  }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipTeam() {
     MinistryOwnershipTeamEntity entity = new MinistryOwnershipTeamEntity();

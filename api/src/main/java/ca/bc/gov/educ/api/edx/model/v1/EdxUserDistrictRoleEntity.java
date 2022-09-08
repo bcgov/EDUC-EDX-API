@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "EDX_USER_DISTRICT_ROLE")
+@Table(name = "EDX_USER_DISTRICT_ROLE", uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_DISTRICT_ID_EDX_ROLE_UK", columnNames = {"EDX_USER_DISTRICT_ID", "EDX_ROLE_CODE"})})
 @DynamicUpdate
 public class EdxUserDistrictRoleEntity {
   @Id
@@ -43,4 +43,12 @@ public class EdxUserDistrictRoleEntity {
 
   @Column(name = "EDX_ROLE_CODE")
   private String edxRoleCode;
+
+  @PreRemove
+  public void preRemove() {
+    if(this.edxUserDistrictEntity != null) {
+      this.edxUserDistrictEntity.getEdxUserDistrictRoleEntities().remove(this);
+      this.edxUserDistrictEntity = null;
+    }
+  }
 }

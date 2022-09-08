@@ -325,6 +325,34 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
   -d "{\"description\": \"Delete scope for secure exchange student\",\"id\": \"DELETE_SECURE_EXCHANGE_STUDENT\",\"name\": \"DELETE_SECURE_EXCHANGE_STUDENT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_EDX_USER_DISTRICT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for EDX_USER_DISTRICT\",\"id\": \"WRITE_EDX_USER_DISTRICT\",\"name\": \"WRITE_EDX_USER_DISTRICT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_EDX_USER_DISTRICT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Delete scope for EDX_USER_DISTRICT\",\"id\": \"DELETE_EDX_USER_DISTRICT\",\"name\": \"DELETE_EDX_USER_DISTRICT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope WRITE_EDX_USER_DISTRICT_ROLE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for EDX_USER_DISTRICT_ROLE\",\"id\": \"WRITE_EDX_USER_DISTRICT_ROLE\",\"name\": \"WRITE_EDX_USER_DISTRICT_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope DELETE_EDX_USER_DISTRICT_ROLE
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Write scope for DELETE_EDX_USER_DISTRICT_ROLE\",\"id\": \"DELETE_EDX_USER_DISTRICT_ROLE\",\"name\": \"DELETE_EDX_USER_DISTRICT_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 ###########################################################
 #Setup for config-map
 ###########################################################

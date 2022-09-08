@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx;
 
-import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
@@ -9,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import org.junit.Before;
-import org.junit.platform.commons.util.StringUtils;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -206,6 +204,13 @@ public abstract class BaseSecureExchangeAPITest {
     edxUserSchool.setEdxUserID(edxUsr.getEdxUserID());
     edxUserSchool.setSchoolID(UUID.randomUUID());
     return edxUserSchool;
+  }
+
+  protected EdxUserDistrict createEdxUserDistrict(EdxUser edxUsr) {
+    EdxUserDistrict edxUserDistrict = new EdxUserDistrict();
+    edxUserDistrict.setEdxUserID(edxUsr.getEdxUserID());
+    edxUserDistrict.setDistrictID(UUID.randomUUID().toString());
+    return edxUserDistrict;
   }
 
   protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, boolean isURLClicked, UUID schoolID) {

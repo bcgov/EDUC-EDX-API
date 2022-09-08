@@ -44,4 +44,12 @@ public class EdxUserSchoolRoleEntity {
   @Column(name = "EDX_ROLE_CODE")
   private String edxRoleCode;
 
+  @PreRemove
+  public void preRemove() {
+    if(this.edxUserSchoolEntity != null) {
+      this.edxUserSchoolEntity.getEdxUserSchoolRoleEntities().remove(this);
+      this.edxUserSchoolEntity = null;
+    }
+  }
+
 }

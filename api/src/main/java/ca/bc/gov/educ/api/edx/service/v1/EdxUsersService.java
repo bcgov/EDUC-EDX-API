@@ -31,7 +31,6 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -59,6 +58,18 @@ public class EdxUsersService {
    */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRepository edxUserSchoolsRepository;
+
+  /**
+   * The Edx user district roles repository.
+   */
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
+
+  /**
+   * The Edx user district repository.
+   */
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxUserDistrictRepository edxUserDistrictRepository;
 
   /**
    * The Edx user school role repository.
@@ -105,12 +116,16 @@ public class EdxUsersService {
   @Getter(AccessLevel.PRIVATE)
   private final ApplicationProperties props;
 
+  private static final String EDX_USER_DISTRICT_ID="edxUserDistrictID";
+
   /**
    * Instantiates a new Edx users service.
    *
    * @param ministryOwnershipTeamRepository the ministry ownership team repository
    * @param edxUserSchoolsRepository        the edx user schools repository
    * @param edxUserRepository               the edx user repository
+   * @param edxUserDistrictRoleRepository   the edx user district role repository
+   * @param edxUserDistrictRepository       the edx user district repository
    * @param edxUserSchoolRoleRepository     the edx user school role repository
    * @param edxRoleRepository               the edx role repository
    * @param edxActivationCodeRepository     the edx activation code repository
@@ -118,10 +133,12 @@ public class EdxUsersService {
    * @param props                           the props
    */
   @Autowired
-  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, ApplicationProperties props) {
+  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, ApplicationProperties props) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
     this.edxUserSchoolsRepository = edxUserSchoolsRepository;
     this.edxUserRepository = edxUserRepository;
+    this.edxUserDistrictRoleRepository = edxUserDistrictRoleRepository;
+    this.edxUserDistrictRepository = edxUserDistrictRepository;
     this.edxUserSchoolRoleRepository = edxUserSchoolRoleRepository;
     this.edxRoleRepository = edxRoleRepository;
     this.edxActivationCodeRepository = edxActivationCodeRepository;
@@ -270,6 +287,12 @@ public class EdxUsersService {
     }
   }
 
+
+  private void logUpdatesEdxUserDistrict(final EdxUserDistrictEntity currentEdxUserDistrictEntity, final EdxUserDistrictEntity newEdxUserDistrictEntity) {
+    if (log.isDebugEnabled()) {
+      log.debug("Edx User District update, current :: {}, new :: {}", currentEdxUserDistrictEntity, newEdxUserDistrictEntity);
+    }
+  }
   /**
    * Create edx user school role edx user school role entity.
    *
@@ -899,5 +922,91 @@ public class EdxUsersService {
     EdxRoleEntity entity = new EdxRoleEntity();
     entity.setIsDistrictRole(isDistrictRole);
     return this.getEdxRoleRepository().findAll(Example.of(entity, customExampleMatcher));
+  }
+
+  public EdxUserDistrictEntity createEdxUserDistrict (UUID edxUserID, EdxUserDistrictEntity edxUserDistrictEntity) {
+    val entityOptional = getEdxUserRepository().findById(edxUserID);
+    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
+    val optionalDistrict = getEdxUserDistrictRepository().findEdxUserDistrictEntitiesByDistrictIDAndEdxUserEntity(edxUserDistrictEntity.getDistrictID(), userEntity);
+    if (optionalDistrict.isEmpty()) {
+      edxUserDistrictEntity.getEdxUserDistrictRoleEntities().forEach(districtRole -> districtRole.setEdxUserDistrictEntity(edxUserDistrictEntity));
+      return getEdxUserDistrictRepository().save(edxUserDistrictEntity);
+    } else {
+      throw new EntityExistsException("EdxUser to EdxUserDistrict association already exists");
+    }
+  }
+
+  public EdxUserDistrictEntity updateEdxUserSchool(UUID edxUserID, EdxUserDistrictEntity edxUserDistrictEntity) {
+    val entityOptional = getEdxUserRepository().findById(edxUserID);
+    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
+
+    //check for district
+    val optionalDistrict = getEdxUserDistrictRepository().findEdxUserDistrictEntitiesByDistrictIDAndEdxUserEntity(edxUserDistrictEntity.getDistrictID(), userEntity);
+    if (optionalDistrict.isPresent()) {
+      EdxUserDistrictEntity currentEdxUserDistrictEntity = optionalDistrict.get();
+      logUpdatesEdxUserDistrict(currentEdxUserDistrictEntity, edxUserDistrictEntity);
+      BeanUtils.copyProperties(edxUserDistrictEntity, currentEdxUserDistrictEntity, "edxUserDistrictRoleEntities", "createUser", "createDate");
+
+      currentEdxUserDistrictEntity.getEdxUserDistrictRoleEntities().clear();
+      currentEdxUserDistrictEntity.getEdxUserDistrictRoleEntities().addAll(edxUserDistrictEntity.getEdxUserDistrictRoleEntities());
+
+      //If we add a new role, we need to set the audit fields
+      for (var districtRole : currentEdxUserDistrictEntity.getEdxUserDistrictRoleEntities()) {
+        if (districtRole.getEdxUserDistrictRoleID() == null) {
+          districtRole.setCreateDate(LocalDateTime.now());
+          districtRole.setCreateUser(edxUserDistrictEntity.getUpdateUser());
+          districtRole.setUpdateDate(LocalDateTime.now());
+          districtRole.setUpdateUser(edxUserDistrictEntity.getUpdateUser());
+
+          //since we are adding a new role, we need to link the role entity to the district entity (follows pattern from creating Edx User)
+          districtRole.setEdxUserDistrictEntity(currentEdxUserDistrictEntity);
+        }
+      }
+
+      return getEdxUserDistrictRepository().save(currentEdxUserDistrictEntity);
+    } else {
+      throw new EntityNotFoundException(EdxUserDistrictEntity.class, "EdxUserDistrictEntity", edxUserDistrictEntity.getEdxUserDistrictID().toString());
+    }
+  }
+
+  public void deleteEdxDistrictUserById(UUID edxUserID, UUID edxUserDistrictID) {
+    val entityOptional = getEdxUserDistrictRepository().findById(edxUserDistrictID);
+    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserDistrictEntity.class, EDX_USER_DISTRICT_ID, edxUserDistrictID.toString()));
+    if (entity.getEdxUserEntity().getEdxUserID().equals(edxUserID)) {
+      this.getEdxUserDistrictRepository().delete(entity);
+    } else {
+      throw new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString());
+    }
+  }
+
+  public void deleteEdxDistrictUserRoleById(UUID edxUserID, UUID edxUserDistrictRoleID) {
+    val entityOptional = getEdxUserDistrictRoleRepository().findById(edxUserDistrictRoleID);
+    val entity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserDistrictRoleEntity.class, "edxUserDistrictRoleID", edxUserDistrictRoleID.toString()));
+    if (entity.getEdxUserDistrictEntity() != null && entity.getEdxUserDistrictEntity().getEdxUserEntity().getEdxUserID().equals(edxUserID)) {
+      this.getEdxUserDistrictRoleRepository().delete(entity);
+    } else {
+      throw new EntityNotFoundException(EdxUserDistrictRoleEntity.class, EDX_USER_ID, edxUserID.toString());
+    }
+
+  }
+
+  public EdxUserDistrictRoleEntity createEdxUserDistrictRole(UUID edxUserID, UUID edxUserDistrictID, EdxUserDistrictRoleEntity userDistrictRoleEntity) {
+    val optionalUserDistrictRoleEntity = getEdxUserDistrictRoleRepository().findEdxUserDistrictRoleEntityByEdxUserDistrictEntityEdxUserDistrictIDAndEdxRoleCode(userDistrictRoleEntity.getEdxUserDistrictEntity().getEdxUserDistrictID(), userDistrictRoleEntity.getEdxRoleCode());
+    if (optionalUserDistrictRoleEntity.isEmpty()) {
+      val optionalEdxUserDistrictEntity = getEdxUserDistrictRepository().findById(userDistrictRoleEntity.getEdxUserDistrictEntity().getEdxUserDistrictID());
+      optionalEdxUserDistrictEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserDistrictEntity.class, EDX_USER_DISTRICT_ID, edxUserDistrictID.toString()));
+      EdxUserDistrictEntity userDistrictEntity = optionalEdxUserDistrictEntity.get();
+      val optionEdxUserEntity = getEdxUserRepository().findById(userDistrictEntity.getEdxUserEntity().getEdxUserID());
+      optionEdxUserEntity.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_DISTRICT_ID, edxUserDistrictID.toString()));
+      if (edxUserID.equals(userDistrictEntity.getEdxUserEntity().getEdxUserID())) {
+        return getEdxUserDistrictRoleRepository().save(userDistrictRoleEntity);
+      } else {
+        ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This EdxUserDistrictRole cannot be added for this EdxUser " + edxUserID).status(BAD_REQUEST).build();
+        throw new InvalidPayloadException(error);
+      }
+
+    } else {
+      throw new EntityExistsException("EdxUserDistrictRole to EdxUserDistrict association already exists");
+    }
   }
 }
