@@ -212,6 +212,16 @@ public class EdxUsersService {
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
     for (var entity : edxUserEntity.getEdxUserSchoolEntities()) {
       entity.setEdxUserEntity(edxUserEntity);
+      for(var roleEntity : entity.getEdxUserSchoolRoleEntities()){
+        roleEntity.setEdxUserSchoolEntity(entity);
+      }
+    }
+
+    for (var entity : edxUserEntity.getEdxUserDistrictEntities()) {
+      entity.setEdxUserEntity(edxUserEntity);
+      for(var roleEntity : entity.getEdxUserDistrictRoleEntities()){
+        roleEntity.setEdxUserDistrictEntity(entity);
+      }
     }
     return this.getEdxUserRepository().save(edxUserEntity);
   }
