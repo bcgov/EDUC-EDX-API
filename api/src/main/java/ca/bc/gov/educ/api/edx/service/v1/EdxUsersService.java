@@ -210,10 +210,38 @@ public class EdxUsersService {
    * @return the edx user entity
    */
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
-    for (var entity : edxUserEntity.getEdxUserSchoolEntities()) {
-      entity.setEdxUserEntity(edxUserEntity);
-    }
+
+    mapEdxUserSchoolAndRole(edxUserEntity);
+
+    mapEdxUserDistrictAndRole(edxUserEntity);
+
     return this.getEdxUserRepository().save(edxUserEntity);
+  }
+
+  private void mapEdxUserDistrictAndRole(EdxUserEntity edxUserEntity) {
+    if (!CollectionUtils.isEmpty(edxUserEntity.getEdxUserDistrictEntities())) {
+      for (var entity : edxUserEntity.getEdxUserDistrictEntities()) {
+        entity.setEdxUserEntity(edxUserEntity);
+        if (!CollectionUtils.isEmpty(entity.getEdxUserDistrictRoleEntities())) {
+          for(var roleEntity : entity.getEdxUserDistrictRoleEntities()){
+            roleEntity.setEdxUserDistrictEntity(entity);
+          }
+        }
+      }
+    }
+  }
+
+  private  void mapEdxUserSchoolAndRole(EdxUserEntity edxUserEntity) {
+    if (!CollectionUtils.isEmpty(edxUserEntity.getEdxUserSchoolEntities())) {
+      for (var entity : edxUserEntity.getEdxUserSchoolEntities()) {
+        entity.setEdxUserEntity(edxUserEntity);
+        if (!CollectionUtils.isEmpty(entity.getEdxUserSchoolRoleEntities())) {
+          for (var roleEntity : entity.getEdxUserSchoolRoleEntities()) {
+            roleEntity.setEdxUserSchoolEntity(entity);
+          }
+        }
+      }
+    }
   }
 
   /**
