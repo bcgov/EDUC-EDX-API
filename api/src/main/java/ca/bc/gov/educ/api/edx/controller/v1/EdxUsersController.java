@@ -95,17 +95,35 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public EdxUser createEdxUser(EdxUser edxUser) {
     validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserPayload(edxUser));
     RequestUtil.setAuditColumnsForCreate(edxUser);
-    if(edxUser.getEdxUserSchools() != null) {
-      for (var entity : edxUser.getEdxUserSchools()) {
-        RequestUtil.setAuditColumnsForCreate(entity);
-      }
-    }
-    if(edxUser.getEdxUserDistricts() != null) {
-      for (var entity : edxUser.getEdxUserDistricts()) {
-        RequestUtil.setAuditColumnsForCreate(entity);
-      }
-    }
+    updateAuditColumnsForUserSchoolAndRoles(edxUser);
+    updateAuditColumnsForUserDistrictAndRoles(edxUser);
     return userMapper.toStructure(getService().createEdxUser(userMapper.toModel(edxUser)));
+  }
+
+  private void updateAuditColumnsForUserDistrictAndRoles(EdxUser edxUser) {
+    if (!CollectionUtils.isEmpty(edxUser.getEdxUserDistricts())) {
+      for (var edxUserDistrict : edxUser.getEdxUserDistricts()) {
+        RequestUtil.setAuditColumnsForCreate(edxUserDistrict);
+        if (!CollectionUtils.isEmpty(edxUserDistrict.getEdxUserDistrictRoles())) {
+          for (var role : edxUserDistrict.getEdxUserDistrictRoles()) {
+            RequestUtil.setAuditColumnsForCreate(role);
+          }
+        }
+      }
+    }
+  }
+
+  private void updateAuditColumnsForUserSchoolAndRoles(EdxUser edxUser) {
+    if (!CollectionUtils.isEmpty(edxUser.getEdxUserSchools())) {
+      for (var edxUserSchool : edxUser.getEdxUserSchools()) {
+        RequestUtil.setAuditColumnsForCreate(edxUserSchool);
+        if (!CollectionUtils.isEmpty(edxUserSchool.getEdxUserSchoolRoles())) {
+          for (var role : edxUserSchool.getEdxUserSchoolRoles()) {
+            RequestUtil.setAuditColumnsForCreate(role);
+          }
+        }
+      }
+    }
   }
 
   @Override
