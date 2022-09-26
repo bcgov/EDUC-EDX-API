@@ -143,13 +143,6 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -d "{\"description\": \"Reading ministry teams in EDX\",\"id\": \"READ_MINISTRY_TEAMS\",\"name\": \"READ_MINISTRY_TEAMS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope READ_EDX_USER_SCHOOLS
-curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"Reading user schools in EDX\",\"id\": \"READ_EDX_USER_SCHOOLS\",\"name\": \"READ_EDX_USER_SCHOOLS\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
-
-echo
 echo Writing scope READ_EDX_USERS
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \

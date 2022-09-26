@@ -42,7 +42,7 @@ public interface EdxUsersEndpoint {
    *
    * @return list of user school codes
    */
-  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USER_SCHOOLS')")
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping(URL.USER_SCHOOLS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<String> findAllEdxUserSchoolIDs(@RequestParam(name = "permissionCode") String permissionCode);
