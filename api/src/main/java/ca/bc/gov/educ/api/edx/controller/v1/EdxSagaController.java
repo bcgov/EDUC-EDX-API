@@ -25,7 +25,10 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
@@ -88,14 +91,14 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @return the response entity
    */
   @Override
-  public ResponseEntity<String> edxSchoolUserActivationInvite(EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
+  public ResponseEntity<String> edxSchoolUserActivationInvite(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationInviteSagaData));
     RequestUtil.setAuditColumnsForCreate(edxUserActivationInviteSagaData);
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA, edxUserActivationInviteSagaData);
   }
   @Override
-  public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) {
-    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeRelinkSagaDataPayload(edxUserActivationRelinkSagaData));
+  public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserSchoolActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeRelinkSchoolSagaDataPayload(edxUserActivationRelinkSagaData));
     RequestUtil.setAuditColumnsForCreate(edxUserActivationRelinkSagaData);
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
   }
@@ -127,10 +130,17 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   @Override
-  public ResponseEntity<String> edxDistrictUserActivationInvite(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+  public ResponseEntity<String> edxDistrictUserActivationInvite(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateDistrictUserEdxActivationCodeSagaDataPayload(edxDistrictUserActivationInviteSagaData));
     RequestUtil.setAuditColumnsForCreate(edxDistrictUserActivationInviteSagaData);
     return this.processEdxDistrictUserActivationLinkSaga(EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA, edxDistrictUserActivationInviteSagaData);
+  }
+
+  @Override
+  public ResponseEntity<String> edxDistrictUserActivationRelink(EdxUserDistrictActivationRelinkSagaData edxUserActivationRelinkSagaData) {
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeRelinkSchoolSagaDataPayload(edxUserActivationRelinkSagaData));
+    RequestUtil.setAuditColumnsForCreate(edxUserActivationRelinkSagaData);
+    return this.processEdxDistrictUserActivationLinkSaga(EDX_DISTRICT_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
   }
 
   /**
@@ -156,7 +166,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @param edxUserActivationInviteSagaData the edx user activation invite saga data
    * @return the response entity
    */
-  private ResponseEntity<String> processEdxSchoolUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) {
+  private ResponseEntity<String> processEdxSchoolUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(edxUserActivationInviteSagaData.getSchoolID(), edxUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -171,8 +181,8 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
 
-  private ResponseEntity<String> processEdxDistrictUserActivationLinkSaga(final SagaEnum sagaName, final EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
-    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIDAndEmailId(UUID.fromString(edxDistrictUserActivationInviteSagaData.getDistrictID()), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
+  private ResponseEntity<String> processEdxDistrictUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+    final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIDAndEmailId(edxDistrictUserActivationInviteSagaData.getDistrictID(), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
       return ResponseEntity.status(HttpStatus.CONFLICT).build();
     } else {

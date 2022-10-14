@@ -118,7 +118,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -133,7 +133,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -148,7 +148,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -163,7 +163,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -178,7 +178,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -193,7 +193,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -208,7 +208,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -223,7 +223,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
     createSagaEntity(jsonString, sagaData);
 
@@ -237,7 +237,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -249,7 +249,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationRelinkSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationRelinkSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -264,7 +264,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -279,7 +279,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -294,7 +294,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -309,7 +309,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -324,7 +324,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -339,7 +339,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -354,9 +354,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxSchoolUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
-    EdxUserActivationRelinkSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationRelinkSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
-    createSagaRelinkEntity(jsonString, sagaData);
+    createSagaSchoolRelinkEntity(jsonString, sagaData);
 
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -367,8 +367,22 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
+  public void testEdxDistrictUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
+    EdxUserDistrictActivationRelinkSagaData sagaData = createUserDistrictActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    String jsonString = getJsonString(sagaData);
+    createSagaDistrictRelinkEntity(jsonString, sagaData);
+
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-relink-saga")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(jsonString)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+      .andDo(print()).andExpect(status().isConflict());
+  }
+
+  @Test
   public void testEdxSchoolUserActivationRelink_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -383,7 +397,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     List<UUID> schoolIDs = new ArrayList<>();
     schoolIDs.add(UUID.randomUUID());
     var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, schoolIDs);
-    EdxUserActivationInviteSagaData sagaData = createUserActivationRelinkData("firstName", "lastName", "test@bcgov.ca", edxUser.getEdxUserID().toString(), edxUser.getEdxUserSchoolEntities().iterator().next().getEdxUserSchoolID().toString());
+    EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", edxUser.getEdxUserID().toString(), edxUser.getEdxUserSchoolEntities().iterator().next().getEdxUserSchoolID().toString());
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -713,9 +727,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
       .andDo(print()).andExpect(status().isAccepted());
   }
 
-  private EdxUserActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
+  private EdxUserSchoolActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
 
-    EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
+    EdxUserSchoolActivationInviteSagaData sagaData = new EdxUserSchoolActivationInviteSagaData();
     val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
@@ -730,8 +744,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     return sagaData;
   }
 
-  private EdxUserActivationRelinkSagaData createUserActivationRelinkData(String firstName, String lastName, String email, String edxUserID, String edxUserSchoolID) {
-    EdxUserActivationRelinkSagaData sagaData = new EdxUserActivationRelinkSagaData();
+  private EdxUserSchoolActivationRelinkSagaData createUserSchoolActivationRelinkData(String firstName, String lastName, String email, String edxUserID, String edxUserSchoolID) {
+    EdxUserSchoolActivationRelinkSagaData sagaData = new EdxUserSchoolActivationRelinkSagaData();
     val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
@@ -748,7 +762,25 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     return sagaData;
   }
 
-  private void createSagaEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
+  private EdxUserDistrictActivationRelinkSagaData createUserDistrictActivationRelinkData(String firstName, String lastName, String email, String edxUserID, String edxUserDistrictID) {
+    EdxUserDistrictActivationRelinkSagaData sagaData = new EdxUserDistrictActivationRelinkSagaData();
+    val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
+    sagaData.setFirstName(firstName);
+    sagaData.setLastName(lastName);
+    sagaData.setEmail(email);
+    sagaData.setEdxUserId(edxUserID);
+    sagaData.setEdxUserDistrictID(edxUserDistrictID);
+    sagaData.setDistrictName("Test District");
+    sagaData.setDistrictID(UUID.randomUUID());
+    List<String> rolesList = new ArrayList<>();
+    rolesList.add(edxRoleEntity.getEdxRoleCode());
+    sagaData.setEdxActivationRoleCodes(rolesList);
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
+    return sagaData;
+  }
+
+  private void createSagaEntity(String sagaDataStr, EdxUserSchoolActivationInviteSagaData sagaData) {
     try {
       val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA), sagaData);
       this.sagaService.createSagaRecordInDB(sagaEntity);
@@ -757,7 +789,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     }
   }
 
-  private void createSagaRelinkEntity(String sagaDataStr, EdxUserActivationInviteSagaData sagaData) {
+  private void createSagaSchoolRelinkEntity(String sagaDataStr, EdxUserSchoolActivationInviteSagaData sagaData) {
 
     try {
       val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA), sagaData);
@@ -767,15 +799,25 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     }
   }
 
+  private void createSagaDistrictRelinkEntity(String sagaDataStr, EdxUserDistrictActivationInviteSagaData sagaData) {
 
-  private EdxDistrictUserActivationInviteSagaData createDistrictUserActivationInviteData(String firstName, String lastName, String email) {
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.EDX_DISTRICT_USER_ACTIVATION_RELINK_SAGA), sagaData);
+      this.sagaService.createSagaRecordInDB(sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
+  }
 
-    EdxDistrictUserActivationInviteSagaData sagaData = new EdxDistrictUserActivationInviteSagaData();
+
+  private EdxUserDistrictActivationInviteSagaData createDistrictUserActivationInviteData(String firstName, String lastName, String email) {
+
+    EdxUserDistrictActivationInviteSagaData sagaData = new EdxUserDistrictActivationInviteSagaData();
     val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
     sagaData.setEmail(email);
-    sagaData.setDistrictID(UUID.randomUUID().toString());
+    sagaData.setDistrictID(UUID.randomUUID());
     sagaData.setDistrictName("Test District");
     List<String> rolesList = new ArrayList<>();
     rolesList.add(edxRoleEntity.getEdxRoleCode());

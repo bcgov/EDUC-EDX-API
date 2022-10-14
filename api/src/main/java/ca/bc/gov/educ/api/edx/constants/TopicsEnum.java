@@ -14,6 +14,8 @@ public enum TopicsEnum {
 
   EDX_SCHOOL_USER_ACTIVATION_RELINK_TOPIC,
 
+  EDX_DISTRICT_USER_ACTIVATION_RELINK_TOPIC,
+
   /**
    * Edx secure exchange comment topic topics enum.
    */

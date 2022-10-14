@@ -11,8 +11,7 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxDistrictUserActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -72,7 +71,7 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
     EdxActivationCodeRepository edxActivationCodeRepository;
 
     private SagaEntity saga;
-    EdxDistrictUserActivationInviteSagaData sagaData;
+    EdxUserDistrictActivationInviteSagaData sagaData;
 
     @Captor
     ArgumentCaptor<byte[]> eventCaptor;
@@ -110,14 +109,14 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
       edxPermissionRepository.deleteAll();
     }
 
-    private EdxDistrictUserActivationInviteSagaData createDistrictUserActivationInviteData(String firstName, String lastName, String email) {
+    private EdxUserDistrictActivationInviteSagaData createDistrictUserActivationInviteData(String firstName, String lastName, String email) {
 
-      EdxDistrictUserActivationInviteSagaData sagaData = new EdxDistrictUserActivationInviteSagaData();
+      EdxUserDistrictActivationInviteSagaData sagaData = new EdxUserDistrictActivationInviteSagaData();
       val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
       sagaData.setFirstName(firstName);
       sagaData.setLastName(lastName);
       sagaData.setEmail(email);
-      sagaData.setDistrictID(UUID.randomUUID().toString());
+      sagaData.setDistrictID(UUID.randomUUID());
       sagaData.setDistrictName("Test District");
       List<String> rolesList = new ArrayList<>();
       rolesList.add(edxRoleEntity.getEdxRoleCode());
@@ -147,7 +146,7 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
       final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
       assertThat(sagaFromDB).isPresent();
       assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
-      var payload = JsonUtil.getJsonObjectFromString(EdxDistrictUserActivationInviteSagaData.class,newEvent.getEventPayload());
+      var payload = JsonUtil.getJsonObjectFromString(EdxUserDistrictActivationInviteSagaData.class,newEvent.getEventPayload());
       assertThat(payload.getValidationCode()).isNotBlank();
       assertThat(payload.getPersonalActivationCode()).isNotBlank();
       List<EdxActivationCodeEntity> activationCodeEntities = edxActivationCodeRepository.findEdxActivationCodeEntitiesByValidationCode(UUID.fromString(payload.getValidationCode()));

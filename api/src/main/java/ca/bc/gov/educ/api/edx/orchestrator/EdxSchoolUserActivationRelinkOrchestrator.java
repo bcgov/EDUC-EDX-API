@@ -8,7 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationRelinkSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationRelinkSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +27,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Component
 @Slf4j
-public class EdxSchoolUserActivationRelinkOrchestrator extends UserActivationBaseOrchestrator<EdxUserActivationRelinkSagaData> {
+public class EdxSchoolUserActivationRelinkOrchestrator extends SchoolUserActivationBaseOrchestrator<EdxUserSchoolActivationRelinkSagaData> {
 
   protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
@@ -38,7 +38,7 @@ public class EdxSchoolUserActivationRelinkOrchestrator extends UserActivationBas
   private final EdxUsersService edxUsersService;
 
   public EdxSchoolUserActivationRelinkOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService, EdxUsersService edxUsersService) {
-    super(sagaService, messagePublisher, EdxUserActivationRelinkSagaData.class, EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), EDX_SCHOOL_USER_ACTIVATION_RELINK_TOPIC.toString(), edxSchoolUserActivationInviteOrchestratorService);
+    super(sagaService, messagePublisher, EdxUserSchoolActivationRelinkSagaData.class, EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA.toString(), EDX_SCHOOL_USER_ACTIVATION_RELINK_TOPIC.toString(), edxSchoolUserActivationInviteOrchestratorService);
     this.edxSchoolUserActivationInviteOrchestratorService = edxSchoolUserActivationInviteOrchestratorService;
     this.edxUsersService = edxUsersService;
   }
@@ -60,7 +60,7 @@ public class EdxSchoolUserActivationRelinkOrchestrator extends UserActivationBas
    * @param saga
    * @param edxUserActivationRelinkSagaData
    */
-  protected void removeUserSchoolAccess(Event event, SagaEntity saga, EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData) throws JsonProcessingException {
+  protected void removeUserSchoolAccess(Event event, SagaEntity saga, EdxUserSchoolActivationRelinkSagaData edxUserActivationRelinkSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(REMOVE_USER_SCHOOL_ACCESS.toString());

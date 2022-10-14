@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import static lombok.AccessLevel.PRIVATE;
 
 @Component
 @Slf4j
-public class EdxSchoolUserActivationInviteOrchestrator extends UserActivationBaseOrchestrator<EdxUserActivationInviteSagaData> {
+public class EdxSchoolUserActivationInviteOrchestrator extends SchoolUserActivationBaseOrchestrator<EdxUserSchoolActivationInviteSagaData> {
 
   protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
@@ -34,7 +34,7 @@ public class EdxSchoolUserActivationInviteOrchestrator extends UserActivationBas
    * @param edxSchoolUserActivationInviteOrchestratorService the service
    */
   protected EdxSchoolUserActivationInviteOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService) {
-    super(sagaService, messagePublisher, EdxUserActivationInviteSagaData.class, EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), EDX_SCHOOL_USER_ACTIVATION_INVITE_TOPIC.toString(),edxSchoolUserActivationInviteOrchestratorService);
+    super(sagaService, messagePublisher, EdxUserSchoolActivationInviteSagaData.class, EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(), EDX_SCHOOL_USER_ACTIVATION_INVITE_TOPIC.toString(),edxSchoolUserActivationInviteOrchestratorService);
     this.edxSchoolUserActivationInviteOrchestratorService = edxSchoolUserActivationInviteOrchestratorService;
   }
 

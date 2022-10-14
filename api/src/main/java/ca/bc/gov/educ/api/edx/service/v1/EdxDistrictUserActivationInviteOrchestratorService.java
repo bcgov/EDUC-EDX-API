@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxDistrictUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
@@ -57,7 +57,7 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void createPersonalActivationCodeAndUpdateSagaData(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData, SagaEntity sagaEntity) {
+  public void createPersonalActivationCodeAndUpdateSagaData(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData, SagaEntity sagaEntity) {
     EdxActivationCode edxActivationCode = EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA_DATA_MAPPER.toEdxActivationCode(edxDistrictUserActivationInviteSagaData);
     RequestUtil.setAuditColumnsForCreate(edxActivationCode);
     if (!CollectionUtils.isEmpty(edxActivationCode.getEdxActivationRoles())) {
@@ -72,11 +72,11 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW) // this makes sure it is done in a new transaction when used through proxy, so call on line#84 won't have a new transaction.
-  public void updateSagaData(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
+  public void updateSagaData(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
     updateSagaDataInternal(edxDistrictUserActivationInviteSagaData, personalActivationCodeEntity, sagaEntity);
   }
 
-  private void updateSagaDataInternal(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
+  private void updateSagaDataInternal(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
     edxDistrictUserActivationInviteSagaData.setEdxActivationCodeId(personalActivationCodeEntity.getEdxActivationCodeId().toString());
     edxDistrictUserActivationInviteSagaData.setValidationCode(personalActivationCodeEntity.getValidationCode().toString());
     edxDistrictUserActivationInviteSagaData.setExpiryDate(personalActivationCodeEntity.getExpiryDate());
@@ -85,7 +85,7 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
     this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
   }
 
-  private String createUserActivationLink(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+  private String createUserActivationLink(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
       edxDistrictUserActivationInviteSagaData.getValidationCode();
@@ -96,7 +96,7 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void sendEmail(EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+  public void sendEmail(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     final var emailNotification = EmailNotification.builder()

@@ -11,7 +11,7 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +33,6 @@ import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -73,7 +72,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   EdxActivationCodeRepository edxActivationCodeRepository;
 
   private SagaEntity saga;
-  EdxUserActivationInviteSagaData sagaData;
+  EdxUserSchoolActivationInviteSagaData sagaData;
 
   @Captor
   ArgumentCaptor<byte[]> eventCaptor;
@@ -111,9 +110,9 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
     edxPermissionRepository.deleteAll();
   }
 
-  private EdxUserActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
+  private EdxUserSchoolActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {
 
-    EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
+    EdxUserSchoolActivationInviteSagaData sagaData = new EdxUserSchoolActivationInviteSagaData();
     val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     sagaData.setFirstName(firstName);
     sagaData.setLastName(lastName);
@@ -147,7 +146,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
-    var payload = JsonUtil.getJsonObjectFromString(EdxUserActivationInviteSagaData.class,newEvent.getEventPayload());
+    var payload = JsonUtil.getJsonObjectFromString(EdxUserSchoolActivationInviteSagaData.class,newEvent.getEventPayload());
     assertThat(payload.getValidationCode()).isNotBlank();
     assertThat(payload.getPersonalActivationCode()).isNotBlank();
     List<EdxActivationCodeEntity> activationCodeEntities = edxActivationCodeRepository.findEdxActivationCodeEntitiesByValidationCode(UUID.fromString(payload.getValidationCode()));
