@@ -190,7 +190,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EDX_USER_ACTIVATION_EMAIL);
+    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL);
     assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
 
   }
@@ -199,7 +199,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(SEND_EDX_USER_ACTIVATION_EMAIL)
+      .eventType(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL)
       .eventOutcome(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT)
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
