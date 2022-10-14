@@ -10,10 +10,10 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EdxUserActivationRelinkSagaData extends EdxUserActivationInviteSagaData implements Serializable {
+public class EdxUserDistrictActivationRelinkSagaData extends EdxUserDistrictActivationInviteSagaData implements Serializable {
   private static final long serialVersionUID = -7847063658732692951L;
 
-  @NotNull(message = "edxUserSchoolID cannot be null")
-  String edxUserSchoolID;
+  @NotNull(message = "edxUserDistrictID cannot be null")
+  String edxUserDistrictID;
 
 }

@@ -9,14 +9,13 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
@@ -32,7 +31,7 @@ import static lombok.AccessLevel.PRIVATE;
  * @param <T> the type parameter
  */
 @Slf4j
-public abstract class UserActivationBaseOrchestrator<T> extends BaseOrchestrator<T> {
+public abstract class SchoolUserActivationBaseOrchestrator<T> extends BaseOrchestrator<T> {
 
   protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
@@ -49,7 +48,7 @@ public abstract class UserActivationBaseOrchestrator<T> extends BaseOrchestrator
    * @param topicToSubscribe                                 the topic to subscribe
    * @param edxSchoolUserActivationInviteOrchestratorService
    */
-  protected UserActivationBaseOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, Class<T> clazz, String sagaName, String topicToSubscribe, EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService) {
+  protected SchoolUserActivationBaseOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, Class<T> clazz, String sagaName, String topicToSubscribe, EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService) {
     super(sagaService, messagePublisher, clazz, sagaName, topicToSubscribe);
     this.edxSchoolUserActivationInviteOrchestratorService = edxSchoolUserActivationInviteOrchestratorService;
   }
@@ -61,7 +60,7 @@ public abstract class UserActivationBaseOrchestrator<T> extends BaseOrchestrator
    * @param saga
    * @param edxUserActivationInviteSagaData
    */
-  protected void createPersonalActivationCode(Event event, SagaEntity saga, EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
+  protected void createPersonalActivationCode(Event event, SagaEntity saga, EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_PERSONAL_ACTIVATION_CODE.toString()); // set current event as saga state.
@@ -82,7 +81,7 @@ public abstract class UserActivationBaseOrchestrator<T> extends BaseOrchestrator
   }
 
 
-  protected void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxUserActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
+  protected void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(SEND_EDX_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);

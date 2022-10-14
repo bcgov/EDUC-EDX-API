@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import lombok.SneakyThrows;
 import lombok.val;
@@ -53,7 +53,7 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
 
   @SneakyThrows
   protected SagaEntity creatMockSaga() {
-    EdxUserActivationInviteSagaData sagaData = new EdxUserActivationInviteSagaData();
+    EdxUserSchoolActivationInviteSagaData sagaData = new EdxUserSchoolActivationInviteSagaData();
     val edxRoleEntity = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     sagaData.setFirstName("test");
     sagaData.setLastName("test");

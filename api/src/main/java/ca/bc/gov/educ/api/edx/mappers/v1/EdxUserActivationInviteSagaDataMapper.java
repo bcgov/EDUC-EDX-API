@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserActivationInviteSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -21,7 +21,7 @@ public interface EdxUserActivationInviteSagaDataMapper {
 
 
   @Mapping(target = "edxActivationRoles", source = "edxActivationRoleCodes")
-  EdxActivationCode toEdxActivationCode(EdxUserActivationInviteSagaData edxUserActivationInviteSagaData);
+  EdxActivationCode toEdxActivationCode(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData);
 
   default List<EdxActivationRole> map(List<String> values) {
     if (values == null) {

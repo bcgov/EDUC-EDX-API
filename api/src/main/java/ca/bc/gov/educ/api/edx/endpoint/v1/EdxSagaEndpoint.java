@@ -33,7 +33,7 @@ public interface EdxSagaEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_SCHOOL_USER_ACTIVATION_INVITE_SAGA')")
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
   @ResponseStatus(ACCEPTED)
-  ResponseEntity<String> edxSchoolUserActivationInvite(@Validated @RequestBody EdxUserActivationInviteSagaData edxUserActivationInviteSagaData);
+  ResponseEntity<String> edxSchoolUserActivationInvite(@Validated @RequestBody EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData);
 
 
   /**
@@ -58,7 +58,7 @@ public interface EdxSagaEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_SCHOOL_USER_ACTIVATION_INVITE_SAGA')")
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
   @ResponseStatus(ACCEPTED)
-  ResponseEntity<String> edxSchoolUserActivationRelink(@Validated @RequestBody EdxUserActivationRelinkSagaData edxUserActivationRelinkSagaData);
+  ResponseEntity<String> edxSchoolUserActivationRelink(@Validated @RequestBody EdxUserSchoolActivationRelinkSagaData edxUserActivationRelinkSagaData);
 
   /**
    * Create secure exchange comment response entity.
@@ -77,7 +77,19 @@ public interface EdxSagaEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_DISTRICT_USER_ACTIVATION_INVITE_SAGA')")
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
   @ResponseStatus(ACCEPTED)
-  ResponseEntity<String> edxDistrictUserActivationInvite(@Validated @RequestBody EdxDistrictUserActivationInviteSagaData edxDistrictUserActivationInviteSagaData);
+  ResponseEntity<String> edxDistrictUserActivationInvite(@Validated @RequestBody EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData);
+
+  /**
+   * End point for relinking personal activaton code and sending email invite.
+   *
+   * @param edxUserActivationRelinkSagaData the edx user activation relink saga data
+   * @return response entity
+   */
+  @PostMapping("/district-user-activation-relink-saga")
+  @PreAuthorize("hasAuthority('SCOPE_DISTRICT_USER_ACTIVATION_INVITE_SAGA')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
+  @ResponseStatus(ACCEPTED)
+  ResponseEntity<String> edxDistrictUserActivationRelink(@Validated @RequestBody EdxUserDistrictActivationRelinkSagaData edxUserActivationRelinkSagaData);
 
 
 }

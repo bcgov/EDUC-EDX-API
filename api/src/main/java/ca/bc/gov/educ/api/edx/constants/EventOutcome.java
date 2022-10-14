@@ -17,6 +17,8 @@ public enum EventOutcome {
    * EDX User School removed outcome
    */
   EDX_USER_SCHOOL_REMOVED,
+
+  EDX_USER_DISTRICT_REMOVED,
   /**
    * Personal Activation code creation outcome
    */
