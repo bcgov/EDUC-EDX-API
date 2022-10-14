@@ -25,7 +25,7 @@ public enum EventType {
   /**
    * Send edx user activation email event type.
    */
-  SEND_EDX_USER_ACTIVATION_EMAIL,
+  SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL,
   /**
    * Edx school user activation complete event type.
    */

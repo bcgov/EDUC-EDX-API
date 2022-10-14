@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_PERSONAL_ACTIVATION_CODE;
-import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_EDX_USER_ACTIVATION_EMAIL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
@@ -42,7 +42,7 @@ public class EdxSchoolUserActivationInviteOrchestrator extends SchoolUserActivat
   public void populateStepsToExecuteMap() {
     this.stepBuilder()
       .begin(CREATE_PERSONAL_ACTIVATION_CODE, this::createPersonalActivationCode)
-      .step(CREATE_PERSONAL_ACTIVATION_CODE, PERSONAL_ACTIVATION_CODE_CREATED, SEND_EDX_USER_ACTIVATION_EMAIL, this::sendEdxUserActivationEmail)
-      .end(SEND_EDX_USER_ACTIVATION_EMAIL, EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+      .step(CREATE_PERSONAL_ACTIVATION_CODE, PERSONAL_ACTIVATION_CODE_CREATED, SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, this::sendEdxUserActivationEmail)
+      .end(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
   }
 }

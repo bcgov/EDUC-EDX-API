@@ -21,7 +21,7 @@ import java.util.UUID;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_PERSONAL_ACTIVATION_CODE;
-import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_EDX_USER_ACTIVATION_EMAIL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -83,13 +83,13 @@ public abstract class SchoolUserActivationBaseOrchestrator<T> extends BaseOrches
 
   protected void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-    saga.setSagaState(SEND_EDX_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
+    saga.setSagaState(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
     log.debug("edxUserActivationInviteSagaData :: {}", edxUserActivationInviteSagaData);
     getEdxSchoolUserActivationInviteOrchestratorService().sendEmail(edxUserActivationInviteSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(SEND_EDX_USER_ACTIVATION_EMAIL)
+      .eventType(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL)
       .eventOutcome(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT)
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(edxUserActivationInviteSagaData))
