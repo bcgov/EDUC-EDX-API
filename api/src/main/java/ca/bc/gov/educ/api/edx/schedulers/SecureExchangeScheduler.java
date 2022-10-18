@@ -1,11 +1,14 @@
 package ca.bc.gov.educ.api.edx.schedulers;
 
 import ca.bc.gov.educ.api.edx.constants.SecureExchangeStatusCode;
-import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
+import ca.bc.gov.educ.api.edx.repository.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -19,8 +22,26 @@ import java.util.Arrays;
 public class SecureExchangeScheduler {
   private final DocumentRepository documentRepository;
 
-  public SecureExchangeScheduler(final DocumentRepository documentRepository) {
+  private final SecureExchangeRequestRepository secureExchangeRepository;
+
+  private final SecureExchangeStudentRepository exchangeStudentRepository;
+
+  private final SecureExchangeRequestCommentRepository exchangeCommentRepository;
+
+  private final SecureExchangeRequestNoteRepository exchangeNoteRepository;
+
+
+  @Value("${purge.closed.message.after.days}")
+  @Setter
+  @Getter
+  Integer numberOfDaysBeforeClosedMessagePurged;
+
+  public SecureExchangeScheduler(final DocumentRepository documentRepository, SecureExchangeRequestRepository secureExchangeRepository, SecureExchangeStudentRepository exchangeStudentRepository, SecureExchangeRequestCommentRepository exchangeCommentRepository, SecureExchangeRequestNoteRepository exchangeNoteRepository) {
     this.documentRepository = documentRepository;
+    this.secureExchangeRepository = secureExchangeRepository;
+    this.exchangeStudentRepository = exchangeStudentRepository;
+    this.exchangeCommentRepository = exchangeCommentRepository;
+    this.exchangeNoteRepository = exchangeNoteRepository;
   }
 
   /**
@@ -44,5 +65,26 @@ public class SecureExchangeScheduler {
       this.documentRepository.saveAll(records);
     }
 
+  }
+
+
+  @Scheduled(cron = "${scheduled.jobs.purge.closed.messages.cron}")
+  @SchedulerLock(name = "PurgeClosedMessages",
+          lockAtLeastFor = "PT4H", lockAtMostFor = "PT4H") //midnight job so lock for 4 hours
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void purgeClosedMessages() {
+    LockAssert.assertLocked();
+    final LocalDateTime createDate = this.calculateCreateDateBasedOnMessageAge();
+    exchangeNoteRepository.deleteByCreateDateBefore(createDate);
+    exchangeCommentRepository.deleteByCreateDateBefore(createDate);
+    exchangeStudentRepository.deleteByCreateDateBefore(createDate);
+    documentRepository.deleteByCreateDateBefore(createDate);
+    secureExchangeRepository.deleteByCreateDateBefore(createDate);
+    log.info("Purged closed messages scheduler");
+
+  }
+
+  private LocalDateTime calculateCreateDateBasedOnMessageAge() {
+    return LocalDateTime.now().minusDays(this.getNumberOfDaysBeforeClosedMessagePurged());
   }
 }
