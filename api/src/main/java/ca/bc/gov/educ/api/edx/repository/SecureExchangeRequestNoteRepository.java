@@ -19,7 +19,7 @@ public interface SecureExchangeRequestNoteRepository extends JpaRepository<Secur
 
   @Transactional
   @Modifying
-  @Query(value = "delete from SECURE_EXCHANGE_NOTE e where exists(select 1 from SECURE_EXCHANGE s where s.SECURE_EXCHANGE_ID = e.SECURE_EXCHANGE_ID and s.CREATE_DATE <= :createDate)", nativeQuery = true)
+  @Query(value = "delete from SECURE_EXCHANGE_NOTE e where exists(select 1 from SECURE_EXCHANGE s where s.SECURE_EXCHANGE_ID = e.SECURE_EXCHANGE_ID and s.SECURE_EXCHANGE_STATUS_CODE='CLOSED' and s.CREATE_DATE <= :createDate)", nativeQuery = true)
   void deleteByCreateDateBefore(LocalDateTime createDate);
 
 }

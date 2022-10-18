@@ -16,7 +16,7 @@ public interface SecureExchangeRequestRepository extends JpaRepository<SecureExc
 
     @Transactional
     @Modifying
-    @Query("delete from SecureExchangeEntity where createDate <= :createDate")
+    @Query("delete from SecureExchangeEntity where createDate <= :createDate and secureExchangeStatusCode='CLOSED'")
     void deleteByCreateDateBefore(LocalDateTime createDate);
 
 }
