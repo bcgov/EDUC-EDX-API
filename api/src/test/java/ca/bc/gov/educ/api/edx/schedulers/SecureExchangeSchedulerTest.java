@@ -42,7 +42,6 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     final SecureExchangeEntity secureExchange = new SecureExchangeBuilder().withSecureExchangeStatusCode("CLOSED")
         .withoutSecureExchangeID().build();
     secureExchange.setStatusUpdateDate(LocalDateTime.now().minusHours(25));
-    secureExchange.setCreateDate(LocalDateTime.now().minusDays(366));
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
         .withoutDocumentID()
         .withData(Files.readAllBytes(new ClassPathResource(
@@ -51,7 +50,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
         .withTypeCode("CAPASSPORT")
         .build();
     this.secureExchangeRequestRepository.save(secureExchange);
-    document.setCreateDate(LocalDateTime.now().minusDays(366));
+    document.setCreateDate(LocalDateTime.now().minusDays(5));
     this.repository.save(document);
   }
 
@@ -98,7 +97,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
 
     this.secureExchangeScheduler.purgeClosedMessages();
     val resultsAfterPurge = this.repository.findAll();
-    assertThat(resultsAfterPurge).size().isEqualTo(0);
+    assertThat(resultsAfterPurge).size().isEqualTo(1);
 
   }
 }
