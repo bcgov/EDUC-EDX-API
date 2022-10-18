@@ -42,6 +42,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     final SecureExchangeEntity secureExchange = new SecureExchangeBuilder().withSecureExchangeStatusCode("CLOSED")
         .withoutSecureExchangeID().build();
     secureExchange.setStatusUpdateDate(LocalDateTime.now().minusHours(25));
+    secureExchange.setCreateDate(LocalDateTime.now().minusDays(366));
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
         .withoutDocumentID()
         .withData(Files.readAllBytes(new ClassPathResource(
@@ -50,7 +51,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
         .withTypeCode("CAPASSPORT")
         .build();
     this.secureExchangeRequestRepository.save(secureExchange);
-    document.setCreateDate(LocalDateTime.now().minusDays(5));
+    document.setCreateDate(LocalDateTime.now().minusDays(366));
     this.repository.save(document);
   }
 
@@ -69,5 +70,35 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     assertThat(results.get(0).getFileSize()).isZero();
     val doc = this.secureExchangeAPITestUtils.getDocumentBlobByDocumentID(results.get(0).getDocumentID());
     assertThat(doc).isNull();
+  }
+  @Test
+  public void testPurgeClosedMessages_GivenMessageIsOlderThanGivenTime_MessageWillBeDeleted() throws IOException {
+    val results = this.repository.findAll();
+    assertThat(results).size().isEqualTo(1);
+    assertThat(results.get(0)).isNotNull();
+
+    final SecureExchangeEntity secureExchange = new SecureExchangeBuilder().withSecureExchangeStatusCode("CLOSED")
+            .withoutSecureExchangeID().build();
+    secureExchange.setStatusUpdateDate(LocalDateTime.now().minusHours(25));
+    secureExchange.setCreateDate(LocalDateTime.now().minusDays(366));
+    final SecureExchangeDocumentEntity document = new DocumentBuilder()
+            .withoutDocumentID()
+            .withData(Files.readAllBytes(new ClassPathResource(
+                    "../model/document-req.json", SecureExchangeSchedulerTest.class).getFile().toPath()))
+            .withSecureExchange(secureExchange)
+            .withTypeCode("CAPASSPORT")
+            .build();
+    this.secureExchangeRequestRepository.save(secureExchange);
+    document.setCreateDate(LocalDateTime.now().minusDays(366));
+    this.repository.save(document);
+
+    val results1 = this.repository.findAll();
+    assertThat(results1).size().isEqualTo(2);
+    assertThat(results1.get(0)).isNotNull();
+
+    this.secureExchangeScheduler.purgeClosedMessages();
+    val resultsAfterPurge = this.repository.findAll();
+    assertThat(resultsAfterPurge).size().isEqualTo(0);
+
   }
 }
