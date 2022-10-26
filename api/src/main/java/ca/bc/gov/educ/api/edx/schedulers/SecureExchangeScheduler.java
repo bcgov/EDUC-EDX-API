@@ -52,12 +52,18 @@ public class SecureExchangeScheduler {
     lockAtLeastFor = "PT4H", lockAtMostFor = "PT4H") //midnight job so lock for 4 hours
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void removeBlobContentsFromUploadedDocuments() {
+    log.info("Starting blob contents purge");
     val dateTimeToCompare = LocalDateTime.now().minusHours(24);
+    log.info("Date to compare is: " + dateTimeToCompare);
     LockAssert.assertLocked();
     val records = this.documentRepository.findAllBySecureExchangeEntitySecureExchangeStatusCodeInAndFileSizeGreaterThanAndDocumentDataIsNotNull(Arrays.asList(SecureExchangeStatusCode.CLOSED.toString()), 0);
+    log.info("Number of records to possibly purge: " + records.size());
     if (!records.isEmpty()) {
       for (val document : records) {
+        log.info("Checking secure exchange document ID: " + document.getDocumentID());
+        log.info("Status date is: " + document.getSecureExchangeEntity().getStatusUpdateDate());
         if(document.getSecureExchangeEntity().getStatusUpdateDate().isBefore(dateTimeToCompare)){
+          log.info("Setting values to null for document ID: " + document.getDocumentID());
           document.setDocumentData(null); // empty the document data.
           document.setFileSize(0);
         }
