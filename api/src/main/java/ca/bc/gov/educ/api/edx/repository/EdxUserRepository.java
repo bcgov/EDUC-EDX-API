@@ -14,6 +14,8 @@ public interface EdxUserRepository extends JpaRepository<EdxUserEntity, UUID>, E
 
   List<EdxUserEntity> findEdxUserEntitiesByDigitalIdentityID(UUID digitalIdentityID);
 
+  boolean existsByDigitalIdentityID(UUID digitalIdentityID);
+
   @Query(value = " SELECT DISTINCT EMAIL\n" +
     "FROM EDX_USER\n" +
     "WHERE EDX_USER_ID IN (SELECT ES.EDX_USER_ID\n" +
