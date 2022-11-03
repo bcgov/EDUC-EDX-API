@@ -12,7 +12,6 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
-import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -214,6 +213,10 @@ public class EdxUsersService {
     mapEdxUserSchoolAndRole(edxUserEntity);
 
     mapEdxUserDistrictAndRole(edxUserEntity);
+
+    if(this.getEdxUserRepository().existsByDigitalIdentityID(edxUserEntity.getDigitalIdentityID())){
+      throw new EntityExistsException(String.format("digitalIdentityId must be unique. EdxUser with digitalIdentityID: %s already exists", edxUserEntity.getDigitalIdentityID()));
+    }
 
     return this.getEdxUserRepository().save(edxUserEntity);
   }

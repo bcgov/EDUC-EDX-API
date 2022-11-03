@@ -24,7 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -209,6 +212,21 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
       .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateEdxUsers_GivenUserWithDigitalIdentityIdExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    EdxUser edxUser = createEdxUser();
+    edxUser.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
+    String json = getJsonString(edxUser);
+    this.mockMvc.perform(post(URL.BASE_URL_USERS)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+      .andDo(print()).andExpect(status().isBadRequest())
+      .andExpect(jsonPath("$.message", containsString("digitalIdentityId must be unique")));
   }
 
   @Test
