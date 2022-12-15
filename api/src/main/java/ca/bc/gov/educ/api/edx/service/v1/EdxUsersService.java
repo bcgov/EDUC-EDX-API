@@ -186,7 +186,7 @@ public class EdxUsersService {
    */
   public List<String> getEdxUserSchoolsList(String permissionCode) {
     List<EdxUserSchoolEntity> schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
-    return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).collect(Collectors.toList());
+    return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().collect(Collectors.toList());
   }
 
   /**
