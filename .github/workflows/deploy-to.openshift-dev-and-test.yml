@@ -58,7 +58,7 @@ jobs:
   build-and-deploy-dev:
     name: Build and deploy to OpenShift DEV
     # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: dev
 
     outputs:
@@ -187,7 +187,7 @@ jobs:
   deploy-test:
     name: Deploy to OpenShift TEST
     needs: build-and-deploy-dev
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: test
 
     outputs:
