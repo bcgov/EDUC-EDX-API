@@ -85,10 +85,10 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
     this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
   }
 
-  private String createUserActivationLink(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+  private String createUserActivationLink(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData, String instituteType) {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
-      edxDistrictUserActivationInviteSagaData.getValidationCode();
+      edxDistrictUserActivationInviteSagaData.getValidationCode() + "&instituteType=" + instituteType;
   }
 
   public EdxActivationCodeEntity getActivationCodeById(UUID edxActivationCodeId) {
@@ -104,7 +104,7 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
       .toEmail(edxDistrictUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.district.user.activation.invite")
-      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode()))
+      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData, "DISTRICT"), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode()))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);

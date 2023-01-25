@@ -94,17 +94,17 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
       .toEmail(edxUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.school.user.activation.invite")
-      .emailFields(Map.of("firstName", edxUserActivationInviteSagaData.getFirstName(), "schoolName", edxUserActivationInviteSagaData.getSchoolName(), "activationLink", createUserActivationLink(edxUserActivationInviteSagaData), "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode()))
+      .emailFields(Map.of("firstName", edxUserActivationInviteSagaData.getFirstName(), "schoolName", edxUserActivationInviteSagaData.getSchoolName(), "activationLink", createUserActivationLink(edxUserActivationInviteSagaData, "SCHOOL"), "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode()))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
 
   }
 
-  private String createUserActivationLink(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
+  private String createUserActivationLink(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, String instituteType) {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
-      edxUserActivationInviteSagaData.getValidationCode();
+      edxUserActivationInviteSagaData.getValidationCode() + "&instituteType=" + instituteType;
   }
 
   public EdxActivationCodeEntity getActivationCodeById(UUID edxActivationCodeId) {
