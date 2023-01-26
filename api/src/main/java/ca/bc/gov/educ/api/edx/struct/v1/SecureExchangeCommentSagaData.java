@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -26,14 +27,30 @@ public class SecureExchangeCommentSagaData extends BaseRequest implements Serial
   /**
    * The schoolID.
    */
-  @NotNull(message = "schoolID cannot be null")
   UUID schoolID;
 
   /**
    * The School name.
    */
-  @NotNull(message = "School Name cannot be null")
   String schoolName;
+
+  /**
+   * The district ID.
+   */
+  UUID districtID;
+
+  /**
+   * The district name.
+   */
+  String districtName;
+
+  /**
+   * Contact Type
+   * Acceptable Values: SCHOOL, DISTRICT
+   */
+  @NotNull(message = "secureExchangeContactTypeCode cannot be null")
+  @Size(max = 10)
+  String secureExchangeContactTypeCode;
 
   /**
    * The Ministry team name.

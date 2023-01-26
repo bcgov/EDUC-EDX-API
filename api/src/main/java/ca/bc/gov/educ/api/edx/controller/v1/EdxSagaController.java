@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
@@ -55,6 +56,12 @@ public class EdxSagaController implements EdxSagaEndpoint {
   private final SecureExchangePayloadValidator secureExchangePayloadValidator;
 
   /**
+   * The Secure exchange payload validator.
+   */
+  @Getter(AccessLevel.PRIVATE)
+  private final SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator;
+
+  /**
    * The Saga service.
    */
   @Getter(PRIVATE)
@@ -76,10 +83,11 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @param orchestrators                             the orchestrators
    * @param secureExchangePayloadValidator            the secure exchange payload validator
    */
-  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
+    this.secureExchangeCommentSagaValidator = secureExchangeCommentSagaValidator;
     orchestrators.forEach(orchestrator -> this.orchestratorMap.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
@@ -125,6 +133,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
    */
   @Override
   public ResponseEntity<String> createSecureExchangeComment(SecureExchangeCommentSagaData secureExchangeCommentSagaData) {
+    validatePayload(() -> getSecureExchangeCommentSagaValidator().validateSecureExchangeCommentSagaPayload(secureExchangeCommentSagaData));
     RequestUtil.setAuditColumnsForCreate(secureExchangeCommentSagaData);
     return this.processSecureExchangeCommentSaga(SECURE_EXCHANGE_COMMENT_SAGA,secureExchangeCommentSagaData);
   }
