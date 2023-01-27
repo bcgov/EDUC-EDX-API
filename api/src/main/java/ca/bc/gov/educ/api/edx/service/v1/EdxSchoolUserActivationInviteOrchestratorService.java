@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
+import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
@@ -32,6 +33,10 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodeRepository edxActivationCodeRepository;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxUserRepository edxUserRepository;
+
   @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService edxUsersService;
 
@@ -47,8 +52,9 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
   protected static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
   protected final SagaService sagaService;
 
-  public EdxSchoolUserActivationInviteOrchestratorService(EdxActivationCodeRepository edxActivationCodeRepository, EdxUsersService edxUsersService, EmailProperties emailProperties, ApplicationProperties props, EmailNotificationService emailNotificationService, SagaService sagaService) {
+  public EdxSchoolUserActivationInviteOrchestratorService(EdxActivationCodeRepository edxActivationCodeRepository, EdxUserRepository edxUserRepository, EdxUsersService edxUsersService, EmailProperties emailProperties, ApplicationProperties props, EmailNotificationService emailNotificationService, SagaService sagaService) {
     this.edxActivationCodeRepository = edxActivationCodeRepository;
+    this.edxUserRepository = edxUserRepository;
     this.edxUsersService = edxUsersService;
     this.emailProperties = emailProperties;
     this.props = props;
@@ -89,22 +95,23 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
   public void sendEmail(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
+    final var edxAdminsSet = edxUserRepository.findEdxUserNamesBySchoolIDAndPermissionCode(edxUserActivationInviteSagaData.getSchoolID(), "EDX_USER_SCHOOL_ADMIN");
     final var emailNotification = EmailNotification.builder()
       .fromEmail(from)
       .toEmail(edxUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.school.user.activation.invite")
-      .emailFields(Map.of("firstName", edxUserActivationInviteSagaData.getFirstName(), "schoolName", edxUserActivationInviteSagaData.getSchoolName(), "activationLink", createUserActivationLink(edxUserActivationInviteSagaData, "SCHOOL"), "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode()))
+      .emailFields(Map.of("firstName", edxUserActivationInviteSagaData.getFirstName(), "schoolName", edxUserActivationInviteSagaData.getSchoolName(), "activationLink", createUserActivationLink(edxUserActivationInviteSagaData), "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", String.join(", ", edxAdminsSet)))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
 
   }
 
-  private String createUserActivationLink(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, String instituteType) {
+  private String createUserActivationLink(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
-      edxUserActivationInviteSagaData.getValidationCode() + "&instituteType=" + instituteType;
+      edxUserActivationInviteSagaData.getValidationCode();
   }
 
   public EdxActivationCodeEntity getActivationCodeById(UUID edxActivationCodeId) {
