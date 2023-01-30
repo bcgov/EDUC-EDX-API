@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
+import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
@@ -32,6 +33,10 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodeRepository edxActivationCodeRepository;
+
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxUserRepository edxUserRepository;
+
   @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService edxUsersService;
 
@@ -47,8 +52,9 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
 
   protected static final EdxDistrictUserActivationInviteSagaDataMapper EDX_DISTRICT_USER_ACTIVATION_INVITE_SAGA_DATA_MAPPER = EdxDistrictUserActivationInviteSagaDataMapper.mapper;
 
-  public EdxDistrictUserActivationInviteOrchestratorService(EdxActivationCodeRepository edxActivationCodeRepository, EdxUsersService edxUsersService, EmailProperties emailProperties, ApplicationProperties props, EmailNotificationService emailNotificationService, SagaService sagaService) {
+  public EdxDistrictUserActivationInviteOrchestratorService(EdxActivationCodeRepository edxActivationCodeRepository, EdxUserRepository edxUserRepository, EdxUsersService edxUsersService, EmailProperties emailProperties, ApplicationProperties props, EmailNotificationService emailNotificationService, SagaService sagaService) {
     this.edxActivationCodeRepository = edxActivationCodeRepository;
+    this.edxUserRepository = edxUserRepository;
     this.edxUsersService = edxUsersService;
     this.emailProperties = emailProperties;
     this.props = props;
@@ -85,10 +91,10 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
     this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
   }
 
-  private String createUserActivationLink(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData, String instituteType) {
+  private String createUserActivationLink(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     return props.getEdxApplicationBaseUrl() +
       props.getEdxSchoolUserActivationInviteAppendUrl() +
-      edxDistrictUserActivationInviteSagaData.getValidationCode() + "&instituteType=" + instituteType;
+      edxDistrictUserActivationInviteSagaData.getValidationCode();
   }
 
   public EdxActivationCodeEntity getActivationCodeById(UUID edxActivationCodeId) {
@@ -99,12 +105,13 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
   public void sendEmail(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
+    final var edxAdminsSet = edxUserRepository.findEdxUserNamesByDistrictIDAndPermissionCode(edxDistrictUserActivationInviteSagaData.getDistrictID(), "EDX_USER_DISTRICT_ADMIN");
     final var emailNotification = EmailNotification.builder()
       .fromEmail(from)
       .toEmail(edxDistrictUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.district.user.activation.invite")
-      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData, "DISTRICT"), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode()))
+      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", String.join(", ", edxAdminsSet)))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
