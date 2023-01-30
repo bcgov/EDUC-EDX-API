@@ -85,14 +85,17 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     return entity;
   }
 
-  protected SecureExchangeCommentSagaData createSecureExchangeCommentSagaData(SecureExchangeComment secureExchangeComment, UUID schoolID, String schoolName, String ministryTeamName, UUID secureExchangeID, String sequence) {
+  protected SecureExchangeCommentSagaData createSecureExchangeCommentSagaData(SecureExchangeComment secureExchangeComment, UUID schoolID, UUID districtID, String districtName, String schoolName, String ministryTeamName, UUID secureExchangeID, String sequence, String contactType) {
     SecureExchangeCommentSagaData secureExchangeCommentSagaData = new SecureExchangeCommentSagaData();
     secureExchangeCommentSagaData.setSecureExchangeComment(secureExchangeComment);
     secureExchangeCommentSagaData.setSchoolID(schoolID);
     secureExchangeCommentSagaData.setSchoolName(schoolName);
+    secureExchangeCommentSagaData.setDistrictID(districtID);
+    secureExchangeCommentSagaData.setDistrictName(districtName);
     secureExchangeCommentSagaData.setMinistryTeamName(ministryTeamName);
     secureExchangeCommentSagaData.setSecureExchangeId(secureExchangeID);
     secureExchangeCommentSagaData.setSequenceNumber(sequence);
+    secureExchangeCommentSagaData.setSecureExchangeContactTypeCode(contactType);
     secureExchangeCommentSagaData.setCreateUser("Test");
     secureExchangeCommentSagaData.setUpdateUser("Test");
     return secureExchangeCommentSagaData;

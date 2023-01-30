@@ -946,6 +946,10 @@ public class EdxUsersService {
     return getEdxUserRepository().findEdxUserEmailBySchoolIDAndPermissionCode(schoolID, permissionCode);
   }
 
+  public Set<String> findEdxUserEmailByDistrictIDAndPermissionCode(UUID districtID, String permissionCode) {
+    return getEdxUserRepository().findEdxUserEmailByDistrictIDAndPermissionCode(districtID, permissionCode);
+  }
+
   public List<EdxRoleEntity> findAllEdxRolesForInstituteTypeCode(InstituteTypeCode instituteTypeCode) {
     Boolean isDistrictRole = InstituteTypeCode.DISTRICT.equals(instituteTypeCode);
     ExampleMatcher customExampleMatcher = ExampleMatcher.matchingAny()
