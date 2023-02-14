@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
+import com.google.common.primitives.Chars;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -896,10 +897,15 @@ public class EdxUsersService {
    * @throws NoSuchAlgorithmException the no such algorithm exception
    */
   private String generateActivationCode() throws NoSuchAlgorithmException {
-    int byteLength = 6; //Base64 encoding an input of 6 bytes will generate a string of 8 characters.
-    byte[] randomBytes = new byte[byteLength];
-    SecureRandom.getInstance("SHA1PRNG").nextBytes(randomBytes);
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes).toUpperCase();
+    SecureRandom randomGenerator = SecureRandom.getInstance("SHA1PRNG");
+    List<Character> validCharactersList = Chars.asList(props.getEdxActivationCodeValidCharacters().toCharArray());
+    Collections.shuffle(validCharactersList);
+    StringBuilder codeBuffer = new StringBuilder();
+    for (int i = 0; i < props.getEdxActivationCodeLength(); i++) {
+      char codeCharacter = validCharactersList.get(randomGenerator.nextInt(validCharactersList.size()));
+      codeBuffer.append(codeCharacter);
+    }
+    return codeBuffer.toString();
   }
 
   /**

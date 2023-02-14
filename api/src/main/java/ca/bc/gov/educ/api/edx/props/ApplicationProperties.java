@@ -54,4 +54,10 @@ public class ApplicationProperties {
   private Long edxSchoolUserActivationInviteValidity;
   @Value("${apis.endpoints.student.api}")
   private String studentApiEndpoint;
+
+  @Value("${edx.activation.code.length}")
+  private int edxActivationCodeLength;
+
+  @Value("${edx.activation.code.valid.characters}")
+  private String edxActivationCodeValidCharacters;
 }
