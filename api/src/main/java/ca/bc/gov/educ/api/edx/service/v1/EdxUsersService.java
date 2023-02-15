@@ -774,7 +774,7 @@ public class EdxUsersService {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid Link Provided").status(BAD_REQUEST).build();
       throw new InvalidPayloadException(error);
     }
-    if (activationCodeEntities.stream().anyMatch(el -> el.getIsUrlClicked().equals(Boolean.TRUE))) {
+    if (activationCodeEntities.stream().anyMatch(el -> el.getNumberOfClicks() >= 2)) {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
       throw new InvalidPayloadException(error);
     }
@@ -783,7 +783,7 @@ public class EdxUsersService {
       throw new InvalidPayloadException(error);
     }
     activationCodeEntities.forEach(activationCode -> {
-      activationCode.setIsUrlClicked(Boolean.TRUE);
+      activationCode.setNumberOfClicks(activationCode.getNumberOfClicks() + 1);
       activationCode.setUpdateDate(LocalDateTime.now());
       getEdxActivationCodeRepository().save(activationCode);
     });
@@ -829,7 +829,7 @@ public class EdxUsersService {
   public EdxActivationCodeEntity createPersonalEdxActivationCode(EdxActivationCodeEntity edxActivationCodeEntity) throws NoSuchAlgorithmException {
     edxActivationCodeEntity.setActivationCode(generateActivationCode());
     edxActivationCodeEntity.setExpiryDate(LocalDateTime.now().plusHours(props.getEdxSchoolUserActivationInviteValidity()));
-    edxActivationCodeEntity.setIsUrlClicked(Boolean.FALSE);
+    edxActivationCodeEntity.setNumberOfClicks(0);
     edxActivationCodeEntity.setIsPrimary(Boolean.FALSE);
     return createEdxActivationCode(edxActivationCodeEntity);
   }
