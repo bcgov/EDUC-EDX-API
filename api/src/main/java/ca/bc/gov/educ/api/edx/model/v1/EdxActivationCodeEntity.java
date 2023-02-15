@@ -94,8 +94,8 @@ public class EdxActivationCodeEntity {
   @Column(name = "VALIDATION_CODE", columnDefinition = "BINARY(16)")
   UUID validationCode;
 
-  @Column(name = "IS_URL_CLICKED")
-  Boolean isUrlClicked;
+  @Column(name = "NUMBER_OF_LINK_CLICKS")
+  Integer numberOfClicks;
 
 
 }
