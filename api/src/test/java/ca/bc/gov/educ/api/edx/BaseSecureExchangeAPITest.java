@@ -228,7 +228,7 @@ public abstract class BaseSecureExchangeAPITest {
     EdxActivationCodeRepository edxActivationCodeRepository,
     boolean isActive,
     UUID validationCode,
-    boolean isURLClicked,
+    Integer numberOfClicks,
     UUID schoolID,
     UUID userId
   ) {
@@ -243,7 +243,7 @@ public abstract class BaseSecureExchangeAPITest {
         true,
         isActive,
         validationCode,
-        isURLClicked,
+        numberOfClicks,
         schoolID,
         district,
         userId
@@ -255,7 +255,7 @@ public abstract class BaseSecureExchangeAPITest {
         false,
         isActive,
         validationCode,
-        isURLClicked,
+        numberOfClicks,
         schoolID,
         district,
         userId
@@ -401,7 +401,7 @@ public abstract class BaseSecureExchangeAPITest {
       boolean isPrimary,
       boolean isActive,
       UUID validationCode,
-      boolean isURLClicked,
+      Integer numberOfClicks,
       UUID schoolID,
       UUID districtID,
       UUID edxUserId
@@ -412,7 +412,7 @@ public abstract class BaseSecureExchangeAPITest {
         isPrimary,
         isActive,
         validationCode,
-        isURLClicked,
+        numberOfClicks,
         schoolID,
         districtID
       );

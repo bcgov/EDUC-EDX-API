@@ -1059,7 +1059,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       this.edxActivationCodeRepository,
       true,
       validationCode,
-      true,
+      2,
       schoolID,
       edxUserID
     );
