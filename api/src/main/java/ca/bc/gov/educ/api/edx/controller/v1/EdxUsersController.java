@@ -205,6 +205,12 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public ResponseEntity<Void> deleteActivationCodesByUserId(UUID edxUserId) {
+    getService().deleteActivationCodesByUserId(edxUserId);
+    return ResponseEntity.noContent().build();
+  }
+
+  @Override
   public ResponseEntity<Void> deleteActivationCode(UUID activationCodeId) {
     getService().deleteActivationCode(activationCodeId);
     return ResponseEntity.noContent().build();
