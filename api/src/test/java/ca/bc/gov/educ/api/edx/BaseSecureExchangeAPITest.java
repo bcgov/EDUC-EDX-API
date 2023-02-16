@@ -224,6 +224,47 @@ public abstract class BaseSecureExchangeAPITest {
     edxActivationCodeEntityList.add(savedActivationCode1);
     return edxActivationCodeEntityList;
   }
+  protected List<EdxActivationCodeEntity> createActivationCodeTableDataForSchoolUser(
+    EdxActivationCodeRepository edxActivationCodeRepository,
+    boolean isActive,
+    UUID validationCode,
+    Integer numberOfClicks,
+    UUID schoolID,
+    UUID userId
+  ) {
+    List<EdxActivationCodeEntity> edxActivationCodeEntityList =
+      new ArrayList<>();
+
+    UUID district = UUID.randomUUID();
+
+    var savedActivationCode = edxActivationCodeRepository.save(
+      createEdxActivationCodeEntity(
+        "ABCDE",
+        true,
+        isActive,
+        validationCode,
+        numberOfClicks,
+        schoolID,
+        district,
+        userId
+      ));
+
+    var savedActivationCode1 = edxActivationCodeRepository.save(
+      createEdxActivationCodeEntity(
+        "WXYZ",
+        false,
+        isActive,
+        validationCode,
+        numberOfClicks,
+        schoolID,
+        district,
+        userId
+      ));
+
+    edxActivationCodeEntityList.add(savedActivationCode);
+    edxActivationCodeEntityList.add(savedActivationCode1);
+    return edxActivationCodeEntityList;
+  }
 
   protected List<EdxActivationCodeEntity> createActivationCodeTableDataForDistrictUser(EdxActivationCodeRepository edxActivationCodeRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxActivationRoleRepository edxActivationRoleRepository, boolean isActive, UUID validationCode, Integer numberOfClicks, UUID districtID) {
     List<EdxActivationCodeEntity> edxActivationCodeEntityList = new ArrayList<>();
@@ -353,6 +394,33 @@ public abstract class BaseSecureExchangeAPITest {
     activationCodeEntity.setCreateDate(LocalDateTime.now());
     activationCodeEntity.setUpdateUser("test");
     activationCodeEntity.setUpdateDate(LocalDateTime.now());
+    return activationCodeEntity;
+  }
+  protected EdxActivationCodeEntity createEdxActivationCodeEntity(
+      String activationCode,
+      boolean isPrimary,
+      boolean isActive,
+      UUID validationCode,
+      Integer numberOfClicks,
+      UUID schoolID,
+      UUID districtID,
+      UUID edxUserId
+    ) {
+    EdxActivationCodeEntity activationCodeEntity =
+      createEdxActivationCodeEntity(
+        activationCode,
+        isPrimary,
+        isActive,
+        validationCode,
+        numberOfClicks,
+        schoolID,
+        districtID
+      );
+
+    if (edxUserId != null) {
+      activationCodeEntity.setEdxUserId(edxUserId);
+    }
+
     return activationCodeEntity;
   }
 

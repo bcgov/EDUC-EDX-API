@@ -835,6 +835,17 @@ public class EdxUsersService {
   }
 
   /**
+   * Delete all activation codes belonging to a specified user ID.
+   *
+   * @param edxUserId the user ID
+   */
+  public void deleteActivationCodesByUserId(UUID edxUserId) {
+    val entities = getEdxActivationCodeRepository()
+      .findEdxActivationCodeEntitiesByEdxUserId(edxUserId);
+    this.getEdxActivationCodeRepository().deleteAll(entities);
+  }
+
+  /**
    * Delete activation code.
    *
    * @param activationCodeId the activation code id

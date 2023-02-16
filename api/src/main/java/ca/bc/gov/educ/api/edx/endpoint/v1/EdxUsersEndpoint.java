@@ -153,6 +153,17 @@ public interface EdxUsersEndpoint {
   @ResponseStatus(NO_CONTENT)
   ResponseEntity<Void> deleteActivationCode(@PathVariable UUID activationCodeId);
 
+  @Transactional
+  @PreAuthorize("hasAuthority('SCOPE_DELETE_ACTIVATION_CODE')")
+  @DeleteMapping("/activation-code/user/{edxUserId}")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "204", description = "NO CONTENT"),
+      @ApiResponse(responseCode = "404", description = "NOT FOUND."),
+      @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")
+  })
+  @ResponseStatus(NO_CONTENT)
+  ResponseEntity<Void> deleteActivationCodesByUserId(@PathVariable UUID edxUserId);
+
   @PreAuthorize("hasAuthority('SCOPE_READ_PRIMARY_ACTIVATION_CODE')")
   @GetMapping("/activation-code/primary/{instituteType}/{instituteIdentifier}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "404", description = "NOT FOUND")})
