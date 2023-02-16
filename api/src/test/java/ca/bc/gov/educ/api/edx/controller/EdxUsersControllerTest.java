@@ -1049,6 +1049,30 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
+  public void testDeleteActivationCodeByUserId_GivenValidInput_WillReturnNoContentResponse()
+    throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    UUID edxUserID = UUID.randomUUID();
+    UUID schoolID = UUID.randomUUID();
+
+    this.createActivationCodeTableDataForSchoolUser(
+      this.edxActivationCodeRepository,
+      true,
+      validationCode,
+      true,
+      schoolID,
+      edxUserID
+    );
+
+    val resultActions = this.mockMvc.perform(
+        delete(URL.BASE_URL_USERS + "/activation-code/user/" + edxUserID
+          )
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+      .andDo(print()).andExpect(status().isNoContent());
+  }
+  @Test
   public void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUseSchoolAndSchoolRole_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
