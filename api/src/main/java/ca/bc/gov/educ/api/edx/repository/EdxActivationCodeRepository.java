@@ -24,5 +24,4 @@ public interface EdxActivationCodeRepository extends JpaRepository<EdxActivation
   List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByEmailAndSchoolIDAndIsPrimaryIsFalseAndIsUrlClickedIsFalse(String emailId, String schoolID);
 
   List<EdxActivationCodeEntity> findEdxActivationCodeEntitiesByEdxUserId(UUID edxUserId);
-
 }
