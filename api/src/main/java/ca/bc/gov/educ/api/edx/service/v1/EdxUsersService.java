@@ -933,6 +933,7 @@ public class EdxUsersService {
       toReturn.setDistrictID(edxPrimaryActivationCode.getDistrictID());
     }
     toReturn.setIsPrimary(true);
+    toReturn.setNumberOfClicks(0);
     toReturn.setCreateUser(edxPrimaryActivationCode.getCreateUser());
     toReturn.setCreateDate(currentTime);
     toReturn.setUpdateUser(edxPrimaryActivationCode.getUpdateUser());
