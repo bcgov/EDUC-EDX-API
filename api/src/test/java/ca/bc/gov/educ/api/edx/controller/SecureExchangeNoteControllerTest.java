@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import java.util.UUID;
 

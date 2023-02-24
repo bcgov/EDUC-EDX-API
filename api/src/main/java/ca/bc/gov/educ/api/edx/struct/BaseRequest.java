@@ -2,8 +2,8 @@ package ca.bc.gov.educ.api.edx.struct;
 
 import lombok.Data;
 
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 
 @Data
 public abstract class BaseRequest {
