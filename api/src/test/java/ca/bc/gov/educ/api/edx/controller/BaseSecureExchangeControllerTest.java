@@ -9,7 +9,7 @@ import java.util.Set;
 public abstract class BaseSecureExchangeControllerTest extends BaseSecureExchangeAPITest {
 
   protected String dummySecureExchangeJson() {
-    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"secureExchangeStatusCode\":\"OPEN\",\"isReadByExchangeContact\":\"false\",\"isReadByMinistry\":\"false\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"updateDate\":\"1952-10-31T00:00:00\",\"createDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e3\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\"}";
+    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"secureExchangeStatusCode\":\"OPEN\",\"isReadByExchangeContact\":\"false\",\"isReadByMinistry\":\"false\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"updateDate\":\"1952-10-31T00:00:00\",\"createDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e3\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\", \"secureExchangeID\":\"0a004b01-7027-17b1-8170-27cb21100000\"}";
   }
 
   protected String dummySecureExchangeNoCreateUpdateDateJson() {
@@ -57,6 +57,7 @@ public abstract class BaseSecureExchangeControllerTest extends BaseSecureExchang
 
   protected SecureExchange getSecureExchangeEntityFromJsonString() {
     try {
+      System.out.println(this.dummySecureExchangeJson());
       return new ObjectMapper().readValue(this.dummySecureExchangeJson(), SecureExchange.class);
     } catch (final Exception e) {
       throw new RuntimeException(e);

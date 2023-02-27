@@ -93,33 +93,23 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Test
   public void testFindSecureExchange_GivenOnlyPenInQueryParam_ShouldReturnOkStatusAndEntities() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
-    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?secureExchangeID" + entity.getSecureExchangeID())
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" + entity.getSecureExchangeID())
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
-            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1))).andExpect(MockMvcResultMatchers.jsonPath("$[0].secureExchangeID").value(entity.getSecureExchangeID().toString()));
+            .andDo(print()).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.secureExchangeID").value(entity.getSecureExchangeID().toString()));
   }
 
   @Test
-  public void testRetrieveSecureExchange_GivenRandomEDXUserIDAndStatusCode_ShouldReturnOkStatus() throws Exception {
-    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/?contactIdentifier=" + UUID.randomUUID() + "&status=" + "INT")
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE"))))
-            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(0)));
-  }
-
-  @Test
-  public void testCreateSecureExchange_GivenValidCommentPayload_ShouldReturnStatusCreated() throws Exception {
-    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
-    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
-      .contentType(APPLICATION_JSON)
-      .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isCreated());
+  public void testRetrieveSecureExchange_GetSecureExchangeStatusCode_ShouldReturnOkStatus() throws Exception {
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/statuses")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_CODES"))))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));
   }
 
   @Test
   public void testCreateSecureExchange_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMin(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isCreated());
@@ -129,7 +119,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testCreateSecureExchange_GivenValidPayloadWithStatusCode_ShouldReturnStatusCreated() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
       .contentType(APPLICATION_JSON)
       .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinAndStatusCode(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print())
@@ -142,7 +132,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testCreateSecureExchange_GivenValidPayloadWithStudentAdded_ShouldReturnStatusCreated() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
         .contentType(APPLICATION_JSON)
         .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateSecureExchangeWithCommentAndStudent(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print())
@@ -156,7 +146,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testCreateSecureExchange_GivenPenReqIdInPayloadNoID_ShouldReturnStatusBadRequest() throws Exception {
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
       .contentType(APPLICATION_JSON)
       .accept(APPLICATION_JSON).content(this.dummySecureExchangeNoCreateUpdateDateJsonWithMinNoID(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isBadRequest());
@@ -164,7 +154,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testCreateSecureExchange_GivenPenReqIdInPayload_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidPenReqID())).andDo(print()).andExpect(status().isBadRequest());
@@ -172,7 +162,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   public void testCreateSecureExchange_LowercaseEmailVerifiedFlag_ShouldReturnStatusBadRequest() throws Exception {
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidEmailVerifiedFlag())).andDo(print()).andExpect(status().isBadRequest());
@@ -182,7 +172,8 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testClaimSecureExchange_ShouldReturnStatusNoContent() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
 
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL +"/?secureExchangeIDs=" + entity.getSecureExchangeID() + "&reviewer=" + "TESTMIN")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL).param(
+           "secureExchangeIDs", new String[]{String.valueOf(entity.getSecureExchangeID())}).param("reviewer", "TESTMIN")
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
       .contentType(APPLICATION_JSON)
       .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
@@ -193,7 +184,8 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
     final SecureExchangeEntity entity2 = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
 
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL +"/?secureExchangeIDs=" + entity.getSecureExchangeID() + ',' + entity2.getSecureExchangeID() + "&reviewer=" + "TESTMIN")
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL).param(
+                    "secureExchangeIDs", new String[]{String.valueOf(entity.getSecureExchangeID()), String.valueOf(entity2.getSecureExchangeID())}).param("reviewer", "TESTMIN")
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
       .contentType(APPLICATION_JSON)
       .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
@@ -215,7 +207,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithValidPenReqID(penReqId, ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print()).andExpect(status().isOk());
@@ -225,7 +217,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   public void testUpdateSecureExchange_GivenInvalidDemogChangedInPayload_ShouldReturnBadRequest() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
     final String penReqId = entity.getSecureExchangeID().toString();
-    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+"/")
+    this.mockMvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
             .contentType(APPLICATION_JSON)
             .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithInvalidDemogChanged(penReqId))).andDo(print()).andExpect(status().isBadRequest());
