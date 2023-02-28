@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
-import ca.bc.gov.educ.api.edx.support.TestSecurityConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
