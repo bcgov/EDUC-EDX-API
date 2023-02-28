@@ -54,7 +54,7 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
       predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("lastName"), lastName));
     }
 
-    if(predicates.size()!=0) {
+    if(!predicates.isEmpty()) {
       criteriaQuery.where(predicates.toArray(new Predicate[0]));
     }
 

@@ -101,7 +101,7 @@ public class FilterCriteria<T extends Comparable<T>> {
 
       //For 'in' or 'nin' operation
     } else if (FilterOperation.IN == operation || FilterOperation.NOT_IN == operation) {
-      convertedValues.addAll(originalValues.stream().map(converterFunction).collect(Collectors.toList()));
+      convertedValues.addAll(originalValues.stream().map(converterFunction).toList());
     } else {
       //All other operation
       this.convertedSingleValue = converterFunction.apply(operationValues[0]);
