@@ -23,14 +23,13 @@
       src/main/java/ca/bc/gov/educ/api/edx/orchestrator/base/SagaEventState.java,
       src/main/java/ca/bc/gov/educ/api/edx/validator/EmailValidator.java,
     </sonar.exclusions>
-    <java.version>11</java.version>
-    <maven.compiler.version>3.8.0</maven.compiler.version>
+    <java.version>18</java.version>
+    <maven.compiler.version>3.10.1</maven.compiler.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
+    <org.mapstruct.version>1.5.3.Final</org.mapstruct.version>
     <shedlock.version>4.15.1</shedlock.version>
-    <springdoc.version>1.6.8</springdoc.version>
-    <lombok.version>1.18.12</lombok.version>
+    <lombok.version>1.18.24</lombok.version>
     <nats.version>2.11.0</nats.version>
     <guava.version>30.1.1-jre</guava.version>
   </properties>
@@ -38,7 +37,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.0</version>
+    <version>3.0.2</version>
   </parent>
 
   <dependencies>
@@ -57,21 +56,12 @@
       <artifactId>spring-boot-starter-oauth2-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
-      <version>5.7.5</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -103,10 +93,6 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>javax.persistence-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -123,13 +109,8 @@
     </dependency>
     <dependency>
       <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-webmvc-core</artifactId>
-      <version>${springdoc.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springdoc</groupId>
-      <artifactId>springdoc-openapi-ui</artifactId>
-      <version>${springdoc.version}</version>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>2.0.2</version>
     </dependency>
     <dependency>
       <groupId>org.mapstruct</groupId>
@@ -206,6 +187,12 @@
       <version>${guava.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.9.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
       <scope>test</scope>
@@ -240,7 +227,7 @@
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.4</version>
+          <version>0.8.8</version>
         </plugin>
         <plugin>
           <groupId>org.hibernate.orm.tooling</groupId>
@@ -292,14 +279,14 @@
               <target>${java.version}</target>
               <annotationProcessorPaths>
                 <path>
-                  <groupId>org.mapstruct</groupId>
-                  <artifactId>mapstruct-processor</artifactId>
-                  <version>${org.mapstruct.version}</version>
-                </path>
-                <path>
                   <groupId>org.projectlombok</groupId>
                   <artifactId>lombok</artifactId>
                   <version>${lombok.version}</version>
+                </path>
+                <path>
+                  <groupId>org.mapstruct</groupId>
+                  <artifactId>mapstruct-processor</artifactId>
+                  <version>${org.mapstruct.version}</version>
                 </path>
                 <path>
                   <groupId>org.springframework</groupId>

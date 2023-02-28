@@ -25,7 +25,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import javax.persistence.EntityExistsException;
+import jakarta.persistence.EntityExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -187,7 +187,7 @@ public class EdxUsersService {
    */
   public List<String> getEdxUserSchoolsList(String permissionCode) {
     List<EdxUserSchoolEntity> schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
-    return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().collect(Collectors.toList());
+    return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
   }
 
   /**

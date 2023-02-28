@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -54,7 +54,9 @@ public class EdxUserRepositoryCustomImpl implements EdxUserRepositoryCustom {
       predicates.add(criteriaBuilder.equal(edxUserEntityRoot.get("lastName"), lastName));
     }
 
-    criteriaQuery.where(predicates.toArray(new Predicate[0]));
+    if(!predicates.isEmpty()) {
+      criteriaQuery.where(predicates.toArray(new Predicate[0]));
+    }
 
     return entityManager.createQuery(criteriaQuery).getResultList();
   }

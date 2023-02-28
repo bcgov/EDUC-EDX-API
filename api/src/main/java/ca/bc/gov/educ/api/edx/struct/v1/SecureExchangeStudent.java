@@ -5,9 +5,9 @@ import ca.bc.gov.educ.api.edx.validator.UUIDValidator;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
 
 @EqualsAndHashCode
