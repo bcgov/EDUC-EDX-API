@@ -1,14 +1,16 @@
 package ca.bc.gov.educ.api.edx.model.v1;
 
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.*;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
+import org.hibernate.annotations.Parameter;
+
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -78,7 +80,7 @@ public class SecureExchangeDocumentEntity {
 
   @Basic(fetch = FetchType.LAZY)
   @Lob
-//  @Type(type = "org.hibernate.type.BinaryType")
+  @JdbcTypeCode(Types.VARBINARY)
   @Column(name = "DOCUMENT_DATA", columnDefinition = "BLOB")
   byte[] documentData;
 }
