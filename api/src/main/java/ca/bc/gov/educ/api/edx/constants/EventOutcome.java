@@ -46,8 +46,15 @@ public enum EventOutcome {
   /**
    * Email notification for secure exchange comment sent event outcome.
    */
-  EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT
+  EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT,
 
-
+  /**
+   * Move School Events Outcome
+   */
+  SCHOOL_NUMBER_EXISTS_IN_DISTRICT,
+  SCHOOL_NUMBER_DOES_NOT_EXIST_IN_DISTRICT,
+  NEW_SCHOOL_CREATED,
+  EXISTING_SCHOOL_UPDATED,
+  SCHOOL_MOVED
 
   }
