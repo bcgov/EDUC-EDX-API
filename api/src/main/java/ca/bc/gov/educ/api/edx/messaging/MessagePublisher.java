@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.messaging;
 
 import io.nats.client.Connection;
+import io.nats.client.Message;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * The type Message publisher.
@@ -51,5 +53,16 @@ public class MessagePublisher {
     val responseValue = new String(response);
     log.info("got response from NATS :: {}", responseValue);
     return Optional.of(responseValue);
+  }
+
+  /**
+   * Request message completable future.
+   *
+   * @param subject the subject
+   * @param message the message
+   * @return the completable future
+   */
+  public CompletableFuture<Message> requestPaginatedMessage(final String subject, final byte[] message) {
+    return this.connection.request(subject, message);
   }
 }

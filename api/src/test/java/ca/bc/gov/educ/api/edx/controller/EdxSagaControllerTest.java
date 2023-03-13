@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.service.v1.MoveSchoolOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -22,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +31,7 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -772,6 +775,61 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
+  }
+
+  @Test
+  public void testEdxMoveSchool_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+    MoveSchoolSagaData sagaData = createDummyMoveSchoolSagaData();
+    String jsonString = getJsonString(sagaData);
+    doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolNumberInDistrict(any(), any(), any());
+    doReturn(createDummySchool()).when(this.restUtils).createSchool(any(), any());
+    doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolById(any(), any());
+    doReturn(createDummySchool()).when(this.restUtils).updateSchool(any(), any());
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
+            .andDo(print()).andExpect(status().isAccepted());
+  }
+
+  private MoveSchoolSagaData createDummyMoveSchoolSagaData() {
+    MoveSchoolSagaData moveSchool = new MoveSchoolSagaData();
+    moveSchool.setSchool(createDummySchool());
+    moveSchool.setMoveDate(String.valueOf(LocalDateTime.now().minusDays(1).withNano(0)));
+    moveSchool.setNewSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
+    moveSchool.setCreateUser("Test");
+    moveSchool.setUpdateUser("Test");
+    return moveSchool;
+  }
+
+  private School createDummySchool() {
+    School school = new School();
+    school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
+    school.setSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd24");
+    school.setSchoolNumber("00002");
+    school.setDisplayName("Test College");
+    school.setSchoolOrganizationCode("TRIMESTER");
+    school.setSchoolCategoryCode("FED_BAND");
+    school.setFacilityTypeCode("STANDARD");
+    school.setGrades(List.of(createSchoolGrade()));
+    school.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
+    return school;
+  }
+
+  private SchoolGrade createSchoolGrade() {
+    SchoolGrade schoolGrade = new SchoolGrade();
+    schoolGrade.setSchoolGradeCode("01");
+    schoolGrade.setCreateUser("TEST");
+    schoolGrade.setUpdateUser("TEST");
+    return schoolGrade;
+  }
+  private NeighborhoodLearning createNeighborhoodLearning() {
+    NeighborhoodLearning neighborhoodLearning = new NeighborhoodLearning();
+    neighborhoodLearning.setNeighborhoodLearningTypeCode("COMM_USE");
+    neighborhoodLearning.setCreateUser("TEST");
+    neighborhoodLearning.setUpdateUser("TEST");
+    return neighborhoodLearning;
   }
 
   private EdxUserSchoolActivationInviteSagaData createUserActivationInviteData(String firstName, String lastName, String email) {

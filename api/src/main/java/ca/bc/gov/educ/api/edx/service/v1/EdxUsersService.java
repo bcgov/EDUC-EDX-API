@@ -7,10 +7,7 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import com.google.common.primitives.Chars;
 import lombok.AccessLevel;
@@ -1060,6 +1057,23 @@ public class EdxUsersService {
 
     } else {
       throw new EntityExistsException("EdxUserDistrictRole to EdxUserDistrict association already exists");
+    }
+  }
+
+  public EdxUserSchoolEntity moveEdxUsersToNewSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity, UUID newSchoolID) {
+    val entityOptional = getEdxUserRepository().findById(edxUserID);
+    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
+
+    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesBySchoolIDAndEdxUserEntity(edxUserSchoolEntity.getSchoolID(), userEntity);
+    if (optionalSchool.isPresent()) {
+      EdxUserSchoolEntity currentEdxUserSchoolEntity = optionalSchool.get();
+      logUpdatesEdxUserSchool(currentEdxUserSchoolEntity, edxUserSchoolEntity);
+      BeanUtils.copyProperties(edxUserSchoolEntity, currentEdxUserSchoolEntity, "schoolID");
+      currentEdxUserSchoolEntity.setSchoolID(newSchoolID);
+
+      return getEdxUserSchoolsRepository().save(currentEdxUserSchoolEntity);
+    } else {
+      throw new EntityNotFoundException(EdxUserSchoolEntity.class, "EdxUserSchoolEntity", edxUserSchoolEntity.toString());
     }
   }
 }

@@ -21,6 +21,7 @@ public class School extends BaseRequest implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
+  @NotNull(message = "schoolId can not be null.")
   private String schoolId;
   @NotNull(message = "districtId can not be null.")
   private String districtId;
@@ -30,6 +31,7 @@ public class School extends BaseRequest implements Serializable {
   private String independentAuthorityId;
 
   @Size(max = 5)
+  @NotNull(message = "schoolNumber can not be null.")
   private String schoolNumber;
 
   @Size(max = 10)
