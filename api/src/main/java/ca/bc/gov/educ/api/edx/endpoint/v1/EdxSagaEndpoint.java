@@ -91,5 +91,9 @@ public interface EdxSagaEndpoint {
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> edxDistrictUserActivationRelink(@Validated @RequestBody EdxUserDistrictActivationRelinkSagaData edxUserActivationRelinkSagaData);
 
-
+  @PostMapping("/move-school-saga")
+  @PreAuthorize("hasAuthority('SCOPE_MOVE_SCHOOL_SAGA')")
+  @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
+  @ResponseStatus(ACCEPTED)
+  ResponseEntity<String> moveSchool(@Validated @RequestBody MoveSchoolSagaData moveSchoolSagaData);
 }

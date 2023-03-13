@@ -152,6 +152,27 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return this.processEdxDistrictUserActivationLinkSaga(EDX_DISTRICT_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
   }
 
+  @Override
+  public ResponseEntity<String> moveSchool(MoveSchoolSagaData moveSchoolSagaData) {
+    return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolSagaData);
+  }
+
+  /**
+   * Process move school saga response entity.
+   *
+   * @param sagaName                      the saga name
+   * @param moveSchoolSagaData            move school saga data
+   * @return the response entity
+   */
+  private ResponseEntity<String> processMoveSchoolSaga(SagaEnum sagaName, MoveSchoolSagaData moveSchoolSagaData) {
+    try {
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),moveSchoolSagaData);
+      return processServicesSaga(sagaName,sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
+  }
+
   /**
    * Process secure exchange comment saga response entity.
    *

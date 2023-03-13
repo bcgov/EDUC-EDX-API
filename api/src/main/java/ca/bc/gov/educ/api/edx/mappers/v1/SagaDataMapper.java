@@ -3,10 +3,7 @@ package ca.bc.gov.educ.api.edx.mappers.v1;
 import ca.bc.gov.educ.api.edx.mappers.LocalDateTimeMapper;
 import ca.bc.gov.educ.api.edx.mappers.UUIDMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCommentSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -68,4 +65,17 @@ public interface SagaDataMapper {
   @Mapping(target = "edxUserId", ignore = true)
   @Mapping(target = "districtID", ignore = true)
   SagaEntity toModel(String sagaName, SecureExchangeCommentSagaData sagaData) throws JsonProcessingException;
+
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "sagaState", ignore = true)
+  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaCompensated", ignore = true)
+  @Mapping(target = "retryCount", ignore = true)
+  @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(moveSchoolSagaData))")
+  @Mapping(target = "emailId", ignore = true)
+  @Mapping(target = "edxUserId", ignore = true)
+  @Mapping(target = "districtID", ignore = true)
+  @Mapping(target = "secureExchangeId", ignore = true)
+  @Mapping(target = "schoolID", source = "moveSchoolSagaData.school.schoolId")
+  SagaEntity toModel(String sagaName, MoveSchoolSagaData moveSchoolSagaData) throws JsonProcessingException;
 }
