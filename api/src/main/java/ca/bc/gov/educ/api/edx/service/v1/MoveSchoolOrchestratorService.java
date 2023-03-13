@@ -93,9 +93,9 @@ public class MoveSchoolOrchestratorService {
                 getService().findEdxUsers(Optional.empty(), Optional.of(UUID.fromString(moveSchoolSagaData.getSchool().getSchoolId())),
                         null, null, Optional.empty())
                         .stream()
-                        .map(userMapper::toStructure).collect(Collectors.toList());
+                        .map(userMapper::toStructure).toList();
 
-        List<EdxUserSchool> userSchoolEntity = userEntities.stream().flatMap(edxUser -> edxUser.getEdxUserSchools().stream()).collect(Collectors.toList());
+        List<EdxUserSchool> userSchoolEntity = userEntities.stream().flatMap(edxUser -> edxUser.getEdxUserSchools().stream()).toList();
         List<EdxUserSchool> matchedSchoolEntity = userSchoolEntity.stream().filter(edxUserSchool -> edxUserSchool.getSchoolID().equals(UUID.fromString(moveSchoolSagaData.getSchool().getSchoolId()))).collect(Collectors.toList());
 
 

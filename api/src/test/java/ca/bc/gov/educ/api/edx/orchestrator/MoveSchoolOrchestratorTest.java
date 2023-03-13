@@ -127,7 +127,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         assertThat(payload.getMoveDate()).isNotNull();
 
         final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
-        assertThat(sagaStates.size()).isEqualTo(1);
+        assertThat(sagaStates).hasSize(1);
         assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
         assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
     }
