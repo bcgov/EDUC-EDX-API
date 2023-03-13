@@ -8,8 +8,7 @@ import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
-import ca.bc.gov.educ.api.edx.repository.SagaEventStateRepository;
-import ca.bc.gov.educ.api.edx.repository.SagaRepository;
+import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
@@ -28,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
@@ -45,6 +46,21 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
      */
     @Autowired
     SagaRepository sagaRepository;
+
+    @Autowired
+    private EdxUserRepository edxUserRepository;
+
+    @Autowired
+    private EdxUserSchoolRepository edxUserSchoolRepository;
+
+    @Autowired
+    private EdxUserDistrictRepository edxUserDistrictRepository;
+
+    @Autowired
+    private EdxRoleRepository edxRoleRepository;
+
+    @Autowired
+    private EdxPermissionRepository edxPermissionRepository;
     /**
      * The Saga event repository.
      */
@@ -93,6 +109,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
             doReturn(createDummySchool()).when(this.restUtils).createSchool(any(), any());
             doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolById(any(), any());
             doReturn(createDummySchool()).when(this.restUtils).updateSchool(any(), any());
+            mockUserEntity();
         } catch (Exception e) {
             throw new SagaRuntimeException(e);
         }
@@ -132,6 +149,19 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
     }
 
+    @Test(expected = SagaRuntimeException.class)
+    public void testMoveSchoolEvent_GivenCreateFailed_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
+        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+        doReturn(null).when(this.restUtils).createSchool(any(), any());
+        final var event = Event.builder()
+                .eventType(INITIATED)
+                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+                .sagaId(this.saga.getSagaId())
+                .eventPayload(sagaPayload)
+                .build();
+        this.orchestrator.handleEvent(event);
+    }
+
     @Test
     public void testUpdateSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
@@ -164,6 +194,69 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
         assertThat(nextNewEvent.getEventType()).isEqualTo(UPDATE_SCHOOL);
         assertThat(nextNewEvent.getEventOutcome()).isEqualTo(SCHOOL_UPDATED);
+    }
+
+    @Test(expected = SagaRuntimeException.class)
+    public void testMoveSchoolEvent_GivenNoSchoolFoundForUpdate_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
+        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+        doReturn(List.of()).when(this.restUtils).getSchoolById(any(), any());
+        final var event = Event.builder()
+                .eventType(INITIATED)
+                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+                .sagaId(this.saga.getSagaId())
+                .eventPayload(sagaPayload)
+                .build();
+        this.orchestrator.handleEvent(event);
+
+        verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+        final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
+        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
+        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
+
+        final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
+        assertThat(sagaFromDB).isPresent();
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
+
+        final var nextEvent = Event.builder()
+                .eventType(CREATE_SCHOOL)
+                .eventOutcome(EventOutcome.SCHOOL_CREATED)
+                .sagaId(this.saga.getSagaId())
+                .eventPayload(newEvent.getEventPayload())
+                .build();
+        this.orchestrator.handleEvent(nextEvent);
+    }
+
+    @Test(expected = SagaRuntimeException.class)
+    public void testMoveSchoolEvent_GivenMultipleSchoolsForUpdate_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
+        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
+        List<School> dummyList = new ArrayList<School>(2);
+        dummyList.add(createDummySchool());
+        dummyList.add(createDummySchool());
+        doReturn(dummyList).when(this.restUtils).getSchoolById(any(), any());
+        final var event = Event.builder()
+                .eventType(INITIATED)
+                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+                .sagaId(this.saga.getSagaId())
+                .eventPayload(sagaPayload)
+                .build();
+        this.orchestrator.handleEvent(event);
+
+        verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+        final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
+        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
+        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
+
+        final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
+        assertThat(sagaFromDB).isPresent();
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
+
+        final var nextEvent = Event.builder()
+                .eventType(CREATE_SCHOOL)
+                .eventOutcome(EventOutcome.SCHOOL_CREATED)
+                .sagaId(this.saga.getSagaId())
+                .eventPayload(newEvent.getEventPayload())
+                .build();
+        this.orchestrator.handleEvent(nextEvent);
     }
 
     @Test
@@ -251,6 +344,13 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         neighborhoodLearning.setCreateUser("TEST");
         neighborhoodLearning.setUpdateUser("TEST");
         return neighborhoodLearning;
+    }
+
+    private void mockUserEntity() {
+        var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+        var schoolEntity = getEdxUserSchoolEntity(entity);
+        schoolEntity.setSchoolID(UUID.fromString("be44a3f7-1a04-938e-dcdc-118989f6dd24"));
+        edxUserSchoolRepository.save(schoolEntity);
     }
 
 }

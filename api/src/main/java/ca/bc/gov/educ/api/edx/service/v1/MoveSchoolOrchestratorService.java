@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,7 +47,7 @@ public class MoveSchoolOrchestratorService {
          return !schools.isEmpty();
     }
 
-    public School createNewSchool(MoveSchoolSagaData moveSchoolSagaData, SagaEntity saga, boolean hasSchoolNumber) {
+    public void createNewSchool(MoveSchoolSagaData moveSchoolSagaData, SagaEntity saga, boolean hasSchoolNumber) {
         School createSchoolObj = createSchoolObject(moveSchoolSagaData, hasSchoolNumber);
         School school  = restUtils.createSchool(UUID.randomUUID(), createSchoolObj);
         if(school == null) {
@@ -61,10 +60,9 @@ public class MoveSchoolOrchestratorService {
          } catch (JsonProcessingException e) {
           throw new SagaRuntimeException(e);
         }
-        return school;
     }
 
-    public School updateSchool(MoveSchoolSagaData moveSchoolSagaData, SagaEntity saga) {
+    public void updateSchool(MoveSchoolSagaData moveSchoolSagaData, SagaEntity saga) {
         List<School> schools = restUtils.getSchoolById(UUID.randomUUID(), moveSchoolSagaData.getSchool().getSchoolId());
         if(schools.isEmpty()) {
             throw new SagaRuntimeException("Update failed: School" + moveSchoolSagaData.getSchool().getSchoolId() + " does not exist.");
@@ -84,7 +82,6 @@ public class MoveSchoolOrchestratorService {
         } catch (JsonProcessingException e) {
             throw new SagaRuntimeException(e);
         }
-        return school;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -96,7 +93,7 @@ public class MoveSchoolOrchestratorService {
                         .map(userMapper::toStructure).toList();
 
         List<EdxUserSchool> userSchoolEntity = userEntities.stream().flatMap(edxUser -> edxUser.getEdxUserSchools().stream()).toList();
-        List<EdxUserSchool> matchedSchoolEntity = userSchoolEntity.stream().filter(edxUserSchool -> edxUserSchool.getSchoolID().equals(UUID.fromString(moveSchoolSagaData.getSchool().getSchoolId()))).collect(Collectors.toList());
+        List<EdxUserSchool> matchedSchoolEntity = userSchoolEntity.stream().filter(edxUserSchool -> edxUserSchool.getSchoolID().equals(UUID.fromString(moveSchoolSagaData.getSchool().getSchoolId()))).toList();
 
 
         for(EdxUserSchool schoolEntity: matchedSchoolEntity) {
@@ -127,14 +124,14 @@ public class MoveSchoolOrchestratorService {
         createSchool.setOpenedDate(moveSchoolSagaData.getMoveDate());
 
         if(!createSchool.getGrades().isEmpty()) {
-            createSchool.getGrades().stream().forEach(grade -> {
+            createSchool.getGrades().forEach(grade -> {
                 grade.setSchoolId(null);
                 grade.setSchoolGradeId(null);
             });
         }
 
         if(!createSchool.getNeighborhoodLearning().isEmpty()) {
-            createSchool.getNeighborhoodLearning().stream().forEach(grade -> {
+            createSchool.getNeighborhoodLearning().forEach(grade -> {
                 grade.setNeighborhoodLearningId(null);
                 grade.setSchoolId(null);
             });
