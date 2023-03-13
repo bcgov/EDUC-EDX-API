@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
-import ca.bc.gov.educ.api.edx.exception.APIServiceException;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
@@ -9,14 +9,11 @@ import ca.bc.gov.educ.api.edx.service.v1.MoveSchoolOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.MoveSchoolSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
@@ -30,16 +27,20 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolSagaData>
 
     @Getter(PRIVATE)
     private final MoveSchoolOrchestratorService moveSchoolOrchestratorService;
+
+    private final Publisher publisher;
     /**
      * Instantiates a new Base orchestrator.
      *
      * @param sagaService                   the saga service
      * @param messagePublisher              the message publisher
      * @param moveSchoolOrchestratorService
+     * @param publisher
      */
-    protected MoveSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, MoveSchoolOrchestratorService moveSchoolOrchestratorService) {
+    protected MoveSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, MoveSchoolOrchestratorService moveSchoolOrchestratorService, Publisher publisher) {
         super(sagaService, messagePublisher, MoveSchoolSagaData.class, MOVE_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString());
         this.moveSchoolOrchestratorService = moveSchoolOrchestratorService;
+        this.publisher = publisher;
     }
 
     @Override
@@ -91,6 +92,11 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolSagaData>
                 .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolSagaData))
                 .build();
         this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+        publishToJetStream(nextEvent, saga);
         log.info("message sent to EDX_API_TOPIC for MOVE_USERS_TO_NEW_SCHOOL Event.");
+    }
+
+    private void publishToJetStream(final Event event, SagaEntity saga) {
+        publisher.dispatchChoreographyEvent(event, saga);
     }
 }
