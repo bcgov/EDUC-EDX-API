@@ -17,6 +17,7 @@ public class MoveSchoolSagaData extends BaseRequest implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
+    @NotNull(message = "school cannot be null")
     private School school;
 
     private String newSchoolId;
