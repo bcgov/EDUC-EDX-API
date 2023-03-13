@@ -117,7 +117,7 @@ public class RestUtils {
     this.sendEmail(this.getChesEmail(fromEmail, toEmail, body, subject));
   }
 
-//  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
+  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public List<School> getSchoolNumberInDistrict(UUID correlationID, String schoolNumber, String districtId) {
     try {
       final SearchCriteria schoolNumberCriteria = this.getCriteria("schoolNumber", FilterOperation.EQUAL, schoolNumber , ValueType.STRING);
