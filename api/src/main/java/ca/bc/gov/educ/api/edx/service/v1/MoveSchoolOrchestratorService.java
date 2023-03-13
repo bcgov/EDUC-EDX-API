@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -116,7 +117,8 @@ public class MoveSchoolOrchestratorService {
     }
 
     private School createSchoolObject(MoveSchoolSagaData moveSchoolSagaData, boolean hasSchoolNumber) {
-        School createSchool = moveSchoolSagaData.getSchool();
+        School createSchool = new School();
+        BeanUtils.copyProperties(moveSchoolSagaData.getSchool(), createSchool);
         RequestUtil.setAuditColumnsForCreate(createSchool);
 
         createSchool.setSchoolId(null);
