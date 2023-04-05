@@ -8,9 +8,10 @@ import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.MoveSchoolOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
-import ca.bc.gov.educ.api.edx.struct.v1.MoveSchoolSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.MoveSchoolData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,11 +20,12 @@ import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.MOVE_SCHOOL_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
 
 @Component
 @Slf4j
-public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolSagaData> {
+public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
 
     @Getter(PRIVATE)
     private final MoveSchoolOrchestratorService moveSchoolOrchestratorService;
@@ -38,7 +40,7 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolSagaData>
      * @param publisher
      */
     protected MoveSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, MoveSchoolOrchestratorService moveSchoolOrchestratorService, Publisher publisher) {
-        super(sagaService, messagePublisher, MoveSchoolSagaData.class, MOVE_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString());
+        super(sagaService, messagePublisher, MoveSchoolData.class, MOVE_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString());
         this.moveSchoolOrchestratorService = moveSchoolOrchestratorService;
         this.publisher = publisher;
     }
@@ -46,53 +48,41 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolSagaData>
     @Override
     public void populateStepsToExecuteMap() {
         this.stepBuilder()
-          .begin(CREATE_SCHOOL, this::checkIfSchoolNumberIsAvailableInDistrict)
-          .step(CREATE_SCHOOL, SCHOOL_CREATED, UPDATE_SCHOOL, this::updateExistingSchool)
-          .step(UPDATE_SCHOOL, SCHOOL_UPDATED, MOVE_USERS_TO_NEW_SCHOOL, this::moveUsersToNewSchool)
-          .end(MOVE_USERS_TO_NEW_SCHOOL, SCHOOL_MOVED);
+          .begin(MOVE_SCHOOL, this::moveSchool)
+          .step(MOVE_SCHOOL, SCHOOL_MOVED, MOVE_USERS_TO_NEW_SCHOOL, this::moveUsersToNewSchool)
+          .end(MOVE_USERS_TO_NEW_SCHOOL, USERS_TO_NEW_SCHOOL_MOVED);
     }
 
-    private void checkIfSchoolNumberIsAvailableInDistrict(Event event, SagaEntity saga, MoveSchoolSagaData moveSchoolSagaData) throws JsonProcessingException{
+    public void moveSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException {
         final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-        saga.setSagaState(CREATE_SCHOOL.toString());
+        saga.setSagaState(MOVE_SCHOOL.toString());
         this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-        boolean exists = getMoveSchoolOrchestratorService().findSchoolNumberInDistrict(moveSchoolSagaData.getSchool().getSchoolNumber(), moveSchoolSagaData.getSchool().getDistrictId());
-        getMoveSchoolOrchestratorService().createNewSchool(moveSchoolSagaData, saga, exists);
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-                .eventType(CREATE_SCHOOL).eventOutcome(SCHOOL_CREATED)
-                .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolSagaData))
-                .build();
-        this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-        log.info("message sent to EDX_API_TOPIC for CREATE_SCHOOL Event.");
+            .eventType(MOVE_SCHOOL)
+            .replyTo(this.getTopicToSubscribe())
+            .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolData))
+            .build();
+        this.postMessageToTopic(INSTITUTE_API_TOPIC.toString(), nextEvent);
+        publishToJetStream(nextEvent, saga);
+        log.info("message sent to INSTITUTE_API_TOPIC for MOVE SCHOOL Event. :: {}", saga.getSagaId());
     }
 
-    private void updateExistingSchool(Event event, SagaEntity saga, MoveSchoolSagaData moveSchoolSagaData) throws JsonProcessingException{
-        final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-        saga.setSagaState(UPDATE_SCHOOL.toString());
-        this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-        getMoveSchoolOrchestratorService().updateSchool(moveSchoolSagaData, saga);
-        final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-                .eventType(UPDATE_SCHOOL).eventOutcome(SCHOOL_UPDATED)
-                .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolSagaData))
-                .build();
-        this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-        log.info("message sent to EDX_API_TOPIC for UPDATE_EXISTING_SCHOOL Event.");
-    }
-
-    private void moveUsersToNewSchool(Event event, SagaEntity saga, MoveSchoolSagaData moveSchoolSagaData) throws JsonProcessingException{
+    private void moveUsersToNewSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException{
         final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
         saga.setSagaState(MOVE_USERS_TO_NEW_SCHOOL.toString());
         this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
-        getMoveSchoolOrchestratorService().moveUsersToNewSchool(moveSchoolSagaData, saga);
+        ObjectMapper objectMapper = new ObjectMapper();
+        MoveSchoolData moveSchoolDataFromEvent = objectMapper.readValue(event.getEventPayload(), MoveSchoolData.class);
+
+        getMoveSchoolOrchestratorService().moveUsersToNewSchool(moveSchoolDataFromEvent, saga);
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-                .eventType(MOVE_USERS_TO_NEW_SCHOOL).eventOutcome(SCHOOL_MOVED)
-                .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolSagaData))
+                .eventType(MOVE_USERS_TO_NEW_SCHOOL).eventOutcome(USERS_TO_NEW_SCHOOL_MOVED)
+                .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolDataFromEvent))
                 .build();
         this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-        publishToJetStream(nextEvent, saga);
         log.info("message sent to EDX_API_TOPIC for MOVE_USERS_TO_NEW_SCHOOL Event.");
     }
 

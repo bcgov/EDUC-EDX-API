@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,7 +22,7 @@ public class School extends BaseRequest implements Serializable {
    */
   private static final long serialVersionUID = 1L;
 
-  @NotNull(message = "schoolId can not be null.")
+  @Null(message = "schoolId should be null")
   private String schoolId;
   @NotNull(message = "districtId can not be null.")
   private String districtId;

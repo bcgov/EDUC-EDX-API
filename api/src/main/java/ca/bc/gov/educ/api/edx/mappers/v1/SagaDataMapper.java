@@ -71,11 +71,11 @@ public interface SagaDataMapper {
   @Mapping(target = "sagaId", ignore = true)
   @Mapping(target = "sagaCompensated", ignore = true)
   @Mapping(target = "retryCount", ignore = true)
-  @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(moveSchoolSagaData))")
+  @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(moveSchoolData))")
   @Mapping(target = "emailId", ignore = true)
   @Mapping(target = "edxUserId", ignore = true)
   @Mapping(target = "districtID", ignore = true)
   @Mapping(target = "secureExchangeId", ignore = true)
-  @Mapping(target = "schoolID", source = "moveSchoolSagaData.school.schoolId")
-  SagaEntity toModel(String sagaName, MoveSchoolSagaData moveSchoolSagaData) throws JsonProcessingException;
+  @Mapping(target = "schoolID", ignore = true)
+  SagaEntity toModel(String sagaName, MoveSchoolData moveSchoolData) throws JsonProcessingException;
 }

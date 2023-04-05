@@ -779,12 +779,8 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testEdxMoveSchool_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
-    MoveSchoolSagaData sagaData = createDummyMoveSchoolSagaData();
+    MoveSchoolData sagaData = createDummyMoveSchoolSagaData();
     String jsonString = getJsonString(sagaData);
-    doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolNumberInDistrict(any(), any(), any());
-    doReturn(createDummySchool()).when(this.restUtils).createSchool(any(), any());
-    doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolById(any(), any());
-    doReturn(createDummySchool()).when(this.restUtils).updateSchool(any(), any());
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonString)
@@ -793,11 +789,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
             .andDo(print()).andExpect(status().isAccepted());
   }
 
-  private MoveSchoolSagaData createDummyMoveSchoolSagaData() {
-    MoveSchoolSagaData moveSchool = new MoveSchoolSagaData();
-    moveSchool.setSchool(createDummySchool());
+  private MoveSchoolData createDummyMoveSchoolSagaData() {
+    MoveSchoolData moveSchool = new MoveSchoolData();
+    moveSchool.setToSchool(createDummySchool());
     moveSchool.setMoveDate(String.valueOf(LocalDateTime.now().minusDays(1).withNano(0)));
-    moveSchool.setNewSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
+    moveSchool.setFromSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
     moveSchool.setCreateUser("Test");
     moveSchool.setUpdateUser("Test");
     return moveSchool;
@@ -806,11 +802,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   private School createDummySchool() {
     School school = new School();
     school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
-    school.setSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd24");
     school.setSchoolNumber("00002");
     school.setDisplayName("Test College");
     school.setSchoolOrganizationCode("TRIMESTER");
     school.setSchoolCategoryCode("FED_BAND");
+    school.setSchoolReportingRequirementCode("REGULAR");
     school.setFacilityTypeCode("STANDARD");
     school.setGrades(List.of(createSchoolGrade()));
     school.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));

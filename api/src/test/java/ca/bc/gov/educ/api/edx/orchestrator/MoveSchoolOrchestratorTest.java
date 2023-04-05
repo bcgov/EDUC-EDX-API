@@ -34,6 +34,7 @@ import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -70,7 +71,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     @Autowired
     private SagaService sagaService;
 
-    MoveSchoolSagaData sagaData;
+    MoveSchoolData sagaData;
 
     String sagaPayload;
 
@@ -115,148 +116,62 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         }
     }
 
-    private MoveSchoolSagaData createMoveSchoolSagaData() throws Exception {
-        MoveSchoolSagaData sagaData =
+    private MoveSchoolData createMoveSchoolSagaData() throws Exception {
+        MoveSchoolData sagaData =
                 createDummyMoveSchoolSagaData();
         return sagaData;
     }
 
     @Test
-    public void testMoveSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+    public void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(sagaPayload)
-                .build();
-        this.orchestrator.handleEvent(event);
+            .eventType(INITIATED)
+            .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+            .sagaId(this.saga.getSagaId())
+            .eventPayload(sagaPayload)
+            .build();
+        this.orchestrator.moveSchool(event, this.saga, this.sagaData);
 
-        verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
+        verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(INSTITUTE_API_TOPIC.toString()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
-
+        assertThat(newEvent.getEventType()).isEqualTo(MOVE_SCHOOL);
+        assertThat(newEvent.getEventPayload()).isEqualTo(sagaPayload);
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
-        var payload = JsonUtil.getJsonObjectFromString(MoveSchoolSagaData.class, newEvent.getEventPayload());
-        assertThat(payload.getMoveDate()).isNotNull();
-
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(MOVE_SCHOOL.toString());
         final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
-        assertThat(sagaStates).hasSize(1);
+        assertThat(sagaStates.size()).isEqualTo(1);
         assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());
         assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.INITIATE_SUCCESS.toString());
     }
 
-    @Test(expected = SagaRuntimeException.class)
-    public void testMoveSchoolEvent_GivenCreateFailed_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
-        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
-        doReturn(null).when(this.restUtils).createSchool(any(), any());
-        final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(sagaPayload)
-                .build();
-        this.orchestrator.handleEvent(event);
-    }
-
     @Test
-    public void testUpdateSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+    public void testMoveSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDB() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(sagaPayload)
-                .build();
+            .eventType(MOVE_SCHOOL)
+            .eventOutcome(EventOutcome.SCHOOL_MOVED)
+            .sagaId(this.saga.getSagaId())
+            .eventPayload(sagaPayload)
+            .build();
         this.orchestrator.handleEvent(event);
 
         verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
+        assertThat(newEvent.getEventType()).isEqualTo(MOVE_USERS_TO_NEW_SCHOOL);
+        assertThat(newEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_MOVED);
 
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(MOVE_USERS_TO_NEW_SCHOOL.toString());
+        var payload = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, newEvent.getEventPayload());
+        assertThat(payload.getMoveDate()).isNotNull();
 
-        final var nextEvent = Event.builder()
-                .eventType(CREATE_SCHOOL)
-                .eventOutcome(EventOutcome.SCHOOL_CREATED)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(newEvent.getEventPayload())
-                .build();
-        this.orchestrator.handleEvent(nextEvent);
-
-        verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-        final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(nextNewEvent.getEventType()).isEqualTo(UPDATE_SCHOOL);
-        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(SCHOOL_UPDATED);
-    }
-
-    @Test(expected = SagaRuntimeException.class)
-    public void testMoveSchoolEvent_GivenNoSchoolFoundForUpdate_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
-        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
-        doReturn(List.of()).when(this.restUtils).getSchoolById(any(), any());
-        final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(sagaPayload)
-                .build();
-        this.orchestrator.handleEvent(event);
-
-        verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-        final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
-
-        final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
-        assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
-
-        final var nextEvent = Event.builder()
-                .eventType(CREATE_SCHOOL)
-                .eventOutcome(EventOutcome.SCHOOL_CREATED)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(newEvent.getEventPayload())
-                .build();
-        this.orchestrator.handleEvent(nextEvent);
-    }
-
-    @Test(expected = SagaRuntimeException.class)
-    public void testMoveSchoolEvent_GivenMultipleSchoolsForUpdate_ShouldThrowError() throws IOException, InterruptedException, TimeoutException {
-        final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
-        List<School> dummyList = new ArrayList<School>(2);
-        dummyList.add(createDummySchool());
-        dummyList.add(createDummySchool());
-        doReturn(dummyList).when(this.restUtils).getSchoolById(any(), any());
-        final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(sagaPayload)
-                .build();
-        this.orchestrator.handleEvent(event);
-
-        verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-        final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
-
-        final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
-        assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
-
-        final var nextEvent = Event.builder()
-                .eventType(CREATE_SCHOOL)
-                .eventOutcome(EventOutcome.SCHOOL_CREATED)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(newEvent.getEventPayload())
-                .build();
-        this.orchestrator.handleEvent(nextEvent);
+        final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
+        assertThat(sagaStates).hasSize(1);
+        assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.MOVE_SCHOOL.toString());
+        assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(EventOutcome.SCHOOL_MOVED.toString());
     }
 
     @Test
@@ -272,16 +187,16 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
+        assertThat(newEvent.getEventType()).isEqualTo(INITIATED);
+        assertThat(newEvent.getEventOutcome()).isEqualTo(INITIATE_SUCCESS);
 
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(MOVE_SCHOOL.toString());
 
         final var nextEvent = Event.builder()
-                .eventType(CREATE_SCHOOL)
-                .eventOutcome(EventOutcome.SCHOOL_CREATED)
+                .eventType(MOVE_SCHOOL)
+                .eventOutcome(SCHOOL_MOVED)
                 .sagaId(this.saga.getSagaId())
                 .eventPayload(newEvent.getEventPayload())
                 .build();
@@ -289,29 +204,15 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(nextNewEvent.getEventType()).isEqualTo(UPDATE_SCHOOL);
-        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(SCHOOL_UPDATED);
-
-        final var nextMoveEvent = Event.builder()
-                .eventType(UPDATE_SCHOOL)
-                .eventOutcome(EventOutcome.SCHOOL_UPDATED)
-                .sagaId(this.saga.getSagaId())
-                .eventPayload(newEvent.getEventPayload())
-                .build();
-        this.orchestrator.handleEvent(nextMoveEvent);
-
-        verify(this.messagePublisher, atMost(invocations + 4)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-        final var nextNewMoveEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(nextNewMoveEvent.getEventType()).isEqualTo(MOVE_USERS_TO_NEW_SCHOOL);
-        assertThat(nextNewMoveEvent.getEventOutcome()).isEqualTo(SCHOOL_MOVED);
-
+        assertThat(nextNewEvent.getEventType()).isEqualTo(MOVE_USERS_TO_NEW_SCHOOL);
+        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_MOVED);
     }
 
-    private MoveSchoolSagaData createDummyMoveSchoolSagaData() {
-        MoveSchoolSagaData moveSchool = new MoveSchoolSagaData();
-        moveSchool.setSchool(createDummySchool());
+    private MoveSchoolData createDummyMoveSchoolSagaData() {
+        MoveSchoolData moveSchool = new MoveSchoolData();
+        moveSchool.setToSchool(createDummySchool());
         moveSchool.setMoveDate(String.valueOf(LocalDateTime.now().minusDays(1).withNano(0)));
-        moveSchool.setNewSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
+        moveSchool.setFromSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
         moveSchool.setCreateUser("Test");
         moveSchool.setUpdateUser("Test");
         return moveSchool;

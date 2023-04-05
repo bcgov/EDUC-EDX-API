@@ -54,6 +54,7 @@ public enum EventOutcome {
 
   SCHOOL_CREATED,
   SCHOOL_UPDATED,
-  SCHOOL_MOVED
+  SCHOOL_MOVED,
+  USERS_TO_NEW_SCHOOL_MOVED
 
   }
