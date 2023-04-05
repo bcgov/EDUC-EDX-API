@@ -153,20 +153,21 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   @Override
-  public ResponseEntity<String> moveSchool(MoveSchoolSagaData moveSchoolSagaData) {
-    return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolSagaData);
+  public ResponseEntity<String> moveSchool(MoveSchoolData moveSchoolData) {
+    return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolData);
   }
 
   /**
    * Process move school saga response entity.
    *
    * @param sagaName                      the saga name
-   * @param moveSchoolSagaData            move school saga data
+   * @param moveSchoolData            move school saga data
    * @return the response entity
    */
-  private ResponseEntity<String> processMoveSchoolSaga(SagaEnum sagaName, MoveSchoolSagaData moveSchoolSagaData) {
+  private ResponseEntity<String> processMoveSchoolSaga(SagaEnum sagaName, MoveSchoolData moveSchoolData) {
     try {
-      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),moveSchoolSagaData);
+      RequestUtil.setAuditColumnsForCreate(moveSchoolData);
+      val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),moveSchoolData);
       return processServicesSaga(sagaName,sagaEntity);
     } catch (JsonProcessingException e) {
       throw new SagaRuntimeException(e);
