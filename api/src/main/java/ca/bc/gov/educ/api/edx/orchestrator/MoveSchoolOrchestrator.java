@@ -64,7 +64,6 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
             .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolData))
             .build();
         this.postMessageToTopic(INSTITUTE_API_TOPIC.toString(), nextEvent);
-        publishToJetStream(nextEvent, saga);
         log.info("message sent to INSTITUTE_API_TOPIC for MOVE SCHOOL Event. :: {}", saga.getSagaId());
     }
 
@@ -83,6 +82,7 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
                 .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolDataFromEvent))
                 .build();
         this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+        publishToJetStream(nextEvent, saga);
         log.info("message sent to EDX_API_TOPIC for MOVE_USERS_TO_NEW_SCHOOL Event.");
     }
 
