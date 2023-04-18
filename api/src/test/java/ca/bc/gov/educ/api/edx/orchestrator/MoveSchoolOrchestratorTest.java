@@ -105,7 +105,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         MockitoAnnotations.openMocks(this);
         try {
             UUID schoolID = mockUserEntity();
-            sagaData = createMoveSchoolSagaData(schoolID);
+            sagaData = createDummyMoveSchoolSagaData(schoolID);
             sagaPayload = getJsonString(sagaData);
             val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.MOVE_SCHOOL_SAGA), sagaData);
             saga = sagaService.createSagaRecordInDB(sagaEntity);
@@ -117,12 +117,6 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         } catch (Exception e) {
             throw new SagaRuntimeException(e);
         }
-    }
-
-    private MoveSchoolData createMoveSchoolSagaData(UUID schoolID) throws Exception {
-        MoveSchoolData sagaData =
-                createDummyMoveSchoolSagaData(schoolID);
-        return sagaData;
     }
 
     @Test
