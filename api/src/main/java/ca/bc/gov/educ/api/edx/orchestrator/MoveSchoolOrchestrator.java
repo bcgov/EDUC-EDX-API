@@ -49,8 +49,8 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
     public void populateStepsToExecuteMap() {
         this.stepBuilder()
           .begin(MOVE_SCHOOL, this::moveSchool)
-          .step(MOVE_SCHOOL, SCHOOL_MOVED, MOVE_USERS_TO_NEW_SCHOOL, this::moveUsersToNewSchool)
-          .end(MOVE_USERS_TO_NEW_SCHOOL, USERS_TO_NEW_SCHOOL_MOVED);
+          .step(MOVE_SCHOOL, SCHOOL_MOVED, CREATE_USERS_AT_NEW_SCHOOL, this::createSameUsersAtNewSchool)
+          .end(CREATE_USERS_AT_NEW_SCHOOL, USERS_AT_NEW_SCHOOL_CREATED);
     }
 
     public void moveSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException {
@@ -67,18 +67,18 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
         log.info("message sent to INSTITUTE_API_TOPIC for MOVE SCHOOL Event. :: {}", saga.getSagaId());
     }
 
-    private void moveUsersToNewSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException{
+    private void createSameUsersAtNewSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException{
         final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-        saga.setSagaState(MOVE_USERS_TO_NEW_SCHOOL.toString());
+        saga.setSagaState(CREATE_USERS_AT_NEW_SCHOOL.toString());
         this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
         ObjectMapper objectMapper = new ObjectMapper();
         MoveSchoolData moveSchoolDataFromEvent = objectMapper.readValue(event.getEventPayload(), MoveSchoolData.class);
 
-        getMoveSchoolOrchestratorService().moveUsersToNewSchool(moveSchoolDataFromEvent, saga);
+        getMoveSchoolOrchestratorService().createSameUsersAtNewSchool(moveSchoolDataFromEvent, saga);
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-                .eventType(MOVE_USERS_TO_NEW_SCHOOL).eventOutcome(USERS_TO_NEW_SCHOOL_MOVED)
+                .eventType(CREATE_USERS_AT_NEW_SCHOOL).eventOutcome(USERS_AT_NEW_SCHOOL_CREATED)
                 .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolDataFromEvent))
                 .build();
         this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);

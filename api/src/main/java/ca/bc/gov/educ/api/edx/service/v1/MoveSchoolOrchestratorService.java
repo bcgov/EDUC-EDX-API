@@ -36,16 +36,16 @@ public class MoveSchoolOrchestratorService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void moveUsersToNewSchool(MoveSchoolData moveSchoolData, SagaEntity saga) {
+    public void createSameUsersAtNewSchool(MoveSchoolData moveSchoolData, SagaEntity saga) {
 
         List<EdxUserSchoolEntity> edxUserSchoolEntityList =  edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(moveSchoolData.getFromSchoolId()));
 
         List<EdxUserSchoolEntity> edxUserSchoolEntityListToSave = new ArrayList<>();
 
-        log.info("copying {} users to new school", edxUserSchoolEntityList.size());
+        log.info("creating {} users to new school", edxUserSchoolEntityList.size());
 
         for (EdxUserSchoolEntity edxUserSchoolEntity : edxUserSchoolEntityList) {
-            log.debug("copying edxUserSchoolEntity :: {}", edxUserSchoolEntity);
+            log.debug("copying from edxUserSchoolEntity :: {}", edxUserSchoolEntity);
             EdxUserSchoolEntity newEdxUserSchoolEntity = new EdxUserSchoolEntity();
             newEdxUserSchoolEntity.setEdxUserEntity(edxUserSchoolEntity.getEdxUserEntity());
             newEdxUserSchoolEntity.setSchoolID(UUID.fromString(moveSchoolData.getToSchool().getSchoolId()));
