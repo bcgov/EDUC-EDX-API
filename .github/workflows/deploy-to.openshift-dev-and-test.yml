@@ -67,7 +67,7 @@ jobs:
 
     steps:
     - name: Check for required secrets
-      uses: actions/github-script@v4
+      uses: actions/github-script@v6
       with:
         script: |
           const secrets = {
@@ -105,7 +105,7 @@ jobs:
           }
 
     - name: Check out repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Determine image tags
       if: env.IMAGE_TAGS == ''
@@ -113,7 +113,7 @@ jobs:
         echo "IMAGE_TAGS=latest ${GITHUB_SHA::12}" | tee -a $GITHUB_ENV
 
     - name: Login to Docker Hub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: ${{ env.DOCKER_ARTIFACTORY_REPO }}
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -152,7 +152,7 @@ jobs:
         oc: 4
 
       # https://github.com/redhat-actions/oc-login#readme
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Deploy API
       run: |
@@ -180,7 +180,7 @@ jobs:
         oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
 
     - name: ZAP Scan
-      uses: zaproxy/action-api-scan@v0.1.0
+      uses: zaproxy/action-api-scan@v0.1.1
       with:
         target: 'https://${{ env.APP_NAME }}-${{ env.OPENSHIFT_NAMESPACE_DEV }}.apps.silver.devops.gov.bc.ca/v3/api-docs'
 
@@ -196,7 +196,7 @@ jobs:
 
     steps:
       - name: Check for required secrets
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         with:
           script: |
             const secrets = {
@@ -234,7 +234,7 @@ jobs:
             }
 
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1
@@ -267,6 +267,6 @@ jobs:
           oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
 
       - name: ZAP Scan
-        uses: zaproxy/action-api-scan@v0.1.0
+        uses: zaproxy/action-api-scan@v0.1.1
         with:
           target: 'https://${{ env.APP_NAME }}-${{ env.OPENSHIFT_NAMESPACE_TEST }}.apps.silver.devops.gov.bc.ca/v3/api-docs'

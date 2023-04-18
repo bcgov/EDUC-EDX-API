@@ -36,7 +36,7 @@ jobs:
 
     steps:
     - name: Check out repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Create tag
       uses: actions/github-script@v5
@@ -55,7 +55,7 @@ jobs:
         oc: 4
 
       # https://github.com/redhat-actions/oc-login#readme
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Tag in OpenShift
       run: |
         set -eux
