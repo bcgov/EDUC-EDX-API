@@ -1059,21 +1059,4 @@ public class EdxUsersService {
       throw new EntityExistsException("EdxUserDistrictRole to EdxUserDistrict association already exists");
     }
   }
-
-  public EdxUserSchoolEntity moveEdxUsersToNewSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity, UUID newSchoolID) {
-    val entityOptional = getEdxUserRepository().findById(edxUserID);
-    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
-
-    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesBySchoolIDAndEdxUserEntity(edxUserSchoolEntity.getSchoolID(), userEntity);
-    if (optionalSchool.isPresent()) {
-      EdxUserSchoolEntity currentEdxUserSchoolEntity = optionalSchool.get();
-      logUpdatesEdxUserSchool(currentEdxUserSchoolEntity, edxUserSchoolEntity);
-      BeanUtils.copyProperties(edxUserSchoolEntity, currentEdxUserSchoolEntity, "schoolID");
-      currentEdxUserSchoolEntity.setSchoolID(newSchoolID);
-
-      return getEdxUserSchoolsRepository().save(currentEdxUserSchoolEntity);
-    } else {
-      throw new EntityNotFoundException(EdxUserSchoolEntity.class, "EdxUserSchoolEntity", edxUserSchoolEntity.toString());
-    }
-  }
 }
