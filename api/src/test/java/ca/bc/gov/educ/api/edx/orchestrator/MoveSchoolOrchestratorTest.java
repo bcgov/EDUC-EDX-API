@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
@@ -27,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
@@ -96,13 +96,16 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     public void after() {
         sagaEventStateRepository.deleteAll();
         sagaRepository.deleteAll();
+        edxUserSchoolRepository.deleteAll();
+
     }
 
     @Before
     public void setUp() throws JsonProcessingException {
         MockitoAnnotations.openMocks(this);
         try {
-            sagaData = createMoveSchoolSagaData();
+            UUID schoolID = mockUserEntity();
+            sagaData = createMoveSchoolSagaData(schoolID);
             sagaPayload = getJsonString(sagaData);
             val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.MOVE_SCHOOL_SAGA), sagaData);
             saga = sagaService.createSagaRecordInDB(sagaEntity);
@@ -110,15 +113,15 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
             doReturn(createDummySchool()).when(this.restUtils).createSchool(any(), any());
             doReturn(List.of(createDummySchool())).when(this.restUtils).getSchoolById(any(), any());
             doReturn(createDummySchool()).when(this.restUtils).updateSchool(any(), any());
-            mockUserEntity();
+
         } catch (Exception e) {
             throw new SagaRuntimeException(e);
         }
     }
 
-    private MoveSchoolData createMoveSchoolSagaData() throws Exception {
+    private MoveSchoolData createMoveSchoolSagaData(UUID schoolID) throws Exception {
         MoveSchoolData sagaData =
-                createDummyMoveSchoolSagaData();
+                createDummyMoveSchoolSagaData(schoolID);
         return sagaData;
     }
 
@@ -175,7 +178,9 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    public void testMoveUsersEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+    public void testMoveUsersEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNatsAndEdxUserSchoolsShouldBeCopiedToNewSchool() throws IOException, InterruptedException, TimeoutException {
+        this.edxUserRepository.findAll();
+
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
                 .eventType(INITIATED)
@@ -206,13 +211,17 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
         assertThat(nextNewEvent.getEventType()).isEqualTo(MOVE_USERS_TO_NEW_SCHOOL);
         assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_MOVED);
+
+        final List<EdxUserSchoolEntity> edxUserSchoolEntityList = this.edxUserSchoolRepository.findAll();
+        assertThat(edxUserSchoolEntityList).hasSize(2);
+        assertThat(edxUserSchoolEntityList.get(1).getEdxUserSchoolRoleEntities()).hasSize(1);
     }
 
-    private MoveSchoolData createDummyMoveSchoolSagaData() {
+    private MoveSchoolData createDummyMoveSchoolSagaData(UUID schoolID) {
         MoveSchoolData moveSchool = new MoveSchoolData();
         moveSchool.setToSchool(createDummySchool());
         moveSchool.setMoveDate(String.valueOf(LocalDateTime.now().minusDays(1).withNano(0)));
-        moveSchool.setFromSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
+        moveSchool.setFromSchoolId(schoolID.toString());
         moveSchool.setCreateUser("Test");
         moveSchool.setUpdateUser("Test");
         return moveSchool;
@@ -221,7 +230,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     private School createDummySchool() {
         School school = new School();
         school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
-        school.setSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd24");
+        school.setSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
         school.setSchoolNumber("00002");
         school.setDisplayName("Test College");
         school.setSchoolOrganizationCode("TRIMESTER");
@@ -247,11 +256,9 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
         return neighborhoodLearning;
     }
 
-    private void mockUserEntity() {
+    private UUID mockUserEntity() {
         var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-        var schoolEntity = getEdxUserSchoolEntity(entity);
-        schoolEntity.setSchoolID(UUID.fromString("be44a3f7-1a04-938e-dcdc-118989f6dd24"));
-        edxUserSchoolRepository.save(schoolEntity);
+        return entity.getEdxUserSchoolEntities().stream().toList().get(0).getSchoolID();
     }
 
 }

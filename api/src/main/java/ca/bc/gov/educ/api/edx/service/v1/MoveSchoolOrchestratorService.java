@@ -1,13 +1,15 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserSchoolMapper;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchool;
+import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.MoveSchoolData;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -22,34 +24,56 @@ public class MoveSchoolOrchestratorService {
 
     protected final SagaService sagaService;
 
-    private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
-
-    private static final EdxUserSchoolMapper USER_SCHOOL_MAPPER = EdxUserSchoolMapper.mapper;
-
     @Getter(AccessLevel.PRIVATE)
     private final EdxUsersService service;
 
-    public MoveSchoolOrchestratorService(SagaService sagaService, EdxUsersService service) {
+    private final EdxUserSchoolRepository edxUserSchoolsRepository;
+
+    public MoveSchoolOrchestratorService(SagaService sagaService, EdxUsersService service, EdxUserSchoolRepository edxUserSchoolRepository) {
         this.sagaService = sagaService;
         this.service = service;
+        this.edxUserSchoolsRepository = edxUserSchoolRepository;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void moveUsersToNewSchool(MoveSchoolData moveSchoolData, SagaEntity saga) {
-        List<EdxUser> userEntities =
-                getService().findEdxUsers(Optional.empty(), Optional.of(UUID.fromString(moveSchoolData.getFromSchoolId())),
-                        null, null, Optional.empty())
-                        .stream()
-                        .map(userMapper::toStructure).toList();
 
-        log.info("Moving {} users to new school", userEntities.size());
+        List<EdxUserSchoolEntity> edxUserSchoolEntityList =  edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(moveSchoolData.getFromSchoolId()));
 
-        List<EdxUserSchool> userSchoolEntity = userEntities.stream().flatMap(edxUser -> edxUser.getEdxUserSchools().stream()).toList();
-        List<EdxUserSchool> matchedSchoolEntity = userSchoolEntity.stream().filter(edxUserSchool -> edxUserSchool.getSchoolID().equals(UUID.fromString(moveSchoolData.getFromSchoolId()))).toList();
+        List<EdxUserSchoolEntity> edxUserSchoolEntityListToSave = new ArrayList<>();
 
+        log.info("copying {} users to new school", edxUserSchoolEntityList.size());
 
-        for(EdxUserSchool schoolEntity: matchedSchoolEntity) {
-            getService().moveEdxUsersToNewSchool(UUID.fromString(schoolEntity.getEdxUserID()), USER_SCHOOL_MAPPER.toModel(schoolEntity), UUID.fromString(moveSchoolData.getToSchool().getSchoolId()));
+        for (EdxUserSchoolEntity edxUserSchoolEntity : edxUserSchoolEntityList) {
+            log.debug("copying edxUserSchoolEntity :: {}", edxUserSchoolEntity);
+            EdxUserSchoolEntity newEdxUserSchoolEntity = new EdxUserSchoolEntity();
+            newEdxUserSchoolEntity.setEdxUserEntity(edxUserSchoolEntity.getEdxUserEntity());
+            newEdxUserSchoolEntity.setSchoolID(UUID.fromString(moveSchoolData.getToSchool().getSchoolId()));
+            newEdxUserSchoolEntity.setCreateUser(moveSchoolData.getCreateUser());
+            newEdxUserSchoolEntity.setUpdateDate(LocalDateTime.now());
+            newEdxUserSchoolEntity.setUpdateUser(moveSchoolData.getCreateUser());
+            newEdxUserSchoolEntity.setCreateDate(LocalDateTime.now());
+
+            Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntitySet = new HashSet<>();
+
+            for (EdxUserSchoolRoleEntity edxUserSchoolRole: edxUserSchoolEntity.getEdxUserSchoolRoleEntities()) {
+                EdxUserSchoolRoleEntity newEdxUserSchoolRoleEntity = new EdxUserSchoolRoleEntity();
+                newEdxUserSchoolRoleEntity.setEdxUserSchoolEntity(newEdxUserSchoolEntity);
+                newEdxUserSchoolRoleEntity.setEdxRoleCode(edxUserSchoolRole.getEdxRoleCode());
+                newEdxUserSchoolRoleEntity.setCreateUser(moveSchoolData.getCreateUser());
+                newEdxUserSchoolRoleEntity.setUpdateDate(LocalDateTime.now());
+                newEdxUserSchoolRoleEntity.setUpdateUser(moveSchoolData.getCreateUser());
+                newEdxUserSchoolRoleEntity.setCreateDate(LocalDateTime.now());
+
+                edxUserSchoolRoleEntitySet.add(newEdxUserSchoolRoleEntity);
+            }
+
+            newEdxUserSchoolEntity.setEdxUserSchoolRoleEntities(edxUserSchoolRoleEntitySet);
+
+            edxUserSchoolEntityListToSave.add(newEdxUserSchoolEntity);
         }
+
+        edxUserSchoolsRepository.saveAll(edxUserSchoolEntityListToSave);
+
     }
 }
