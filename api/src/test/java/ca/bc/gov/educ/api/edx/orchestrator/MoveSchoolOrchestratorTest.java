@@ -162,12 +162,12 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(CREATE_USERS_AT_NEW_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(USERS_AT_NEW_SCHOOL_CREATED);
+        assertThat(newEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL);
+        assertThat(newEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED);
 
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
-        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_USERS_AT_NEW_SCHOOL.toString());
+        assertThat(sagaFromDB.get().getSagaState()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL.toString());
         var payload = JsonUtil.getJsonObjectFromString(MoveSchoolData.class, newEvent.getEventPayload());
         assertThat(payload.getMoveDate()).isNotNull();
 
@@ -209,8 +209,8 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(nextNewEvent.getEventType()).isEqualTo(CREATE_USERS_AT_NEW_SCHOOL);
-        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_AT_NEW_SCHOOL_CREATED);
+        assertThat(nextNewEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL);
+        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED);
 
         final List<EdxUserSchoolEntity> edxUserSchoolEntityList = this.edxUserSchoolRepository.findAll();
         assertThat(edxUserSchoolEntityList).hasSize(2);
