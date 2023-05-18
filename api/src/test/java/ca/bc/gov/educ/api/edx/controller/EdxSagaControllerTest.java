@@ -426,6 +426,36 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, null, "name", "MinTeam");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+            .andExpect(jsonPath("$.subErrors[1].message", is("District ID cannot be null")))
+            .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void testCreateNewSecureExchange_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
+    val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, UUID.randomUUID(), null, "MinTeam");
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+            .andExpect(jsonPath("$.subErrors[1].message", is("District Name cannot be null")))
+            .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void testCreateNewSecureExchange_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(this.ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(),"SCHOOL"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), null, null, null, "MinTeam");
