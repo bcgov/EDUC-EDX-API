@@ -16,6 +16,7 @@ public final class URL {
   public static final String FILE_REQUIREMENTS = "/file-requirements";
   public static final String MINISTRY_TEAMS = "/ministry-teams";
   public static final String USER_SCHOOLS = "/user-schools";
+  public static final String USER_DISTRICTS = "/user-districts";
 
   private URL(){
 
