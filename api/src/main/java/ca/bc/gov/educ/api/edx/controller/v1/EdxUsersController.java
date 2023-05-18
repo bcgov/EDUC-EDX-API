@@ -82,6 +82,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public List<String> findAllEdxUserDistrictIDs(String permissionCode) {
+    return getService().getEdxUserDistrictsList(permissionCode);
+  }
+
+  @Override
   public EdxUser retrieveEdxUser(String id) {
     return userMapper.toStructure(getService().retrieveEdxUserByID(UUIDUtil.fromString(id)));
   }

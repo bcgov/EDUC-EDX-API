@@ -118,6 +118,17 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  public void testFindAllEdxUserDistrictIDs_GivenValidPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
+                    .param("permissionCode", "Exchange")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$.[0]", is(entity.getEdxUserDistrictEntities().iterator().next().getDistrictID().toString())));
+  }
+
+  @Test
   public void testFindEdxUsers_GivenValidDigitalIdentityID_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     UUID digitalIdentityID = entity.getDigitalIdentityID();

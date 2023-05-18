@@ -188,6 +188,16 @@ public class EdxUsersService {
   }
 
   /**
+   * Gets edx user districts list
+   * @param permissionCode permission code
+   * @return list of districts
+   */
+  public List<String> getEdxUserDistrictsList(String permissionCode) {
+    List<EdxUserDistrictEntity> districtIDs = edxUserDistrictRepository.findDistrictsByPermission(permissionCode);
+    return districtIDs.stream().map(district -> district.getDistrictID().toString()).distinct().toList();
+  }
+
+  /**
    * Find edx users list.
    *
    * @param digitalId the digital id
