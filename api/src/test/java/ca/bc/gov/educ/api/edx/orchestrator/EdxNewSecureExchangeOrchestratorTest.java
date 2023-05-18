@@ -118,7 +118,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
     SecureExchangeCreateSagaData sagaData = new SecureExchangeCreateSagaData();
-    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
+    SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "SCHOOL"), SecureExchangeCreate.class);
     sagaData.setSecureExchangeCreate(secureExchangeCreate);
     sagaData.setSchoolID(UUID.randomUUID());
     sagaData.setSchoolName("ABC School");

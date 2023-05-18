@@ -21,6 +21,10 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"isReadByExchangeContact\":\"false\",\"isReadByMinistry\":\"false\",\"secureExchangeStatusCode\":\"OPEN\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\", \"commentsList\": [{\"staffUserIdentifier\": \"TEST\", \"commentUserName\": \"JACKSON, JAMES\", \"content\": \"This is content\", \"updateUser\":\"TEST\",\"createUser\":\"TEST\"}]}";
   }
 
+  protected String secureExchangeCreateJson(final String ministryOwnershipTeamID, final String secureExchangeContactTypeCode) {
+    return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"isReadByExchangeContact\":\"false\",\"isReadByMinistry\":\"false\",\"secureExchangeStatusCode\":\"OPEN\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"" + ministryOwnershipTeamID + "\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"" +secureExchangeContactTypeCode + "\", \"commentsList\": [{\"staffUserIdentifier\": \"TEST\", \"commentUserName\": \"JACKSON, JAMES\", \"content\": \"This is content\", \"updateUser\":\"TEST\",\"createUser\":\"TEST\"}]}";
+  }
+
   protected String secureExchangeCommentJson(final String secureExchangeID) {
     return "{\n" +
       "  \"secureExchangeID\": \"" + secureExchangeID + "\",\n" +
@@ -45,12 +49,13 @@ public abstract class BaseSagaControllerTest extends BaseSecureExchangeControlle
     return entity;
   }
 
-  protected SecureExchangeCreateSagaData createSecureExchangeCreateSagaData(SecureExchangeCreate secureExchangeCreate, UUID schoolID, String schoolName, String ministryTeamName) {
+  protected SecureExchangeCreateSagaData createSecureExchangeCreateSagaData(SecureExchangeCreate secureExchangeCreate, UUID schoolID, String schoolName, UUID districtID, String districtName, String ministryTeamName) {
     SecureExchangeCreateSagaData sagaData = new SecureExchangeCreateSagaData();
-    sagaData.setSecureExchangeCreate(secureExchangeCreate);
     sagaData.setSecureExchangeCreate(secureExchangeCreate);
     sagaData.setSchoolID(schoolID);
     sagaData.setSchoolName(schoolName);
+    sagaData.setDistrictID(districtID);
+    sagaData.setDistrictName(districtName);
     sagaData.setMinistryTeamName(ministryTeamName);
     return sagaData;
   }
