@@ -19,11 +19,13 @@ public class SecureExchangeCreateSagaData extends BaseRequest implements Seriali
   @NotNull(message = "SecureExchange cannot be null")
   SecureExchangeCreate secureExchangeCreate;
 
-  @NotNull(message = "School ID cannot be null")
   UUID schoolID;
 
-  @NotNull(message = "School Name cannot be null")
   String schoolName;
+
+  UUID districtID;
+
+  String districtName;
 
   @NotNull(message = "Ministry Team Name cannot be null")
   String ministryTeamName;

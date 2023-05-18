@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
+import ca.bc.gov.educ.api.edx.constants.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -94,8 +95,14 @@ public class EdxNewSecureExchangeOrchestratorService {
    */
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
-    // query to find all the users to whom it should be sent
-    Set<String> emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCreateSagaData.getSchoolID(),"SECURE_EXCHANGE");
+    Set<String> emailIds = null;
+
+    if(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString())) {
+      emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCreateSagaData.getSchoolID(), "SECURE_EXCHANGE");
+    } else if(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.DISTRICT.toString())) {
+      emailIds = getEdxUsersService().findEdxUserEmailByDistrictIDAndPermissionCode(secureExchangeCreateSagaData.getDistrictID(), "SECURE_EXCHANGE");
+    }
+
     final var subject = emailProperties.getEdxNewSecureExchangeNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     for(String emailId : emailIds){
@@ -104,13 +111,11 @@ public class EdxNewSecureExchangeOrchestratorService {
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.new.secure.exchange.notification")
-        .emailFields(Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
+        .emailFields(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString()) ? Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()): Map.of("districtName", secureExchangeCreateSagaData.getDistrictName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
     }
-
-
   }
 
   /**

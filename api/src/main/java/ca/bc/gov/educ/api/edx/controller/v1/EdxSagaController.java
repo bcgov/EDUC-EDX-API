@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
+import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangeSagaPayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
@@ -61,6 +62,8 @@ public class EdxSagaController implements EdxSagaEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator;
 
+  private final CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator;
+
   /**
    * The Saga service.
    */
@@ -82,12 +85,14 @@ public class EdxSagaController implements EdxSagaEndpoint {
    * @param sagaService                               the saga service
    * @param orchestrators                             the orchestrators
    * @param secureExchangePayloadValidator            the secure exchange payload validator
+   * @param createSecureExchangeSagaPayloadValidator
    */
-  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
     this.secureExchangeCommentSagaValidator = secureExchangeCommentSagaValidator;
+    this.createSecureExchangeSagaPayloadValidator = createSecureExchangeSagaPayloadValidator;
     orchestrators.forEach(orchestrator -> this.orchestratorMap.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
@@ -119,7 +124,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
    */
   @Override
   public ResponseEntity<String> createNewSecureExchange(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
-    validatePayload(() -> getSecureExchangePayloadValidator().validatePayload(secureExchangeCreateSagaData.getSecureExchangeCreate(),true));
+    validatePayload(() -> createSecureExchangeSagaPayloadValidator.validatePayload(secureExchangeCreateSagaData,true));
     RequestUtil.setAuditColumnsForCreate(secureExchangeCreateSagaData);
     return this.processNewSecureExchangeMessageSaga(NEW_SECURE_EXCHANGE_SAGA, secureExchangeCreateSagaData);
 
