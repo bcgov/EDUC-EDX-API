@@ -15,7 +15,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -105,13 +104,14 @@ public class EdxNewSecureExchangeOrchestratorService {
 
     final var subject = emailProperties.getEdxNewSecureExchangeNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
+    final var instituteName = secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString()) ? secureExchangeCreateSagaData.getSchoolName() : secureExchangeCreateSagaData.getDistrictName();
     for(String emailId : emailIds){
       final var emailNotification = EmailNotification.builder()
         .fromEmail(from)
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.new.secure.exchange.notification")
-        .emailFields(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString()) ? Map.of("schoolName", secureExchangeCreateSagaData.getSchoolName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()): Map.of("districtName", secureExchangeCreateSagaData.getDistrictName(), "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
+        .emailFields(Map.of("instituteName", instituteName, "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
