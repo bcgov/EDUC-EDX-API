@@ -123,13 +123,14 @@ public class EdxSecureExchangeCommentOrchestratorService {
 
     final var subject = emailProperties.getEdxSecureExchangeCommentNotificationEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
+    final var instituteName = secureExchangeCommentSagaData.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString()) ? secureExchangeCommentSagaData.getSchoolName() : secureExchangeCommentSagaData.getDistrictName();
     for (String emailId : emailIds) {
       final var emailNotification = EmailNotification.builder()
         .fromEmail(from)
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.secure.exchange.comment.notification")
-        .emailFields(secureExchangeCommentSagaData.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString()) ? Map.of("schoolName", secureExchangeCommentSagaData.getSchoolName(), "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl(),"messageSequenceNumber",secureExchangeCommentSagaData.getSequenceNumber()) : Map.of("districtName", secureExchangeCommentSagaData.getDistrictName(), "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl(),"messageSequenceNumber",secureExchangeCommentSagaData.getSequenceNumber()))
+        .emailFields(Map.of("instituteName", instituteName, "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl(),"messageSequenceNumber",secureExchangeCommentSagaData.getSequenceNumber()))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
