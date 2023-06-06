@@ -16,30 +16,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EdxActivationCodeSagaDataPayLoadValidator {
+public class EdxActivationCodeSagaDataPayloadValidator {
   @Getter(AccessLevel.PRIVATE)
   private final EdxRoleRepository edxRoleRepository;
   private static final String EDX_ACTIVATION_ROLE_CODE = "edxActivationRoleCode";
   private final ApplicationProperties props;
 
-  public EdxActivationCodeSagaDataPayLoadValidator(EdxRoleRepository edxRoleRepository, ApplicationProperties props) {
+  public EdxActivationCodeSagaDataPayloadValidator(EdxRoleRepository edxRoleRepository, ApplicationProperties props) {
     this.edxRoleRepository = edxRoleRepository;
     this.props = props;
   }
 
   public List<FieldError> validateEdxActivationCodeSagaDataPayload(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
-    final List<FieldError> apiValidationErrors = new ArrayList<>();
-    apiValidationErrors.addAll(validateEdxActivationCodes(edxUserActivationInviteSagaData.getEdxActivationRoleCodes()));
-    return apiValidationErrors;
+    return new ArrayList<>(validateEdxActivationCodes(edxUserActivationInviteSagaData.getEdxActivationRoleCodes()));
   }
 
   public List<FieldError> validateDistrictUserEdxActivationCodeSagaDataPayload(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
-    final List<FieldError> apiValidationErrors = new ArrayList<>();
-    apiValidationErrors.addAll(validateEdxActivationCodes(edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes()));
-    return apiValidationErrors;
+    return new ArrayList<>(validateEdxActivationCodes(edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes()));
   }
 
-  public List<FieldError> validateEdxActivationCodes(List<String> roles) {
+  private List<FieldError> validateEdxActivationCodes(List<String> roles) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     for(var role: roles) {
       if (!props.getAllowRolesList().contains(role)) {

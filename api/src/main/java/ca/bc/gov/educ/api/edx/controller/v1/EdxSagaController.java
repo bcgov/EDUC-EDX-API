@@ -13,7 +13,7 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangeSagaPayloadValidator;
-import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,7 +42,7 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 public class EdxSagaController implements EdxSagaEndpoint {
 
   @Getter(AccessLevel.PRIVATE)
-  private final EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator;
+  private final EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator;
 
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangePayloadValidator secureExchangePayloadValidator;
@@ -60,7 +60,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;

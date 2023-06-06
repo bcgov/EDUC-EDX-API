@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EdxActivationCodePayLoadValidator {
+public class EdxActivationCodePayloadValidator {
 
   private final ApplicationProperties props;
   private static final String EDX_ROLE_CODE = "edxRoleCode";
-  public EdxActivationCodePayLoadValidator(ApplicationProperties props) {
+  public EdxActivationCodePayloadValidator(ApplicationProperties props) {
     this.props = props;
   }
 
@@ -64,7 +64,7 @@ public class EdxActivationCodePayLoadValidator {
   public List<FieldError> validateEdxActivateUserPayload(EdxActivateUser edxActivateUser) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (edxActivateUser.getSchoolID() == null && edxActivateUser.getDistrictID() == null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "SchoolID or DistrictID Information is required for User Activation"));
+      apiValidationErrors.add(createFieldError("edxActivateUser", null, "SchoolID or DistrictID Information is required for User Activation"));
     }
     if (edxActivateUser.getSchoolID() != null && edxActivateUser.getDistrictID() != null) {
       apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "Either SchoolID or DistrictID Information should be present per User Activation Request"));

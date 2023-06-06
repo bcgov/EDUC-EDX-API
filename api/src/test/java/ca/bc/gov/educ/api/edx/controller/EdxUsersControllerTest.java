@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
@@ -36,15 +35,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
-  private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
   @Autowired
   private MockMvc mockMvc;
   @Autowired
   EdxUsersController controller;
-
   @Autowired
   MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
-
   @Autowired
   private EdxUserRepository edxUserRepository;
 
@@ -59,12 +55,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Autowired
   private EdxUserDistrictRepository edxUserDistrictRepository;
-
-  @Autowired
-  private EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
-
-  @Autowired
-  private EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
 
   @Autowired
   private EdxActivationCodeRepository edxActivationCodeRepository;
@@ -167,7 +157,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
   @Test
   public void testFindEdxUsers_GivenNoInput_ShouldReturnOkStatusWithResult() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
+    this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
@@ -177,7 +167,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindEdxUsers_GivenInvalidSchoolIDAsInput_ShouldReturnOkStatusWithEmptyResult() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
+    this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
@@ -189,7 +179,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testFindEdxUsers_GivenInValidDigitalIdentityID_ShouldReturnOkStatusWithEmptyResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-    UUID digitalIdentityID = entity.getDigitalIdentityID();
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("digitalId", UUID.randomUUID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
@@ -394,7 +383,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     edxUserSchool.setEdxUserSchoolID(UUID.randomUUID().toString());
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
 
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
@@ -432,7 +421,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
 
-    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
@@ -460,7 +449,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     edxUserSchool.setEdxUserID(null);
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
 
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
@@ -489,7 +478,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     edxUserSchool.setEdxUserID(UUID.randomUUID().toString());
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
 
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
@@ -566,6 +555,28 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     resultActions3.andExpect(jsonPath("$.edxUserSchoolRoles", hasSize(0))).andDo(print()).andExpect(status().isOk());
   }
 
+@Test
+  public void testUpdateEdxUserSchool_GivenInvalidRoleData_ShouldBeBadRequest() throws Exception {
+    //create and save EdxUser with a school
+    EdxUser edxUser = createEdxUser();
+    EdxUserSchool userSchool = createEdxUserSchool(edxUser);
+    userSchool.setEdxUserSchoolRoles(new ArrayList<>());
+    EdxUserSchoolRole role = new EdxUserSchoolRole();
+    role.setEdxRoleCode("ABC");
+    userSchool.getEdxUserSchoolRoles().add(role);
+    edxUser.setEdxUserSchools(new ArrayList<>());
+    edxUser.getEdxUserSchools().add(userSchool);
+    String json = getJsonString(edxUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+    resultActions.andDo(print()).andExpect(status().isBadRequest());
+
+    objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
+  }
+
   @Test
   public void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
@@ -601,7 +612,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
-    val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
+    objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), randomId)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
@@ -675,7 +686,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isCreated());
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
 
-    ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNoContent());
 
@@ -862,7 +873,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
 
-    val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
+    objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
 
     var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
     var roleEntity = getEdxRoleEntity();
@@ -968,7 +979,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     var savedRoleEntity = edxRoleRepository.save(roleEntity);
 
-    String guid = UUID.randomUUID().toString();
     EdxUserSchoolRole edxUserSchoolRole = new EdxUserSchoolRole();
     edxUserSchoolRole.setEdxUserSchoolID(edxUsrSchool.getEdxUserSchoolID());
     edxUserSchoolRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
@@ -1073,7 +1083,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       edxUserID
     );
 
-    val resultActions = this.mockMvc.perform(
+    this.mockMvc.perform(
         delete(URL.BASE_URL_USERS + "/activation-code/user/" + edxUserID
           )
         .contentType(MediaType.APPLICATION_JSON)
@@ -1116,7 +1126,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     UUID districtID = UUID.randomUUID();
-    val activationCodes = this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setDistrictID(districtID);
     edxActivateUser.setPersonalActivationCode("WXYZ");
@@ -1229,14 +1239,14 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testEdxActivateUsers_GivenInValidInput_EdxUserAlreadyExistsWithTheSchoolIDInDB_EdxUserIsNotUpdated_WithConflictErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-    var activationCodeData = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 2, userEntity.getEdxUserSchoolEntities().iterator().next().getSchoolID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 2, userEntity.getEdxUserSchoolEntities().iterator().next().getSchoolID());
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setSchoolID(userEntity.getEdxUserSchoolEntities().iterator().next().getSchoolID());
     edxActivateUser.setPersonalActivationCode("WXYZ");
     edxActivateUser.setPrimaryEdxCode("ABCDE");
     edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
     String activateUserJson = getJsonString(edxActivateUser);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
@@ -1248,11 +1258,11 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
   UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 0, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 0, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1266,11 +1276,11 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdatessssIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 0, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 0, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1278,7 +1288,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string("\"SCHOOL\""));
 
-    val secondResult = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1286,7 +1296,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string("\"SCHOOL\""));
 
-    val thirdResult = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1297,7 +1307,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkIsAlreadyClicked_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
@@ -1318,12 +1328,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkHasAlreadyExpired_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,2, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
 
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1336,7 +1346,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(UUID.randomUUID().toString());
     String jsonString = getJsonString(edxActivationCode);
@@ -1358,7 +1368,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1376,7 +1386,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
     edxActivationCode.setEdxActivationCodeId(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1391,12 +1401,12 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
-   val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
-   activationRole.setEdxActivationCodeId(validationCode.toString());
-   activationRole.setEdxActivationRoleId(validationCode.toString());
-   activationRole.setEdxRoleCode(null);
+    val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
+    activationRole.setEdxActivationCodeId(validationCode.toString());
+    activationRole.setEdxActivationRoleId(validationCode.toString());
+    activationRole.setEdxRoleCode(null);
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1417,7 +1427,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val activationRole = edxActivationCode.getEdxActivationRoles().get(0);
     activationRole.setEdxRoleCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1434,7 +1444,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
     edxActivationCode.getEdxActivationRoles().clear();
     String jsonString = getJsonString(edxActivationCode);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1450,7 +1460,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID validationCode = UUID.randomUUID();
     val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
 
-    val resultActions = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+entityList.get(0).getEdxActivationCodeId())
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+entityList.get(0).getEdxActivationCodeId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
@@ -1461,9 +1471,9 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testDeleteActivationCode_GivenInValidInput_WillReturnNotFoundErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
 
-    val resultActions = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+validationCode)
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+validationCode)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
@@ -1475,7 +1485,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testFindPrimaryEdxActivationCode_ForSchool_GivenValidInput_WillReturnSuccess() throws Exception {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.schoolID", not(emptyOrNullString())))
@@ -1489,7 +1499,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testFindPrimaryEdxActivationCode_ForDistrict_GivenValidInput_WillReturnSuccess() throws Exception {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.schoolID", is(nullValue())))
@@ -1505,7 +1515,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + secondaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + secondaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
@@ -1523,7 +1533,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + secondaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + secondaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
@@ -1538,7 +1548,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindPrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnNotFound() throws Exception {
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
@@ -1546,7 +1556,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindPrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnNotFound() throws Exception {
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
@@ -1555,7 +1565,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testFindPrimaryEdxActivationCode_ForSchool_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + nonPrimaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + nonPrimaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
@@ -1564,7 +1574,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Test
   public void testFindPrimaryEdxActivationCode_ForDistrict_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
-    ResultActions resultActions = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + nonPrimaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + nonPrimaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
@@ -1576,7 +1586,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(primaryActivationCode.getSchoolID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1591,7 +1601,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(primaryActivationCode.getDistrictID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1606,7 +1616,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID schoolID = UUID.randomUUID();
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1625,7 +1635,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     UUID districtID = UUID.randomUUID();
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1646,7 +1656,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1670,7 +1680,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1693,7 +1703,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + schoolID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1715,7 +1725,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + districtID)
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1736,7 +1746,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setDistrictID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + toJsonStringify.getSchoolID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + toJsonStringify.getSchoolID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1749,7 +1759,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + toJsonStringify.getDistrictID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + toJsonStringify.getDistrictID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1761,7 +1771,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenNullInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1774,7 +1784,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1788,7 +1798,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     toJsonStringify.setSchoolID(null);
     toJsonStringify.setDistrictID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1802,7 +1812,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     toJsonStringify.setSchoolID(UUID.randomUUID());
     toJsonStringify.setDistrictID(null);
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1814,7 +1824,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenMismatchedSchoolIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1826,7 +1836,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenMismatchedDistrictIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID(),"EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
-    ResultActions resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID().toString())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID())
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
@@ -1951,7 +1961,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
 
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
 
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
@@ -1988,7 +1998,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
 
-    val resultActions2 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
                     .accept(MediaType.APPLICATION_JSON)
@@ -2016,7 +2026,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     edxUserDistrict.setEdxUserID(null);
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
 
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
@@ -2045,7 +2055,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     edxUserDistrict.setEdxUserID(UUID.randomUUID().toString());
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
 
-    val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
 
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
@@ -2156,7 +2166,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
-    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+    objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), randomId)
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
@@ -2229,7 +2239,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .andDo(print()).andExpect(status().isCreated());
     val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
 
-    ResultActions resultActions2 = this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
+    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
             .andDo(print()).andExpect(status().isNoContent());
 
@@ -2415,7 +2425,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
 
-    val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
+    objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
 
     var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
     var roleEntity = getEdxRoleEntity();
@@ -2522,7 +2532,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     var savedRoleEntity = edxRoleRepository.save(roleEntity);
 
-    String guid = UUID.randomUUID().toString();
     EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
     EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
     EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());
@@ -2581,7 +2590,6 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     var savedRoleEntity = edxRoleRepository.save(roleEntity);
 
-    String guid = UUID.randomUUID().toString();
     EdxUserDistrictRole EdxUserDistrictRole = new EdxUserDistrictRole();
     EdxUserDistrictRole.setEdxUserDistrictID(userDistrict.getEdxUserDistrictID());
     EdxUserDistrictRole.setEdxRoleCode(EdxRoleMapper.mapper.toStructure(savedRoleEntity).getEdxRoleCode());

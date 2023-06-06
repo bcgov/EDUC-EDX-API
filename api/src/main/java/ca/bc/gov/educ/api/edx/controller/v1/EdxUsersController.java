@@ -13,9 +13,9 @@ import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
-import ca.bc.gov.educ.api.edx.validator.EdxActivationCodePayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxActivationCodePayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxPrimaryActivationCodeValidator;
-import ca.bc.gov.educ.api.edx.validator.EdxUserPayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxUserPayloadValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,10 +44,10 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private final EdxUsersService service;
 
   @Getter(AccessLevel.PRIVATE)
-  private final EdxUserPayLoadValidator edxUserPayLoadValidator;
+  private final EdxUserPayloadValidator edxUserPayLoadValidator;
 
   @Getter(AccessLevel.PRIVATE)
-  private final EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator;
+  private final EdxActivationCodePayloadValidator edxActivationCodePayLoadValidator;
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator;
@@ -68,7 +68,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
   @Autowired
-  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator, EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator, ApplicationProperties props) {
+  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayloadValidator edxUserPayLoadValidator, EdxActivationCodePayloadValidator edxActivationCodePayLoadValidator, EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator, ApplicationProperties props) {
     this.service = secureExchange;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
     this.edxActivationCodePayLoadValidator = edxActivationCodePayLoadValidator;
@@ -103,7 +103,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
 
   @Override
   public EdxUser createEdxUser(EdxUser edxUser) {
-    validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserPayload(edxUser));
+    validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(edxUser, true));
     RequestUtil.setAuditColumnsForCreate(edxUser);
     updateAuditColumnsForUserSchoolAndRoles(edxUser);
     updateAuditColumnsForUserDistrictAndRoles(edxUser);
@@ -143,7 +143,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public EdxUserSchool createEdxSchoolUser(UUID id, EdxUserSchool edxUserSchool) {
+  public EdxUserSchool createEdxUserSchool(UUID id, EdxUserSchool edxUserSchool) {
     validatePayload(() -> getEdxUserPayLoadValidator().validateCreateEdxUserSchoolPayload(id, edxUserSchool));
     RequestUtil.setAuditColumnsForCreate(edxUserSchool);
     if (!CollectionUtils.isEmpty(edxUserSchool.getEdxUserSchoolRoles())) {
@@ -160,7 +160,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public ResponseEntity<Void> deleteEdxSchoolUserById(UUID id, UUID edxUserSchoolId) {
+  public ResponseEntity<Void> deleteEdxUserSchoolById(UUID id, UUID edxUserSchoolId) {
     getService().deleteEdxSchoolUserById(id, edxUserSchoolId);
     return ResponseEntity.noContent().build();
   }
@@ -173,7 +173,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public ResponseEntity<Void> deleteEdxSchoolUserRoleById(UUID id, UUID edxUserSchoolRoleId) {
+  public ResponseEntity<Void> deleteEdxUserSchoolRoleById(UUID id, UUID edxUserSchoolRoleId) {
     getService().deleteEdxSchoolUserRoleById(id, edxUserSchoolRoleId);
     return ResponseEntity.noContent().build();
   }
@@ -182,11 +182,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public List<EdxRole> findAllEdxRoles(InstituteTypeCode instituteTypeCode) {
     if (instituteTypeCode == null) {
       return getService().findAllEdxRoles().stream()
-              .filter(edxRoleEntity -> filterRole(edxRoleEntity))
+              .filter(this::filterRole)
               .map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     } else {
       return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream()
-              .filter(edxRoleEntity -> filterRole(edxRoleEntity))
+              .filter(this::filterRole)
               .map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     }
   }
