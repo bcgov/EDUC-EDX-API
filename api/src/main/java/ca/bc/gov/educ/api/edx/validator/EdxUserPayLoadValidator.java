@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
@@ -12,6 +13,12 @@ import java.util.UUID;
 public class EdxUserPayLoadValidator {
 
     private static final String EDX_USER_ID = "edxUserID";
+    private static final String EDX_ROLE_CODE = "edxRoleCode";
+    private final ApplicationProperties props;
+
+    public EdxUserPayLoadValidator(ApplicationProperties props) {
+        this.props = props;
+    }
 
     public List<FieldError> validateEdxUserPayload(EdxUser edxUser, boolean isCreateOperation) {
         final List<FieldError> apiValidationErrors = new ArrayList<>();
@@ -36,13 +43,21 @@ public class EdxUserPayLoadValidator {
     public List<FieldError> validateEdxUserSchoolPayload(UUID edxUserId, EdxUserSchool edxUserSchool, boolean isCreateOperation) {
         final List<FieldError> apiValidationErrors = new ArrayList<>();
         if (isCreateOperation && edxUserSchool.getEdxUserSchoolID() != null) {
-            apiValidationErrors.add(createFieldError("edxUserSchoolID", edxUserSchool.getEdxUserSchoolID(), "edxUserSchoolID should be null for post operation."));
+           apiValidationErrors.add(createFieldError("edxUserSchoolID", edxUserSchool.getEdxUserSchoolID(), "edxUserSchoolID should be null for post operation."));
         }
         if (isCreateOperation && edxUserSchool.getEdxUserID() == null) {
-            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserID(), "edxUserID should not be null for post operation."));
+           apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserID(), "edxUserID should not be null for post operation."));
         }
         if (!edxUserId.toString().equals(edxUserSchool.getEdxUserID())) {
-            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserSchoolID(), "edxUserID in path and payload edxUserId mismatch."));
+           apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUserSchool.getEdxUserSchoolID(), "edxUserID in path and payload edxUserId mismatch."));
+        }
+        if(edxUserSchool.getEdxUserSchoolRoles() != null) {
+           for (var role : edxUserSchool.getEdxUserSchoolRoles()) {
+              if (!props.getAllowRolesList().contains(role.getEdxRoleCode())) {
+                 apiValidationErrors.add(createFieldError(EDX_ROLE_CODE, role.getEdxRoleCode(), "edxRoleCode is not valid according to the allow list."));
+                 break;
+              }
+           }
         }
         return apiValidationErrors;
     }

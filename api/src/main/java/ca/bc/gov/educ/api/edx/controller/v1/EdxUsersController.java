@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.mappers.v1.*;
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
@@ -50,6 +51,8 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   @Getter(AccessLevel.PRIVATE)
   private final EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator;
 
+  private final ApplicationProperties props;
+
   private static final MinistryTeamMapper mapper = MinistryTeamMapper.mapper;
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
 
@@ -64,11 +67,12 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private static final EdxActivationCodeMapper EDX_ACTIVATION_CODE_MAPPER = EdxActivationCodeMapper.mapper;
 
   @Autowired
-  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator, EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator) {
+  EdxUsersController(final EdxUsersService secureExchange, EdxUserPayLoadValidator edxUserPayLoadValidator, EdxActivationCodePayLoadValidator edxActivationCodePayLoadValidator, EdxPrimaryActivationCodeValidator edxPrimaryActivationCodeValidator, ApplicationProperties props) {
     this.service = secureExchange;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
     this.edxActivationCodePayLoadValidator = edxActivationCodePayLoadValidator;
     this.edxPrimaryActivationCodeValidator = edxPrimaryActivationCodeValidator;
+    this.props = props;
   }
 
   @Override
@@ -178,9 +182,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
     if (instituteTypeCode == null) {
       return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     } else {
-      return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+      return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream().filter(edxRoleEntity -> {
+        var allowRolesList = props.getAllowRolesList();
+        return allowRolesList.contains(edxRoleEntity.getEdxRoleCode());
+      }).map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     }
-
   }
 
   @Override

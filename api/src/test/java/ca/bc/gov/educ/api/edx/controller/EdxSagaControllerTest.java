@@ -10,7 +10,6 @@ import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
-import ca.bc.gov.educ.api.edx.service.v1.MoveSchoolOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +30,6 @@ import java.util.UUID;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -220,7 +218,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Invalid Edx Roles in the payload")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoleCode is not valid according to the allow list.")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -351,7 +349,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Invalid Edx Roles in the payload")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoleCode is not valid according to the allow list.")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 

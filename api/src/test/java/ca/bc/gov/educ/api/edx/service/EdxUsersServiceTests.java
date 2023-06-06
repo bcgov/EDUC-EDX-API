@@ -113,7 +113,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     var edxUserSchoolRollEntity = List.copyOf(edxUserSchoolEntity.getEdxUserSchoolRoleEntities()).get(0);
     assertThat(edxUserSchoolRollEntity).isNotNull();
     assertThat(edxUserSchoolRollEntity.getEdxRoleCode()).isNotNull();
-    assertThat(edxUserSchoolRollEntity.getEdxRoleCode()).isEqualTo("Admin");
+    assertThat(edxUserSchoolRollEntity.getEdxRoleCode()).isEqualTo("EDX_SCHOOL_ADMIN");
   }
 
   @Test

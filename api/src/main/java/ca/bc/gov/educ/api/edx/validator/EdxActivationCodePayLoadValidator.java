@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
@@ -12,6 +13,12 @@ import java.util.List;
 
 @Component
 public class EdxActivationCodePayLoadValidator {
+
+  private final ApplicationProperties props;
+  private static final String EDX_ROLE_CODE = "edxRoleCode";
+  public EdxActivationCodePayLoadValidator(ApplicationProperties props) {
+    this.props = props;
+  }
 
   public List<FieldError> validateEdxActivationCodePayload(EdxActivationCode edxActivationCode) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
@@ -43,6 +50,9 @@ public class EdxActivationCodePayLoadValidator {
     }
     if (activationRole.getEdxRoleCode() == null) {
       apiValidationErrors.add(createFieldError("edxRoleId", activationRole.getEdxActivationRoleId(), "edxRoleCode should not be null for post operation."));
+    }
+    if (!props.getAllowRolesList().contains(activationRole.getEdxRoleCode())) {
+      apiValidationErrors.add(createFieldError(EDX_ROLE_CODE, activationRole.getEdxRoleCode(), "edxRoleCode is not valid according to the allow list."));
     }
     return apiValidationErrors;
   }

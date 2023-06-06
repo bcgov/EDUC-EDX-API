@@ -5,9 +5,7 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
-import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
-import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
-import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
+import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
@@ -102,8 +100,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
-      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRoleCode", is("Admin")))
-      .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRoleCode", is("Admin")));
+      .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
+      .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRoleCode", is("EDX_SCHOOL_ADMIN")));
   }
 
   @Test
@@ -662,7 +660,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
     EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
     var role = new EdxUserSchoolRole();
-    role.setEdxRoleCode("EDX_ADMIN");
+    role.setEdxRoleCode("EDX_SCHOOL_ADMIN");
     edxUserSchool.setEdxUserSchoolRoles(new ArrayList<>());
     edxUserSchool.getEdxUserSchoolRoles().add(role);
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
@@ -741,7 +739,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInValidData_UserSchoolRoleIDNottNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  public void testCreateEdxUsersSchoolRole_GivenInvalidData_UserSchoolRoleIDNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -1424,7 +1422,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
-      .andExpect(jsonPath("$.message", is("The Role Id provided in the payload does not exist.")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -1844,7 +1842,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(3)))
-      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE")))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
       .andExpect(jsonPath("$.[0].edxRolePermissions.[0].edxPermissionCode", is("SECURE_EXCHANGE")))
       .andExpect(jsonPath("$.[1].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
       .andExpect(jsonPath("$.[1].edxRolePermissions", hasSize(2)))
@@ -1862,13 +1860,34 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(2)))
-      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE")))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
       .andExpect(jsonPath("$.[0].edxRolePermissions", hasSize(1)))
       .andExpect(jsonPath("$.[1].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
       .andExpect(jsonPath("$.[1].edxRolePermissions",  hasSize(2)));
 
   }
 
+    @Test
+  public void testFindEdxRoles_ForSchoolTypeInstitutionCodeAllowList_ShouldReturnOkStatusWithResult() throws Exception {
+    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
+    EdxPermissionEntity secureExchangePermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("ABC_TEST"));
+    EdxRoleEntity secureExchangeRole = createEdxRoleForSchoolAndDistrict("ABC_TEST","ABC Test",false);
+
+    var secureExchangeRolePermissionEntity = getEdxRolePermissionEntity(secureExchangeRole, secureExchangePermissionEntity);
+    secureExchangeRole.setEdxRolePermissionEntities(Set.of(secureExchangeRolePermissionEntity));
+    edxRoleRepository.save(secureExchangeRole);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
+        .param("instituteType",InstituteTypeCode.SCHOOL.toString())
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$",  hasSize(2)))
+      .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
+      .andExpect(jsonPath("$.[0].edxRolePermissions", hasSize(1)))
+      .andExpect(jsonPath("$.[1].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
+      .andExpect(jsonPath("$.[1].edxRolePermissions",  hasSize(2)));
+
+  }
 
   @Test
   public void testFindEdxRoles_ForDistrictTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
