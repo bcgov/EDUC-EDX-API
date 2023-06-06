@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.SecureExchangeRuntimeException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.mappers.v1.*;
+import ca.bc.gov.educ.api.edx.model.v1.EdxRoleEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
@@ -180,13 +181,19 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   @Override
   public List<EdxRole> findAllEdxRoles(InstituteTypeCode instituteTypeCode) {
     if (instituteTypeCode == null) {
-      return getService().findAllEdxRoles().stream().map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+      return getService().findAllEdxRoles().stream()
+              .filter(edxRoleEntity -> filterRole(edxRoleEntity))
+              .map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     } else {
-      return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream().filter(edxRoleEntity -> {
-        var allowRolesList = props.getAllowRolesList();
-        return allowRolesList.contains(edxRoleEntity.getEdxRoleCode());
-      }).map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
+      return getService().findAllEdxRolesForInstituteTypeCode(instituteTypeCode).stream()
+              .filter(edxRoleEntity -> filterRole(edxRoleEntity))
+              .map(EDX_ROLE_MAPPER::toStructure).collect(Collectors.toList());
     }
+  }
+
+  private boolean filterRole(EdxRoleEntity edxRoleEntity){
+    var allowRolesList = props.getAllowRolesList();
+    return allowRolesList.contains(edxRoleEntity.getEdxRoleCode());
   }
 
   @Override
