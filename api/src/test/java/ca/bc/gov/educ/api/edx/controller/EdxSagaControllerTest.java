@@ -819,6 +819,27 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
             .andDo(print()).andExpect(status().isAccepted());
   }
 
+  @Test
+  public void testEdxMoveSchoolWithDisplayNameNoSpecChars_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+    School school = createDummySchool();
+    school.setDisplayNameNoSpecialChars("Test Special Chars.");
+
+    MoveSchoolData sagaData = new MoveSchoolData();
+    sagaData.setToSchool(school);
+    sagaData.setMoveDate(String.valueOf(LocalDateTime.now().minusDays(1).withNano(0)));
+    sagaData.setFromSchoolId("be44a3f7-1a04-938e-dcdc-118989f6dd23");
+    sagaData.setCreateUser("Test");
+    sagaData.setUpdateUser("Test");
+
+    String jsonString = getJsonString(sagaData);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
+            .andDo(print()).andExpect(status().isAccepted());
+  }
+
   private MoveSchoolData createDummyMoveSchoolSagaData() {
     MoveSchoolData moveSchool = new MoveSchoolData();
     moveSchool.setToSchool(createDummySchool());
