@@ -136,8 +136,8 @@ public abstract class BaseSecureExchangeAPITest {
 
   protected EdxRoleEntity getEdxRoleEntity() {
     EdxRoleEntity entity = new EdxRoleEntity();
-    entity.setEdxRoleCode("Admin");
-    entity.setLabel("Admin");
+    entity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    entity.setLabel("EDX School Admin");
     entity.setIsDistrictRole(false);
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
@@ -454,7 +454,7 @@ public abstract class BaseSecureExchangeAPITest {
     EdxPermissionEntity secureExchangePermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("SECURE_EXCHANGE"));
     EdxPermissionEntity adminPermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("EDX_USER_ADMIN"));
 
-    EdxRoleEntity secureExchangeRole = createEdxRoleForSchoolAndDistrict("SECURE_EXCHANGE","Secure Exchange",false);
+    EdxRoleEntity secureExchangeRole = createEdxRoleForSchoolAndDistrict("SECURE_EXCHANGE_SCHOOL","Secure Exchange",false);
 
     var secureExchangeRolePermissionEntity = getEdxRolePermissionEntity(secureExchangeRole, secureExchangePermissionEntity);
     secureExchangeRole.setEdxRolePermissionEntities(Set.of(secureExchangeRolePermissionEntity));
@@ -474,7 +474,7 @@ public abstract class BaseSecureExchangeAPITest {
 
   }
 
-  private  EdxRoleEntity createEdxRoleForSchoolAndDistrict(String roleCode, String label,boolean isDistrict) {
+  protected EdxRoleEntity createEdxRoleForSchoolAndDistrict(String roleCode, String label,boolean isDistrict) {
     EdxRoleEntity entity = new EdxRoleEntity();
     entity.setEdxRoleCode(roleCode);
     entity.setLabel(label);
@@ -486,7 +486,7 @@ public abstract class BaseSecureExchangeAPITest {
     return entity;
   }
 
-  private  EdxPermissionEntity createEdxPermissionForSchoolAndDistrict(String permissionCode){
+  protected EdxPermissionEntity createEdxPermissionForSchoolAndDistrict(String permissionCode){
     EdxPermissionEntity entity = new EdxPermissionEntity();
     entity.setEdxPermissionCode(permissionCode);
     entity.setCreateUser("test");

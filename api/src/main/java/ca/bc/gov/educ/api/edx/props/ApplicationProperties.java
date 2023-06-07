@@ -60,4 +60,7 @@ public class ApplicationProperties {
 
   @Value("${edx.activation.code.valid.characters}")
   private String edxActivationCodeValidCharacters;
+
+  @Value("${roles.allow.list}")
+  private List<String> allowRolesList;
 }

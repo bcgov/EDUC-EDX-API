@@ -13,7 +13,7 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangeSagaPayloadValidator;
-import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayLoadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,57 +37,30 @@ import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
 import static lombok.AccessLevel.PRIVATE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
-/**
- * The type Edx saga controller.
- */
 @RestController
 @Slf4j
 public class EdxSagaController implements EdxSagaEndpoint {
 
-  /**
-   * The Edx activation code saga data pay load validator.
-   */
   @Getter(AccessLevel.PRIVATE)
-  private final EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator;
+  private final EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator;
 
-  /**
-   * The Secure exchange payload validator.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangePayloadValidator secureExchangePayloadValidator;
 
-  /**
-   * The Secure exchange payload validator.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator;
 
   private final CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator;
 
-  /**
-   * The Saga service.
-   */
   @Getter(PRIVATE)
   private final SagaService sagaService;
 
-  /**
-   * The Orchestrator map.
-   */
   @Getter(PRIVATE)
   private final Map<String, Orchestrator> orchestratorMap = new HashMap<>();
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  /**
-   * Instantiates a new Edx saga controller.
-   *
-   * @param edxActivationCodeSagaDataPayLoadValidator the edx activation code saga data pay load validator
-   * @param sagaService                               the saga service
-   * @param orchestrators                             the orchestrators
-   * @param secureExchangePayloadValidator            the secure exchange payload validator
-   * @param createSecureExchangeSagaPayloadValidator
-   */
-  public EdxSagaController(EdxActivationCodeSagaDataPayLoadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
@@ -97,18 +70,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
 
-  /**
-   * Edx school user activation invite response entity.
-   *
-   * @param edxUserActivationInviteSagaData the edx user activation invite saga data
-   * @return the response entity
-   */
   @Override
   public ResponseEntity<String> edxSchoolUserActivationInvite(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationInviteSagaData));
     RequestUtil.setAuditColumnsForCreate(edxUserActivationInviteSagaData);
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA, edxUserActivationInviteSagaData);
   }
+
   @Override
   public ResponseEntity<String> edxSchoolUserActivationRelink(EdxUserSchoolActivationRelinkSagaData edxUserActivationRelinkSagaData) {
     validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeRelinkSchoolSagaDataPayload(edxUserActivationRelinkSagaData));
@@ -116,12 +84,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_RELINK_SAGA, edxUserActivationRelinkSagaData);
   }
 
-  /**
-   * Create new secure exchange response entity.
-   *
-   * @param secureExchangeCreateSagaData the secure exchange create saga data
-   * @return the response entity
-   */
   @Override
   public ResponseEntity<String> createNewSecureExchange(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
     validatePayload(() -> createSecureExchangeSagaPayloadValidator.validatePayload(secureExchangeCreateSagaData,true));
@@ -130,12 +92,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   }
 
-  /**
-   * Create secure exchange comment response entity.
-   *
-   * @param secureExchangeCommentSagaData the secure exchange comment saga data
-   * @return the response entity
-   */
   @Override
   public ResponseEntity<String> createSecureExchangeComment(SecureExchangeCommentSagaData secureExchangeCommentSagaData) {
     validatePayload(() -> getSecureExchangeCommentSagaValidator().validateSecureExchangeCommentSagaPayload(secureExchangeCommentSagaData));
@@ -162,13 +118,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolData);
   }
 
-  /**
-   * Process move school saga response entity.
-   *
-   * @param sagaName                      the saga name
-   * @param moveSchoolData            move school saga data
-   * @return the response entity
-   */
   private ResponseEntity<String> processMoveSchoolSaga(SagaEnum sagaName, MoveSchoolData moveSchoolData) {
     try {
       RequestUtil.setAuditColumnsForCreate(moveSchoolData);
@@ -179,13 +128,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     }
   }
 
-  /**
-   * Process secure exchange comment saga response entity.
-   *
-   * @param sagaName                      the saga name
-   * @param secureExchangeCommentSagaData the secure exchange comment saga data
-   * @return the response entity
-   */
   private ResponseEntity<String> processSecureExchangeCommentSaga(SagaEnum sagaName, SecureExchangeCommentSagaData secureExchangeCommentSagaData) {
     try {
       val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),secureExchangeCommentSagaData);
@@ -195,13 +137,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     }
   }
 
-  /**
-   * Process edx school user activation link saga response entity.
-   *
-   * @param sagaName                        the saga name
-   * @param edxUserActivationInviteSagaData the edx user activation invite saga data
-   * @return the response entity
-   */
   private ResponseEntity<String> processEdxSchoolUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
     final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(edxUserActivationInviteSagaData.getSchoolID(), edxUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
@@ -232,13 +167,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     }
   }
 
-  /**
-   * Process new secure exchange message saga response entity.
-   *
-   * @param sagaName                     the saga name
-   * @param secureExchangeCreateSagaData the secure exchange create saga data
-   * @return the response entity
-   */
   private ResponseEntity<String> processNewSecureExchangeMessageSaga(final SagaEnum sagaName, final SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
 
     try {
@@ -247,14 +175,8 @@ public class EdxSagaController implements EdxSagaEndpoint {
     } catch (JsonProcessingException e) {
       throw new SagaRuntimeException(e);
     }
-
   }
 
-  /**
-   * Validate payload.
-   *
-   * @param validator the validator
-   */
   private void validatePayload(Supplier<List<FieldError>> validator) {
     val validationResult = validator.get();
     if (!validationResult.isEmpty()) {
@@ -264,18 +186,12 @@ public class EdxSagaController implements EdxSagaEndpoint {
     }
   }
 
-  /**
-   * Gets active statuses filter.
-   *
-   * @return the active statuses filter
-   */
   protected List<String> getActiveStatusesFilter() {
     final var statuses = new ArrayList<String>();
     statuses.add(SagaStatusEnum.IN_PROGRESS.toString());
     statuses.add(SagaStatusEnum.STARTED.toString());
     return statuses;
   }
-
 
   private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, SagaEntity sagaEntity) {
     try {

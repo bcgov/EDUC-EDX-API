@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationRelinkSagaData;
@@ -15,28 +16,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EdxActivationCodeSagaDataPayLoadValidator {
+public class EdxActivationCodeSagaDataPayloadValidator {
   @Getter(AccessLevel.PRIVATE)
   private final EdxRoleRepository edxRoleRepository;
+  private static final String EDX_ACTIVATION_ROLE_CODE = "edxActivationRoleCode";
+  private final ApplicationProperties props;
 
-  public EdxActivationCodeSagaDataPayLoadValidator(EdxRoleRepository edxRoleRepository) {
+  public EdxActivationCodeSagaDataPayloadValidator(EdxRoleRepository edxRoleRepository, ApplicationProperties props) {
     this.edxRoleRepository = edxRoleRepository;
+    this.props = props;
   }
 
   public List<FieldError> validateEdxActivationCodeSagaDataPayload(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
-    final List<FieldError> apiValidationErrors = new ArrayList<>();
-    int rolesListInDBSize = getEdxRoleRepository().findAllById(edxUserActivationInviteSagaData.getEdxActivationRoleCodes()).size();
-    if(rolesListInDBSize!= edxUserActivationInviteSagaData.getEdxActivationRoleCodes().size()){
-      apiValidationErrors.add(createFieldError("edxActivationRoleIds", edxUserActivationInviteSagaData.getEdxActivationRoleCodes(), "Invalid Edx Roles in the payload"));
-    }
-    return apiValidationErrors;
+    return new ArrayList<>(validateEdxActivationCodes(edxUserActivationInviteSagaData.getEdxActivationRoleCodes()));
   }
 
   public List<FieldError> validateDistrictUserEdxActivationCodeSagaDataPayload(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
+    return new ArrayList<>(validateEdxActivationCodes(edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes()));
+  }
+
+  private List<FieldError> validateEdxActivationCodes(List<String> roles) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
-    int rolesListInDBSize = getEdxRoleRepository().findAllById(edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes()).size();
-    if(rolesListInDBSize!= edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes().size()){
-      apiValidationErrors.add(createFieldError("edxActivationRoleIds", edxDistrictUserActivationInviteSagaData.getEdxActivationRoleCodes(), "Invalid Edx Roles in the payload"));
+    for(var role: roles) {
+      if (!props.getAllowRolesList().contains(role)) {
+        apiValidationErrors.add(createFieldError(EDX_ACTIVATION_ROLE_CODE, role, "edxActivationRoleCode is not valid according to the allow list."));
+        break;
+      }
     }
     return apiValidationErrors;
   }

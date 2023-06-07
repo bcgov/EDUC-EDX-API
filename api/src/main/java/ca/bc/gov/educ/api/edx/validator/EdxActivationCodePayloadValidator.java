@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivateUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationRole;
@@ -11,7 +12,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class EdxActivationCodePayLoadValidator {
+public class EdxActivationCodePayloadValidator {
+
+  private final ApplicationProperties props;
+  private static final String EDX_ROLE_CODE = "edxRoleCode";
+  public EdxActivationCodePayloadValidator(ApplicationProperties props) {
+    this.props = props;
+  }
 
   public List<FieldError> validateEdxActivationCodePayload(EdxActivationCode edxActivationCode) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
@@ -44,6 +51,9 @@ public class EdxActivationCodePayLoadValidator {
     if (activationRole.getEdxRoleCode() == null) {
       apiValidationErrors.add(createFieldError("edxRoleId", activationRole.getEdxActivationRoleId(), "edxRoleCode should not be null for post operation."));
     }
+    if (!props.getAllowRolesList().contains(activationRole.getEdxRoleCode())) {
+      apiValidationErrors.add(createFieldError(EDX_ROLE_CODE, activationRole.getEdxRoleCode(), "edxRoleCode is not valid according to the allow list."));
+    }
     return apiValidationErrors;
   }
 
@@ -54,7 +64,7 @@ public class EdxActivationCodePayLoadValidator {
   public List<FieldError> validateEdxActivateUserPayload(EdxActivateUser edxActivateUser) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (edxActivateUser.getSchoolID() == null && edxActivateUser.getDistrictID() == null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "SchoolID or DistrictID Information is required for User Activation"));
+      apiValidationErrors.add(createFieldError("edxActivateUser", null, "SchoolID or DistrictID Information is required for User Activation"));
     }
     if (edxActivateUser.getSchoolID() != null && edxActivateUser.getDistrictID() != null) {
       apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "Either SchoolID or DistrictID Information should be present per User Activation Request"));

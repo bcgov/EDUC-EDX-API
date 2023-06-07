@@ -14,8 +14,7 @@ public class EdxPrimaryActivationCodeValidator {
     private static final String SCHOOL_ID_FIELD = "schoolID";
     private static final String DISTRICT_ID_FIELD = "districtID";
     public List<FieldError> validateEdxPrimaryActivationCode(InstituteTypeCode instituteType, String instituteIdentifier, EdxPrimaryActivationCode toValidate) {
-        List<FieldError> toReturn = new ArrayList<>();
-        toReturn.addAll(this.validateSchoolIDAndDistrictIDFields(toValidate));
+        List<FieldError> toReturn = new ArrayList<>(this.validateSchoolIDAndDistrictIDFields(toValidate));
         if (instituteType == InstituteTypeCode.SCHOOL) {
             toReturn.addAll(this.validateEdxPrimaryActivationCodeForSchool(instituteIdentifier, toValidate));
         }
@@ -49,8 +48,10 @@ public class EdxPrimaryActivationCodeValidator {
         if (toValidate.getDistrictID() != null) {
             toReturn.add(createFieldError(DISTRICT_ID_FIELD, toValidate.getDistrictID(), "The districtID field is expected to be null for an EdxPrimaryActivationCode meant for a school."));
         }
+
         return toReturn;
     }
+
     private List<FieldError> validateEdxPrimaryActivationCodeForDistrict(String instituteIdentifier, EdxPrimaryActivationCode toValidate) {
         List<FieldError> toReturn = new ArrayList<>();
         if (toValidate.getDistrictID() == null) {

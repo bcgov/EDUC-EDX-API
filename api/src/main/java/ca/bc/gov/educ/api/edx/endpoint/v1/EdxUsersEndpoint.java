@@ -98,7 +98,7 @@ public interface EdxUsersEndpoint {
   @PostMapping("/{id}/school")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
-  EdxUserSchool createEdxSchoolUser(@PathVariable UUID id, @Validated @RequestBody  EdxUserSchool edxUserSchool);
+  EdxUserSchool createEdxUserSchool(@PathVariable UUID id, @Validated @RequestBody  EdxUserSchool edxUserSchool);
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_SCHOOL')")
@@ -111,7 +111,7 @@ public interface EdxUsersEndpoint {
   @DeleteMapping("/{id}/school/{edxUserSchoolId}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @ResponseStatus(NO_CONTENT)
-  ResponseEntity<Void> deleteEdxSchoolUserById(@PathVariable UUID id, @PathVariable UUID edxUserSchoolId );
+  ResponseEntity<Void> deleteEdxUserSchoolById(@PathVariable UUID id, @PathVariable UUID edxUserSchoolId );
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_SCHOOL_ROLE')")
@@ -125,7 +125,7 @@ public interface EdxUsersEndpoint {
   @DeleteMapping("{id}/school/role/{edxSchoolUserRoleId}")
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @ResponseStatus(NO_CONTENT)
-  ResponseEntity<Void> deleteEdxSchoolUserRoleById(@PathVariable UUID id,@PathVariable UUID edxSchoolUserRoleId);
+  ResponseEntity<Void> deleteEdxUserSchoolRoleById(@PathVariable UUID id, @PathVariable UUID edxSchoolUserRoleId);
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
