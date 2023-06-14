@@ -147,6 +147,9 @@ public class SagaService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public SagaEntity createSagaRecordInDB(final SagaEntity saga) {
+
+    long startTime = System.currentTimeMillis();
+
     final var sagaEntity = SagaEntity
       .builder()
       .payload(saga.getPayload())
@@ -164,6 +167,10 @@ public class SagaService {
       .updateDate(LocalDateTime.now())
       .sagaCompensated(false)
       .build();
+
+    long elapsedTime = System.currentTimeMillis() - startTime;
+    long elapsedSeconds = elapsedTime / 1000;
+    System.out.println(String.format("createSagaRecordInDB SagaService.java done in %s seconds", elapsedSeconds));
     return this.createSagaRecord(sagaEntity);
   }
 
