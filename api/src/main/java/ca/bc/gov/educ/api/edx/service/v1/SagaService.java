@@ -170,7 +170,7 @@ public class SagaService {
 
     long elapsedTime = System.currentTimeMillis() - startTime;
     long elapsedSeconds = elapsedTime / 1000;
-    System.out.println(String.format("createSagaRecordInDB SagaService.java done in %s seconds", elapsedSeconds));
+    log.info("createSagaRecordInDB SagaService.java done in {} seconds", elapsedSeconds);
     return this.createSagaRecord(sagaEntity);
   }
 

@@ -422,7 +422,7 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
     }
     long startTime = System.currentTimeMillis();
     this.broadcastSagaInitiatedMessage(event);
-    System.out.println(String.format("handleEvent broadcastSagaInitiatedMessage BaseOrchestrator.java done in %s seconds", (System.currentTimeMillis() - startTime) / 1000));
+    log.info("handleEvent broadcastSagaInitiatedMessage BaseOrchestrator.java done in {} seconds", (System.currentTimeMillis() - startTime) / 1000);
 
     final var sagaOptional = this.getSagaService().findSagaById(event.getSagaId()); // system expects a saga record to be present here.
     if (sagaOptional.isPresent()) {
@@ -461,7 +461,7 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
         .sagaId(saga.getSagaId())
         .eventPayload(saga.getPayload())
         .build());
-      System.out.println(String.format("startSaga handleEvent BaseOrchestrator.java done in %s seconds", (System.currentTimeMillis() - startTime) / 1000));
+      log.info("startSaga handleEvent BaseOrchestrator.java done in {} seconds", (System.currentTimeMillis() - startTime) / 1000);
     } catch (InterruptedException e) {
       log.error("InterruptedException while startSaga", e);
       Thread.currentThread().interrupt();
