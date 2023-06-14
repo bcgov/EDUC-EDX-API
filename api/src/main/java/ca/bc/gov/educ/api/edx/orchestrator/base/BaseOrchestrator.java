@@ -420,7 +420,9 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
       log.trace("Execution is not required for this message returning EVENT is :: {}", event);
       return;
     }
+    long startTime = System.currentTimeMillis();
     this.broadcastSagaInitiatedMessage(event);
+    System.out.println(String.format("handleEvent broadcastSagaInitiatedMessage BaseOrchestrator.java done in %s seconds", (System.currentTimeMillis() - startTime) / 1000));
 
     final var sagaOptional = this.getSagaService().findSagaById(event.getSagaId()); // system expects a saga record to be present here.
     if (sagaOptional.isPresent()) {
@@ -452,12 +454,14 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void startSaga(@NotNull final SagaEntity saga) {
     try {
+      long startTime = System.currentTimeMillis();
       this.handleEvent(Event.builder()
         .eventType(EventType.INITIATED)
         .eventOutcome(EventOutcome.INITIATE_SUCCESS)
         .sagaId(saga.getSagaId())
         .eventPayload(saga.getPayload())
         .build());
+      System.out.println(String.format("startSaga handleEvent BaseOrchestrator.java done in %s seconds", (System.currentTimeMillis() - startTime) / 1000));
     } catch (InterruptedException e) {
       log.error("InterruptedException while startSaga", e);
       Thread.currentThread().interrupt();
