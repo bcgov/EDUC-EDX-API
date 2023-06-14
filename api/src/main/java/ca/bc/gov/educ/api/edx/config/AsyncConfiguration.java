@@ -8,8 +8,10 @@ import org.springframework.context.annotation.Profile;
 
 import java.time.Duration;
 import java.util.concurrent.Executor;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration
+@EnableAsync
 @Profile("!test")
 public class AsyncConfiguration {
   /**
