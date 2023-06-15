@@ -195,14 +195,12 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, SagaEntity sagaEntity) {
     try {
-      long startTime = System.currentTimeMillis();
+
       final var orchestrator = this.getOrchestratorMap().get(sagaName.toString());
       final var saga = this.getOrchestratorMap()
         .get(sagaName.toString())
         .createSaga(sagaEntity);
-      log.info("ProcessServicesSaga orchestrator.get.createSaga EdxSagaController.java done in {} seconds", (System.currentTimeMillis() - startTime) / 1000);
       orchestrator.startSaga(saga);
-      log.info("ProcessServicesSaga orchestrator.startSaga EdxSagaController.java done in {} seconds", (System.currentTimeMillis() - startTime) / 1000);
       return ResponseEntity.status(HttpStatus.ACCEPTED).body(saga.getSagaId().toString());
     } catch (final Exception e) {
       throw new SagaRuntimeException(e.getMessage());
