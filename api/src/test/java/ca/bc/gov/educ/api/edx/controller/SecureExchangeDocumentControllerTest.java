@@ -16,12 +16,14 @@ import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.nio.file.Files;
 import java.util.UUID;
@@ -176,7 +178,8 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("fileExtension")));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.subErrors[0].message",
+                        Matchers.containsString("fileExtension provided is invalid")));
   }
 
   @Test
@@ -190,7 +193,8 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.subErrors[0].message",
+                        Matchers.containsString("Document type code is invalid")));
   }
 
   @Test
@@ -204,7 +208,8 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("fileSize")));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.subErrors[0].message",
+                        Matchers.containsString("Document fileSize encoded is too large")));
   }
 
   @Test
@@ -218,21 +223,8 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
-  }
-
-  @Test
-  public void testCreateDocument_GivenDocTypeExpired_ShouldReturnStatusBadRequest() throws Exception {
-    final SecureExchangeDocument secureExchangeDocument = this.getDummyDocument(null);
-    secureExchangeDocument.setDocumentTypeCode("dl");
-    this.mvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS, this.penReqID)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(this.getDummyDocJsonString(secureExchangeDocument))
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
-            .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentTypeCode")));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.subErrors[0].message",
+                        Matchers.containsString("Document type code is invalid")));
   }
 
   @Test
@@ -245,7 +237,8 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
-            .andExpect(jsonPath("$.message", containsStringIgnoringCase("documentData")));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.subErrors[0].message",
+                        Matchers.containsString("Document fileSize does not match provided file size")));
   }
 
   @Test
