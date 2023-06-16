@@ -1,17 +1,18 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import ca.bc.gov.educ.api.edx.exception.InvalidParameterException;
-import ca.bc.gov.educ.api.edx.exception.InvalidValueException;
-import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
+import ca.bc.gov.educ.api.edx.mappers.Base64Mapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.DocumentTypeCodeTableRepository;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocument;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.FieldError;
 
-import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,6 +20,7 @@ public class SecureExchangeDocumentsValidator {
 
   private final ApplicationProperties properties;
   private final DocumentTypeCodeTableRepository documentTypeCodeRepository;
+  private final Base64Mapper base64Mapper = new Base64Mapper();
 
   @Autowired
   public SecureExchangeDocumentsValidator(final ApplicationProperties properties, final DocumentTypeCodeTableRepository documentTypeCodeRepository) {
@@ -36,31 +38,41 @@ public class SecureExchangeDocumentsValidator {
     return documentTypeCodeRepository.findAll();
   }
 
-  public void validateDocumentPayload(final SecureExchangeDocumentEntity document, boolean isCreateOperation) {
+  public List<FieldError> validateDocumentPayload(final SecureExchangeDocument document, boolean isCreateOperation) {
+    final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (isCreateOperation && document.getDocumentID() != null) {
-      throw new InvalidParameterException("documentID");
+      apiValidationErrors.add(createFieldError("documentID", document.getDocumentID(), "documentID must be null for new documents"));
+      return apiValidationErrors;
     }
-    if (isCreateOperation && (document.getDocumentData() == null || document.getDocumentData().length == 0)) {
-      throw new InvalidValueException("documentData", null);
+    if (isCreateOperation && (document.getDocumentData() == null || document.getDocumentData().getBytes().length == 0)) {
+      apiValidationErrors.add(createFieldError("documentData", null, "No document data provided"));
+      return apiValidationErrors;
     }
 
     if (!properties.getFileExtensions().contains(document.getFileExtension())) {
-      throw new InvalidValueException("fileExtension", document.getFileExtension());
+      apiValidationErrors.add(createFieldError("fileExtension", document.getFileExtension(), "fileExtension provided is invalid"));
+      return apiValidationErrors;
     }
 
     if (document.getFileSize() > properties.getMaxEncodedFileSize()) {
-      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "Max Encoded fileSize",
-              String.valueOf(properties.getMaxFileSize()));
+      apiValidationErrors.add(createFieldError("fileSize", document.getFileSize().toString(), "Document fileSize encoded is too large"));
+      return apiValidationErrors;
     }
 
-    if (isCreateOperation && document.getFileSize() != document.getDocumentData().length) {
-      throw new InvalidValueException("fileSize", document.getFileSize().toString(), "documentData length",
-              String.valueOf(document.getDocumentData().length));
+    if (isCreateOperation && document.getFileSize() != base64Mapper.map(document.getDocumentData()).length) {
+      apiValidationErrors.add(createFieldError("fileSize", document.getFileSize().toString(), "Document fileSize does not match provided file size"));
+      return apiValidationErrors;
     }
 
     if (!isDocumentTypeCodeValid(document.getDocumentTypeCode())) {
-      throw new InvalidValueException("documentTypeCode", document.getDocumentTypeCode());
+      apiValidationErrors.add(createFieldError("documentTypeCode", document.getDocumentTypeCode(), "Document type code is invalid"));
+      return apiValidationErrors;
     }
+    return apiValidationErrors;
+  }
+
+  private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
+    return new FieldError("secureExchange", fieldName, rejectedValue, false, null, null, message);
   }
 
   public boolean isDocumentTypeCodeValid(final String documentTypeCode) {

@@ -61,7 +61,6 @@ public class SecureExchangeStudentController implements SecureExchangeStudentEnd
       error.addValidationErrors(validationResult);
       throw new InvalidPayloadException(error);
     }
-
   }
 
 }

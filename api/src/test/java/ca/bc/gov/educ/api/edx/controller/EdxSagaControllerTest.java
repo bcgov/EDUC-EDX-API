@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
+import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.val;
 import org.junit.After;
@@ -87,6 +88,9 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   MinistryOwnershipTeamEntity ministryOwnershipTeamEntity;
 
   @Autowired
+  private DocumentTypeCodeTableRepository documentTypeCodeRepository;
+
+  @Autowired
   SecureExchangeRequestCommentRepository secureExchangeRequestCommentRepository;
 
   private static final SecureExchangeEntityMapper SECURE_EXCHANGE_ENTITY_MAPPER = SecureExchangeEntityMapper.mapper;
@@ -96,6 +100,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   @Before
   public void setUp() {
     MockitoAnnotations.openMocks(this);
+    DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
     ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
     this.ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
@@ -115,6 +120,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     ministryOwnershipTeamRepository.deleteAll();
     secureExchangeStatusCodeTableRepo.deleteAll();
     secureExchangeContactTypeCodeTableRepository.deleteAll();
+    this.documentTypeCodeRepository.deleteAll();
   }
 
   @Test
@@ -500,9 +506,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   public void testCreateNewSecureExchange_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
-
+    final SecureExchangeDocument secureExchangeDocument = this.getSampleDocument(null);
+    final SecureExchangeStudent secureExchangeStudent = this.getSampleStudent();
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), "WildFlower", null, null, "Min Team");
+    sagaData.getSecureExchangeCreate().setDocumentList(new ArrayList<>());
+    sagaData.getSecureExchangeCreate().setStudentList(new ArrayList<>());
+    sagaData.getSecureExchangeCreate().getDocumentList().add(secureExchangeDocument);
+    sagaData.getSecureExchangeCreate().getStudentList().add(secureExchangeStudent);
     String jsonString = getJsonString(sagaData);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
         .contentType(MediaType.APPLICATION_JSON)
@@ -975,5 +986,23 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setCreateUser("Test");
     sagaData.setUpdateUser("Test");
     return sagaData;
+  }
+
+  private SecureExchangeDocument getSampleDocument(final String documentId) {
+    final SecureExchangeDocument secureExchangeDocument = new SecureExchangeDocument();
+    secureExchangeDocument.setDocumentID(documentId);
+    secureExchangeDocument.setDocumentData("TXkgY2FyZCE=");
+    secureExchangeDocument.setDocumentTypeCode("BCSCPHOTO");
+    secureExchangeDocument.setFileName("card.jpg");
+    secureExchangeDocument.setFileExtension("jpg");
+    secureExchangeDocument.setFileSize(8);
+    return secureExchangeDocument;
+  }
+
+  private SecureExchangeStudent getSampleStudent() {
+    final SecureExchangeStudent secureExchangeStudent = new SecureExchangeStudent();
+    secureExchangeStudent.setStudentId(UUID.randomUUID().toString());
+    secureExchangeStudent.setEdxUserID(UUID.randomUUID().toString());
+    return secureExchangeStudent;
   }
 }

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.edx.validator;
 
 import ca.bc.gov.educ.api.edx.constants.SecureExchangeContactTypeCode;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeBase;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,6 +14,8 @@ import java.util.List;
 public class CreateSecureExchangeSagaPayloadValidator {
 
   private final SecureExchangePayloadValidator payloadValidator;
+  private final SecureExchangeDocumentsValidator secureExchangeDocumentsValidator;
+  private final SecureExchangeStudentValidator secureExchangeStudentValidator;
 
   public static final String DISTRICT_ID = "districtID";
   public static final String DISTRICT_NAME = "districtName";
@@ -21,12 +23,14 @@ public class CreateSecureExchangeSagaPayloadValidator {
   public static final String SCHOOL_NAME = "schoolName";
 
   @Autowired
-  public CreateSecureExchangeSagaPayloadValidator(SecureExchangePayloadValidator payloadValidator) {
+  public CreateSecureExchangeSagaPayloadValidator(SecureExchangePayloadValidator payloadValidator, SecureExchangeDocumentsValidator secureExchangeDocumentsValidator, SecureExchangeStudentValidator secureExchangeStudentValidator) {
     this.payloadValidator = payloadValidator;
+    this.secureExchangeDocumentsValidator = secureExchangeDocumentsValidator;
+    this.secureExchangeStudentValidator = secureExchangeStudentValidator;
   }
 
   public List<FieldError> validatePayload(SecureExchangeCreateSagaData secureExchangeCreateSagaData, boolean isCreateOperation) {
-    SecureExchangeBase secureExchange = secureExchangeCreateSagaData.getSecureExchangeCreate();
+    SecureExchangeCreate secureExchange = secureExchangeCreateSagaData.getSecureExchangeCreate();
 
     final List<FieldError> apiValidationErrors = new ArrayList<>(payloadValidator.validatePayload(secureExchange, isCreateOperation));
     if(isCreateOperation && secureExchange.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString())) {
@@ -46,6 +50,14 @@ public class CreateSecureExchangeSagaPayloadValidator {
       if(secureExchangeCreateSagaData.getDistrictName() == null) {
         apiValidationErrors.add(createFieldError(DISTRICT_NAME, secureExchangeCreateSagaData.getDistrictName(), "District Name cannot be null"));
       }
+    }
+
+    if(secureExchange.getDocumentList() != null){
+      secureExchange.getDocumentList().forEach(document -> apiValidationErrors.addAll(secureExchangeDocumentsValidator.validateDocumentPayload(document, true)));
+    }
+
+    if(secureExchange.getStudentList() != null){
+      secureExchange.getStudentList().forEach(student -> apiValidationErrors.addAll(secureExchangeStudentValidator.validatePayload(student)));
     }
 
     return apiValidationErrors;
