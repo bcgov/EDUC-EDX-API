@@ -61,12 +61,20 @@ public class FilterCriteria<T extends Comparable<T>> {
     this.fieldName = fieldName;
     this.converterFunction = converterFunction;
 
-    // Split the fieldValue value as comma separated.
-    String[] operationValues = StringUtils.split(fieldValue, ",");
+    String[] operationValues = new String[0];
 
-    if (operationValues.length < 1) {
-      throw new IllegalArgumentException("field value can't be empty");
+    if (filterOperation == FilterOperation.BETWEEN || filterOperation == FilterOperation.IN || filterOperation == FilterOperation.NOT_IN) {
+      if(fieldValue != null) {
+        // Split the fieldValue value as comma separated.
+        operationValues = StringUtils.split(fieldValue, ",");
+      }
+      if (operationValues.length < 1) {
+        throw new IllegalArgumentException("field value can't be empty");
+      }
+    } else {
+      operationValues = new String[]{fieldValue};
     }
+
     this.operation = filterOperation;
     this.originalValues = Arrays.asList(operationValues);
     this.convertedValues = new ArrayList<>();
