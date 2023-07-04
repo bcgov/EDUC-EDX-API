@@ -336,6 +336,34 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   }
 
   @Test
+  public void testReadSecureExchangePaginated_ByOpenAndUnclaimed_ShouldReturnStatusOk() throws Exception {
+    final var file = new File(
+            Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()
+    );
+    final List<SecureExchange> entities = new ObjectMapper().readValue(file, new TypeReference<>() {
+    });
+    final SearchCriteria criteria = SearchCriteria.builder().key("ministryOwnershipTeamID").operation(FilterOperation.EQUAL).value("ef4bd106-32a6-402f-9dd8-cf70b69c5ecb").valueType(ValueType.UUID).build();
+    final SearchCriteria criteria2 = SearchCriteria.builder().key("reviewer").operation(FilterOperation.EQUAL).value(null).valueType(ValueType.STRING).build();
+    final SearchCriteria criteria3 = SearchCriteria.builder().key("secureExchangeStatusCode").operation(FilterOperation.IN).value("OPEN").valueType(ValueType.STRING).build();
+
+    final List<SearchCriteria> criteriaList = new ArrayList<>();
+    criteriaList.add(criteria);
+    criteriaList.add(criteria2);
+    criteriaList.add(criteria3);
+
+    final var objectMapper = new ObjectMapper();
+    final String criteriaJSON = objectMapper.writeValueAsString(criteriaList);
+    this.repository.saveAll(entities.stream().map(mapper::toModel).collect(Collectors.toList()));
+    final MvcResult result = this.mockMvc
+            .perform(get(URL.BASE_URL_SECURE_EXCHANGE+URL.PAGINATED)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
+                    .param("searchCriteriaList", criteriaJSON)
+                    .contentType(APPLICATION_JSON))
+            .andReturn();
+    this.mockMvc.perform(asyncDispatch(result)).andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$.content", hasSize(1)));
+  }
+
+  @Test
   public void testReadSecureExchangePaginated_givenOperationTypeNull_ShouldReturnStatusOk() throws Exception {
     final var file = new File(
         Objects.requireNonNull(this.getClass().getClassLoader().getResource("mock_secure_exchanges.json")).getFile()

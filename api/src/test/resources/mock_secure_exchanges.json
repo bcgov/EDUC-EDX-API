@@ -138,5 +138,19 @@
     "updateUser": "TEST",
     "secureExchangeContactTypeCode": "SCHOOL",
     "secureExchangeStatusCode": "CLOSED"
+  },
+  {
+    "contactIdentifier": "2039b365-cafb-4a1b-ba5d-9e02d2475ad3",
+    "ministryOwnershipTeamID": "ef4bd106-32a6-402f-9dd8-cf70b69c5ecb",
+    "secureExchangeStatusCode": "OPEN",
+    "secureExchangeContactTypeCode": "SCHOOL",
+    "subject": "New student",
+    "isReadByMinistry": false,
+    "isReadByExchangeContact": false,
+    "statusUpdateDate": "1952-10-31T00:00:00",
+    "createDate": "1952-10-31T00:00:00",
+    "updateDate": "1952-10-31T00:00:00",
+    "createUser": "TEST",
+    "updateUser": "TEST"
   }
 ]
