@@ -67,8 +67,6 @@ public class FilterCriteria<T extends Comparable<T>> {
       if(fieldValue != null) {
         // Split the fieldValue value as comma separated.
         operationValues = StringUtils.split(fieldValue, ",");
-      } else {
-        operationValues = new String[]{null};
       }
       if (operationValues.length < 1) {
         throw new IllegalArgumentException("field value can't be empty");
