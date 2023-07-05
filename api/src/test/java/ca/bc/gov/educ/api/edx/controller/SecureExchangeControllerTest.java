@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.ValueType;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
+import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
@@ -59,10 +60,14 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Autowired
   SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
 
+  @Autowired
+  private DocumentTypeCodeTableRepository documentTypeCodeRepository;
+
   @Before
   public void setUp() {
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
     this.secureExchangeStatusCodeTableRepo.save(createNewStatus());
+    DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
     MockitoAnnotations.openMocks(this);
   }
 
@@ -71,6 +76,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     this.secureExchangeContactTypeCodeTableRepository.deleteAll();
     this.secureExchangeStatusCodeTableRepo.deleteAll();
     this.documentRepository.deleteAll();
+    this.documentTypeCodeRepository.deleteAll();
     this.repository.deleteAll();
   }
 
@@ -141,6 +147,21 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
       .andExpect(jsonPath("$.secureExchangeStatusCode", is("OPEN")))
      .andExpect(jsonPath("$.studentsList.[0].secureExchangeId", is(notNullValue())));
   }
+
+  @Test
+  public void testCreateSecureExchange_GivenValidPayloadWithDocumentAdded_ShouldReturnStatusCreated() throws Exception {
+    MinistryOwnershipTeamEntity ministryOwnershipTeamEntity = getMinistryOwnershipTeam();
+    ministryOwnershipTeamRepository.save(ministryOwnershipTeamEntity);
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                    .contentType(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON).content(this.dummySecureExchangeJsonWithMinAndDocument(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()))).andDo(print())
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.isReadByMinistry", is(false)))
+            .andExpect(jsonPath("$.secureExchangeStatusCode", is("OPEN")))
+            .andExpect(jsonPath("$.documentList.[0].documentID", is(notNullValue())));
+  }
+
 
   @Test
   public void testCreateSecureExchange_GivenPenReqIdInPayloadNoID_ShouldReturnStatusBadRequest() throws Exception {
