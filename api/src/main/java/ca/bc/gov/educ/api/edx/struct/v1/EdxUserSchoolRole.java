@@ -16,7 +16,6 @@ import java.io.Serializable;
 public class EdxUserSchoolRole extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  @NotNull(message = "edxUserSchoolRoleID cannot be null.")
   String edxUserSchoolRoleID;
 
   @NotNull(message = "edxRoleCode cannot be null.")
