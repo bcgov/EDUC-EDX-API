@@ -49,7 +49,7 @@ public class SecureExchangeDocumentsValidator {
       return apiValidationErrors;
     }
 
-    if (!properties.getFileExtensions().contains(document.getFileExtension())) {
+    if (properties.getFileExtensions().stream().noneMatch(ext -> ext.equalsIgnoreCase(document.getFileExtension().toLowerCase()))) {
       apiValidationErrors.add(createFieldError("fileExtension", document.getFileExtension(), "fileExtension provided is invalid"));
       return apiValidationErrors;
     }

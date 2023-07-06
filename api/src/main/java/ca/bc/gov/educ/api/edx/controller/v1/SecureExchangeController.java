@@ -15,6 +15,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.UUIDUtil;
+import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangePayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -55,12 +56,15 @@ public class SecureExchangeController extends BaseController implements SecureEx
   private static final SecureExchangeStatusCodeMapper statusCodeMapper = SecureExchangeStatusCodeMapper.mapper;
   private static final SecureExchangeContactTypeCodeMapper secureExchangeContactTypeCodeMapper = SecureExchangeContactTypeCodeMapper.mapper;
   private final SecureExchangeFilterSpecs secureExchangeFilterSpecs;
+  @Getter(AccessLevel.PRIVATE)
+  private final CreateSecureExchangePayloadValidator createSecureExchangePayloadValidator;
 
   @Autowired
-  SecureExchangeController(final SecureExchangeService secureExchange, final SecureExchangePayloadValidator payloadValidator, SecureExchangeFilterSpecs secureExchangeFilterSpecs) {
+  SecureExchangeController(final SecureExchangeService secureExchange, final SecureExchangePayloadValidator payloadValidator, SecureExchangeFilterSpecs secureExchangeFilterSpecs, CreateSecureExchangePayloadValidator createSecureExchangePayloadValidator) {
     this.service = secureExchange;
     this.payloadValidator = payloadValidator;
     this.secureExchangeFilterSpecs = secureExchangeFilterSpecs;
+    this.createSecureExchangePayloadValidator = createSecureExchangePayloadValidator;
   }
 
   public SecureExchange retrieveSecureExchange(String id) {
@@ -74,7 +78,7 @@ public class SecureExchangeController extends BaseController implements SecureEx
 
   @Override
   public SecureExchange createSecureExchange(SecureExchangeCreate secureExchangeCreate) {
-    validatePayload(secureExchangeCreate, true);
+    validatePayload(secureExchangeCreate);
     setAuditColumns(secureExchangeCreate);
     return mapper.toStructure(getService().createSecureExchange(mapper.toModel(secureExchangeCreate)));
   }
@@ -100,6 +104,15 @@ public class SecureExchangeController extends BaseController implements SecureEx
 
   private void validatePayload(SecureExchangeBase secureExchange, boolean isCreateOperation) {
     val validationResult = getPayloadValidator().validatePayload(secureExchange, isCreateOperation);
+    if (!validationResult.isEmpty()) {
+      ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Payload contains invalid data.").status(BAD_REQUEST).build();
+      error.addValidationErrors(validationResult);
+      throw new InvalidPayloadException(error);
+    }
+  }
+
+  private void validatePayload(SecureExchangeCreate secureExchange) {
+    val validationResult = createSecureExchangePayloadValidator.validatePayload(secureExchange);
     if (!validationResult.isEmpty()) {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Payload contains invalid data.").status(BAD_REQUEST).build();
       error.addValidationErrors(validationResult);
