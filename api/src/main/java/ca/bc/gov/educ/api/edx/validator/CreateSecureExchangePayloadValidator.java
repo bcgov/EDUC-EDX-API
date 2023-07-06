@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import ca.bc.gov.educ.api.edx.constants.SecureExchangeContactTypeCode;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
