@@ -994,7 +994,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     secureExchangeDocument.setDocumentData("TXkgY2FyZCE=");
     secureExchangeDocument.setDocumentTypeCode("BCSCPHOTO");
     secureExchangeDocument.setFileName("card.jpg");
-    secureExchangeDocument.setFileExtension("jpg");
+    secureExchangeDocument.setFileExtension(".jpg");
     secureExchangeDocument.setFileSize(8);
     return secureExchangeDocument;
   }

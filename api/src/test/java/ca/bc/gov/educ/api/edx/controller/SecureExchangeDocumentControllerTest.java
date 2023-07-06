@@ -126,7 +126,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
     assertThat(result.getResponse().getContentType()).isEqualTo("application/json");
     final SecureExchangeDocMetadata secureExchangeDocMetadata = JsonUtil.getJsonObjectFromString(SecureExchangeDocMetadata.class,result.getResponse().getContentAsString());
     secureExchangeDocMetadata.setCreateDate(null);
-    secureExchangeDocMetadata.setFileExtension("pdf");
+    secureExchangeDocMetadata.setFileExtension(".doc");
     this.mvc.perform(put(URL.BASE_URL_SECURE_EXCHANGE+URL.SECURE_EXCHANGE_ID_DOCUMENTS+URL.DOCUMENT_ID, this.penReqID, secureExchangeDocMetadata.getDocumentID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
@@ -136,7 +136,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
         .andDo(print())
         .andExpect(jsonPath("$.documentID", not(is(this.documentID.toString()))))
         .andExpect(jsonPath("$.documentTypeCode", is("BCSCPHOTO")))
-        .andExpect(jsonPath("$.fileExtension", is("pdf")))
+        .andExpect(jsonPath("$.fileExtension", is(".doc")))
         .andExpect(jsonPath("$.documentData").doesNotExist())
         .andExpect(jsonPath("$.secureExchangeID").doesNotExist());
   }
@@ -332,7 +332,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
     secureExchangeDocument.setDocumentData("TXkgY2FyZCE=");
     secureExchangeDocument.setDocumentTypeCode("BCSCPHOTO");
     secureExchangeDocument.setFileName("card.jpg");
-    secureExchangeDocument.setFileExtension("jpg");
+    secureExchangeDocument.setFileExtension(".jpg");
     secureExchangeDocument.setFileSize(8);
     return secureExchangeDocument;
   }
