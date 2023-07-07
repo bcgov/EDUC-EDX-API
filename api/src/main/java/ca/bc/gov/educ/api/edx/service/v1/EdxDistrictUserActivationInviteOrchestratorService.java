@@ -26,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -105,13 +106,13 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
   public void sendEmail(EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
-    final var edxAdminsSet = edxUserRepository.findEdxUserNamesByDistrictIDAndPermissionCode(edxDistrictUserActivationInviteSagaData.getDistrictID(), "EDX_USER_DISTRICT_ADMIN");
+    final var edxAdmins = edxUserRepository.findEdxUserNamesByDistrictIDAndPermissionCode(edxDistrictUserActivationInviteSagaData.getDistrictID(), "EDX_USER_DISTRICT_ADMIN").stream().sorted().collect(Collectors.joining(", "));
     final var emailNotification = EmailNotification.builder()
       .fromEmail(from)
       .toEmail(edxDistrictUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.district.user.activation.invite")
-      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", String.join(", ", edxAdminsSet)))
+      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", edxAdmins))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
