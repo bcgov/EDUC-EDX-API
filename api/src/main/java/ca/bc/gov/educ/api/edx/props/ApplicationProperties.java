@@ -55,6 +55,9 @@ public class ApplicationProperties {
   @Value("${apis.endpoints.student.api}")
   private String studentApiEndpoint;
 
+  @Value("${institute.api.url}")
+  private String instituteApiURL;
+
   @Value("${edx.activation.code.length}")
   private int edxActivationCodeLength;
 
