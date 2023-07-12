@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
+import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
@@ -35,6 +36,7 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
    */
   @Getter(PRIVATE)
   private final EdxNewSecureExchangeOrchestratorService edxNewSecureExchangeOrchestratorService;
+  private final Publisher publisher;
 
   /**
    * Instantiates a new Base orchestrator.
@@ -43,9 +45,10 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
    * @param messagePublisher                        the message publisher
    * @param edxNewSecureExchangeOrchestratorService the edx new secure exchange orchestror service
    */
-  protected EdxNewSecureExchangeOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, EdxNewSecureExchangeOrchestratorService edxNewSecureExchangeOrchestratorService) {
+  protected EdxNewSecureExchangeOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, EdxNewSecureExchangeOrchestratorService edxNewSecureExchangeOrchestratorService, Publisher publisher) {
     super(sagaService, messagePublisher, SecureExchangeCreateSagaData.class, NEW_SECURE_EXCHANGE_SAGA.toString(), EDX_NEW_SECURE_EXCHANGE_TOPIC.toString());
     this.edxNewSecureExchangeOrchestratorService = edxNewSecureExchangeOrchestratorService;
+    this.publisher = publisher;
   }
 
   /**
@@ -111,6 +114,11 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCreateSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+    publishToJetStream(nextEvent, saga);
     log.info("message sent to EDX_API_TOPIC for SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE Event.");
+  }
+
+  private void publishToJetStream(final Event event, SagaEntity saga) {
+    publisher.dispatchChoreographyEvent(event, saga);
   }
 }
