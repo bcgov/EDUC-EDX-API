@@ -37,8 +37,8 @@ public class EdxStatsService {
     this.edxUserSchoolRepository = edxUserSchoolRepository;
   }
 
-  public List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(String instituteType, Integer months) {
-    List<IStatsSecureExchangeCreatedWithInstitute> results = this.secureExchangeRequestRepository.countSecureExchangesCreatedWithByMonth(instituteType, months);
+  public List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(String instituteType) {
+    List<IStatsSecureExchangeCreatedWithInstitute> results = this.secureExchangeRequestRepository.countSecureExchangesCreatedWithByMonth(instituteType);
 
     List<CountSecureExchangeCreatedWithInstituteByMonth> statsCreatedWithInstitutesList = new ArrayList<>();
 
@@ -89,8 +89,8 @@ public class EdxStatsService {
     return statsCreatedWithInstitutesList;
   }
 
-  public List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveSecureExchangeUser() {
-    List<EdxUserSchoolEntity> listOfUsers = this.edxUserSchoolRepository.findSchoolsByPermission("SECURE_EXCHANGE");
+  public List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveEdxUserByPermissionCode(String permissionCode) {
+    List<EdxUserSchoolEntity> listOfUsers = this.edxUserSchoolRepository.findSchoolsByPermission(permissionCode);
     List<String> listOfSchoolsWithExchangeUser = listOfUsers.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
 
     List<School> schoolList = this.restUtils.getSchools();

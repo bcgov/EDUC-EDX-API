@@ -22,17 +22,16 @@ import org.springframework.web.bind.annotation.*;
 public interface EdxStatsEndpoint {
 
   /**
-   * End point for obtaining count of secure exchanges created with schools or districts for the last number of months.
+   * End point for obtaining count of secure exchanges created with schools or districts for the last 12 months.
    *
    * @param instituteType can be either SCHOOL or DISTRICT.
-   * @param months number of months to search back from.
    * @return statistics for number of secure messages created to a school or district
    */
   @GetMapping("/stats/count-secure-exchanges-created-with-institute")
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
   @Transactional(readOnly = true)
-  List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(@Validated @RequestParam String instituteType, @Validated @RequestParam Integer months);
+  List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(@Validated @RequestParam String instituteType);
 
   @GetMapping("/stats/count-schools-with-active-edx-users")
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
@@ -42,13 +41,13 @@ public interface EdxStatsEndpoint {
 
   @GetMapping("/stats/count-secure-exchanges-by-institute")
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
   @Transactional(readOnly = true)
   List<CountSecureExchangesCreatedWithInstituteTypeGroupedByInstitute> countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute(@Validated @RequestParam String instituteType);
 
   @GetMapping("/stats/school-list-without-active-edx-users")
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "503", description = "SERVICE UNAVAILABLE.")})
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})
   @Transactional(readOnly = true)
-  List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveSecureExchangeUser();
+  List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveEdxUserByPermissionCode(@Validated @RequestParam String permissionCode);
 }

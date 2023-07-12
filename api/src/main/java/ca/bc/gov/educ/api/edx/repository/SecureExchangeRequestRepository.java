@@ -25,12 +25,12 @@ public interface SecureExchangeRequestRepository extends JpaRepository<SecureExc
     @Query(value = "SELECT date_trunc('month', create_date) AS localDateTimeMonth, " +
         "COUNT(*) AS total " +
         "FROM secure_exchange " +
-        "WHERE create_date >= CURRENT_DATE - make_interval(months => :months) " +
+        "WHERE create_date >= CURRENT_DATE - INTERVAL '12' MONTH " +
         "AND secure_exchange_contact_type_code = :instituteType " +
         "GROUP BY localDateTimeMonth " +
         "ORDER BY localDateTimeMonth",
         nativeQuery = true)
-    List<IStatsSecureExchangeCreatedWithInstitute> countSecureExchangesCreatedWithByMonth(String instituteType, Integer months);
+    List<IStatsSecureExchangeCreatedWithInstitute> countSecureExchangesCreatedWithByMonth(String instituteType);
 
     @Query(value = """
         SELECT contact_identifier AS contactIdentifier, count(*) AS total 

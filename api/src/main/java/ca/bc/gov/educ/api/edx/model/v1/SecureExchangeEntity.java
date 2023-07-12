@@ -3,7 +3,9 @@ package ca.bc.gov.educ.api.edx.model.v1;
 import ca.bc.gov.educ.api.edx.utils.UpperCase;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
@@ -19,6 +21,8 @@ import java.util.UUID;
 @Data
 @Entity
 @Table(name = "SECURE_EXCHANGE")
+@SuperBuilder
+@NoArgsConstructor
 @DynamicUpdate
 public class SecureExchangeEntity {
   @Id

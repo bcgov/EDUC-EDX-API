@@ -26,8 +26,8 @@ public class EdxStatsController extends BaseController implements EdxStatsEndpoi
   }
 
   @Override
-  public List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(String instituteType, Integer months) {
-    return this.edxStatsService.countSecureExchangesCreatedWithInstitute(instituteType.toUpperCase(), months);
+  public List<CountSecureExchangeCreatedWithInstituteByMonth> countSecureExchangesCreatedWithInstitute(String instituteType) {
+    return this.edxStatsService.countSecureExchangesCreatedWithInstitute(instituteType.toUpperCase());
   }
 
   @Override
@@ -41,7 +41,7 @@ public class EdxStatsController extends BaseController implements EdxStatsEndpoi
   }
 
   @Override
-  public List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveSecureExchangeUser() {
-    return this.edxStatsService.schoolListWithoutActiveSecureExchangeUser();
+  public List<SchoolWithoutActiveSecureExchangeUser> schoolListWithoutActiveEdxUserByPermissionCode(String permissionCode) {
+    return this.edxStatsService.schoolListWithoutActiveEdxUserByPermissionCode(permissionCode);
   }
 }
