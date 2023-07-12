@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.rest;
 
 import ca.bc.gov.educ.api.edx.constants.EventType;
-import ca.bc.gov.educ.api.edx.exception.APIServiceException;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
@@ -10,10 +9,10 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -23,9 +22,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -39,13 +36,15 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 @Slf4j
 public class RestUtils {
   private final WebClient chesWebClient;
+  private final WebClient webClient;
   private final ApplicationProperties props;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private final MessagePublisher messagePublisher;
   private static final String INSTITUTE_API_TOPIC = "INSTITUTE_API_TOPIC";
 
-  public RestUtils(@Qualifier("chesWebClient") final WebClient chesWebClient, final ApplicationProperties props, final MessagePublisher messagePublisher) {
+  public RestUtils(@Qualifier("chesWebClient") final WebClient chesWebClient, final WebClient webClient, final ApplicationProperties props, final MessagePublisher messagePublisher) {
     this.chesWebClient = chesWebClient;
+    this.webClient = webClient;
     this.props = props;
     this.messagePublisher = messagePublisher;
   }
@@ -115,6 +114,47 @@ public class RestUtils {
 
   public void sendEmail(final String fromEmail, final String toEmail, final String body, final String subject) {
     this.sendEmail(this.getChesEmail(fromEmail, toEmail, body, subject));
+  }
+
+  public Map<String, School> getSchoolMap() {
+    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+    for (val school : this.getSchools()) {
+      schoolMap.put(school.getSchoolId(), school);
+    }
+
+    return schoolMap;
+
+  }
+  public List<School> getSchools() {
+    log.info("Calling Institute api to get list of schools");
+    return this.webClient.get()
+        .uri(this.props.getInstituteApiURL() + "/school")
+        .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .retrieve()
+        .bodyToFlux(School.class)
+        .collectList()
+        .block();
+  }
+
+  public Map<String, District> getDistrictMap() {
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    for (val district : this.getDistricts()) {
+      districtMap.put(district.getDistrictId(), district);
+    }
+
+    return districtMap;
+
+  }
+
+  public List<District> getDistricts() {
+    log.info("Calling Institute api to get list of districts");
+    return this.webClient.get()
+        .uri(this.props.getInstituteApiURL() + "/district")
+        .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .retrieve()
+        .bodyToFlux(District.class)
+        .collectList()
+        .block();
   }
 
   @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
