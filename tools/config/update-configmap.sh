@@ -353,6 +353,20 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer $TKN" \
   -d "{\"description\": \"Write scope for DELETE_EDX_USER_DISTRICT_ROLE\",\"id\": \"DELETE_EDX_USER_DISTRICT_ROLE\",\"name\": \"DELETE_EDX_USER_DISTRICT_ROLE\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope READ_DISTRICT
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read scope for district\",\"id\": \"READ_DISTRICT\",\"name\": \"READ_DISTRICT\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
+echo Writing scope READ_SCHOOL
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TKN" \
+  -d "{\"description\": \"Read scope for school\",\"id\": \"READ_SCHOOL\",\"name\": \"READ_SCHOOL\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 ###########################################################
 #Setup for config-map
 ###########################################################
