@@ -14,19 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * The interface EDX Users.
- */
 @RequestMapping(URL.BASE_URL_SECURE_EXCHANGE)
 @OpenAPIDefinition(info = @Info(title = "API for EDX statistics.", description = "This API is for EDX statistics.", version = "1"))
 public interface EdxStatsEndpoint {
 
-  /**
-   * End point for obtaining count of secure exchanges created with schools or districts for the last 12 months.
-   *
-   * @param instituteType can be either SCHOOL or DISTRICT.
-   * @return statistics for number of secure messages created to a school or district
-   */
   @GetMapping("/stats/count-secure-exchanges-created-with-institute")
   @PreAuthorize("hasAuthority('SCOPE_READ_SECURE_EXCHANGE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST.")})

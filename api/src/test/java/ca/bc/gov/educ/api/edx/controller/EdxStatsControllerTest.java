@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxStatsController;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.v1.District;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,6 +56,11 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   @After
   public void after() {
     this.secureExchangeRequestRepository.deleteAll();
+    this.edxUserRepository.deleteAll();
+    this.edxPermissionRepository.deleteAll();
+    this.edxRoleRepository.deleteAll();
+    this.edxUserSchoolRepository.deleteAll();
+    this.edxUserDistrictRepository.deleteAll();
   }
 
   @Test
@@ -85,7 +91,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidInstituteType_ShouldReturnCount() throws Exception {
+  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidSchoolInstituteType_ShouldReturnCount() throws Exception {
 
     String schoolId = UUID.randomUUID().toString();
 
@@ -104,6 +110,25 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
             .param("instituteType", "SCHOOL"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].count", is(2)));;
+  }
+
+  @Test
+  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidDistrictInstituteType_ShouldReturnCount() throws Exception {
+
+    String districtId = UUID.randomUUID().toString();
+
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    districtMap.put(districtId, createDummyDistrict(districtId));
+
+    Mockito.when(this.restUtils.getDistrictMap()).thenReturn(districtMap);
+
+    this.secureExchangeRequestRepository.save(createDummySecureExchangeEntity(districtId, "DISTRICT"));
+
+    this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/stats/count-secure-exchanges-by-institute")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE")))
+            .param("instituteType", "DISTRICT"))
+        .andDo(print()).andExpect(status().isOk())
+        .andExpect(jsonPath("$.[0].count", is(1)));;
   }
 
   @Test
@@ -162,6 +187,16 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
     school.setSchoolCategoryCode("FED_BAND");
     school.setFacilityTypeCode("STANDARD");
     return school;
+  }
+
+  private District createDummyDistrict(String districtId) {
+    District district = new District();
+    district.setDistrictId(districtId);
+    district.setDistrictNumber("12345");
+    district.setDisplayName("Test District");
+    district.setDistrictRegionCode("METRO");
+    district.setDistrictStatusCode("ACTIVE");
+    return district;
   }
 
 }
