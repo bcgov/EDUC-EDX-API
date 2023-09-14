@@ -26,7 +26,7 @@ class TestChildClass extends TestParentClass {
 }
 
 @RunWith(SpringRunner.class)
-public class TransformUtilTest {
+class TransformUtilTest {
   @Test
   void testIsUppercaseField_WhenFieldInParentClass_ShouldReturnTrue()  {
     assertTrue(TransformUtil.isUppercaseField(TestChildClass.class, "filedA"));

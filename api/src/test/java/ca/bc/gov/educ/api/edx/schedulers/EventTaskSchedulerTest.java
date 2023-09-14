@@ -24,7 +24,7 @@ import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
+class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   EventTaskScheduler eventTaskScheduler;
   @Autowired

@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ContextConfiguration(classes = {SecureExchangeDocumentMapperImpl.class})
 @AutoConfigureJsonTesters
 @SpringBootTest
-public class SecureExchangeDocumentJsonTests {
+class SecureExchangeDocumentJsonTests {
     @Autowired
     private JacksonTester<SecureExchangeDocument> jsonTester;
 

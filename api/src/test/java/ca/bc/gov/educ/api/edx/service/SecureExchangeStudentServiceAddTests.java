@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-public class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
+class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
 
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     @MockBean

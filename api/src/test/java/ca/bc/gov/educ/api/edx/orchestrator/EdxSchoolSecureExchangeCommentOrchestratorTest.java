@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaControllerTest {
+class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.

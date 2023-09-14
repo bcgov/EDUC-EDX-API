@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-public class Base64MapperTest {
+class Base64MapperTest {
   private final Base64Mapper mapper = new Base64Mapper();
 
   @Test

@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 
-public class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
+class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
 
   @Autowired
   EmailNotificationService emailNotificationService;

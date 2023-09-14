@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class SecureExchangeCommentControllerTest extends BaseSecureExchangeControllerTest {
+class SecureExchangeCommentControllerTest extends BaseSecureExchangeControllerTest {
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     @Autowired
     private MockMvc mockMvc;

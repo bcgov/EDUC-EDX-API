@@ -28,7 +28,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
+class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private MockMvc mockMvc;
   @Autowired

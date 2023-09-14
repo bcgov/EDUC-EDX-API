@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class EdxSagaControllerTest extends BaseSagaControllerTest {
+class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Autowired
   private MockMvc mockMvc;

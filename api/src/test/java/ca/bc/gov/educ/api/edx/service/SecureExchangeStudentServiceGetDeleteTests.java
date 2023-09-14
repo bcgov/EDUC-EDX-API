@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITest {
+class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITest {
 
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 

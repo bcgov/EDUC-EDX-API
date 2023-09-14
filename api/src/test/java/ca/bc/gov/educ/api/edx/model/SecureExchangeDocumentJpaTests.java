@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 //@DataJpaTest
 //@ActiveProfiles("test")
 //@ContextConfiguration(classes = TestSecurityConfig.class, loader= AnnotationConfigContextLoader.class)
-public class SecureExchangeDocumentJpaTests {
+class SecureExchangeDocumentJpaTests {
 
 //    @Autowired
 //    private TestEntityManager entityManager;

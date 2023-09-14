@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class EmailPropertiesTest extends BaseSecureExchangeAPITest {
+class EmailPropertiesTest extends BaseSecureExchangeAPITest {
 
   @Autowired
   EmailProperties emailProperties;

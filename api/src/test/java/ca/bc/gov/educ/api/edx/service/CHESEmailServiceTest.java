@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-public class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
+class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
 
 
   @Autowired

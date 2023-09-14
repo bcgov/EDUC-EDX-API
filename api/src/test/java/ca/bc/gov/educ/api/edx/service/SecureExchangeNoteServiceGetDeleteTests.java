@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-public class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest {
+class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest {
     @Autowired
     SecureExchangeNoteService secureExchangeNoteService;
 

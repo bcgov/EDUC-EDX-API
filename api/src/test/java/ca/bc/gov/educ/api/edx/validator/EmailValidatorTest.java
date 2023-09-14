@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import lombok.val;
 
-public class EmailValidatorTest {
+class EmailValidatorTest {
   private final EmailValidator validator = new EmailValidator(Map.of("template1", "test template"));
 
   @ParameterizedTest

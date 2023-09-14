@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //import javax.transaction.Transactional;
 
 
-public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITest {
+class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITest {
 
   @Autowired
   DocumentService service;

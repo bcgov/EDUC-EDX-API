@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 //@RunWith(SpringRunner.class)
 //@DataJpaTest
-public class SecureExchangeJpaTests {
+class SecureExchangeJpaTests {
 //    @Autowired
 //    private SecureExchangeRequestRepository repository;
 

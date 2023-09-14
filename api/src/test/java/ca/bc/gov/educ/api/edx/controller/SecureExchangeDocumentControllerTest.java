@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
+class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
   @Autowired
   private MockMvc mvc;
 

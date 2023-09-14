@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureJsonTesters
 @SpringBootTest
 @ActiveProfiles("test")
-public class SecureExchangeDocRequirementEntityJsonTests {
+class SecureExchangeDocRequirementEntityJsonTests {
     @Autowired
     private JacksonTester<SecureExchangeDocRequirement> jsonTester;
 
