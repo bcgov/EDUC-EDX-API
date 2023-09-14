@@ -5,8 +5,8 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.service.v1.EmailNotificationService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
   @Captor
   ArgumentCaptor<String> emailBodyCaptor;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     openMocks(this);
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(), any());

@@ -10,9 +10,9 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +62,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxActivationRoleRepository edxActivationRoleRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
@@ -70,7 +70,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EDXUserControllerTestUtils edxUserControllerTestUtils;
 
-  @After
+  @AfterEach
   public  void after() {
     this.edxUserControllerTestUtils.cleanDB();
   }

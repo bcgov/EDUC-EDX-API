@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,12 +48,12 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   EdxUserDistrictRepository edxUserDistrictRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
-  @After
+  @AfterEach
   public void after() {
     this.secureExchangeRequestRepository.deleteAll();
     this.edxUserRepository.deleteAll();

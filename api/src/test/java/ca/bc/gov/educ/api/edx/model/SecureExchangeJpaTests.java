@@ -3,8 +3,8 @@ package ca.bc.gov.educ.api.edx.model;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,7 +20,7 @@ public class SecureExchangeJpaTests {
 
 //    private SecureExchangeEntity secureExchange;
 //
-//    @Before
+//    @BeforeEach
 //    public void setUp() {
 //        this.secureExchange = new SecureExchangeBuilder()
 //                            .withoutSecureExchangeID().build();

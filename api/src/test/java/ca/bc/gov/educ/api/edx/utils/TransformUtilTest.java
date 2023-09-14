@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.edx.utils;
 
 import lombok.Data;
-import org.junit.Test;
+import lombok.EqualsAndHashCode;
+
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -17,6 +19,7 @@ class TestParentClass {
 }
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 class TestChildClass extends TestParentClass {
   @UpperCase
   String filedE;

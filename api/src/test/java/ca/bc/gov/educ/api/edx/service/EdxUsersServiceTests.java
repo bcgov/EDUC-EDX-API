@@ -9,8 +9,8 @@ import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
@@ -47,7 +48,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private EdxActivationCodeRepository edxActivationCodeRepository;
 
-  @After
+  @AfterEach
   public void tearDown() {
     this.edxUserSchoolRepository.deleteAll();
     this.edxUserRepository.deleteAll();
@@ -161,28 +162,36 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(found.getIsPrimary()).isTrue();
   }
 
-  @Test(expected = EntityNotFoundException.class)
+  @Test()
   public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
-    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
-    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryEdxActivationCode.getSchoolID().toString());
-    assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    assertThrows(EntityNotFoundException.class, () -> {
+      EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
+      EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryEdxActivationCode.getSchoolID().toString());
+      assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    });
   }
 
-  @Test(expected = EntityNotFoundException.class)
+  @Test()
   public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForDistrict() {
-    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
-    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryEdxActivationCode.getDistrictID().toString());
-    assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    assertThrows(EntityNotFoundException.class, () -> {
+      EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
+      EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryEdxActivationCode.getDistrictID().toString());
+      assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
+    });
   }
 
-  @Test(expected = EntityNotFoundException.class)
+  @Test()
   public void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForSchool() {
-    this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, UUID.randomUUID().toString());
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, UUID.randomUUID().toString());
+    });
   }
 
-  @Test(expected = EntityNotFoundException.class)
+  @Test()
   public void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForDistrict() {
-    this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, UUID.randomUUID().toString());
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, UUID.randomUUID().toString());
+    });
   }
 
   @Test

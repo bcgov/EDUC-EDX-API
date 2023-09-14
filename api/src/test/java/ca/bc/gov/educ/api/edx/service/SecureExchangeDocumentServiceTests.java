@@ -11,8 +11,8 @@ import ca.bc.gov.educ.api.edx.service.v1.DocumentService;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -44,7 +44,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
   private UUID secureExchangeID;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
     this.secureExchange = new SecureExchangeBuilder()
