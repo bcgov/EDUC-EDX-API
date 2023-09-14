@@ -34,7 +34,7 @@ class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
 
     @Test
     @Transactional
-    public void testAddStudentToExchange() throws Exception {
+    void testAddStudentToExchange() throws Exception {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(createSecureExchange());
         SecureExchange secureExchange = createSecureExchangeFromEntityWithStudent(LEGIT_STUDENT_ID, entity);
         doReturn(secureExchange).when(secureExchangeStudentServiceMock).addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class));

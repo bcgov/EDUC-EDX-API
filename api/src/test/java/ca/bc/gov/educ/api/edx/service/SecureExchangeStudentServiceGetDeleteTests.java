@@ -37,7 +37,7 @@ class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITe
 
     @Test
     @Transactional
-    public void testDeleteStudentFromExchange() {
+    void testDeleteStudentFromExchange() {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(
                 addStudentToSecureExchangeEntity(createSecureExchange(), UUID.fromString(LEGIT_STUDENT_ID))
         );
@@ -57,7 +57,7 @@ class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITe
 
     @Test
     @Transactional
-    public void testGetStudentIDsFromExchange(){
+    void testGetStudentIDsFromExchange(){
         SecureExchangeEntity entity = addStudentToSecureExchangeEntity(createSecureExchange(), UUID.fromString(LEGIT_STUDENT_ID));
         addStudentToSecureExchangeEntity(entity, UUID.randomUUID());
         entity = this.secureExchangeRequestRepository.save(entity);

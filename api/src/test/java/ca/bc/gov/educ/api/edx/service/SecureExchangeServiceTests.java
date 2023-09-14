@@ -53,7 +53,7 @@ class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   @Transactional
-  public void createSecureExchange() {
+  void createSecureExchange() {
     var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     var secureExchange = new SecureExchangeBuilder()
       .withoutSecureExchangeID().build();
@@ -74,7 +74,7 @@ class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   @Transactional
-  public void createSecureExchangeWithDocuments() {
+  void createSecureExchangeWithDocuments() {
     var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     var secureExchange = new SecureExchangeBuilder()
       .withoutSecureExchangeID().build();

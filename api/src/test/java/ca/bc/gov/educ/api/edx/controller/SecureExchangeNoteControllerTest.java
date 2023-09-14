@@ -106,7 +106,7 @@ class SecureExchangeNoteControllerTest extends BaseSecureExchangeControllerTest 
     // test get notes with valid exchangeid returns notes
     @Test
     @Transactional
-    public void testGetNotes_GivenValidExchangeId_ExpectReturns200OkWithNotes() throws Exception {
+    void testGetNotes_GivenValidExchangeId_ExpectReturns200OkWithNotes() throws Exception {
         ObjectMapper objectMapper1 = new ObjectMapper();
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(exchangeMapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         SecureExchangeNoteEntity note = noteMapper.toModel(objectMapper1.readValue(
@@ -140,7 +140,7 @@ class SecureExchangeNoteControllerTest extends BaseSecureExchangeControllerTest 
 
     @Test
     @Transactional
-    public void testDeleteNotes_GivenValidExchangeId_ExpectReturns204NoContentWithoutNotes() throws Exception {
+    void testDeleteNotes_GivenValidExchangeId_ExpectReturns204NoContentWithoutNotes() throws Exception {
         ObjectMapper objectMapper1 = new ObjectMapper();
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(exchangeMapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         SecureExchangeNoteEntity note = noteMapper.toModel(objectMapper1.readValue(

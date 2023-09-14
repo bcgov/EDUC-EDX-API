@@ -32,7 +32,7 @@ class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest 
 
     @Test
     @Transactional
-    public void testDeleteNoteFromExchange() {
+    void testDeleteNoteFromExchange() {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(
                 addNoteToSecureExchangeEntity(createSecureExchange())
         );

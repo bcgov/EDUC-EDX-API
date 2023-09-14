@@ -146,7 +146,7 @@ class SecureExchangeStudentControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   @Transactional
-  public void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
+  void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
     SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
     final String sid = entity.getSecureExchangeID().toString();
     List<SecureExchangeStudentEntity> students = new ArrayList<>();
@@ -160,7 +160,7 @@ class SecureExchangeStudentControllerTest extends BaseSecureExchangeControllerTe
 
   @Test
   @Transactional
-  public void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
+  void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
     final String sid = entity.getSecureExchangeID().toString();
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
