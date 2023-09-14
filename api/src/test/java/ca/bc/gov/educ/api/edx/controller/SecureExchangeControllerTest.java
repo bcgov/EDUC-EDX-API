@@ -28,7 +28,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -443,13 +442,6 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     entity.setTeamName("JOHN");
     entity.setGroupRoleIdentifier("ABC");
     return entity;
-  }
-
-  private String dummySecureExchangeCommentsJsonWithValidPenReqID(final String penReqId) {
-    return "{\n" +
-            "  \"penRetrievalRequestID\": \"" + penReqId + "\",\n" +
-            "  \"content\": \"" + "comment1" + "\",\n" +
-            "}";
   }
 
 }

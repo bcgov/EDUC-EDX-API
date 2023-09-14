@@ -160,7 +160,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   private SecureExchangeEntity createDummySecureExchangeEntity(String contactIdenfier, String secureExchangeContactTypeCode) {
-    return new SecureExchangeEntity().builder()
+    return SecureExchangeEntity.builder()
         .ministryOwnershipTeamID(UUID.randomUUID())
         .secureExchangeContactTypeCode(secureExchangeContactTypeCode)
         .contactIdentifier(contactIdenfier)

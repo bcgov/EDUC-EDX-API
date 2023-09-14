@@ -128,11 +128,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -143,11 +143,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -158,11 +158,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -173,11 +173,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -188,11 +188,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -203,11 +203,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -218,11 +218,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoleCode is not valid according to the allow list.")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -234,11 +234,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     String jsonString = getJsonString(sagaData);
     createSagaEntity(jsonString, sagaData);
 
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isConflict());
   }
 
@@ -246,11 +246,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxSchoolUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -259,11 +259,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationRelinkSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -274,11 +274,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -289,11 +289,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -304,11 +304,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -319,11 +319,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -334,11 +334,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -349,11 +349,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoleCode is not valid according to the allow list.")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -365,11 +365,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     String jsonString = getJsonString(sagaData);
     createSagaSchoolRelinkEntity(jsonString, sagaData);
 
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isConflict());
   }
 
@@ -379,11 +379,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     String jsonString = getJsonString(sagaData);
     createSagaDistrictRelinkEntity(jsonString, sagaData);
 
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isConflict());
   }
 
@@ -391,11 +391,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxSchoolUserActivationRelink_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -406,11 +406,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, schoolIDs);
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", edxUser.getEdxUserID().toString(), edxUser.getEdxUserSchoolEntities().iterator().next().getEdxUserSchoolID().toString());
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -419,11 +419,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "SCHOOL"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, "schoolName", null, null, "MinTeam");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[1].message", is("School ID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -434,14 +434,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, null, "name", "MinTeam");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
-            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-            .andExpect(jsonPath("$.subErrors[1].message", is("District ID cannot be null")))
-            .andDo(print()).andExpect(status().isBadRequest());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[1].message", is("District ID cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
@@ -449,14 +449,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, UUID.randomUUID(), null, "MinTeam");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
-            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-            .andExpect(jsonPath("$.subErrors[1].message", is("District Name cannot be null")))
-            .andDo(print()).andExpect(status().isBadRequest());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[1].message", is("District Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
@@ -464,11 +464,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(this.ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(),"SCHOOL"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), null, null, null, "MinTeam");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[1].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -479,11 +479,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), "WildFlower", null, null, null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Ministry Team Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -493,11 +493,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testCreateNewSecureExchange_GivenInputWithMissingSecureExchangeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     val sagaData = createSecureExchangeCreateSagaData(null, UUID.randomUUID(), "WildFlower", null, null, "ABC Team");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("SecureExchange cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -515,11 +515,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.getSecureExchangeCreate().getDocumentList().add(secureExchangeDocument);
     sagaData.getSecureExchangeCreate().getStudentList().add(secureExchangeStudent);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -528,11 +528,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, null, null, "WildFlower", "ABC Team", UUID.randomUUID(), "10", "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School ID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -544,11 +544,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), null, null,null, "ABC Team", UUID.randomUUID(), "10", "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -560,14 +560,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, UUID.randomUUID(), null, null, "ABC Team", UUID.randomUUID(), "10", "DISTRICT");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
-            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-            .andExpect(jsonPath("$.subErrors[0].message", is("District Name cannot be null")))
-            .andDo(print()).andExpect(status().isBadRequest());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("District Name cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
@@ -576,14 +576,14 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, null, "DGroup", null, "ABC Team", UUID.randomUUID(), "10", "DISTRICT");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
-            .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
-            .andExpect(jsonPath("$.subErrors[0].message", is("District ID cannot be null")))
-            .andDo(print()).andExpect(status().isBadRequest());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("District ID cannot be null")))
+      .andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
@@ -592,11 +592,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", null, UUID.randomUUID(), "10", "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("MinistryTeamName cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -608,11 +608,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), null, null,"WildFlower", "ABC Team", null, "10", "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("SecureExchangeId cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -624,11 +624,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", UUID.randomUUID(), null, "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Sequence Number cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -639,11 +639,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
     val sagaData = createSecureExchangeCommentSagaData(null, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", UUID.randomUUID(), "12", "SCHOOL");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Secure Exchange Comment cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -658,11 +658,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", entity.getSecureExchangeID(), "10", "SCHOOL");
 
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -673,23 +673,23 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null,UUID.randomUUID(), "DGroup", null, "ABC Team", entity.getSecureExchangeID(), "10", "DISTRICT");
 
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
-            .andDo(print()).andExpect(status().isAccepted());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/secure-exchange-comment-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SECURE_EXCHANGE_COMMENT_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
   }
   @Test
   public void testEdxDistrictUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData(null, "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -700,11 +700,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", null, "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -715,11 +715,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -730,11 +730,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test.abc");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email address should be a valid email address")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -746,11 +746,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictID(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("DistrictID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -762,11 +762,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictName(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("District Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -777,11 +777,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictID(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("DistrictID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -793,11 +793,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setEdxActivationRoleCodes(null);
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andExpect(jsonPath("$.message", is("Validation error")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -808,11 +808,11 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(jsonString)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/district-user-activation-invite-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "DISTRICT_USER_ACTIVATION_INVITE_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
   }
 
@@ -820,12 +820,12 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   public void testEdxMoveSchool_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     MoveSchoolData sagaData = createDummyMoveSchoolSagaData();
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
-            .andDo(print()).andExpect(status().isAccepted());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
   }
 
   @Test
@@ -841,12 +841,12 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     sagaData.setUpdateUser("Test");
 
     String jsonString = getJsonString(sagaData);
-    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(jsonString)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
-            .andDo(print()).andExpect(status().isAccepted());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(jsonString)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
   }
 
   private MoveSchoolData createDummyMoveSchoolSagaData() {

@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.filter;
 
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,6 @@ import java.util.UUID;
 import java.util.function.Function;
 
 @Service
-@Slf4j
 public class SecureExchangeFilterSpecs {
 
   private final FilterSpecifications<SecureExchangeEntity, ChronoLocalDate> dateFilterSpecifications;

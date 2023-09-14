@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class EdxUserDistrictActivationRelinkSagaData extends EdxUserDistrictActivationInviteSagaData implements Serializable {
+public class EdxUserDistrictActivationRelinkSagaData extends EdxUserDistrictActivationInviteSagaData {
   private static final long serialVersionUID = -7847063658732692951L;
 
   @NotNull(message = "edxUserDistrictID cannot be null")

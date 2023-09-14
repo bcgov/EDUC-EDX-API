@@ -5,7 +5,6 @@ import ca.bc.gov.educ.api.edx.service.v1.EdxDistrictUserActivationInviteOrchestr
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserDistrictActivationInviteSagaData;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT;
@@ -20,7 +19,6 @@ import static lombok.AccessLevel.PRIVATE;
  * The type Edx district user activation invite orchestrator.
  */
 @Component
-@Slf4j
 public class EdxDistrictUserActivationInviteOrchestrator extends DistrictUserActivationBaseOrchestrator<EdxUserDistrictActivationInviteSagaData> {
 
 

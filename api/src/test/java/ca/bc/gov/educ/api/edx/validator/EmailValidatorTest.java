@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.validator;
 
-import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import lombok.val;
