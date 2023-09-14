@@ -64,7 +64,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCountSecureExchangesCreatedWithInstitute_GivenValidInstituteAndInterval_ShouldReturnCount() throws Exception{
+  void testCountSecureExchangesCreatedWithInstitute_GivenValidInstituteAndInterval_ShouldReturnCount() throws Exception{
 
     this.secureExchangeRequestRepository.save(createDummySecureExchangeEntity(UUID.randomUUID().toString(), "SCHOOL"));
     this.secureExchangeRequestRepository.save(createDummySecureExchangeEntity(UUID.randomUUID().toString(), "SCHOOL"));
@@ -91,7 +91,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidSchoolInstituteType_ShouldReturnCount() throws Exception {
+  void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidSchoolInstituteType_ShouldReturnCount() throws Exception {
 
     String schoolId = UUID.randomUUID().toString();
 
@@ -113,7 +113,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidDistrictInstituteType_ShouldReturnCount() throws Exception {
+  void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidDistrictInstituteType_ShouldReturnCount() throws Exception {
 
     String districtId = UUID.randomUUID().toString();
 
@@ -132,7 +132,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSchoolsWithActiveEdxUsersByPermissionCode_GivenPermissionCode_ShouldReturnCount() throws Exception {
+  void countSchoolsWithActiveEdxUsersByPermissionCode_GivenPermissionCode_ShouldReturnCount() throws Exception {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/stats/count-schools-with-active-edx-users")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
@@ -142,7 +142,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void schoolListWithoutActiveSecureExchangeUser_WithEdxUsers_ShouldReturnOneSchoolWithoutExchangeUsers() throws Exception {
+  void schoolListWithoutActiveSecureExchangeUser_WithEdxUsers_ShouldReturnOneSchoolWithoutExchangeUsers() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     String schoolIdWithUser = entity.getEdxUserSchoolEntities().stream().findFirst().get().getSchoolID().toString();
     School dummySchoolWithUser = createDummySchool(schoolIdWithUser);

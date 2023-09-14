@@ -36,7 +36,7 @@ public class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void sendEmail_givenGMP_ADDITIONAL_INFO_EmailNotificationEntity_shouldSendCorrectEmail() {
+  void sendEmail_givenGMP_ADDITIONAL_INFO_EmailNotificationEntity_shouldSendCorrectEmail() {
     final var emailNotificationEntity = this.createEmailNotificationEntity("edx.school.user.activation.invite", Map.of("firstName", "FirstName"));
     this.emailNotificationService.sendEmail(emailNotificationEntity);
     verify(this.restUtils, atLeastOnce()).sendEmail(eq(emailNotificationEntity.getFromEmail()), eq(emailNotificationEntity.getToEmail()), this.emailBodyCaptor.capture(), eq(emailNotificationEntity.getSubject()));

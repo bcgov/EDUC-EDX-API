@@ -28,22 +28,22 @@ class TestChildClass extends TestParentClass {
 @RunWith(SpringRunner.class)
 public class TransformUtilTest {
   @Test
-  public void testIsUppercaseField_WhenFieldInParentClass_ShouldReturnTrue()  {
+  void testIsUppercaseField_WhenFieldInParentClass_ShouldReturnTrue()  {
     assertTrue(TransformUtil.isUppercaseField(TestChildClass.class, "filedA"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldInClass_ShouldReturnTrue()  {
+  void testIsUppercaseField_WhenFieldInClass_ShouldReturnTrue()  {
     assertTrue(TransformUtil.isUppercaseField(TestChildClass.class, "filedE"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldNotExists_ShouldReturnFalse()  {
+  void testIsUppercaseField_WhenFieldNotExists_ShouldReturnFalse()  {
     assertFalse(TransformUtil.isUppercaseField(TestChildClass.class, "filedC"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldIsNotUppercased_ShouldReturnFalse()  {
+  void testIsUppercaseField_WhenFieldIsNotUppercased_ShouldReturnFalse()  {
     assertFalse(TransformUtil.isUppercaseField(TestChildClass.class, "filedB"));
   }
 }

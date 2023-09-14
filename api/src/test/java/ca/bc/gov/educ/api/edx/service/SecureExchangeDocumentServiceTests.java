@@ -59,7 +59,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void createValidDocumentTest() {
+  void createValidDocumentTest() {
     SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .build();
@@ -71,7 +71,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void createValidDocumentCheckUnreadStatusExchangeContactTest() {
+  void createValidDocumentCheckUnreadStatusExchangeContactTest() {
     SecureExchangeDocumentEntity document = new DocumentBuilder()
       .withoutDocumentID()
       .build();
@@ -85,7 +85,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void createValidDocumentCheckUnreadStatusMinContactTest() {
+  void createValidDocumentCheckUnreadStatusMinContactTest() {
     SecureExchangeDocumentEntity document = new DocumentBuilder()
       .withoutDocumentID()
       .build();
@@ -101,7 +101,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentMetadataTest() {
+  void retrieveDocumentMetadataTest() {
     final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocumentMetadata(this.secureExchangeID, this.bcscPhoto.getDocumentID());
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
@@ -110,7 +110,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentMetadataThrowsExceptionWhenInvalidDocumentIdGivenTest() {
+  void retrieveDocumentMetadataThrowsExceptionWhenInvalidDocumentIdGivenTest() {
     final UUID randomGuid =  UUID.randomUUID();
     assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(this.secureExchangeID, randomGuid))
             .isInstanceOf(EntityNotFoundException.class)
@@ -118,7 +118,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentMetadataThrowsExceptionWhenInvalidSecureExchangeIdGivenTest() {
+  void retrieveDocumentMetadataThrowsExceptionWhenInvalidSecureExchangeIdGivenTest() {
     final UUID randomGuid =  UUID.randomUUID();
     final var docID = this.bcscPhoto.getDocumentID();
     assertThatThrownBy(() -> this.service.retrieveDocumentMetadata(randomGuid, docID))
@@ -127,7 +127,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentDataTest() {
+  void retrieveDocumentDataTest() {
     final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"Y");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
@@ -136,7 +136,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentDataTest1() {
+  void retrieveDocumentDataTest1() {
     final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"TRUE");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
@@ -145,7 +145,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveDocumentDataTest2() {
+  void retrieveDocumentDataTest2() {
     final SecureExchangeDocumentEntity retrievedDocument = this.service.retrieveDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID(),"N");
     assertThat(retrievedDocument).isNotNull();
     assertThat(retrievedDocument.getDocumentTypeCode()).isEqualTo("BCSCPHOTO");
@@ -154,7 +154,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void retrieveAllDocumentMetadataTest() {
+  void retrieveAllDocumentMetadataTest() {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .withSecureExchange(this.secureExchange)
@@ -167,7 +167,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
 
 
   @Test
-  public void deleteDocumentTest() {
+  void deleteDocumentTest() {
     final SecureExchangeDocumentEntity deletedDocument = this.service.deleteDocument(this.secureExchangeID, this.bcscPhoto.getDocumentID());
     assertThat(deletedDocument).isNotNull();
     final UUID guid =  this.bcscPhoto.getDocumentID();
@@ -176,7 +176,7 @@ public class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITes
   }
 
   @Test
-  public void deleteDocumentThrowsExceptionWhenInvalidIdGivenTest() {
+  void deleteDocumentThrowsExceptionWhenInvalidIdGivenTest() {
     final UUID guid =  UUID.randomUUID();
     assertThatThrownBy(() -> this.service.deleteDocument(this.secureExchangeID, guid))
             .isInstanceOf(EntityNotFoundException.class)

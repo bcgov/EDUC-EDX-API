@@ -60,7 +60,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void removeBlobContentsFromUploadedDocuments() {
+  void removeBlobContentsFromUploadedDocuments() {
     this.secureExchangeScheduler.removeBlobContentsFromUploadedDocuments();
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
@@ -71,7 +71,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     assertThat(doc).isNull();
   }
   @Test
-  public void testPurgeClosedMessages_GivenMessageIsOlderThanGivenTime_MessageWillBeDeleted() throws IOException {
+  void testPurgeClosedMessages_GivenMessageIsOlderThanGivenTime_MessageWillBeDeleted() throws IOException {
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
     assertThat(results.get(0)).isNotNull();

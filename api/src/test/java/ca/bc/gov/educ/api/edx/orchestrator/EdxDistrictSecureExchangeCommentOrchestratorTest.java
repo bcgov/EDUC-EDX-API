@@ -129,7 +129,7 @@ public class EdxDistrictSecureExchangeCommentOrchestratorTest extends BaseSagaCo
   }
 
   @Test
-  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -158,7 +158,7 @@ public class EdxDistrictSecureExchangeCommentOrchestratorTest extends BaseSagaCo
   }
 
   @Test
-  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -188,7 +188,7 @@ public class EdxDistrictSecureExchangeCommentOrchestratorTest extends BaseSagaCo
   }
 
   @Test
-  public void testSendEmailEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  void testSendEmailEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -224,7 +224,7 @@ public class EdxDistrictSecureExchangeCommentOrchestratorTest extends BaseSagaCo
   }
 
   @Test
-  public void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT)

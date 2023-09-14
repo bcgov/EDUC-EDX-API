@@ -39,7 +39,7 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void testFindAndProcessPendingSagaEvents_givenInProgressSagas_shouldBeRetried() {
+  void testFindAndProcessPendingSagaEvents_givenInProgressSagas_shouldBeRetried() {
     val saga = this.secureExchangeAPITestUtils.getSagaRepository().save(this.creatMockSaga());
     this.eventTaskScheduler.findAndProcessUncompletedSagas();
     List<SagaEventStatesEntity> sagaEvents = this.secureExchangeAPITestUtils.getSagaEventStateRepository().findBySaga(saga);

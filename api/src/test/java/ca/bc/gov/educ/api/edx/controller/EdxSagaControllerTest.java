@@ -124,7 +124,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
@@ -139,7 +139,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
@@ -154,7 +154,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
@@ -169,7 +169,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
@@ -184,7 +184,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
@@ -199,7 +199,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
@@ -214,7 +214,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
@@ -229,7 +229,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
     createSagaEntity(jsonString, sagaData);
@@ -243,7 +243,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxSchoolUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-invite-saga")
@@ -255,7 +255,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationRelinkSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setLastName(null);
     String jsonString = getJsonString(sagaData);
@@ -270,7 +270,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setFirstName(null);
     String jsonString = getJsonString(sagaData);
@@ -285,7 +285,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setEmail(null);
     String jsonString = getJsonString(sagaData);
@@ -300,7 +300,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolName(null);
     String jsonString = getJsonString(sagaData);
@@ -315,7 +315,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.setSchoolID(null);
     String jsonString = getJsonString(sagaData);
@@ -330,7 +330,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithMissingRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().clear();
     String jsonString = getJsonString(sagaData);
@@ -345,7 +345,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithInvalidRoleIdsRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     sagaData.getEdxActivationRoleCodes().add("ABCD");
     String jsonString = getJsonString(sagaData);
@@ -360,7 +360,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserSchoolActivationRelinkSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
     createSagaSchoolRelinkEntity(jsonString, sagaData);
@@ -374,7 +374,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
+  void testEdxDistrictUserActivationRelink_GivenInputWithSagaAlreadyInProgress_ShouldReturnStatusConflict() throws Exception {
     EdxUserDistrictActivationRelinkSagaData sagaData = createUserDistrictActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
     createSagaDistrictRelinkEntity(jsonString, sagaData);
@@ -388,7 +388,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     EdxUserSchoolActivationInviteSagaData sagaData = createUserSchoolActivationRelinkData("firstName", "lastName", "test@bcgov.ca", UUID.randomUUID().toString(), UUID.randomUUID().toString());
     String jsonString = getJsonString(sagaData);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/school-user-activation-relink-saga")
@@ -400,7 +400,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxSchoolUserActivationRelink_GivenValidInputAndValidSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxSchoolUserActivationRelink_GivenValidInputAndValidSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
     List<UUID> schoolIDs = new ArrayList<>();
     schoolIDs.add(UUID.randomUUID());
     var edxUser = createUserEntityWithMultipleSchools(edxUserRepository, edxPermissionRepository, edxRoleRepository, edxUserSchoolRepository, edxUserDistrictRepository, schoolIDs);
@@ -415,7 +415,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "SCHOOL"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, "schoolName", null, null, "MinTeam");
     String jsonString = getJsonString(sagaData);
@@ -430,7 +430,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, null, "name", "MinTeam");
     String jsonString = getJsonString(sagaData);
@@ -445,7 +445,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(), "DISTRICT"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, null, null, UUID.randomUUID(), null, "MinTeam");
     String jsonString = getJsonString(sagaData);
@@ -460,7 +460,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJson(this.ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString(),"SCHOOL"), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), null, null, null, "MinTeam");
     String jsonString = getJsonString(sagaData);
@@ -475,7 +475,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
     val sagaData = createSecureExchangeCreateSagaData(secureExchangeCreate, UUID.randomUUID(), "WildFlower", null, null, null);
     String jsonString = getJsonString(sagaData);
@@ -490,7 +490,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateNewSecureExchange_GivenInputWithMissingSecureExchangeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenInputWithMissingSecureExchangeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     val sagaData = createSecureExchangeCreateSagaData(null, UUID.randomUUID(), "WildFlower", null, null, "ABC Team");
     String jsonString = getJsonString(sagaData);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/new-secure-exchange-saga")
@@ -505,7 +505,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
 
   @Test
-  public void testCreateNewSecureExchange_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testCreateNewSecureExchange_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     final SecureExchangeDocument secureExchangeDocument = this.getSampleDocument(null);
     final SecureExchangeStudent secureExchangeStudent = this.getSampleStudent();
     SecureExchangeCreate secureExchangeCreate = objectMapper.readValue(secureExchangeCreateJsonWithMinAndComment(ministryOwnershipTeamEntity.getMinistryOwnershipTeamId().toString()), SecureExchangeCreate.class);
@@ -524,7 +524,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingSchoolIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, null, null, "WildFlower", "ABC Team", UUID.randomUUID(), "10", "SCHOOL");
     String jsonString = getJsonString(sagaData);
@@ -539,7 +539,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingSchoolNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), null, null,null, "ABC Team", UUID.randomUUID(), "10", "SCHOOL");
@@ -555,7 +555,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, UUID.randomUUID(), null, null, "ABC Team", UUID.randomUUID(), "10", "DISTRICT");
@@ -571,7 +571,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null, null, "DGroup", null, "ABC Team", UUID.randomUUID(), "10", "DISTRICT");
@@ -587,7 +587,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingMinistryTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingMinistryTeamNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", null, UUID.randomUUID(), "10", "SCHOOL");
@@ -603,7 +603,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingSecureExchangeIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingSecureExchangeIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(), null, null,"WildFlower", "ABC Team", null, "10", "SCHOOL");
@@ -619,7 +619,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingSequenceNumberRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingSequenceNumberRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(UUID.randomUUID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", UUID.randomUUID(), null, "SCHOOL");
@@ -635,7 +635,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenInputWithMissingCommentRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenInputWithMissingCommentRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createSecureExchangeCommentSagaData(null, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", UUID.randomUUID(), "12", "SCHOOL");
     String jsonString = getJsonString(sagaData);
@@ -652,7 +652,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
 
   @Test
-  public void testCreateSecureExchangeComment_GivenValidInputForSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenValidInputForSchool_ShouldReturnStatusAcceptedRequest() throws Exception {
     final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString()));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(entity.getSecureExchangeID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, UUID.randomUUID(),null, null, "WildFlower", "ABC Team", entity.getSecureExchangeID(), "10", "SCHOOL");
@@ -667,7 +667,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testCreateSecureExchangeComment_GivenValidInputForDistrict_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testCreateSecureExchangeComment_GivenValidInputForDistrict_ShouldReturnStatusAcceptedRequest() throws Exception {
     final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(SECURE_EXCHANGE_ENTITY_MAPPER.toModel(this.getSecureExchangeEntityFromJsonString()));
     SecureExchangeComment secureExchangeComment = objectMapper.readValue(secureExchangeCommentJson(entity.getSecureExchangeID().toString()), SecureExchangeComment.class);
     val sagaData = createSecureExchangeCommentSagaData(secureExchangeComment, null,UUID.randomUUID(), "DGroup", null, "ABC Team", entity.getSecureExchangeID(), "10", "DISTRICT");
@@ -681,7 +681,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
       .andDo(print()).andExpect(status().isAccepted());
   }
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingFirstNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData(null, "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
@@ -696,7 +696,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingLastNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", null, "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
@@ -711,7 +711,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", null);
     String jsonString = getJsonString(sagaData);
@@ -726,7 +726,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithInvalidEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithInvalidEmailRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test.abc");
     String jsonString = getJsonString(sagaData);
@@ -741,7 +741,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIdRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictID(null);
@@ -757,7 +757,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictNameRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictName(null);
@@ -773,7 +773,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingDistrictIDRequiredField_ShouldReturnStatusBadRequest() throws Exception {
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setDistrictID(null);
     String jsonString = getJsonString(sagaData);
@@ -788,7 +788,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenInputWithMissingEdxActivationRoleCodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenInputWithMissingEdxActivationRoleCodeRequiredField_ShouldReturnStatusBadRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     sagaData.setEdxActivationRoleCodes(null);
@@ -804,7 +804,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxDistrictUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxDistrictUserActivationInvite_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
 
     val sagaData = createDistrictUserActivationInviteData("firstName", "lastName", "test@bcgov.ca");
     String jsonString = getJsonString(sagaData);
@@ -817,7 +817,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxMoveSchool_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxMoveSchool_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     MoveSchoolData sagaData = createDummyMoveSchoolSagaData();
     String jsonString = getJsonString(sagaData);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/move-school-saga")
@@ -829,7 +829,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  public void testEdxMoveSchoolWithDisplayNameNoSpecChars_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
+  void testEdxMoveSchoolWithDisplayNameNoSpecChars_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     School school = createDummySchool();
     school.setDisplayNameNoSpecialChars("Test Special Chars.");
 

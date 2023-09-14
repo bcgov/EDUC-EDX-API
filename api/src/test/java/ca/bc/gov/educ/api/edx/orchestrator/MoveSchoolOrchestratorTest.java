@@ -119,7 +119,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    public void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException, InterruptedException, TimeoutException {
+    void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
             .eventType(INITIATED)
@@ -143,7 +143,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    public void testMoveSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDB() throws IOException, InterruptedException, TimeoutException {
+    void testMoveSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDB() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
             .eventType(MOVE_SCHOOL)
@@ -171,7 +171,7 @@ public class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    public void testMoveUsersEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNatsAndEdxUserSchoolsShouldBeCopiedToNewSchool() throws IOException, InterruptedException, TimeoutException {
+    void testMoveUsersEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNatsAndEdxUserSchoolsShouldBeCopiedToNewSchool() throws IOException, InterruptedException, TimeoutException {
         this.edxUserRepository.findAll();
 
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();

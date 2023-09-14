@@ -47,14 +47,14 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     }
 
     @Test
-    public void testRetrieveSecureExchangeComments_GivenInvalidPenReqID_ShouldReturnStatusNotFound() throws Exception {
+    void testRetrieveSecureExchangeComments_GivenInvalidPenReqID_ShouldReturnStatusNotFound() throws Exception {
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,UUID.randomUUID())
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_COMMENT"))))
                 .andDo(print()).andExpect(status().isNotFound());
     }
 
     @Test
-    public void testRetrieveSecureExchangeComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
+    void testRetrieveSecureExchangeComments_GivenValidPenReqID_ShouldReturnStatusOk() throws Exception {
         final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         final String penReqId = entity.getSecureExchangeID().toString();
         this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS, penReqId )
@@ -63,7 +63,7 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     }
 
     @Test
-    public void testCreateSecureExchangeComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
+    void testCreateSecureExchangeComments_GivenValidPayload_ShouldReturnStatusCreated() throws Exception {
         final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         final String secureExchangeID = entity.getSecureExchangeID().toString();
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,secureExchangeID )
@@ -78,7 +78,7 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     }
 
     @Test
-    public void testCreateSecureExchangeComments_GivenValidPayloadWithEdxUserId_ShouldReturnStatusCreated() throws Exception {
+    void testCreateSecureExchangeComments_GivenValidPayloadWithEdxUserId_ShouldReturnStatusCreated() throws Exception {
         final SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
         final String secureExchangeID = entity.getSecureExchangeID().toString();
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,secureExchangeID )
@@ -93,7 +93,7 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     }
 
     @Test
-    public void testCreateSecureExchangeComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
+    void testCreateSecureExchangeComments_GivenInvalidPenReqId_ShouldReturnStatusNotFound() throws Exception {
         final String penReqId = UUID.randomUUID().toString();
         this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE+"/" +URL.SECURE_EXCHANGE_ID_COMMENTS,penReqId)
                 .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_COMMENT")))

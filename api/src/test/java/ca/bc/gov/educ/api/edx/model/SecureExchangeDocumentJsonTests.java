@@ -41,7 +41,7 @@ public class SecureExchangeDocumentJsonTests {
     }
 
     @Test
-    public void documentSerializeTest() throws Exception {
+    void documentSerializeTest() throws Exception {
         JsonContent<SecureExchangeDocument> json = this.jsonTester.write(mapper.toStructure(this.document));
 
         assertThat(json).hasJsonPathStringValue("@.documentID");
@@ -54,7 +54,7 @@ public class SecureExchangeDocumentJsonTests {
     }
 
     @Test
-    public void documentMetadataSerializeTest() throws Exception {
+    void documentMetadataSerializeTest() throws Exception {
         JsonContent<SecureExchangeDocMetadata> json = this.documentMetadataTester.write(mapper.toMetadataStructure(this.document));
 
         assertThat(json).hasJsonPathStringValue("@.documentID");
@@ -65,14 +65,14 @@ public class SecureExchangeDocumentJsonTests {
     }
 
     @Test
-    public void documentDeserializeTest() throws Exception {
+    void documentDeserializeTest() throws Exception {
         SecureExchangeDocument penReqDocument = this.jsonTester.readObject("document.json");
         SecureExchangeDocumentEntity secureExchangeDocument = mapper.toModel(penReqDocument);
         assertThat(secureExchangeDocument.getDocumentData()).isEqualTo("My card!".getBytes());
     }
 
     @Test
-    public void documentDeserializeWithExtraTest() throws Exception {
+    void documentDeserializeWithExtraTest() throws Exception {
         SecureExchangeDocument secureExchangeDocument = this.jsonTester.readObject("document-extra-properties.json");
         assertThat(secureExchangeDocument.getDocumentData()).isEqualTo("TXkgY2FyZCE=");
     }

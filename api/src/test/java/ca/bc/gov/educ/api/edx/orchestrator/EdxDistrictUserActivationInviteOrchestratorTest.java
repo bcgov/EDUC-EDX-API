@@ -127,7 +127,7 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
     }
 
     @Test
-    public void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException
+    void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException
     {
       final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
       final var event = Event.builder()
@@ -160,7 +160,7 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
 
 
     @Test
-    public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+    void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
       //to create the test data/
       final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
       final var event = Event.builder()
@@ -196,7 +196,7 @@ public class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureE
     }
 
     @Test
-    public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+    void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
       final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
       final var event = Event.builder()
         .eventType(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL)

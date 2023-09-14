@@ -33,7 +33,7 @@ public class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
 
 
   @Test
-  public void sendEmail() {
+  void sendEmail() {
     final var payload = EmailNotification.builder().build();
     payload.setToEmail("test@gov.bc.ca");
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(),any());

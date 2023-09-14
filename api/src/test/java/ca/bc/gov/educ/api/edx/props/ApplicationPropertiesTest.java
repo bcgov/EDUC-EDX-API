@@ -11,7 +11,7 @@ public class ApplicationPropertiesTest extends BaseSecureExchangeAPITest {
   ApplicationProperties applicationProperties;
 
   @Test
-  public void testGetDifferentAttributes_GivenPresentInProperties_ShouldReturnNotNull() {
+  void testGetDifferentAttributes_GivenPresentInProperties_ShouldReturnNotNull() {
     assertThat(applicationProperties.getChesClientID()).isNotBlank();
     assertThat(applicationProperties.getChesClientSecret()).isNotBlank();
     assertThat(applicationProperties.getChesEndpointURL()).isNotBlank();

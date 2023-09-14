@@ -126,7 +126,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -157,7 +157,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -188,7 +188,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -224,7 +224,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE)

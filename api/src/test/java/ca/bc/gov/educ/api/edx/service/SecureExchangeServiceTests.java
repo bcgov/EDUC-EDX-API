@@ -101,7 +101,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void getSecureExchangeContactTypes() {
+  void getSecureExchangeContactTypes() {
     final Iterable<SecureExchangeContactTypeCodeEntity> contactTypes = this.service.getSecureExchangeContactTypeCodesList();
     assertThat(contactTypes).isNotNull();
     long count = StreamSupport.stream(contactTypes.spliterator(), false).count();

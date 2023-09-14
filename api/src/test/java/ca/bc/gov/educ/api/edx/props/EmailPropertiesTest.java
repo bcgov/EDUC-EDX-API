@@ -10,12 +10,12 @@ public class EmailPropertiesTest extends BaseSecureExchangeAPITest {
   @Autowired
   EmailProperties emailProperties;
   @Test
-  public void getEdxSchoolUserActivationInviteEmailSubject() {
+  void getEdxSchoolUserActivationInviteEmailSubject() {
     assertThat(emailProperties.getEdxSchoolUserActivationInviteEmailSubject()).isNotNull();
   }
 
   @Test
-  public void getEdxSchoolUserActivationInviteEmailFrom() {
+  void getEdxSchoolUserActivationInviteEmailFrom() {
     assertThat(emailProperties.getEdxSchoolUserActivationInviteEmailFrom()).isNotNull();
   }
 }

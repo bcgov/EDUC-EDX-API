@@ -26,7 +26,7 @@ public class SecureExchangeDocRequirementEntityJsonTests {
     private JacksonTester<SecureExchangeDocRequirement> jsonTester;
 
     @Test
-    public void requirementSerializeTest() throws Exception {
+    void requirementSerializeTest() throws Exception {
         int maxSize = 100;
         List<String> extensions = new ArrayList<String>(Arrays.asList("jpg", "png", "pdf"));
         SecureExchangeDocRequirement requirement = new SecureExchangeDocRequirement(maxSize, extensions);
@@ -43,7 +43,7 @@ public class SecureExchangeDocRequirementEntityJsonTests {
     }
 
     @Test
-    public void documentDeserializeTest() throws Exception {
+    void documentDeserializeTest() throws Exception {
         SecureExchangeDocRequirement document = this.jsonTester.readObject("requirement.json");
         assertThat(document.getMaxSize()).isEqualTo(20);
         assertThat(document.getExtensions()).hasSize(2);
