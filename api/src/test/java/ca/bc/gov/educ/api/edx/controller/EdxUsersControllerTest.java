@@ -178,7 +178,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Test
   public void testFindEdxUsers_GivenInValidDigitalIdentityID_ShouldReturnOkStatusWithEmptyResult() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("digitalId", UUID.randomUUID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))

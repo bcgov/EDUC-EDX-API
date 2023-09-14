@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.edx.service.v1;
 
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolRoleEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.MoveSchoolData;
 import java.time.LocalDateTime;

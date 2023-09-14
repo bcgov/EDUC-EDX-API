@@ -18,7 +18,6 @@ import ca.bc.gov.educ.api.edx.validator.EdxPrimaryActivationCodeValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxUserPayloadValidator;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
-@Slf4j
 public class EdxUsersController extends BaseController implements EdxUsersEndpoint {
 
   @Getter(AccessLevel.PRIVATE)

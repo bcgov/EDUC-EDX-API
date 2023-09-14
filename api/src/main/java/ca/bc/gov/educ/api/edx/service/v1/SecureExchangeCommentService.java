@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class SecureExchangeCommentService {
 
   @Getter(AccessLevel.PRIVATE)

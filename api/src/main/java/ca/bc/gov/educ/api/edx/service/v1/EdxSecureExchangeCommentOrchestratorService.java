@@ -14,7 +14,6 @@ import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ import java.util.*;
  * The type Edx secure exchange comment orchestrator service.
  */
 @Service
-@Slf4j
 public class EdxSecureExchangeCommentOrchestratorService {
 
   /**
