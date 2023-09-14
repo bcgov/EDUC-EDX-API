@@ -17,8 +17,8 @@ import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
@@ -60,7 +60,7 @@ public class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPIT
 
   private UUID penReqID = UUID.randomUUID();
 
-  @Before
+  @BeforeEach
   public void setUp() {
 
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);

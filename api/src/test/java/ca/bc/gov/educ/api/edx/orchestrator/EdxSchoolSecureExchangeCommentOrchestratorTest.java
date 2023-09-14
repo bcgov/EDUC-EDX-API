@@ -21,9 +21,9 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -97,7 +97,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  @After
+  @AfterEach
   public void after() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
@@ -108,7 +108,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
     ministryOwnershipTeamRepository.deleteAll();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
     sagaData = createCommentSagaData();

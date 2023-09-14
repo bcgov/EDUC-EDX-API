@@ -12,9 +12,9 @@ import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hibernate.Hibernate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,12 +40,12 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     this.ministryOwnershipTeamRepository.deleteAll();
     this.secureExchangeContactTypeCodeTableRepository.deleteAll();

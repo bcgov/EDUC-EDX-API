@@ -11,8 +11,8 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.javacrumbs.shedlock.core.LockAssert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -33,7 +33,7 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   private EdxPermissionRepository edxPermissionRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     LockAssert.TestHelper.makeAllAssertsPass(true);
   }

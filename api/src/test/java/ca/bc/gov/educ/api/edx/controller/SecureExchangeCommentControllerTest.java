@@ -7,10 +7,9 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestCommentRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -38,17 +37,12 @@ public class SecureExchangeCommentControllerTest extends BaseSecureExchangeContr
     @Autowired
     SecureExchangeRequestCommentRepository repository;
 
-    @BeforeClass
-    public static void beforeClass() {
-
-    }
-
-    @Before
+    @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
-    @After
+    @AfterEach
     public void after() {
       this.repository.deleteAll();
     }

@@ -13,9 +13,9 @@ import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,7 +63,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
   @Autowired
   private DocumentTypeCodeTableRepository documentTypeCodeRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
     this.secureExchangeStatusCodeTableRepo.save(createNewStatus());
@@ -71,7 +71,7 @@ public class SecureExchangeControllerTest extends BaseSecureExchangeControllerTe
     MockitoAnnotations.openMocks(this);
   }
 
-  @After
+  @AfterEach
   public void after() {
     this.secureExchangeContactTypeCodeTableRepository.deleteAll();
     this.secureExchangeStatusCodeTableRepo.deleteAll();

@@ -15,9 +15,9 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -97,7 +97,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
@@ -108,7 +108,7 @@ public class EdxSagaControllerTest extends BaseSagaControllerTest {
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(), any());
   }
 
-  @After
+  @AfterEach
   public void after() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
