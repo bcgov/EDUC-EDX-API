@@ -162,8 +162,8 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(found.getIsPrimary()).isTrue();
   }
 
-  @Test()
-  public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
+  @Test
+  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
     assertThrows(EntityNotFoundException.class, () -> {
       EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
       EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryEdxActivationCode.getSchoolID().toString());
