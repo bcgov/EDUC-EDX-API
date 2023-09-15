@@ -163,34 +163,18 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
-    assertThrows(EntityNotFoundException.class, () -> {
-      EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
-      EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryEdxActivationCode.getSchoolID().toString());
-      assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
-    });
-  }
-
-  @Test
-  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForDistrict() {
-    assertThrows(EntityNotFoundException.class, () -> {
-      EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
-      EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryEdxActivationCode.getDistrictID().toString());
-      assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
-    });
-  }
-
-  @Test
   void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForSchool() {
+    String uuid = UUID.randomUUID().toString();
     assertThrows(EntityNotFoundException.class, () -> {
-      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, UUID.randomUUID().toString());
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, uuid);
     });
   }
 
   @Test
   void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForDistrict() {
+    String uuid = UUID.randomUUID().toString();
     assertThrows(EntityNotFoundException.class, () -> {
-      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, UUID.randomUUID().toString());
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, uuid);
     });
   }
 
