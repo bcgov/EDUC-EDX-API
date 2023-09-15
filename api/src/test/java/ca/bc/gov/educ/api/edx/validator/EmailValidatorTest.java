@@ -23,7 +23,7 @@ class EmailValidatorTest {
     "username@test.ca,false",
     "username@yahoo.com,false",
   })
-  public void testValidateEmail_givenDifferentInputs_shouldReturnExpectedResult(final String email, final boolean expectedErrorSize) {
+  void testValidateEmail_givenDifferentInputs_shouldReturnExpectedResult(final String email, final boolean expectedErrorSize) {
     val result = this.validator.isInvalidEmailAddress(email);
     assertThat (result).isEqualTo(expectedErrorSize);
   }
