@@ -17,9 +17,9 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -37,8 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@Slf4j
-public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExchangeAPITest {
+class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExchangeAPITest {
 
   /**
    * The Repository.
@@ -83,7 +82,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  @Before
+  @BeforeEach
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
     sagaData = createUserActivationInviteData("Test", "User", "testuser@bcgov.ca");
@@ -101,7 +100,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   /**
    * After.
    */
-  @After
+  @AfterEach
   public void after() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
@@ -128,7 +127,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   }
 
   @Test
-  public void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -160,7 +159,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
 
 
   @Test
-  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -196,7 +195,7 @@ public class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExc
   }
 
   @Test
-  public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL)

@@ -11,8 +11,8 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import lombok.SneakyThrows;
 import lombok.val;
 import net.javacrumbs.shedlock.core.LockAssert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
+class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   EventTaskScheduler eventTaskScheduler;
   @Autowired
@@ -33,13 +33,13 @@ public class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   private EdxPermissionRepository edxPermissionRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     LockAssert.TestHelper.makeAllAssertsPass(true);
   }
 
   @Test
-  public void testFindAndProcessPendingSagaEvents_givenInProgressSagas_shouldBeRetried() {
+  void testFindAndProcessPendingSagaEvents_givenInProgressSagas_shouldBeRetried() {
     val saga = this.secureExchangeAPITestUtils.getSagaRepository().save(this.creatMockSaga());
     this.eventTaskScheduler.findAndProcessUncompletedSagas();
     List<SagaEventStatesEntity> sagaEvents = this.secureExchangeAPITestUtils.getSagaEventStateRepository().findBySaga(saga);

@@ -11,9 +11,9 @@ import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import lombok.val;
 import net.javacrumbs.shedlock.core.LockAssert;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
+class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   private DocumentRepository repository;
   @Autowired
@@ -34,7 +34,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
   @Autowired
   private SecureExchangeRequestRepository secureExchangeRequestRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     LockAssert.TestHelper.makeAllAssertsPass(true);
     DocumentTypeCodeBuilder.setUpDocumentTypeCodes(this.documentTypeCodeRepository);
@@ -54,13 +54,13 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     this.repository.save(document);
   }
 
-  @After
+  @AfterEach
   public void after() {
     this.repository.deleteAll();
   }
 
   @Test
-  public void removeBlobContentsFromUploadedDocuments() {
+  void removeBlobContentsFromUploadedDocuments() {
     this.secureExchangeScheduler.removeBlobContentsFromUploadedDocuments();
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
@@ -71,7 +71,7 @@ public class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     assertThat(doc).isNull();
   }
   @Test
-  public void testPurgeClosedMessages_GivenMessageIsOlderThanGivenTime_MessageWillBeDeleted() throws IOException {
+  void testPurgeClosedMessages_GivenMessageIsOlderThanGivenTime_MessageWillBeDeleted() throws IOException {
     val results = this.repository.findAll();
     assertThat(results).size().isEqualTo(1);
     assertThat(results.get(0)).isNotNull();

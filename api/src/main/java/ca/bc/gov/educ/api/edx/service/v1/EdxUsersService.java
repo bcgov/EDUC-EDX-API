@@ -870,7 +870,8 @@ public class EdxUsersService {
    * @param instituteIdentifier the instituteIdentifier
    * @return the edx activation code entity
    */
-  public EdxActivationCodeEntity findPrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier) {
+  public EdxActivationCodeEntity findPrimaryEdxActivationCode(InstituteTypeCode instituteType, String instituteIdentifier)
+  throws EntityNotFoundException {
     Optional<EdxActivationCodeEntity> primaryEdxActivationCode = this.findPrimaryEdxActivationCodeForInstitute(instituteType, instituteIdentifier);
     if (primaryEdxActivationCode.isEmpty()) {
       throw new EntityNotFoundException(EdxActivationCodeEntity.class, INSTITUTE_IDENTIFIER, instituteIdentifier);

@@ -10,7 +10,7 @@ import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITest {
+class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchangeAPITest {
 
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 
@@ -37,7 +37,7 @@ public class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchan
 
     @Test
     @Transactional
-    public void testDeleteStudentFromExchange() {
+    void testDeleteStudentFromExchange() {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(
                 addStudentToSecureExchangeEntity(createSecureExchange(), UUID.fromString(LEGIT_STUDENT_ID))
         );
@@ -57,7 +57,7 @@ public class SecureExchangeStudentServiceGetDeleteTests extends BaseSecureExchan
 
     @Test
     @Transactional
-    public void testGetStudentIDsFromExchange(){
+    void testGetStudentIDsFromExchange(){
         SecureExchangeEntity entity = addStudentToSecureExchangeEntity(createSecureExchange(), UUID.fromString(LEGIT_STUDENT_ID));
         addStudentToSecureExchangeEntity(entity, UUID.randomUUID());
         entity = this.secureExchangeRequestRepository.save(entity);

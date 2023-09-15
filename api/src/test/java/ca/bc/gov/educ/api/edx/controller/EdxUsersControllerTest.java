@@ -10,9 +10,9 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
+class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -62,7 +62,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxActivationRoleRepository edxActivationRoleRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
@@ -70,13 +70,13 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EDXUserControllerTestUtils edxUserControllerTestUtils;
 
-  @After
+  @AfterEach
   public  void after() {
     this.edxUserControllerTestUtils.cleanDB();
   }
 
   @Test
-  public void testRetrieveMinistryTeams_ShouldReturnOkStatus() throws Exception {
+  void testRetrieveMinistryTeams_ShouldReturnOkStatus() throws Exception {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipTeam());
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.MINISTRY_TEAMS)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_MINISTRY_TEAMS"))))
@@ -85,7 +85,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testRetrieveUsers_GivenValidID_ShouldReturnOkStatus() throws Exception {
+  void testRetrieveUsers_GivenValidID_ShouldReturnOkStatus() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
@@ -95,7 +95,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindAllEdxUserSchoolIDs_GivenValidPermissionName_ShouldReturnOkStatusAndSchoolIDs() throws Exception {
+  void testFindAllEdxUserSchoolIDs_GivenValidPermissionName_ShouldReturnOkStatusAndSchoolIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOLS)
         .param("permissionCode", "Exchange")
@@ -106,7 +106,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindAllEdxUserDistrictIDs_GivenValidPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
+  void testFindAllEdxUserDistrictIDs_GivenValidPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
                     .param("permissionCode", "Exchange")
@@ -117,7 +117,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenValidDigitalIdentityID_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxUsers_GivenValidDigitalIdentityID_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     UUID digitalIdentityID = entity.getDigitalIdentityID();
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
@@ -128,7 +128,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
@@ -140,7 +140,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
   @Test
-  public void testFindEdxUsers_GivenSchoolIDAsInput_ShouldReturnOkStatusWithResults() throws Exception {
+  void testFindEdxUsers_GivenSchoolIDAsInput_ShouldReturnOkStatusWithResults() throws Exception {
     List<UUID> schoolIDList = new ArrayList<>();
     schoolIDList.add(UUID.randomUUID());
 
@@ -156,7 +156,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
         .andExpect(jsonPath("$.[0].edxUserDistricts[0].districtID", is(notNullValue())));
   }
   @Test
-  public void testFindEdxUsers_GivenNoInput_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxUsers_GivenNoInput_ShouldReturnOkStatusWithResult() throws Exception {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
@@ -166,7 +166,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenInvalidSchoolIDAsInput_ShouldReturnOkStatusWithEmptyResult() throws Exception {
+  void testFindEdxUsers_GivenInvalidSchoolIDAsInput_ShouldReturnOkStatusWithEmptyResult() throws Exception {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
@@ -177,8 +177,8 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxUsers_GivenInValidDigitalIdentityID_ShouldReturnOkStatusWithEmptyResult() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+  void testFindEdxUsers_GivenInValidDigitalIdentityID_ShouldReturnOkStatusWithEmptyResult() throws Exception {
+    this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("digitalId", UUID.randomUUID().toString())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
@@ -187,7 +187,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+  void testCreateEdxUsers_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -200,7 +200,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_MissingRequiredData_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_MissingRequiredData_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setFirstName(null);
     String json = getJsonString(edxUser);
@@ -213,7 +213,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenUserWithDigitalIdentityIdExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenUserWithDigitalIdentityIdExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     EdxUser edxUser = createEdxUser();
     edxUser.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
@@ -228,7 +228,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_PKIdColumnHasValue_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_PKIdColumnHasValue_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setEdxUserID(UUID.randomUUID().toString());
     String json = getJsonString(edxUser);
@@ -243,7 +243,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_FirstNameMoreThan255Characters_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_FirstNameMoreThan255Characters_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setFirstName("VeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTest");
     String json = getJsonString(edxUser);
@@ -259,7 +259,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_LastNameMoreThan255Characters_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_LastNameMoreThan255Characters_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setLastName("VeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTestVeryLongUserNameTest");
     String json = getJsonString(edxUser);
@@ -275,7 +275,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_IncorrectEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setEmail("abc@test@test.coms");
     String json = getJsonString(edxUser);
@@ -291,7 +291,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsers_GivenInValidData_NoEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsers_GivenInValidData_NoEmailId_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     edxUser.setEmail(null);
     String json = getJsonString(edxUser);
@@ -308,7 +308,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testDeleteEdxUsers_GivenValidData_ShouldDelete_AndReturnResultWithNoContentStatus() throws Exception {
+  void testDeleteEdxUsers_GivenValidData_ShouldDelete_AndReturnResultWithNoContentStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -327,7 +327,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}", UUID.randomUUID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER"))))
@@ -337,7 +337,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testCreateEdxUsersSchool_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+  void testCreateEdxUsersSchool_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -366,7 +366,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchool_GivenInValidData_PKColumnNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersSchool_GivenInValidData_PKColumnNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -396,7 +396,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testCreateEdxUsersSchool_GivenInValidData_EntityAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersSchool_GivenInValidData_EntityAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -432,7 +432,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchool_GivenInValidData_EdxUserIdIsNullEdxUserSchool_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersSchool_GivenInValidData_EdxUserIdIsNullEdxUserSchool_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -461,7 +461,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchool_GivenInValidData_EdxUserIdMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersSchool_GivenInValidData_EdxUserIdMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -490,7 +490,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdateEdxUserSchool_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
+  void testUpdateEdxUserSchool_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
     //create and save EdxUser with a school
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
@@ -556,7 +556,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
 @Test
-  public void testUpdateEdxUserSchool_GivenInvalidRoleData_ShouldBeBadRequest() throws Exception {
+  void testUpdateEdxUserSchool_GivenInvalidRoleData_ShouldBeBadRequest() throws Exception {
     //create and save EdxUser with a school
     EdxUser edxUser = createEdxUser();
     EdxUserSchool userSchool = createEdxUserSchool(edxUser);
@@ -578,7 +578,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", UUID.randomUUID(), UUID.randomUUID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
@@ -588,7 +588,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenInValidData_CorrectEdxUserIdWithIncorrectEdxUserSchoolId_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxSchoolUsers_GivenInValidData_CorrectEdxUserIdWithIncorrectEdxUserSchoolId_AndReturnResultWithNotFound() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -622,7 +622,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenInValidData_CorrectEdxUserSchoolIdWithIncorrectEdxUserId_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxSchoolUsers_GivenInValidData_CorrectEdxUserSchoolIdWithIncorrectEdxUserId_AndReturnResultWithNotFound() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -656,7 +656,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
+  void testDeleteEdxSchoolUsers_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -700,7 +700,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -750,7 +750,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInvalidData_UserSchoolRoleIDNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenInvalidData_UserSchoolRoleIDNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -800,7 +800,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInValidData_UserSchoolIDMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenInValidData_UserSchoolIDMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -849,7 +849,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserSchoolDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserSchoolDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -898,7 +898,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -947,7 +947,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserSchoolRoleAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersSchoolRole_GivenInValidData_EdxUserSchoolRoleAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -1004,7 +1004,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithOkStatusResponse() throws Exception {
+  void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, schoolID);
@@ -1028,7 +1028,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenInValidInput_ActivationCodeIsExpired_UserIsNotCreated_BadRequestResponse() throws Exception {
+  void testEdxActivateUsers_GivenInValidInput_ActivationCodeIsExpired_UserIsNotCreated_BadRequestResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode, 2, schoolID);
@@ -1049,7 +1049,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenInValidInput_NoActivationCodeDataPresentInDB_UserIsNotCreated_IsNotFoundResponseStatus() throws Exception {
+  void testEdxActivateUsers_GivenInValidInput_NoActivationCodeDataPresentInDB_UserIsNotCreated_IsNotFoundResponseStatus() throws Exception {
     EdxActivateUser edxActivateUser = new EdxActivateUser();
     edxActivateUser.setSchoolID(UUID.randomUUID());
     edxActivateUser.setPersonalActivationCode("WXYZ");
@@ -1068,7 +1068,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testDeleteActivationCodeByUserId_GivenValidInput_WillReturnNoContentResponse()
+  void testDeleteActivationCodeByUserId_GivenValidInput_WillReturnNoContentResponse()
     throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID edxUserID = UUID.randomUUID();
@@ -1092,7 +1092,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .andDo(print()).andExpect(status().isNoContent());
   }
   @Test
-  public void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUseSchoolAndSchoolRole_WithOkStatusResponse() throws Exception {
+  void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUseSchoolAndSchoolRole_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
@@ -1122,7 +1122,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUserDistrictAndDistrictRoles_WithOkStatusResponse() throws Exception {
+  void testEdxActivateUsers_GivenValidInput_UserIsUpdated_WithAdditionalUserDistrictAndDistrictRoles_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     UUID districtID = UUID.randomUUID();
@@ -1153,7 +1153,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenInValidInput_WhereSchoolIDAndDistrictIdBothMissing_WithErrorResponse() throws Exception {
+  void testEdxActivateUsers_GivenInValidInput_WhereSchoolIDAndDistrictIdBothMissing_WithErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     UUID districtID = UUID.randomUUID();
@@ -1176,7 +1176,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenValidInput_EdxUserIdPresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
+  void testEdxActivateUsers_GivenValidInput_EdxUserIdPresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
@@ -1206,7 +1206,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenValidInput_PresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
+  void testEdxActivateUsers_GivenValidInput_PresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
@@ -1236,7 +1236,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testEdxActivateUsers_GivenInValidInput_EdxUserAlreadyExistsWithTheSchoolIDInDB_EdxUserIsNotUpdated_WithConflictErrorResponse() throws Exception {
+  void testEdxActivateUsers_GivenInValidInput_EdxUserAlreadyExistsWithTheSchoolIDInDB_EdxUserIsNotUpdated_WithConflictErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 2, userEntity.getEdxUserSchoolEntities().iterator().next().getSchoolID());
@@ -1256,7 +1256,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdateIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
+  void testUpdateIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
   UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 0, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
@@ -1274,7 +1274,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdatessssIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
+  void testUpdatessssIsUrlClicked_GivenValidInput_EdxActivationCodeDataIsUpdatedAndReturn_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true, validationCode, 0, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
@@ -1305,7 +1305,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdateIsUrlClicked_GivenValidationLinkIsAlreadyClicked_WillReturnErrorResponse() throws Exception {
+  void testUpdateIsUrlClicked_GivenValidationLinkIsAlreadyClicked_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
@@ -1326,7 +1326,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdateIsUrlClicked_GivenValidationLinkHasAlreadyExpired_WillReturnErrorResponse() throws Exception {
+  void testUpdateIsUrlClicked_GivenValidationLinkHasAlreadyExpired_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, false,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
@@ -1344,7 +1344,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
+  void testUpdateIsUrlClicked_GivenValidationLinkDoesNotExist_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
@@ -1363,7 +1363,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateActivationCode_GivenValidInput_ActivationCodeDataIsCreated_WithCreatedStatusResponse() throws Exception {
+  void testCreateActivationCode_GivenValidInput_ActivationCodeDataIsCreated_WithCreatedStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
@@ -1380,7 +1380,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateActivationCode_GivenInValidInput_ActivationCodeDataContainsId_BadRequestInResponse() throws Exception {
+  void testCreateActivationCode_GivenInValidInput_ActivationCodeDataContainsId_BadRequestInResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
@@ -1397,7 +1397,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
   @Test
-  public void testCreateActivationCode_GivenInValidInput_ActivationRoleDataContainsId_BadRequestInResponse() throws Exception {
+  void testCreateActivationCode_GivenInValidInput_ActivationRoleDataContainsId_BadRequestInResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
@@ -1420,7 +1420,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateActivationCode_GivenInValidInput_ContainsInvalidRoleId_BadRequestInResponse() throws Exception {
+  void testCreateActivationCode_GivenInValidInput_ContainsInvalidRoleId_BadRequestInResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
@@ -1438,7 +1438,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateActivationCode_GivenInValidInput_ActivationCodeHasNoActivationRolesData_BadRequestInResponse() throws Exception {
+  void testCreateActivationCode_GivenInValidInput_ActivationCodeHasNoActivationRolesData_BadRequestInResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val edxRoleEntity  = this.createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
     EdxActivationCode edxActivationCode = createActivationCodeDetails(validationCode, edxRoleEntity,"ABCDE",true);
@@ -1456,7 +1456,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
+  void testDeleteActivationCode_GivenValidInput_WillReturnNoContentResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     val entityList  = this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
 
@@ -1469,7 +1469,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteActivationCode_GivenInValidInput_WillReturnNotFoundErrorResponse() throws Exception {
+  void testDeleteActivationCode_GivenInValidInput_WillReturnNotFoundErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
 
@@ -1483,7 +1483,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForSchool_GivenValidInput_WillReturnSuccess() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForSchool_GivenValidInput_WillReturnSuccess() throws Exception {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -1497,7 +1497,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForDistrict_GivenValidInput_WillReturnSuccess() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForDistrict_GivenValidInput_WillReturnSuccess() throws Exception {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -1511,7 +1511,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForSchool_OnlyReturnsPrimaryActivationCodes_WillReturnSuccess() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForSchool_OnlyReturnsPrimaryActivationCodes_WillReturnSuccess() throws Exception {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID));
@@ -1529,7 +1529,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForDistrict_OnlyReturnsPrimaryActivationCodes_WillReturnSuccess() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForDistrict_OnlyReturnsPrimaryActivationCodes_WillReturnSuccess() throws Exception {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
@@ -1547,7 +1547,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnNotFound() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnNotFound() throws Exception {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
@@ -1555,7 +1555,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnNotFound() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnNotFound() throws Exception {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
@@ -1563,7 +1563,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForSchool_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForSchool_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + nonPrimaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -1572,7 +1572,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindPrimaryEdxActivationCode_ForDistrict_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
+  void testFindPrimaryEdxActivationCode_ForDistrict_OnlyReturnsPrimaryActivationCodes_WillReturnNotFound() throws Exception {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + nonPrimaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
@@ -1581,7 +1581,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenValidInput_SetsNewRandomActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenValidInput_SetsNewRandomActivationCode_WillReturnCreated() throws Exception {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(primaryActivationCode.getSchoolID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
@@ -1597,7 +1597,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenValidInput_SetsNewRandomActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenValidInput_SetsNewRandomActivationCode_WillReturnCreated() throws Exception {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(primaryActivationCode.getDistrictID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
@@ -1612,7 +1612,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenNewSchoolID_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenNewSchoolID_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
     UUID schoolID = UUID.randomUUID();
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
@@ -1631,7 +1631,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenNewDistrictID_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenNewDistrictID_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
     UUID districtID = UUID.randomUUID();
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
@@ -1650,7 +1650,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenExistingSchoolID_SetsNewRandomActivationCodeOfPrimary_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenExistingSchoolID_SetsNewRandomActivationCodeOfPrimary_WillReturnCreated() throws Exception {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID, null));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
@@ -1674,7 +1674,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenExistingDistrictID_SetsNewRandomActivationCodeOfPrimary_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenExistingDistrictID_SetsNewRandomActivationCodeOfPrimary_WillReturnCreated() throws Exception {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
@@ -1698,7 +1698,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenExistingSchoolID_WillOnlyGenerateActivationCodeOfPrimary_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenExistingSchoolID_WillOnlyGenerateActivationCodeOfPrimary_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
@@ -1720,7 +1720,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenExistingDistrictID_WillOnlyGenerateActivationCodeOfPrimary_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenExistingDistrictID_WillOnlyGenerateActivationCodeOfPrimary_CreatesNewEdxActivationCode_WillReturnCreated() throws Exception {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
@@ -1742,7 +1742,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setDistrictID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
@@ -1755,7 +1755,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
@@ -1768,7 +1768,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenNullInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenNullInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
     this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID())
@@ -1780,7 +1780,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenNullInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenNullInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(UUID.randomUUID());
     String jsonString = getJsonString(toJsonStringify);
@@ -1793,7 +1793,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenDistrictIDInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenDistrictIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(null);
     toJsonStringify.setDistrictID(UUID.randomUUID());
@@ -1807,7 +1807,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenSchoolIDInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenSchoolIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCode("EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     toJsonStringify.setSchoolID(UUID.randomUUID());
     toJsonStringify.setDistrictID(null);
@@ -1821,7 +1821,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenMismatchedSchoolIDInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForSchool_GivenMismatchedSchoolIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForSchool(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
     this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID())
@@ -1833,7 +1833,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenMismatchedDistrictIDInput_WillReturnBadRequest() throws Exception {
+  void testGenerateOrRegeneratePrimaryEdxActivationCode_ForDistrict_GivenMismatchedDistrictIDInput_WillReturnBadRequest() throws Exception {
     EdxPrimaryActivationCode toJsonStringify = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID(),"EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     String jsonString = getJsonString(toJsonStringify);
     this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID())
@@ -1845,7 +1845,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxRoles_GivenNoTypeCode_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxRoles_GivenNoTypeCode_ShouldReturnOkStatusWithResult() throws Exception {
     this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
@@ -1862,7 +1862,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testFindEdxRoles_ForSchoolTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxRoles_ForSchoolTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
     this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
@@ -1878,7 +1878,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
     @Test
-  public void testFindEdxRoles_ForSchoolTypeInstitutionCodeAllowList_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxRoles_ForSchoolTypeInstitutionCodeAllowList_ShouldReturnOkStatusWithResult() throws Exception {
     this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
     EdxPermissionEntity secureExchangePermissionEntity =  edxPermissionRepository.save(createEdxPermissionForSchoolAndDistrict("ABC_TEST"));
     EdxRoleEntity secureExchangeRole = createEdxRoleForSchoolAndDistrict("ABC_TEST","ABC Test",false);
@@ -1900,7 +1900,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testFindEdxRoles_ForDistrictTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
+  void testFindEdxRoles_ForDistrictTypeInstitutionCode_ShouldReturnOkStatusWithResult() throws Exception {
     this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
@@ -1914,7 +1914,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUserDistrict_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+  void testCreateEdxUserDistrict_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -1943,7 +1943,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUserDistrict_GivenInValidData_PKColumnNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUserDistrict_GivenInValidData_PKColumnNotNull_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -1973,7 +1973,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrict_GivenInValidData_EntityAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersDistrict_GivenInValidData_EntityAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2009,7 +2009,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdIsNullEdxUserSchool_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdIsNullEdxUserSchool_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2038,7 +2038,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
+  void testCreateEdxUsersDistrict_GivenInValidData_EdxUserIdMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequestStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2066,7 +2066,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
   }
   @Test
-  public void testUpdateEdxUserDistrict_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
+  void testUpdateEdxUserDistrict_GivenValidRoleData_ShouldUpdateEntityWithRole_AndReturnResultWithOkStatus_GivenNoRoleData_ShouldUpdateEntityWithoutRoles_AndReturnResultWithOkStatus() throws Exception {
     //create and save EdxUser with a district
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
@@ -2132,7 +2132,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxUserDistrict_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxUserDistrict_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", UUID.randomUUID(), UUID.randomUUID())
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
@@ -2142,7 +2142,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserIdWithIncorrectEdxUserDistrictId_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserIdWithIncorrectEdxUserDistrictId_AndReturnResultWithNotFound() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2175,7 +2175,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserDistrictIdWithIncorrectEdxUserId_AndReturnResultWithNotFound() throws Exception {
+  void testDeleteEdxUserDistrict_GivenInValidData_CorrectEdxUserDistrictIdWithIncorrectEdxUserId_AndReturnResultWithNotFound() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2209,7 +2209,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testDeleteEdxUserDistrict_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
+  void testDeleteEdxUserDistrict_GivenValidData_WillDeleteRecordAndChildrenUsingPreRemove_AndReturnResultNoContentStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2252,7 +2252,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenValidData_ShouldCreateEntity_AndReturnResultWithOkStatus() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2302,7 +2302,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictRoleIDNottNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictRoleIDNottNull_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2352,7 +2352,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictIDMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenInValidData_UserDistrictIDMismatch_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2401,7 +2401,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2451,7 +2451,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDoesNotExist_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2500,7 +2500,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictRoleAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
+  void testCreateEdxUsersDistrictRole_GivenInValidData_EdxUserDistrictRoleAlreadyExists_ShouldNotCreateEntity_AndReturnResultWithBadRequest() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)
@@ -2558,7 +2558,7 @@ public class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
 
 
   @Test
-  public void testDeleteEdxUsersDistrictRole_GivenValidData_EdxUserDistrictRoleIsDeleted() throws Exception {
+  void testDeleteEdxUsersDistrictRole_GivenValidData_EdxUserDistrictRoleIsDeleted() throws Exception {
     EdxUser edxUser = createEdxUser();
     String json = getJsonString(edxUser);
     val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS)

@@ -12,9 +12,9 @@ import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeService;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hibernate.Hibernate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
+class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Autowired
   SecureExchangeService service;
@@ -40,12 +40,12 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private SecureExchangeContactTypeCodeTableRepository secureExchangeContactTypeCodeTableRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     this.secureExchangeContactTypeCodeTableRepository.save(createContactType());
   }
 
-  @After
+  @AfterEach
   public void tearDown() {
     this.ministryOwnershipTeamRepository.deleteAll();
     this.secureExchangeContactTypeCodeTableRepository.deleteAll();
@@ -53,7 +53,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   @Transactional
-  public void createSecureExchange() {
+  void createSecureExchange() {
     var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     var secureExchange = new SecureExchangeBuilder()
       .withoutSecureExchangeID().build();
@@ -74,7 +74,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
 
   @Test
   @Transactional
-  public void createSecureExchangeWithDocuments() {
+  void createSecureExchangeWithDocuments() {
     var ministryTeam = this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     var secureExchange = new SecureExchangeBuilder()
       .withoutSecureExchangeID().build();
@@ -101,7 +101,7 @@ public class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void getSecureExchangeContactTypes() {
+  void getSecureExchangeContactTypes() {
     final Iterable<SecureExchangeContactTypeCodeEntity> contactTypes = this.service.getSecureExchangeContactTypeCodesList();
     assertThat(contactTypes).isNotNull();
     long count = StreamSupport.stream(contactTypes.spliterator(), false).count();

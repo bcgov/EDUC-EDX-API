@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.edx.utils;
 
 import lombok.Data;
-import org.junit.Test;
+import lombok.EqualsAndHashCode;
+
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -17,30 +19,31 @@ class TestParentClass {
 }
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 class TestChildClass extends TestParentClass {
   @UpperCase
   String filedE;
 }
 
 @RunWith(SpringRunner.class)
-public class TransformUtilTest {
+class TransformUtilTest {
   @Test
-  public void testIsUppercaseField_WhenFieldInParentClass_ShouldReturnTrue()  {
+  void testIsUppercaseField_WhenFieldInParentClass_ShouldReturnTrue()  {
     assertTrue(TransformUtil.isUppercaseField(TestChildClass.class, "filedA"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldInClass_ShouldReturnTrue()  {
+  void testIsUppercaseField_WhenFieldInClass_ShouldReturnTrue()  {
     assertTrue(TransformUtil.isUppercaseField(TestChildClass.class, "filedE"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldNotExists_ShouldReturnFalse()  {
+  void testIsUppercaseField_WhenFieldNotExists_ShouldReturnFalse()  {
     assertFalse(TransformUtil.isUppercaseField(TestChildClass.class, "filedC"));
   }
 
   @Test
-  public void testIsUppercaseField_WhenFieldIsNotUppercased_ShouldReturnFalse()  {
+  void testIsUppercaseField_WhenFieldIsNotUppercased_ShouldReturnFalse()  {
     assertFalse(TransformUtil.isUppercaseField(TestChildClass.class, "filedB"));
   }
 }

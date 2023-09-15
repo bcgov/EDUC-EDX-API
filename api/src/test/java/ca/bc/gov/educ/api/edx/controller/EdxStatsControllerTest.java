@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
 
-public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
+class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private MockMvc mockMvc;
   @Autowired
@@ -48,12 +48,12 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   EdxUserDistrictRepository edxUserDistrictRepository;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
-  @After
+  @AfterEach
   public void after() {
     this.secureExchangeRequestRepository.deleteAll();
     this.edxUserRepository.deleteAll();
@@ -64,7 +64,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void testCountSecureExchangesCreatedWithInstitute_GivenValidInstituteAndInterval_ShouldReturnCount() throws Exception{
+  void testCountSecureExchangesCreatedWithInstitute_GivenValidInstituteAndInterval_ShouldReturnCount() throws Exception{
 
     this.secureExchangeRequestRepository.save(createDummySecureExchangeEntity(UUID.randomUUID().toString(), "SCHOOL"));
     this.secureExchangeRequestRepository.save(createDummySecureExchangeEntity(UUID.randomUUID().toString(), "SCHOOL"));
@@ -91,7 +91,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidSchoolInstituteType_ShouldReturnCount() throws Exception {
+  void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidSchoolInstituteType_ShouldReturnCount() throws Exception {
 
     String schoolId = UUID.randomUUID().toString();
 
@@ -113,7 +113,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidDistrictInstituteType_ShouldReturnCount() throws Exception {
+  void countSecureExchangesCreatedWithInstituteTypeGroupedByInstitute_GivenValidDistrictInstituteType_ShouldReturnCount() throws Exception {
 
     String districtId = UUID.randomUUID().toString();
 
@@ -132,7 +132,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void countSchoolsWithActiveEdxUsersByPermissionCode_GivenPermissionCode_ShouldReturnCount() throws Exception {
+  void countSchoolsWithActiveEdxUsersByPermissionCode_GivenPermissionCode_ShouldReturnCount() throws Exception {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/stats/count-schools-with-active-edx-users")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
@@ -142,7 +142,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
-  public void schoolListWithoutActiveSecureExchangeUser_WithEdxUsers_ShouldReturnOneSchoolWithoutExchangeUsers() throws Exception {
+  void schoolListWithoutActiveSecureExchangeUser_WithEdxUsers_ShouldReturnOneSchoolWithoutExchangeUsers() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     String schoolIdWithUser = entity.getEdxUserSchoolEntities().stream().findFirst().get().getSchoolID().toString();
     School dummySchoolWithUser = createDummySchool(schoolIdWithUser);
@@ -160,7 +160,7 @@ public class EdxStatsControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   private SecureExchangeEntity createDummySecureExchangeEntity(String contactIdenfier, String secureExchangeContactTypeCode) {
-    return new SecureExchangeEntity().builder()
+    return SecureExchangeEntity.builder()
         .ministryOwnershipTeamID(UUID.randomUUID())
         .secureExchangeContactTypeCode(secureExchangeContactTypeCode)
         .contactIdentifier(contactIdenfier)

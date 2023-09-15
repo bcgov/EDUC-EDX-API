@@ -9,8 +9,8 @@ import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
@@ -20,8 +20,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
+class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @Autowired
   EdxUsersService service;
@@ -47,7 +48,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   @Autowired
   private EdxActivationCodeRepository edxActivationCodeRepository;
 
-  @After
+  @AfterEach
   public void tearDown() {
     this.edxUserSchoolRepository.deleteAll();
     this.edxUserRepository.deleteAll();
@@ -59,7 +60,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void getAllMinistryTeams() {
+  void getAllMinistryTeams() {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("Test Team", "TEST_TEAM"));
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipEntity("New Team", "NEW_TEAM"));
     final List<MinistryOwnershipTeamEntity> teams = this.service.getMinistryTeamsList();
@@ -68,7 +69,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void getAllEdxUserSchools() {
+  void getAllEdxUserSchools() {
     this.edxUserSchoolRepository.deleteAll();
     var entity = this.edxUserRepository.save(getEdxUserEntity());
     this.edxUserSchoolRepository.save(getEdxUserSchoolEntity(entity));
@@ -77,7 +78,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findEdxUserByDigitalID() {
+  void findEdxUserByDigitalID() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     var schoolEntity = getEdxUserSchoolEntity(entity);
     schoolEntity.setSchoolID(UUID.randomUUID());
@@ -88,7 +89,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findEdxUserBySchoolID() {
+  void findEdxUserBySchoolID() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     var schoolEntity = getEdxUserSchoolEntity(entity);
     schoolEntity.setSchoolID(UUID.randomUUID());
@@ -99,7 +100,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void retrieveEdxUser() {
+  void retrieveEdxUser() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     var edxUserSchoolEntities = this.service.retrieveEdxUserByID(entity.getEdxUserID());
@@ -117,7 +118,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void getEdxUserSchoolsByPermissionName() {
+  void getEdxUserSchoolsByPermissionName() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     final List<String> edxUserSchoolEntities = this.service.getEdxUserSchoolsList("Exchange");
@@ -126,7 +127,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findPrimaryEdxActivationCodeForSchool() {
+  void findPrimaryEdxActivationCodeForSchool() {
     EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
     EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, primaryToFind.getSchoolID().toString());
     assertThat(found.getEdxActivationCodeId()).isNotNull().isEqualTo(primaryToFind.getEdxActivationCodeId());
@@ -134,7 +135,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findPrimaryEdxActivationCodeForDistrict() {
+  void findPrimaryEdxActivationCodeForDistrict() {
     EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, primaryToFind.getDistrictID().toString());
     assertThat(found.getEdxActivationCodeId()).isNotNull().isEqualTo(primaryToFind.getEdxActivationCodeId());
@@ -142,7 +143,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findPrimaryEdxActivationCodeOutOfManyForSchool() {
+  void findPrimaryEdxActivationCodeOutOfManyForSchool() {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID, null));
     EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
@@ -152,7 +153,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void findPrimaryEdxActivationCodeOutOfManyForDistrict() {
+  void findPrimaryEdxActivationCodeOutOfManyForDistrict() {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity primaryToFind = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
@@ -161,32 +162,50 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
     assertThat(found.getIsPrimary()).isTrue();
   }
 
-  @Test(expected = EntityNotFoundException.class)
-  public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
-    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
-    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryEdxActivationCode.getSchoolID().toString());
-    assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
-  }
+  @Test
+  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
+    EdxActivationCodeEntity mockActivationCode = this.createEdxActivationCodeEntity(
+      UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null);
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
 
-  @Test(expected = EntityNotFoundException.class)
-  public void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForDistrict() {
-    EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
-    EdxActivationCodeEntity found = this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryEdxActivationCode.getDistrictID().toString());
-    assertThat(found.getEdxActivationCodeId()).isNotNull().isNotEqualTo(secondaryEdxActivationCode.getEdxActivationCodeId());
-  }
-
-  @Test(expected = EntityNotFoundException.class)
-  public void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForSchool() {
-    this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, UUID.randomUUID().toString());
-  }
-
-  @Test(expected = EntityNotFoundException.class)
-  public void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForDistrict() {
-    this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, UUID.randomUUID().toString());
+    String schoolId = secondaryActivationCode.getSchoolID().toString();
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service
+        .findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, schoolId);
+    });
   }
 
   @Test
-  public void generatePrimaryEdxActivationCodeForSchool() {
+  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForDistrict() {
+    EdxActivationCodeEntity mockActivationCode = this.createEdxActivationCodeEntity(
+      UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID());
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
+
+    String districtId = secondaryActivationCode.getDistrictID().toString();
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service
+        .findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, districtId);
+    });
+  }
+
+  @Test
+  void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForSchool() {
+    String uuid = UUID.randomUUID().toString();
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, uuid);
+    });
+  }
+
+  @Test
+  void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForDistrict() {
+    String uuid = UUID.randomUUID().toString();
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service.findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, uuid);
+    });
+  }
+
+  @Test
+  void generatePrimaryEdxActivationCodeForSchool() {
     EdxPrimaryActivationCode toGenerate = this.createEdxPrimaryActivationCodeForSchool(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     EdxActivationCodeEntity generated = this.service.generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, toGenerate.getSchoolID().toString(), toGenerate);
     assertThat(generated.getSchoolID()).isNotNull().isEqualTo(toGenerate.getSchoolID());
@@ -198,7 +217,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void generatePrimaryEdxActivationCodeForDistrict() {
+  void generatePrimaryEdxActivationCodeForDistrict() {
     EdxPrimaryActivationCode toGenerate = this.createEdxPrimaryActivationCodeForDistrict(UUID.randomUUID(), "EDX-API-UNIT-TEST", "EDX-API-UNIT-TEST");
     EdxActivationCodeEntity generated = this.service.generateOrRegeneratePrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, toGenerate.getDistrictID().toString(), toGenerate);
     assertThat(generated.getSchoolID()).isNull();
@@ -210,7 +229,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void generateEdxActivationCode() throws NoSuchAlgorithmException {
+  void generateEdxActivationCode() throws NoSuchAlgorithmException {
     var edxActivationCodeEntity = this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, UUID.randomUUID(), null);
     UUID user = UUID.randomUUID();
     edxActivationCodeEntity.setEdxUserId(user);
@@ -225,7 +244,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void regeneratePrimaryEdxActivationCodeForSchool() {
+  void regeneratePrimaryEdxActivationCodeForSchool() {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity existing = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID, null));
     EdxPrimaryActivationCode toRegenerate = this.createEdxPrimaryActivationCodeForSchool(schoolID, "EDX-API-UNIT-TEST-UPDATE-USER", "EDX-API-UNIT-TEST-UPDATE-USER");
@@ -240,7 +259,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void regeneratePrimaryEdxActivationCodeForDistrict() {
+  void regeneratePrimaryEdxActivationCodeForDistrict() {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity existing = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxPrimaryActivationCode toRegenerate = this.createEdxPrimaryActivationCodeForDistrict(districtID, "EDX-API-UNIT-TEST-UPDATE-USER", "EDX-API-UNIT-TEST-UPDATE-USER");
@@ -255,7 +274,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void regeneratePrimaryEdxActivationCodeOutOfManyForSchool() {
+  void regeneratePrimaryEdxActivationCodeOutOfManyForSchool() {
     UUID schoolID = UUID.randomUUID();
     EdxActivationCodeEntity existingPrimaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, schoolID, null));
     EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID, null));
@@ -271,7 +290,7 @@ public class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
-  public void regeneratePrimaryEdxActivationCodeOutOfManyForDistrict() {
+  void regeneratePrimaryEdxActivationCodeOutOfManyForDistrict() {
     UUID districtID = UUID.randomUUID();
     EdxActivationCodeEntity existingPrimaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, districtID));
     EdxActivationCodeEntity secondaryEdxActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));

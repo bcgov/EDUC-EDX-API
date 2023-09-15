@@ -5,8 +5,8 @@ import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
 import ca.bc.gov.educ.api.edx.service.v1.EmailNotificationService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 
-public class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
+class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
 
   @Autowired
   EmailNotificationService emailNotificationService;
@@ -29,14 +29,14 @@ public class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
   @Captor
   ArgumentCaptor<String> emailBodyCaptor;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     openMocks(this);
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(), any());
   }
 
   @Test
-  public void sendEmail_givenGMP_ADDITIONAL_INFO_EmailNotificationEntity_shouldSendCorrectEmail() {
+  void sendEmail_givenGMP_ADDITIONAL_INFO_EmailNotificationEntity_shouldSendCorrectEmail() {
     final var emailNotificationEntity = this.createEmailNotificationEntity("edx.school.user.activation.invite", Map.of("firstName", "FirstName"));
     this.emailNotificationService.sendEmail(emailNotificationEntity);
     verify(this.restUtils, atLeastOnce()).sendEmail(eq(emailNotificationEntity.getFromEmail()), eq(emailNotificationEntity.getToEmail()), this.emailBodyCaptor.capture(), eq(emailNotificationEntity.getSubject()));

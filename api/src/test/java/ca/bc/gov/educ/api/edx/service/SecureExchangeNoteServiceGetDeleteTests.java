@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.service;
 
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
-import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeNoteEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
@@ -10,7 +9,7 @@ import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeNoteService;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
 import org.hamcrest.MatcherAssert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +19,8 @@ import static org.junit.Assert.fail;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-public class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest {
-
-    private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
-
+class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest {
     @Autowired
     SecureExchangeNoteService secureExchangeNoteService;
 
@@ -37,7 +32,7 @@ public class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeA
 
     @Test
     @Transactional
-    public void testDeleteNoteFromExchange() {
+    void testDeleteNoteFromExchange() {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(
                 addNoteToSecureExchangeEntity(createSecureExchange())
         );

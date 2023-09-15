@@ -1,17 +1,17 @@
 package ca.bc.gov.educ.api.edx.props;
 
 import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class ApplicationPropertiesTest extends BaseSecureExchangeAPITest {
+class ApplicationPropertiesTest extends BaseSecureExchangeAPITest {
 
   @Autowired
   ApplicationProperties applicationProperties;
 
   @Test
-  public void testGetDifferentAttributes_GivenPresentInProperties_ShouldReturnNotNull() {
+  void testGetDifferentAttributes_GivenPresentInProperties_ShouldReturnNotNull() {
     assertThat(applicationProperties.getChesClientID()).isNotBlank();
     assertThat(applicationProperties.getChesClientSecret()).isNotBlank();
     assertThat(applicationProperties.getChesEndpointURL()).isNotBlank();

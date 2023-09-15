@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.edx.repository.SagaEventStateRepository;
 import ca.bc.gov.educ.api.edx.repository.SagaRepository;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Backoff;
@@ -29,7 +28,6 @@ import static lombok.AccessLevel.PRIVATE;
  * The type Saga service.
  */
 @Service
-@Slf4j
 public class SagaService {
   /**
    * The Saga repository.

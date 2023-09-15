@@ -6,14 +6,14 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.service.v1.CHESEmailService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-public class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
+class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
 
 
   @Autowired
@@ -26,14 +26,14 @@ public class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
   ApplicationProperties properties;
 
 
-  @Before
+  @BeforeEach
   public void setUp() {
     openMocks(this);
   }
 
 
   @Test
-  public void sendEmail() {
+  void sendEmail() {
     final var payload = EmailNotification.builder().build();
     payload.setToEmail("test@gov.bc.ca");
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(),any());

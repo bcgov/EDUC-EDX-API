@@ -17,11 +17,10 @@ import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -34,13 +33,11 @@ import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.NEW_SECURE_EXCHANGE_SAGA;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@Slf4j
-public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest {
+class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.
@@ -91,7 +88,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
 
-  @After
+  @AfterEach
   public void after() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
@@ -100,7 +97,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
     ministryOwnershipTeamRepository.deleteAll();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
     sagaData = createNewSecureExchangeSagaData();
@@ -129,7 +126,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -160,7 +157,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -191,7 +188,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  void testSendEmailEvent_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -227,7 +224,7 @@ public class EdxNewSecureExchangeOrchestratorTest extends BaseSagaControllerTest
   }
 
   @Test
-  public void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE)

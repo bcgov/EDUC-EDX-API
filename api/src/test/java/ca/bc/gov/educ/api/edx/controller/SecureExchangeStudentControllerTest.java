@@ -11,9 +11,9 @@ import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
 import ca.bc.gov.educ.api.edx.service.v1.RESTService;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class SecureExchangeStudentControllerTest extends BaseSecureExchangeControllerTest {
+class SecureExchangeStudentControllerTest extends BaseSecureExchangeControllerTest {
 
   private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
 
@@ -55,19 +55,19 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
   private static final String LEGIT_STUDENT_ID = "ac339d70-7649-1a2e-8176-49fbef5e0059";
 
-  @Before
+  @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
   }
 
-  @After
+  @AfterEach
   public void after() {
     this.secureExchangeRequestRepository.deleteAll();
   }
 
 
   @Test
-  public void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
+  void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenThrow(NotFoundException.class);
@@ -81,7 +81,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
-  public void testAddExchangeStudents_GivenInvalidExchangeID_ShouldReturnStatusNotFound() throws Exception {
+  void testAddExchangeStudents_GivenInvalidExchangeID_ShouldReturnStatusNotFound() throws Exception {
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
@@ -93,7 +93,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
-  public void testAddSecureExchangeStudents_ShouldReturnStatusCreatedWithUpdatedExchangeObject() throws Exception {
+  void testAddSecureExchangeStudents_ShouldReturnStatusCreatedWithUpdatedExchangeObject() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
@@ -115,7 +115,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
-  public void testAddSecureExchangeStudents_ShouldReturnStatusBadRequest() throws Exception {
+  void testAddSecureExchangeStudents_ShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
@@ -130,7 +130,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
-  public void testAddSecureExchangeStudents_BothIdentifiersShouldReturnStatusBadRequest() throws Exception {
+  void testAddSecureExchangeStudents_BothIdentifiersShouldReturnStatusBadRequest() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
     final String sid = entity.getSecureExchangeID().toString();
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
@@ -146,7 +146,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
   @Test
   @Transactional
-  public void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
+  void testDeleteSecureExchangeStudents_ShouldReturnStatusNoContent_AndShouldDeleteFromExchange() throws Exception {
     SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID));
     final String sid = entity.getSecureExchangeID().toString();
     List<SecureExchangeStudentEntity> students = new ArrayList<>();
@@ -160,7 +160,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
 
   @Test
   @Transactional
-  public void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
+  void testGetStudentsFromExchange_shouldReceiveStatusOK_withListOfStudents() throws Exception {
     final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(Arrays.asList(LEGIT_STUDENT_ID, UUID.randomUUID().toString()));
     final String sid = entity.getSecureExchangeID().toString();
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
@@ -171,7 +171,7 @@ public class SecureExchangeStudentControllerTest extends BaseSecureExchangeContr
   }
 
   @Test
-  public void testGetStudentsFromExchange_GivenInvalidExchangeID_ShouldReturnNotFound() throws Exception {
+  void testGetStudentsFromExchange_GivenInvalidExchangeID_ShouldReturnNotFound() throws Exception {
     when(restServiceMock.get(anyString(), any(Class.class))).thenReturn("OK");
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, UUID.randomUUID())
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_SECURE_EXCHANGE_STUDENT"))))

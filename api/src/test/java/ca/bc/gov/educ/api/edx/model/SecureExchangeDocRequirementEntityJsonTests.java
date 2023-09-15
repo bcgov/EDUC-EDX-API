@@ -1,12 +1,14 @@
 package ca.bc.gov.educ.api.edx.model;
 
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeDocRequirement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
@@ -15,16 +17,16 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-
 @RunWith(SpringRunner.class)
 @AutoConfigureJsonTesters
-public class SecureExchangeDocRequirementEntityJsonTests {
+@SpringBootTest
+@ActiveProfiles("test")
+class SecureExchangeDocRequirementEntityJsonTests {
     @Autowired
     private JacksonTester<SecureExchangeDocRequirement> jsonTester;
 
     @Test
-    public void requirementSerializeTest() throws Exception {
+    void requirementSerializeTest() throws Exception {
         int maxSize = 100;
         List<String> extensions = new ArrayList<String>(Arrays.asList("jpg", "png", "pdf"));
         SecureExchangeDocRequirement requirement = new SecureExchangeDocRequirement(maxSize, extensions);
@@ -41,7 +43,7 @@ public class SecureExchangeDocRequirementEntityJsonTests {
     }
 
     @Test
-    public void documentDeserializeTest() throws Exception {
+    void documentDeserializeTest() throws Exception {
         SecureExchangeDocRequirement document = this.jsonTester.readObject("requirement.json");
         assertThat(document.getMaxSize()).isEqualTo(20);
         assertThat(document.getExtensions()).hasSize(2);

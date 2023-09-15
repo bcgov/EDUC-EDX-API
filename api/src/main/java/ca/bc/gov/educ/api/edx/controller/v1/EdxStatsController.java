@@ -9,12 +9,10 @@ import ca.bc.gov.educ.api.edx.struct.v1.SchoolWithoutActiveSecureExchangeUser;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
 public class EdxStatsController extends BaseController implements EdxStatsEndpoint {
 
   @Getter(AccessLevel.PRIVATE)

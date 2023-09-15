@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
-import ca.bc.gov.educ.api.edx.service.v1.EdxNewSecureExchangeOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSecureExchangeCommentOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.SECURE_EXCHANGE_COMMENT_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_SECURE_EXCHANGE_COMMENT_TOPIC;

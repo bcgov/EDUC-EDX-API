@@ -9,7 +9,7 @@ import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import ca.bc.gov.educ.api.edx.support.SecureExchangeBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-public class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
+class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
 
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     @MockBean
@@ -34,7 +34,7 @@ public class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPIT
 
     @Test
     @Transactional
-    public void testAddStudentToExchange() throws Exception {
+    void testAddStudentToExchange() throws Exception {
         SecureExchangeEntity entity = this.secureExchangeRequestRepository.save(createSecureExchange());
         SecureExchange secureExchange = createSecureExchangeFromEntityWithStudent(LEGIT_STUDENT_ID, entity);
         doReturn(secureExchange).when(secureExchangeStudentServiceMock).addStudentToExchange(any(UUID.class), any(SecureExchangeStudent.class));

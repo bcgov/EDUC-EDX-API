@@ -21,9 +21,9 @@ import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
@@ -40,8 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@Slf4j
-public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaControllerTest {
+class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.
@@ -97,7 +96,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  @After
+  @AfterEach
   public void after() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
@@ -108,7 +107,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
     ministryOwnershipTeamRepository.deleteAll();
   }
 
-  @Before
+  @BeforeEach
   public void setUp() throws JsonProcessingException {
     MockitoAnnotations.openMocks(this);
     sagaData = createCommentSagaData();
@@ -132,7 +131,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
   }
 
   @Test
-  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -164,7 +163,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
   }
 
   @Test
-  public void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
+  void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(INITIATED)
@@ -197,7 +196,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
   }
 
   @Test
-  public void testSendEmailEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
+  void testSendEmailEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldCreateEmail() throws IOException, InterruptedException, TimeoutException {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
@@ -233,7 +232,7 @@ public class EdxSchoolSecureExchangeCommentOrchestratorTest extends BaseSagaCont
   }
 
   @Test
-  public void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
+  void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
       .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT)
