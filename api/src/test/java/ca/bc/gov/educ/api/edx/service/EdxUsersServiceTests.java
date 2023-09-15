@@ -168,9 +168,10 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
       UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null);
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
 
+    String schoolId = secondaryActivationCode.getSchoolID().toString();
     assertThrows(EntityNotFoundException.class, () -> {
       this.service
-        .findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryActivationCode.getSchoolID().toString());
+        .findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, schoolId);
     });
   }
 
@@ -180,9 +181,10 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
       UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID());
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
 
+    String districtId = secondaryActivationCode.getDistrictID().toString();
     assertThrows(EntityNotFoundException.class, () -> {
       this.service
-        .findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryActivationCode.getDistrictID().toString());
+        .findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, districtId);
     });
   }
 
