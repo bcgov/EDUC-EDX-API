@@ -163,6 +163,30 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
   }
 
   @Test
+  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForSchool() {
+    EdxActivationCodeEntity mockActivationCode = this.createEdxActivationCodeEntity(
+      UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null);
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
+
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service
+        .findPrimaryEdxActivationCode(InstituteTypeCode.SCHOOL, secondaryActivationCode.getSchoolID().toString());
+    });
+  }
+
+  @Test
+  void findPrimaryEdxActivationCodeOnlyReturnsPrimaryEdxActivationCodeForDistrict() {
+    EdxActivationCodeEntity mockActivationCode = this.createEdxActivationCodeEntity(
+      UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID());
+    EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(mockActivationCode);
+
+    assertThrows(EntityNotFoundException.class, () -> {
+      this.service
+        .findPrimaryEdxActivationCode(InstituteTypeCode.DISTRICT, secondaryActivationCode.getDistrictID().toString());
+    });
+  }
+
+  @Test
   void findPrimaryEdxActivationCodeCannotFindNonExistingEdxActivationCodeForSchool() {
     String uuid = UUID.randomUUID().toString();
     assertThrows(EntityNotFoundException.class, () -> {
