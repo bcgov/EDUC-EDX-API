@@ -16,8 +16,3 @@ public class EdxRolePermission extends BaseRequest implements Serializable {
   String edxRolePermissionId;
   String edxPermissionCode;
 }
-
-
-
-
-

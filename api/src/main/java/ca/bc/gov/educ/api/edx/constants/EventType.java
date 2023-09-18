@@ -63,13 +63,13 @@ public enum EventType {
   SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL,
 
 
-  /**
-   * Move School Events
-   */
+  // Create/move School Events
   CREATE_SCHOOL,
   UPDATE_SCHOOL,
   COPY_USERS_TO_NEW_SCHOOL,
   GET_PAGINATED_SCHOOLS,
-  MOVE_SCHOOL
+  MOVE_SCHOOL,
+  CREATE_INITIAL_USER,
+  INVITE_INITIAL_USER
 
 }

@@ -192,6 +192,30 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
 
 
   /**
+   * End step with method to execute with complete status.
+   *
+   * @param currentEvent  the event that has occurred.
+   * @param outcome       outcome of the event.
+   * @param stepToExecute which method to execute for the MARK_SAGA_COMPLETE event. it is a lambda function.
+   * @return {@link BaseOrchestrator}
+   */
+  public BaseOrchestrator<T> end(final EventType currentEvent, final EventOutcome outcome, final SagaStep<T> stepToExecute) {
+    return this.registerStepToExecute(currentEvent, outcome, (T sagaData) -> true, MARK_SAGA_COMPLETE, (Event event, SagaEntity saga, T sagaData) -> {
+      stepToExecute.apply(event, saga, sagaData);
+      this.markSagaComplete(event, saga, sagaData);
+    });
+  }
+
+  /**
+   * Syntax sugar to make the step statement expressive
+   *
+   * @return {@link BaseOrchestrator}
+   */
+  public BaseOrchestrator<T> or() {
+    return this;
+  }
+
+  /**
    * this is a simple and convenient method to trigger builder pattern in the child classes.
    *
    * @return {@link BaseOrchestrator}

@@ -38,10 +38,22 @@ public interface SagaDataMapper {
   @Mapping(target = "sagaCompensated", ignore = true)
   @Mapping(target = "retryCount", ignore = true)
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
+  @Mapping(target = "emailId", expression = "java(sagaData.getInitialEdxUser().isPresent() ? sagaData.getInitialEdxUser().get().getEmail() : \"\")")
+  @Mapping(target = "edxUserId", ignore = true)
+  @Mapping(target = "schoolID", ignore = true)
+  @Mapping(target = "districtID", ignore = true)
+  SagaEntity toModel(String sagaName, CreateSchoolSagaData sagaData) throws JsonProcessingException;
+
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "secureExchangeId", ignore = true)
+  @Mapping(target = "sagaState", ignore = true)
+  @Mapping(target = "sagaId", ignore = true)
+  @Mapping(target = "sagaCompensated", ignore = true)
+  @Mapping(target = "retryCount", ignore = true)
+  @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
   @Mapping(target = "emailId", source = "sagaData.email")
   @Mapping(target = "districtID", ignore = true)
   SagaEntity toModel(String sagaName, EdxUserSchoolActivationInviteSagaData sagaData) throws JsonProcessingException;
-
 
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "secureExchangeId", ignore = true)
@@ -53,7 +65,6 @@ public interface SagaDataMapper {
   @Mapping(target = "schoolID", ignore = true)
   @Mapping(target = "emailId", source = "sagaData.email")
   SagaEntity toModel(String sagaName, EdxUserDistrictActivationInviteSagaData sagaData) throws JsonProcessingException;
-
 
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "sagaState", ignore = true)

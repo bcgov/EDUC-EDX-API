@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -23,12 +24,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.edx.utils.JsonUtil.createMapper;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {EdxApiResourceApplication.class})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public abstract class BaseSecureExchangeAPITest {
-  protected final static ObjectMapper objectMapper = new ObjectMapper();
+  protected final static ObjectMapper objectMapper = createMapper();
   @Autowired
   protected SecureExchangeAPITestUtils secureExchangeAPITestUtils;
 
