@@ -152,27 +152,22 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to EDX_API_TOPIC for SEND_PRIMARY_ACTIVATION_CODE Event. :: {}", saga.getSagaId());
   }
 
-  // private void createInitialUser(
-  //   Event event,
-  //   SagaEntity saga,
-  //   CreateSchoolSagaData createSchoolSagaData
-  // ) throws JsonProcessingException {
-  //   School school = JsonUtil.getJsonObjectFromString(School.class, saga.getPayload());
-  //   createSchoolSagaData.setSchoolId(school.getSchoolId());
-  //   createSchoolSagaData.setInitialEdxUser(Optional.of(userMapper.toStructure(edxUser)));
+  private void inviteInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
+  throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates =
+      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    saga.setSagaState(INVITE_INITIAL_USER.toString());
+    this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
-  //   final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-  //     .eventType(CREATE_INITIAL_USER).eventOutcome(INITIAL_USER_CREATED)
-  //     .eventPayload(JsonUtil.getJsonStringFromObject(createSchoolSagaData))
-  //     .build();
+    this.orchestratorService.startEdxSchoolUserInviteSaga(sagaData);
 
-  //   this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-  //   publishToJetStream(nextEvent, saga);
-  //   log.info("message sent to EDX_API_TOPIC for CREATE_INITIAL_USER Event. :: {}");
-  // }
-
-  private void inviteInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData createSchoolSagaData) {
-    log.info("Finish writing this saga :: {}");
+    final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
+      .eventType(INVITE_INITIAL_USER).eventOutcome(INITIAL_USER_INVITED)
+      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
+      .build();
+    this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+    publishToJetStream(nextEvent, saga);
+    log.info("message sent to EDX_API_TOPIC for INVITE_INITIAL_USER Event. :: {}", saga.getSagaId());
   }
 
   private void completeCreateSchoolSagaWithNoUser(

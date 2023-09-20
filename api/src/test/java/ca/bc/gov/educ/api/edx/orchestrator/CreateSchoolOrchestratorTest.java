@@ -1,14 +1,17 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATED_SCHOOL_HAS_ADMIN_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_INVITED;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_PRIMARY_CODE_CREATED;
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_PRIMARY_CODE;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_WITH_ADMIN;
-import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
 import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
+import static ca.bc.gov.educ.api.edx.constants.EventType.INVITE_INITIAL_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
 import static ca.bc.gov.educ.api.edx.constants.InstituteTypeCode.SCHOOL;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -38,16 +41,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
+import ca.bc.gov.educ.api.edx.constants.SagaStatusEnum;
 import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
-import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
+import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
 import ca.bc.gov.educ.api.edx.repository.SagaEventStateRepository;
 import ca.bc.gov.educ.api.edx.repository.SagaRepository;
@@ -55,7 +58,6 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
@@ -69,9 +71,6 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
    */
   @Autowired
   SagaRepository sagaRepository;
-
-  @Autowired
-  private EdxUserRepository edxUserRepository;
 
   @Autowired
   private EdxUserSchoolRepository edxUserSchoolRepository;
@@ -108,6 +107,9 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Autowired
   CreateSchoolOrchestrator orchestrator;
 
+  @Autowired
+  EdxActivationCodeRepository edxActivationCodeRepository;
+
   @Captor
   ArgumentCaptor<byte[]> eventCaptor;
 
@@ -124,7 +126,7 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     @AfterEach
     public void after() {
-      tearDownSagas();
+      tearDown();
     }
 
     @Test
@@ -242,6 +244,38 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       System.out.println(mailSentEvent);
     }
 
+    @Test
+    void testInviteInitialUser_GivenEventAndSaga_ShouldStartInviteSaga()
+    throws IOException, InterruptedException, TimeoutException {
+      createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
+      final int invocations = mockingDetails(messagePublisher).getInvocations().size();
+      final Event event = Event.builder()
+        .eventType(SEND_PRIMARY_ACTIVATION_CODE)
+        .eventOutcome(PRIMARY_ACTIVATION_CODE_SENT)
+        .sagaId(saga.getSagaId())
+        .eventPayload(sagaPayload)
+        .build();
+      orchestrator.handleEvent(event);
+
+      verify(messagePublisher, atMost(invocations + 2))
+        .dispatchMessage(eq(orchestrator.getTopicToSubscribe()), eventCaptor.capture());
+
+      Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, eventCaptor.getValue());
+      assertThat(currentEventState.getEventType()).isEqualTo(INVITE_INITIAL_USER);
+      assertThat(currentEventState.getEventOutcome()).isEqualTo(INITIAL_USER_INVITED);
+
+      School school = sagaData.getSchool();
+      EdxUser user = sagaData.getInitialEdxUser().get();
+
+      final Optional<SagaEntity> sagaInProgress = sagaService
+        .findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(
+          UUID.fromString(school.getSchoolId()),
+          user.getEmail(),
+          EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString(),
+          List.of(SagaStatusEnum.IN_PROGRESS.toString(), SagaStatusEnum.STARTED.toString()));
+
+      assertThat(sagaInProgress).isPresent();
+    }
   }
 
   @Nested
@@ -269,7 +303,7 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       assertThat(newEvent.getEventPayload()).isEqualTo("");
       assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
 
-      tearDownSagas();
+      tearDown();
     }
   }
 
@@ -306,10 +340,13 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
     return Optional.of(mockUser);
   }
 
-  private void tearDownSagas() {
+  private void tearDown() {
     sagaEventStateRepository.deleteAll();
     sagaRepository.deleteAll();
     edxUserSchoolRepository.deleteAll();
+    edxActivationCodeRepository.deleteAll();
+    edxRoleRepository.deleteAll();
+    edxPermissionRepository.deleteAll();
   }
 
   private void setUpSagas(CreateSchoolSagaData mockSaga) {
