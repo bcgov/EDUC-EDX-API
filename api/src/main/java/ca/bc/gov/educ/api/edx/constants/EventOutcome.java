@@ -23,6 +23,7 @@ public enum EventOutcome {
    * Personal Activation code creation outcome
    */
   PERSONAL_ACTIVATION_CODE_CREATED,
+  SCHOOL_PRIMARY_CODE_CREATED,
   /**
    * User activation email sent outcome
    */
@@ -47,6 +48,7 @@ public enum EventOutcome {
    * Email notification for secure exchange comment sent event outcome.
    */
   EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT,
+  PRIMARY_ACTIVATION_CODE_SENT,
 
   // Create/move school Events Outcome
   SCHOOL_CREATED,
@@ -54,7 +56,6 @@ public enum EventOutcome {
   SCHOOL_MOVED,
   USERS_TO_NEW_SCHOOL_COPIED,
   CREATED_SCHOOL_HAS_ADMIN_USER,
-  INITIAL_USER_CREATED,
   INITIAL_USER_INVITED
 
   }
