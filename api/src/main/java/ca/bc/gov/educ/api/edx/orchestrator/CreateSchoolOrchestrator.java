@@ -1,11 +1,13 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATED_SCHOOL_HAS_ADMIN_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATE_SCHOOL_SAGA_HAS_ADMIN;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATE_SCHOOL_SAGA_HAS_NO_ADMIN;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_PRIMARY_CODE_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_INVITED;
-import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_WITH_ADMIN;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN;
 import static ca.bc.gov.educ.api.edx.constants.EventType.INVITE_INITIAL_USER;
 import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_PRIMARY_CODE;
@@ -79,9 +81,10 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
   @Override
   public void populateStepsToExecuteMap() {
     this.stepBuilder()
-      .begin(CREATE_SCHOOL_WITH_ADMIN, this::createSchool)
-      .step(CREATE_SCHOOL_WITH_ADMIN, CREATED_SCHOOL_HAS_ADMIN_USER, CREATE_SCHOOL_PRIMARY_CODE, this::createPrimaryCode)
-      .end(CREATE_SCHOOL_WITH_ADMIN, SCHOOL_CREATED, this::completeCreateSchoolSagaWithNoUser)
+      .begin(CREATE_SCHOOL, this::createSchool)
+      .step(CREATE_SCHOOL, SCHOOL_CREATED, CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN, this::checkCreateSchoolSagaForAdmin)
+      .step(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN, CREATE_SCHOOL_SAGA_HAS_ADMIN, CREATE_SCHOOL_PRIMARY_CODE, this::createPrimaryCode)
+      .end(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN, CREATE_SCHOOL_SAGA_HAS_NO_ADMIN, this::completeCreateSchoolSagaWithNoUser)
       .or()
       .step(CREATE_SCHOOL_PRIMARY_CODE, SCHOOL_PRIMARY_CODE_CREATED, SEND_PRIMARY_ACTIVATION_CODE, this::sendPrimaryCode)
       .step(SEND_PRIMARY_ACTIVATION_CODE, PRIMARY_ACTIVATION_CODE_SENT, INVITE_INITIAL_USER, this::inviteInitialUser)
@@ -92,23 +95,42 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
   throws JsonProcessingException {
     final SagaEventStatesEntity eventStates =
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
-    saga.setSagaState(CREATE_SCHOOL_WITH_ADMIN.toString());
+    saga.setSagaState(CREATE_SCHOOL.toString());
+    this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
+
+    School school = createSchoolData.getSchool();
+
+    final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
+      .eventType(CREATE_SCHOOL)
+      .eventOutcome(SCHOOL_CREATED)
+      .replyTo(this.getTopicToSubscribe())
+      .eventPayload(JsonUtil.getJsonStringFromObject(school))
+      .build();
+
+    this.postMessageToTopic(INSTITUTE_API_TOPIC.toString(), nextEvent);
+    log.info("message sent to INSTITUTE_API_TOPIC for CREATE_SCHOOL Event. :: {}", saga.getSagaId());
+  }
+
+  public void checkCreateSchoolSagaForAdmin(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) 
+  throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates =
+      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    saga.setSagaState(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
     final Event.EventBuilder eventBuilder = Event.builder()
-      .eventType(CREATE_SCHOOL_WITH_ADMIN)
+      .eventType(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN)
       .replyTo(this.getTopicToSubscribe());
-    if (createSchoolData.getInitialEdxUser().isEmpty()) {
-      eventBuilder.eventOutcome(SCHOOL_CREATED);
+    if (sagaData.getInitialEdxUser().isEmpty()) {
+      eventBuilder.eventOutcome(CREATE_SCHOOL_SAGA_HAS_NO_ADMIN);
       eventBuilder.eventPayload("");
     } else {
-      eventBuilder.eventOutcome(CREATED_SCHOOL_HAS_ADMIN_USER);
-      eventBuilder.eventPayload(JsonUtil.getJsonStringFromObject(createSchoolData));
+      eventBuilder.eventOutcome(CREATE_SCHOOL_SAGA_HAS_ADMIN);
+      sagaData.setSchool(JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload()));
+      eventBuilder.eventPayload(JsonUtil.getJsonStringFromObject(sagaData));
     }
 
-    final Event nextEvent = eventBuilder.build();
-    this.postMessageToTopic(INSTITUTE_API_TOPIC.toString(), nextEvent);
-    log.info("message sent to INSTITUTE_API_TOPIC for CREATE_SCHOOL Event. :: {}", saga.getSagaId());
+    this.postMessageToTopic(this.getTopicToSubscribe(), eventBuilder.build());
   }
 
   public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
@@ -175,7 +197,15 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final SagaEntity saga,
     final CreateSchoolSagaData createSchoolSagaData
   ) {
-    log.info("CreateSchoolSaga has ended without an initial admin user being created :: {}");
+    final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
+      .eventType(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN)
+      .eventOutcome(CREATE_SCHOOL_SAGA_HAS_NO_ADMIN)
+      .replyTo(getTopicToSubscribe())
+      .eventPayload("")
+      .build();
+    this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+    publishToJetStream(nextEvent, saga);
+    log.info("CreateSchoolSaga has ended without an initial admin user being created :: {}", saga.getSagaId());
   }
 
   private void publishToJetStream(final Event event, SagaEntity saga) {

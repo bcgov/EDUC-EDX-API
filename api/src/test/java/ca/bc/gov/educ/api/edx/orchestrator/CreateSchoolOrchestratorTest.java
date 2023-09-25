@@ -1,12 +1,14 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATED_SCHOOL_HAS_ADMIN_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATE_SCHOOL_SAGA_HAS_ADMIN;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.CREATE_SCHOOL_SAGA_HAS_NO_ADMIN;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_INVITED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_PRIMARY_CODE_CREATED;
 import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_PRIMARY_CODE;
-import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_WITH_ADMIN;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN;
 import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.EventType.INVITE_INITIAL_USER;
 import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
@@ -146,7 +148,8 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
       final Optional<SagaEntity> sagaFromDB = sagaService.findSagaById(saga.getSagaId());
       assertThat(sagaFromDB).isPresent();
-      assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL_WITH_ADMIN.toString());
+      assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
+      assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SCHOOL.toString());
 
       final List<SagaEventStatesEntity> sagaStates = sagaService.findAllSagaStates(saga);
       assertThat(sagaStates).hasSize(1);
@@ -156,25 +159,25 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    void testCreateSchool_GivenAnInitialUser_sagaShouldOnboardInitialUser()
+    void testCheckCreateSchoolSagaForAdmin_GivenAnInitialUser_sagaShouldOnboardInitialUser()
     throws JsonProcessingException, TimeoutException, IOException, InterruptedException {
       final int invocations = mockingDetails(messagePublisher).getInvocations().size();
       final Event event = Event.builder()
-        .eventType(INITIATED)
-        .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+        .eventType(CREATE_SCHOOL)
+        .eventOutcome(SCHOOL_CREATED)
         .sagaId(saga.getSagaId())
         .eventPayload(sagaPayload)
         .build();
       orchestrator.handleEvent(event);
 
       verify(messagePublisher, atMost(invocations + 1))
-        .dispatchMessage(eq(INSTITUTE_API_TOPIC.toString()), eventCaptor.capture());
+        .dispatchMessage(eq(orchestrator.getTopicToSubscribe()), eventCaptor.capture());
 
       final Event newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(eventCaptor.getValue()));
 
-      assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL_WITH_ADMIN);
-      assertThat(newEvent.getEventPayload()).isEqualTo(sagaPayload);
-      assertThat(newEvent.getEventOutcome()).isEqualTo(CREATED_SCHOOL_HAS_ADMIN_USER);
+      assertThat(newEvent.getEventType()).isEqualTo(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN);
+      assertThat(newEvent.getEventPayload()).isNotEmpty();
+      assertThat(newEvent.getEventOutcome()).isEqualTo(CREATE_SCHOOL_SAGA_HAS_ADMIN);
     }
 
     @Test
@@ -182,8 +185,8 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
     throws JsonProcessingException, TimeoutException, IOException, InterruptedException {
       final int invocations = mockingDetails(messagePublisher).getInvocations().size();
       final Event event = Event.builder()
-        .eventType(CREATE_SCHOOL_WITH_ADMIN)
-        .eventOutcome(CREATED_SCHOOL_HAS_ADMIN_USER)
+        .eventType(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN)
+        .eventOutcome(CREATE_SCHOOL_SAGA_HAS_ADMIN)
         .sagaId(saga.getSagaId())
         .eventPayload(sagaPayload)
         .build();
@@ -208,8 +211,8 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
     throws IOException, InterruptedException, TimeoutException {
       final int invocations = mockingDetails(messagePublisher).getInvocations().size();
       final Event event = Event.builder()
-        .eventType(CREATE_SCHOOL_WITH_ADMIN)
-        .eventOutcome(CREATED_SCHOOL_HAS_ADMIN_USER)
+        .eventType(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN)
+        .eventOutcome(CREATE_SCHOOL_SAGA_HAS_ADMIN)
         .sagaId(saga.getSagaId())
         .eventPayload(sagaPayload)
         .build();
@@ -281,27 +284,28 @@ public class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Nested
   class StandaloneTests {
     @Test
-    void testCreateSchool_GivenNoInitialUser_sagaShouldEndEarly() throws JsonProcessingException {
-        setUpSagas(createMockCreateSchoolSagaData());
+    void testCreateSchool_GivenNoInitialUser_sagaShouldEndEarly()
+    throws JsonProcessingException, TimeoutException, IOException, InterruptedException {
+      setUpSagas(createMockCreateSchoolSagaData());
 
       final int invocations = mockingDetails(messagePublisher).getInvocations().size();
       final Event event = Event.builder()
-        .eventType(INITIATED)
-        .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+        .eventType(CREATE_SCHOOL)
+        .eventOutcome(SCHOOL_CREATED)
         .sagaId(saga.getSagaId())
         .eventPayload(sagaPayload)
         .build();
 
-      orchestrator.createSchool(event, saga, sagaData);
+      orchestrator.handleEvent(event);
 
       verify(messagePublisher, atMost(invocations + 1))
-        .dispatchMessage(eq(INSTITUTE_API_TOPIC.toString()), eventCaptor.capture());
+        .dispatchMessage(eq(orchestrator.getTopicToSubscribe()), eventCaptor.capture());
 
       final Event newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(eventCaptor.getValue()));
 
-      assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL_WITH_ADMIN);
-      assertThat(newEvent.getEventPayload()).isEqualTo("");
-      assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_CREATED);
+      assertThat(newEvent.getEventType()).isEqualTo(CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN);
+      assertThat(newEvent.getEventPayload()).isEmpty();
+      assertThat(newEvent.getEventOutcome()).isEqualTo(CREATE_SCHOOL_SAGA_HAS_NO_ADMIN);
 
       tearDown();
     }
