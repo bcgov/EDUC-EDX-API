@@ -73,7 +73,7 @@ public class CreateSchoolOrchestratorService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendPrimaryActivationCodeNotification(CreateSchoolSagaData sagaData) {
-    EdxUser user = sagaData.getInitialEdxUser().get();
+    EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
     School school = sagaData.getSchool();
 
     EdxActivationCodeEntity edxActivationCodeEntity
@@ -99,7 +99,7 @@ public class CreateSchoolOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void startEdxSchoolUserInviteSaga(CreateSchoolSagaData sagaData) {
     EdxUserSchoolActivationInviteSagaData inviteSagaData = new EdxUserSchoolActivationInviteSagaData();
-    EdxUser user = sagaData.getInitialEdxUser().get();
+    EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
     School school = sagaData.getSchool();
     List<String> roles = List.of("EDX_SCHOOL_ADMIN");
     List<String> statusFilters = List.of(SagaStatusEnum.IN_PROGRESS.toString(), SagaStatusEnum.STARTED.toString());
