@@ -64,7 +64,6 @@ public enum EventType {
 
   // Create/move School Events
   CREATE_SCHOOL,
-  CHECK_CREATE_SCHOOL_SAGA_FOR_ADMIN,
   UPDATE_SCHOOL,
   COPY_USERS_TO_NEW_SCHOOL,
   GET_PAGINATED_SCHOOLS,
