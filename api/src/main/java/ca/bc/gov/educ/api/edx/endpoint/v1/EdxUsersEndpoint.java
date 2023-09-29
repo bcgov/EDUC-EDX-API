@@ -79,6 +79,11 @@ public interface EdxUsersEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<EdxUser> findEdxUsers(@RequestParam(name = "digitalId", required = false) Optional<UUID> digitalId, @RequestParam(name = "schoolID", required = false) Optional<UUID> schoolID, @RequestParam(name = "firstName", required = false) String firstName, @RequestParam(name = "lastName", required = false) String lastName, @RequestParam(name = "districtID", required = false) Optional<UUID> districtID);
 
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
+  @GetMapping("/districtSchools/{districtID}")
+  @Transactional(readOnly = true)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<EdxSchool> findAllDistrictEdxUsers(@PathVariable String districtID);
 
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PostMapping

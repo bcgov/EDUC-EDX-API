@@ -100,6 +100,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public List<EdxSchool> findAllDistrictEdxUsers(String districtID) {
+    return getService().findAllDistrictEdxUsers(districtID);
+  }
+
+  @Override
   public EdxUser createEdxUser(EdxUser edxUser) {
     validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(edxUser, true));
     RequestUtil.setAuditColumnsForCreate(edxUser);
