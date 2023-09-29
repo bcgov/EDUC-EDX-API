@@ -11,7 +11,6 @@ import java.util.List;
 public class EdxSchool implements Serializable {
   private static final long serialVersionUID = 583620260139143932L;
 
-  String schoolName;
   String schoolID;
 
   private List<EdxUser> edxUsers;
