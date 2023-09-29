@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,10 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -62,6 +61,8 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxActivationRoleRepository edxActivationRoleRepository;
 
+  @Autowired
+  private RestUtils restUtils;
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -128,6 +129,28 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  void testFindAllEdxUsersByDistrict_GivenValidDistrictID_ShouldReturnOkStatusWithResult() throws Exception {
+    List<UUID> schoolIDList1 = new ArrayList<>();
+    schoolIDList1.add(UUID.randomUUID());
+    var entity1 = this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
+    List<UUID> schoolIDList2 = new ArrayList<>();
+    schoolIDList2.add(UUID.randomUUID());
+    var entity2 = this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList2);
+
+    var districtSchoolsMap = new HashMap<String, List<UUID>>();
+    var districtID = UUID.randomUUID();
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(schoolIDList1.get(0),schoolIDList2.get(0)));
+    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/districtSchools/" + districtID)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.[0].schoolID", is(schoolIDList1.get(0).toString())))
+      .andExpect(jsonPath("$.[1].schoolID", is(schoolIDList2.get(0).toString())));
+  }
+
+
+  @Test
   void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
@@ -144,8 +167,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     List<UUID> schoolIDList = new ArrayList<>();
     schoolIDList.add(UUID.randomUUID());
 
-    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
-        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList);
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList);
 
     //should return user with all their schools and districts access.
     this.mockMvc.perform(get(URL.BASE_URL_USERS)

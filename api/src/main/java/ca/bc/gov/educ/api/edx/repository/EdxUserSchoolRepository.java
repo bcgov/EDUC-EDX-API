@@ -24,5 +24,6 @@ public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEnti
 
   List<EdxUserSchoolEntity> findAllBySchoolID(UUID schoolID);
 
+  List<EdxUserSchoolEntity> findAllBySchoolIDIn(List<UUID> schoolIDs);
 
 }
