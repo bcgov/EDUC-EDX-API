@@ -16,6 +16,8 @@ public class SecureExchangeDocument extends BaseRequest implements Serializable 
 
   private String documentID;
 
+  private String secureExchangeID;
+
   @Size(max = 10)
   @NotNull(message = "documentTypeCode cannot be null")
   private String documentTypeCode;

@@ -14,6 +14,7 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangeSagaPayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayloadValidator;
+import ca.bc.gov.educ.api.edx.validator.EdxUserPayloadValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
 import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
@@ -40,6 +42,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RestController
 @Slf4j
 public class EdxSagaController implements EdxSagaEndpoint {
+
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxUserPayloadValidator edxUserPayLoadValidator;
 
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator;
@@ -60,12 +65,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator, EdxUserPayloadValidator edxUserPayLoadValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
     this.secureExchangeCommentSagaValidator = secureExchangeCommentSagaValidator;
     this.createSecureExchangeSagaPayloadValidator = createSecureExchangeSagaPayloadValidator;
+    this.edxUserPayLoadValidator = edxUserPayLoadValidator;
     orchestrators.forEach(orchestrator -> this.orchestratorMap.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
@@ -114,8 +120,27 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   @Override
+  public ResponseEntity<String> createSchool(CreateSchoolSagaData edxSchoolCreationSagaData) {
+    Optional<EdxUser> userOptional = edxSchoolCreationSagaData.getInitialEdxUser();
+    if (userOptional.isPresent()) {
+      validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(userOptional.get(), true));
+    }
+    return this.processNewSchoolSaga(CREATE_NEW_SCHOOL_SAGA, edxSchoolCreationSagaData);
+  }
+
+  @Override
   public ResponseEntity<String> moveSchool(MoveSchoolData moveSchoolData) {
     return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolData);
+  }
+
+  private ResponseEntity<String> processNewSchoolSaga(SagaEnum sagaName, CreateSchoolSagaData newSchoolSagaData) {
+    try {
+      RequestUtil.setAuditColumnsForCreate(newSchoolSagaData);
+      SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName), newSchoolSagaData);
+      return processServicesSaga(sagaName, sagaEntity);
+    } catch (JsonProcessingException e) {
+      throw new SagaRuntimeException(e);
+    }
   }
 
   private ResponseEntity<String> processMoveSchoolSaga(SagaEnum sagaName, MoveSchoolData moveSchoolData) {
@@ -151,7 +176,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
     }
   }
 
-
   private ResponseEntity<String> processEdxDistrictUserActivationLinkSaga(final SagaEnum sagaName, final EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) {
     final var sagaInProgress = this.getSagaService().findAllActiveUserActivationInviteSagasByDistrictIDAndEmailId(edxDistrictUserActivationInviteSagaData.getDistrictID(), edxDistrictUserActivationInviteSagaData.getEmail(), sagaName.toString(), this.getActiveStatusesFilter());
     if (sagaInProgress.isPresent()) {
@@ -168,7 +192,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   private ResponseEntity<String> processNewSecureExchangeMessageSaga(final SagaEnum sagaName, final SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
-
     try {
       val sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName),secureExchangeCreateSagaData);
       return processServicesSaga(sagaName,sagaEntity);
@@ -195,7 +218,6 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private ResponseEntity<String> processServicesSaga(final SagaEnum sagaName, SagaEntity sagaEntity) {
     try {
-
       final var orchestrator = this.getOrchestratorMap().get(sagaName.toString());
       final var saga = this.getOrchestratorMap()
         .get(sagaName.toString())

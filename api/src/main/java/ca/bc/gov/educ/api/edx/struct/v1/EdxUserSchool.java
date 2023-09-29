@@ -22,7 +22,3 @@ public class EdxUserSchool extends BaseRequest implements Serializable {
   private List<EdxUserSchoolRole> edxUserSchoolRoles;
 }
 
-
-
-
-

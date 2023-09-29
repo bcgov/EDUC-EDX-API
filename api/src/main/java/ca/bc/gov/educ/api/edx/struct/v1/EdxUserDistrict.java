@@ -21,7 +21,3 @@ public class EdxUserDistrict extends BaseRequest implements Serializable {
   private List<EdxUserDistrictRole> edxUserDistrictRoles;
 }
 
-
-
-
-
