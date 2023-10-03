@@ -18,6 +18,7 @@ public class EdxUserSchool extends BaseRequest implements Serializable {
   String edxUserSchoolID;
   String edxUserID;
   UUID schoolID;
+  String expiryDate;
 
   private List<EdxUserSchoolRole> edxUserSchoolRoles;
 }

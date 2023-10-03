@@ -19,7 +19,6 @@ public interface EdxUserDistrictMapper {
   @Mapping(target = "edxUserID", source = "edxUserEntity.edxUserID")
   EdxUserDistrict toStructure(EdxUserDistrictEntity entity);
 
-
   @InheritInverseConfiguration
   EdxUserDistrictEntity toModel(EdxUserDistrict edxUserDistrict);
 

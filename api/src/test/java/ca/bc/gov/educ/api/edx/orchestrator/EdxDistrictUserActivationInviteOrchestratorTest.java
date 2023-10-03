@@ -25,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -86,6 +88,7 @@ class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureExchange
     public void setUp() throws JsonProcessingException {
       MockitoAnnotations.openMocks(this);
       sagaData = createDistrictUserActivationInviteData("Test", "User", "testuser@bcgov.ca");
+      sagaData.setEdxUserExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
       sagaPayload = getJsonString(sagaData);
 
       try {
@@ -151,6 +154,7 @@ class EdxDistrictUserActivationInviteOrchestratorTest extends BaseSecureExchange
       assertThat(payload.getPersonalActivationCode()).isNotBlank();
       List<EdxActivationCodeEntity> activationCodeEntities = edxActivationCodeRepository.findEdxActivationCodeEntitiesByValidationCode(UUID.fromString(payload.getValidationCode()));
       assertThat(activationCodeEntities).hasSize(1);
+      assertThat(activationCodeEntities.get(0).getEdxUserExpiryDate()).isNotNull();
       final var sagaStates = this.sagaService.findAllSagaStates(this.saga);
       assertThat(sagaStates).hasSize(1);
       assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(EventType.INITIATED.toString());

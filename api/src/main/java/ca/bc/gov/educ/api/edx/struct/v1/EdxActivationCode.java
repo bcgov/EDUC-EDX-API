@@ -50,4 +50,6 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
   String numberOfClicks;
 
   String edxUserId;
+
+  String edxUserExpiryDate;
 }
