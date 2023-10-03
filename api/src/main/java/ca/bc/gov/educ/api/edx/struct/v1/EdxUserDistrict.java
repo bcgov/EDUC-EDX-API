@@ -17,6 +17,7 @@ public class EdxUserDistrict extends BaseRequest implements Serializable {
   String edxUserDistrictID;
   String edxUserID;
   String districtID;
+  String expiryDate;
 
   private List<EdxUserDistrictRole> edxUserDistrictRoles;
 }

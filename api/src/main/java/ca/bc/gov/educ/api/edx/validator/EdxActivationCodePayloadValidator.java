@@ -8,12 +8,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.validation.FieldError;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class EdxActivationCodePayloadValidator {
 
+  public static final String EDX_ACTIVATE_USER = "edxActivateUser";
   private final ApplicationProperties props;
   private static final String EDX_ROLE_CODE = "edxRoleCode";
   public EdxActivationCodePayloadValidator(ApplicationProperties props) {
@@ -57,6 +60,7 @@ public class EdxActivationCodePayloadValidator {
     return apiValidationErrors;
   }
 
+
   private FieldError createFieldError(String fieldName, Object rejectedValue, String message) {
     return new FieldError("EdxActivationCode", fieldName, rejectedValue, false, null, null, message);
   }
@@ -64,10 +68,22 @@ public class EdxActivationCodePayloadValidator {
   public List<FieldError> validateEdxActivateUserPayload(EdxActivateUser edxActivateUser) {
     final List<FieldError> apiValidationErrors = new ArrayList<>();
     if (edxActivateUser.getSchoolID() == null && edxActivateUser.getDistrictID() == null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", null, "SchoolID or DistrictID Information is required for User Activation"));
+      apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, null, "SchoolID or DistrictID Information is required for User Activation"));
     }
     if (edxActivateUser.getSchoolID() != null && edxActivateUser.getDistrictID() != null) {
-      apiValidationErrors.add(createFieldError("edxActivateUser", edxActivateUser.getSchoolID(), "Either SchoolID or DistrictID Information should be present per User Activation Request"));
+      apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getSchoolID(), "Either SchoolID or DistrictID Information should be present per User Activation Request"));
+    }
+
+    if (edxActivateUser.getEdxUserExpiryDate() != null) {
+      LocalDateTime expiryDate = null;
+      try{
+        expiryDate = LocalDateTime.parse(edxActivateUser.getEdxUserExpiryDate() , DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+      }catch(Exception e){
+        apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getEdxUserExpiryDate(), "EDX User expiry date provided is invalid, should be ISO_LOCAL_DATE_TIME format"));
+      }
+      if(LocalDateTime.now().isAfter(expiryDate)) {
+        apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getEdxUserExpiryDate(), "EDX User expiry date must be in the future"));
+      }
     }
     return apiValidationErrors;
   }

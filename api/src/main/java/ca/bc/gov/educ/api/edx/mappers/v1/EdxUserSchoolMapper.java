@@ -19,6 +19,6 @@ public interface EdxUserSchoolMapper {
   @Mapping(target = "edxUserID", source = "edxUserEntity.edxUserID")
   EdxUserSchool toStructure(EdxUserSchoolEntity entity);
 
- @InheritInverseConfiguration
+  @InheritInverseConfiguration
   EdxUserSchoolEntity toModel(EdxUserSchool edxUserSchool);
 }

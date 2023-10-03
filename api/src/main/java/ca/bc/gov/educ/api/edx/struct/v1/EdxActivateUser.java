@@ -28,4 +28,6 @@ public class EdxActivateUser extends BaseRequest implements Serializable {
   String digitalId;
 
   String edxUserId;
+
+  String edxUserExpiryDate;
 }
