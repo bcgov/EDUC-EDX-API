@@ -75,14 +75,14 @@ public class EdxActivationCodePayloadValidator {
     }
 
     if (edxActivateUser.getEdxUserExpiryDate() != null) {
-      LocalDateTime expiryDate = null;
+      LocalDateTime expiryDate;
       try{
         expiryDate = LocalDateTime.parse(edxActivateUser.getEdxUserExpiryDate() , DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        if(LocalDateTime.now().isAfter(expiryDate)) {
+          apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getEdxUserExpiryDate(), "EDX User expiry date must be in the future"));
+        }
       }catch(Exception e){
         apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getEdxUserExpiryDate(), "EDX User expiry date provided is invalid, should be ISO_LOCAL_DATE_TIME format"));
-      }
-      if(LocalDateTime.now().isAfter(expiryDate)) {
-        apiValidationErrors.add(createFieldError(EDX_ACTIVATE_USER, edxActivateUser.getEdxUserExpiryDate(), "EDX User expiry date must be in the future"));
       }
     }
     return apiValidationErrors;

@@ -1203,6 +1203,81 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereSchoolIDAndDistrictIdBothFilled_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setDistrictID(UUID.randomUUID());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("Either SchoolID or DistrictID Information should be present per User Activation Request")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereInvalidExpiryDateFormat_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setEdxUserExpiryDate("ABCD");
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date provided is invalid, should be ISO_LOCAL_DATE_TIME format")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereInvalidExpiryDatePast_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setEdxUserExpiryDate(LocalDateTime.now().minusDays(1).toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date must be in the future")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
   void testEdxActivateUsers_GivenValidInput_EdxUserIdPresentInRequest_EdxUserIsUpdated_WithoutAnyAdditionalUseSchoolAndSchoolRoles_WithOkStatusResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
     UUID schoolID = UUID.randomUUID();
