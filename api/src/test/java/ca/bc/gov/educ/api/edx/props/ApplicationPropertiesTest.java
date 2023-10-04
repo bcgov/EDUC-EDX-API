@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.edx.props;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
-class ApplicationPropertiesTest extends BaseSecureExchangeAPITest {
+class ApplicationPropertiesTest extends BaseEdxAPITest {
 
   @Autowired
   ApplicationProperties applicationProperties;

@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeNoteEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
@@ -13,14 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.fail;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-class SecureExchangeNoteServiceGetDeleteTests extends BaseSecureExchangeAPITest {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.fail;
+
+class EdxNoteServiceGetDeleteTests extends BaseEdxAPITest {
     @Autowired
     SecureExchangeNoteService secureExchangeNoteService;
 

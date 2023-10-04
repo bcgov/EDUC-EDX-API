@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.schedulers;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
@@ -24,7 +24,7 @@ import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class EventTaskSchedulerTest extends BaseSecureExchangeAPITest {
+class EventTaskSchedulerTest extends BaseEdxAPITest {
   @Autowired
   EventTaskScheduler eventTaskScheduler;
   @Autowired

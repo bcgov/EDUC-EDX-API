@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
-class SecureExchangeStudentServiceAddTests extends BaseSecureExchangeAPITest {
+class EdxStudentServiceAddTests extends BaseEdxAPITest {
 
     private static final SecureExchangeEntityMapper mapper = SecureExchangeEntityMapper.mapper;
     @MockBean

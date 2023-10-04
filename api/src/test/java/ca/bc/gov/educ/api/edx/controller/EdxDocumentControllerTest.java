@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.controller;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.controller.v1.SecureExchangeDocumentController;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
+class EdxDocumentControllerTest extends BaseEdxAPITest {
   @Autowired
   private MockMvc mvc;
 
@@ -97,7 +97,7 @@ class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req.json", SecureExchangeDocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req.json", EdxDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andDo(print())
@@ -113,7 +113,7 @@ class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(Files.readAllBytes(new ClassPathResource(
-            "../model/document-req.json", SecureExchangeDocumentControllerTest.class).getFile().toPath()))
+            "../model/document-req.json", EdxDocumentControllerTest.class).getFile().toPath()))
         .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isCreated())
         .andDo(print())
@@ -233,7 +233,7 @@ class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-invalid-filesize.json", SecureExchangeDocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req-invalid-filesize.json", EdxDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print())
@@ -247,7 +247,7 @@ class SecureExchangeDocumentControllerTest extends BaseSecureExchangeAPITest {
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_DOCUMENT")))
             .contentType(MediaType.APPLICATION_JSON)
             .content(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req-without-doc-data.json", SecureExchangeDocumentControllerTest.class).getFile().toPath()))
+                    "../model/document-req-without-doc-data.json", EdxDocumentControllerTest.class).getFile().toPath()))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andDo(print());

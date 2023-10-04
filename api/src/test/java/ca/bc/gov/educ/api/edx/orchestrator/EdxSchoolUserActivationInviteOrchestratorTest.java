@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class EdxSchoolUserActivationInviteOrchestratorTest extends BaseSecureExchangeAPITest {
+class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
 
   /**
    * The Repository.
