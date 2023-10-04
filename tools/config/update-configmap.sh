@@ -401,6 +401,8 @@ EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION_LITERAL="<!DOCTYPE html><htm
 
 EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>Message Added to Secure Exchange</title></head><body>Hi there,<br><br>The <span th:text=\"\${$}{ministryTeamName}\"></span> has added a new message to secure message #<span th:text=\"\${$}{messageSequenceNumber}\"></span> for <span th:text=\"\${$}{instituteName}\"></span>.<br><br>To view the message, please log into the Education Data Exchange: <a th:href=\"@{\${\$}{linkToEDX}}\">here</a><br><br>If the above link doesn't work, please paste this link into your web browser's address field:<br><br><a th:href=\"@{\${\$}{linkToEDX}}\" th:text=\"\${\$}{linkToEDX}\"></a><br><br>Regards,<br>The Ministry of Education and Child Care's EDX Team</body></html>"
 
+EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>New Secure Exchange Message</title></head><body><p>Hi <span th:text=\"\${\$}{firstName}\"></span><span th:text=\"\${\$}{lastName}\"></span></p><p>Here is the Primary Access Code for the Education Data Exchange (EDX) for <span th:text=\"\${\$}{minCode}\"></span> - <span th:text=\"\${\$}{instituteName}\"></span>: <span th:text=\"\${\$}{primaryCode}\"></span></p><p>Please keep this code safe. It will be required for the activation of each EDX account at your school. Once you have activated your EDX Admin Account, you will be able to view the Primary Access Code through the EDX User Management screen - available under the \"Administration\" menu option.</p><p>Regards,<br/>The Ministry of Education and Child Care's EDX Team</p></body></html>"
+
 ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT"
 
 if [ "$envValue" = "prod" ]
@@ -459,6 +461,8 @@ oc create -n "$OPENSHIFT_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map
   --from-literal=EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION_LITERAL" \
   --from-literal=EMAIL_SUBJECT_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="Message Added to Secure Exchange" \
   --from-literal=EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL" \
+  --from-literal=EMAIL_SUBJECT_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="Primary Access Code for Education Data Exchange" \
+  --from-literal=EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL" \
   --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR" \
   --from-literal=SCHEDULED_JOBS_PURGE_CLOSED_MESSAGES_CRON="@midnight" \
   --from-literal=PURGE_CLOSED_SECURE_EXCHANGE_AFTER_DAYS="365" \
