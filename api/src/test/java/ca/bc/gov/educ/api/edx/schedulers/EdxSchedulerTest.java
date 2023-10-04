@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.schedulers;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.DocumentRepository;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
+class EdxSchedulerTest extends BaseEdxAPITest {
   @Autowired
   private DocumentRepository repository;
   @Autowired
@@ -45,7 +45,7 @@ class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
         .withoutDocumentID()
         .withData(Files.readAllBytes(new ClassPathResource(
-            "../model/document-req.json", SecureExchangeSchedulerTest.class).getFile().toPath()))
+            "../model/document-req.json", EdxSchedulerTest.class).getFile().toPath()))
         .withSecureExchange(secureExchange)
         .withTypeCode("CAPASSPORT")
         .build();
@@ -83,7 +83,7 @@ class SecureExchangeSchedulerTest extends BaseSecureExchangeAPITest {
     final SecureExchangeDocumentEntity document = new DocumentBuilder()
             .withoutDocumentID()
             .withData(Files.readAllBytes(new ClassPathResource(
-                    "../model/document-req.json", SecureExchangeSchedulerTest.class).getFile().toPath()))
+                    "../model/document-req.json", EdxSchedulerTest.class).getFile().toPath()))
             .withSecureExchange(secureExchange)
             .withTypeCode("CAPASSPORT")
             .build();

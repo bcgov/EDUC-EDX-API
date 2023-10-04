@@ -8,6 +8,9 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -22,6 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("test")
 class SecureExchangeDocRequirementEntityJsonTests {
+    @MockBean
+    ClientRegistrationRepository clientRegistrationRepository;
+    @MockBean
+    OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
     @Autowired
     private JacksonTester<SecureExchangeDocRequirement> jsonTester;
 

@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
-import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserMapper;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
@@ -12,6 +11,7 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import com.google.common.primitives.Chars;
+import jakarta.persistence.EntityExistsException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +24,11 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import jakarta.persistence.EntityExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -134,11 +134,20 @@ public class EdxUsersService {
       if(!edxSchools.containsKey(schoolID)){
         EdxSchool school = new EdxSchool();
         school.setSchoolID(schoolID);
-        school.setEdxUsers(new ArrayList<>());
+        school.setEdxDistrictSchoolUsers(new ArrayList<>());
         edxSchools.put(schoolID, school);
       }
 
-      edxSchools.get(schoolID).getEdxUsers().add(EdxUserMapper.mapper.toStructure(edxUserSchoolEntity.getEdxUserEntity()));
+      EdxDistrictSchoolUserTombstone tomb = new EdxDistrictSchoolUserTombstone();
+      var edxUserEntity = edxUserSchoolEntity.getEdxUserEntity();
+      tomb.setEdxUserID(edxUserEntity.getEdxUserID().toString());
+      tomb.setDigitalIdentityID(edxUserEntity.getDigitalIdentityID().toString());
+      tomb.setEmail(edxUserEntity.getEmail());
+      tomb.setFullName(edxUserEntity.getFirstName() + " " + edxUserEntity.getLastName());
+      var rolesMap = getEdxRolesMap();
+      tomb.setSchoolRoles(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().stream().map(edxSchool -> rolesMap.get(edxSchool.getEdxRoleCode()).getLabel()).toList());
+
+      edxSchools.get(schoolID).getEdxDistrictSchoolUsers().add(tomb);
     });
 
     return edxSchools.values().stream().toList();
@@ -326,6 +335,10 @@ public class EdxUsersService {
    */
   public List<EdxRoleEntity> findAllEdxRoles() {
     return this.getEdxRoleRepository().findAll();
+  }
+
+  public Map<String, EdxRoleEntity> getEdxRolesMap() {
+    return this.getEdxRoleRepository().findAll().stream().collect(Collectors.toMap(EdxRoleEntity::getEdxRoleCode, item -> item));
   }
 
   /**

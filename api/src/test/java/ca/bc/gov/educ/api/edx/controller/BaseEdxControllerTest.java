@@ -1,12 +1,10 @@
 package ca.bc.gov.educ.api.edx.controller;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Set;
-
-public abstract class BaseSecureExchangeControllerTest extends BaseSecureExchangeAPITest {
+public abstract class BaseEdxControllerTest extends BaseEdxAPITest {
 
   protected String dummySecureExchangeJson() {
     return "{\"updateUser\":\"TEST\",\"createUser\":\"TEST\",\"secureExchangeStatusCode\":\"OPEN\",\"isReadByExchangeContact\":\"false\",\"isReadByMinistry\":\"false\",\"statusUpdateDate\":\"1952-10-31T00:00:00\",\"updateDate\":\"1952-10-31T00:00:00\",\"createDate\":\"1952-10-31T00:00:00\",\"subject\":\"Hello Student\",\"ministryOwnershipTeamID\":\"b1e0788a-7dab-4b92-af86-c678e411f1e3\",\"contactIdentifier\":\"b1e0788a-7dab-4b92-af86-c678e411f1e4\",\"secureExchangeContactTypeCode\":\"EDXUSER\", \"secureExchangeID\":\"0a004b01-7027-17b1-8170-27cb21100000\"}";

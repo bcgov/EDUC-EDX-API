@@ -1,11 +1,11 @@
 package ca.bc.gov.educ.api.edx.service;
 
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.CHESEmailService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-class CHESEmailServiceTest extends BaseSecureExchangeAPITest {
+class CHESEmailServiceTest extends BaseEdxAPITest {
 
 
   @Autowired

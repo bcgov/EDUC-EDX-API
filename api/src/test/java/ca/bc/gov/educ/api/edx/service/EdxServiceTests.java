@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeCommentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
@@ -26,7 +26,7 @@ import java.util.stream.StreamSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SecureExchangeServiceTests extends BaseSecureExchangeAPITest {
+class EdxServiceTests extends BaseEdxAPITest {
 
   @Autowired
   SecureExchangeService service;

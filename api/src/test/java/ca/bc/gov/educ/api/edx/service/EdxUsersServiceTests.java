@@ -1,28 +1,29 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
+class EdxUsersServiceTests extends BaseEdxAPITest {
 
   @Autowired
   EdxUsersService service;
@@ -38,6 +39,9 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
   @Autowired
   private EdxUserDistrictRepository edxUserDistrictRepository;
+
+  @Autowired
+  private RestUtils restUtils;
 
   @Autowired
   private EdxRoleRepository edxRoleRepository;
@@ -86,6 +90,28 @@ class EdxUsersServiceTests extends BaseSecureExchangeAPITest {
 
     var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),Optional.empty(), null, null,Optional.empty());
     assertThat(edxUserEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  void findAllEdxUsersByDistrictID() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    var schoolEntity = getEdxUserSchoolEntity(entity);
+    schoolEntity.setSchoolID(UUID.randomUUID());
+    EdxUserSchoolRoleEntity roleEntity = new EdxUserSchoolRoleEntity();
+    roleEntity.setEdxUserSchoolEntity(schoolEntity);
+    roleEntity.setCreateUser("ABC");
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    roleEntity.setCreateDate(LocalDateTime.now());
+    schoolEntity.getEdxUserSchoolRoleEntities().add(roleEntity);
+    edxUserSchoolRepository.save(schoolEntity);
+
+    var districtSchoolsMap = new HashMap<String, List<UUID>>();
+    var districtID = UUID.randomUUID();
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(schoolEntity.getSchoolID()));
+    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
+    assertThat(edxSchools).isNotNull().hasSize(1);
   }
 
   @Test
