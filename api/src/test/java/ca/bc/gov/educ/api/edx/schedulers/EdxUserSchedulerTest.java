@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +20,7 @@ import ca.bc.gov.educ.api.edx.repository.EdxUserDistrictRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
+import net.javacrumbs.shedlock.core.LockAssert;
 
 class EdxUserSchedulerTest extends BaseEdxAPITest {
   @Autowired
@@ -41,7 +41,7 @@ class EdxUserSchedulerTest extends BaseEdxAPITest {
 
   @BeforeEach
   public void setUp() {
-    // LockAssert.TestHelper.makeAllAssertsPass(true);
+    LockAssert.TestHelper.makeAllAssertsPass(true);
   }
 
   @AfterEach
