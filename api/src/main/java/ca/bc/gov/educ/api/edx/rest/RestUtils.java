@@ -126,14 +126,14 @@ public class RestUtils {
     return schoolMap;
   }
 
-  public Map<String, List<UUID>> getDistrictSchoolsMap() {
-    Map<String, List<UUID>> districtSchoolsMap = new ConcurrentHashMap<>();
+  public Map<String, List<School>> getDistrictSchoolsMap() {
+    Map<String, List<School>> districtSchoolsMap = new ConcurrentHashMap<>();
     for (val school : this.getSchools()) {
       if(!districtSchoolsMap.containsKey(school.getDistrictId())){
         districtSchoolsMap.put(school.getDistrictId(),new ArrayList<>());
       }
 
-      districtSchoolsMap.get(school.getDistrictId()).add(UUID.fromString(school.getSchoolId()));
+      districtSchoolsMap.get(school.getDistrictId()).add(school);
     }
 
     return districtSchoolsMap;

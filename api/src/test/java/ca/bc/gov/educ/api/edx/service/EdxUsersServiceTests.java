@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
+import ca.bc.gov.educ.api.edx.struct.v1.School;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -105,9 +106,49 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     schoolEntity.getEdxUserSchoolRoleEntities().add(roleEntity);
     edxUserSchoolRepository.save(schoolEntity);
 
-    var districtSchoolsMap = new HashMap<String, List<UUID>>();
+    List<UUID> schoolIDList1 = new ArrayList<>();
+    schoolIDList1.add(schoolEntity.getSchoolID());
+    School school1 = new School();
+    school1.setSchoolCategoryCode("PUBLIC");
+    school1.setSchoolId(schoolIDList1.get(0).toString());
+
+    var districtSchoolsMap = new HashMap<String, List<School>>();
     var districtID = UUID.randomUUID();
-    districtSchoolsMap.put(districtID.toString(), Arrays.asList(schoolEntity.getSchoolID()));
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1));
+    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
+    assertThat(edxSchools).isNotNull().hasSize(1);
+  }
+
+  @Test
+  void findAllEdxUsersByDistrictIDNoIndependents() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    var schoolEntity = getEdxUserSchoolEntity(entity);
+    schoolEntity.setSchoolID(UUID.randomUUID());
+    EdxUserSchoolRoleEntity roleEntity = new EdxUserSchoolRoleEntity();
+    roleEntity.setEdxUserSchoolEntity(schoolEntity);
+    roleEntity.setCreateUser("ABC");
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    roleEntity.setCreateDate(LocalDateTime.now());
+    schoolEntity.getEdxUserSchoolRoleEntities().add(roleEntity);
+    edxUserSchoolRepository.save(schoolEntity);
+
+    School school1 = new School();
+    school1.setSchoolCategoryCode("PUBLIC");
+    school1.setSchoolId(schoolEntity.getSchoolID().toString());
+
+    School school2 = new School();
+    school2.setSchoolCategoryCode("INDP_FNS");
+    school2.setSchoolId(UUID.randomUUID().toString());
+
+    School school3 = new School();
+    school3.setSchoolCategoryCode("INDEPEND");
+    school3.setSchoolId(UUID.randomUUID().toString());
+
+    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtID = UUID.randomUUID();
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3));
     Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
 
     var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
