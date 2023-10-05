@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,5 +26,7 @@ public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEnti
   List<EdxUserSchoolEntity> findAllBySchoolID(UUID schoolID);
 
   List<EdxUserSchoolEntity> findAllBySchoolIDIn(List<UUID> schoolIDs);
+
+  List<EdxUserSchoolEntity> findAllByExpiryDateBefore(LocalDateTime dateTime);
 
 }
