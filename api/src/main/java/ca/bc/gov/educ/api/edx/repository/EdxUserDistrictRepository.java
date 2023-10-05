@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,4 +25,6 @@ public interface EdxUserDistrictRepository extends JpaRepository<EdxUserDistrict
             WHERE permission.EDX_PERMISSION_CODE = :permissionCode"""
             , nativeQuery = true)
     List<EdxUserDistrictEntity> findDistrictsByPermission(String permissionCode);
+
+    List<EdxUserDistrictEntity> findAllByExpiryDateBefore(LocalDateTime dateTime);
 }

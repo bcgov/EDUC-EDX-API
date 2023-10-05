@@ -48,7 +48,6 @@ public abstract class BaseEdxAPITest {
     this.secureExchangeAPITestUtils.cleanDB();
   }
 
-
   protected EdxUserEntity createUserEntity(EdxUserRepository edxUserRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxUserSchoolRepository edxUserSchoolRepository, EdxUserDistrictRepository edxUserDistrictRepository) {
     var entity = edxUserRepository.save(getEdxUserEntity());
 
@@ -217,10 +216,22 @@ public abstract class BaseEdxAPITest {
     return edxUserSchool;
   }
 
+  protected EdxUserSchool createEdxUserSchool(EdxUser edxUsr, LocalDateTime expiryDate) {
+    EdxUserSchool edxUserSchool = this.createEdxUserSchool(edxUsr);
+    edxUserSchool.setExpiryDate(expiryDate.toString());
+    return edxUserSchool;
+  }
+
   protected EdxUserDistrict createEdxUserDistrict(EdxUser edxUsr) {
     EdxUserDistrict edxUserDistrict = new EdxUserDistrict();
     edxUserDistrict.setEdxUserID(edxUsr.getEdxUserID());
     edxUserDistrict.setDistrictID(UUID.randomUUID().toString());
+    return edxUserDistrict;
+  }
+
+  protected EdxUserDistrict createEdxUserDistrict(EdxUser edxUsr, LocalDateTime expiryDate) {
+    EdxUserDistrict edxUserDistrict = this.createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setExpiryDate(expiryDate.toString());
     return edxUserDistrict;
   }
 
