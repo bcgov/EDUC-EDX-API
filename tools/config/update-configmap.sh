@@ -401,9 +401,7 @@ EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION_LITERAL="<!DOCTYPE html><htm
 
 EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>Message Added to Secure Exchange</title></head><body>Hi there,<br><br>The <span th:text=\"\${$}{ministryTeamName}\"></span> has added a new message to secure message #<span th:text=\"\${$}{messageSequenceNumber}\"></span> for <span th:text=\"\${$}{instituteName}\"></span>.<br><br>To view the message, please log into the Education Data Exchange: <a th:href=\"@{\${\$}{linkToEDX}}\">here</a><br><br>If the above link doesn't work, please paste this link into your web browser's address field:<br><br><a th:href=\"@{\${\$}{linkToEDX}}\" th:text=\"\${\$}{linkToEDX}\"></a><br><br>Regards,<br>The Ministry of Education and Child Care's EDX Team</body></html>"
 
-EMAIL_SUBJECT_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="Change Me!!"
-
-EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>Edx School User Activation</title></head><body>Hi <span th:text=\"\${$}{firstName}\"></span>,<br><br><span th:text=\"\${$}{schoolName}\"></span> would like to invite you to use the Education Data Exchange (EDX).<br><br>To activate your access you will need:<ol><li>A Basic BCeID account - you can create one here if needed: <a href=\"https://www.bceid.ca/\">https://www.bceid.ca/</a></li><li>The school's Primary Activation Code - <span th:unless=\"\${$}{#strings.isEmpty(edxAdmins)}\">available from the EDX administrator(s) for your school: <span th:text=\"\${$}{edxAdmins}\"></span></span><span th:if=\"\${$}{#strings.isEmpty(edxAdmins)}\">an administrator will reach out to you with this information</span></li><li>Your Personal Activation Code - provided below</li></ol>When you have a Basic BCeID account and the Primary Activation Code you are ready to get started!<br><br><b>Steps to Activate your Access</b><ol><li>Access <a th:href=\"@{\${\$}{activationLink}}\">EDX</a></li><li>Enter your Basic BCeID username and password</li><li>Enter the school's Primary Activation Code</li><li>Enter your Personal Activation Code: <span th:text=\"\${$}{personalActivationCode}\"></span></li></ol><br>If the above link doesn't work, please paste this link into your web browser's address field:<br><br><a th:href=\"@{\${\$}{activationLink}}\" th:text=\"\${\$}{activationLink}\"></a><br><br>Regards,<br>The Ministry of Education and Child Care's EDX Team</body></html>"
+EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>New Secure Exchange Message</title></head><body><p>Hi <span th:text=\"\${\$}{firstName}\"></span><span th:text=\"\${\$}{lastName}\"></span></p><p>Here is the Primary Access Code for the Education Data Exchange (EDX) for <span th:text=\"\${\$}{minCode}\"></span> - <span th:text=\"\${\$}{instituteName}\"></span>: <span th:text=\"\${\$}{primaryCode}\"></span></p><p>Please keep this code safe. It will be required for the activation of each EDX account at your school. Once you have activated your EDX Admin Account, you will be able to view the Primary Access Code through the EDX User Management screen - available under the \"Administration\" menu option.</p><p>Regards,<br/>The Ministry of Education and Child Care's EDX Team</p></body></html>"
 
 ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT"
 
@@ -419,7 +417,58 @@ EDX_ACTIVATION_CODE_LENGTH="8"
 EDX_ACTIVATION_CODE_VALID_CHARACTERS="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 echo
 echo Creating config map "$APP_NAME"-config-map
-oc create -n "$OPENSHIFT_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student/" --from-literal=EDX_API_CLIENT_ID="edx-api-service" --from-literal=EDX_API_CLIENT_SECRET="$PME_APIServiceClientSecret" --from-literal=TZ=$TZVALUE --from-literal=TOKEN_ISSUER_URL="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID" --from-literal=NATS_URL="$NATS_URL" --from-literal=NATS_CLUSTER=$NATS_CLUSTER --from-literal=JDBC_URL="$DB_JDBC_CONNECT_STRING" --from-literal=DB_USERNAME="$DB_USER" --from-literal=DB_PASSWORD="$DB_PWD" --from-literal=SPRING_SECURITY_LOG_LEVEL=INFO --from-literal=SPRING_SHOW_SQL=false --from-literal=SPRING_WEB_LOG_LEVEL=INFO --from-literal=APP_LOG_LEVEL=INFO --from-literal=HIBERNATE_STATISTICS=false --from-literal=SPRING_BOOT_AUTOCONFIG_LOG_LEVEL=INFO --from-literal=SPRING_SHOW_REQUEST_DETAILS=false --from-literal=FILE_EXTENSIONS="image/jpeg,image/png,application/pdf,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.jpg,.jpeg,.jpe,.jfif,.jif,.jfi,.std,.ver,.csv,.doc,.docx,.xls,.xlsx" --from-literal=FILE_MAXSIZE=10485760  --from-literal=FILE_MAX_ENCODED_SIZE=15485760  --from-literal=BCSC_AUTO_MATCH_OUTCOMES="RIGHTPEN,WRONGPEN,ZEROMATCHES,MANYMATCHES,ONEMATCH" --from-literal=ROLES_ALLOW_LIST="$ROLES_ALLOW_LIST" --from-literal=REMOVE_BLOB_CONTENTS_DOCUMENT_AFTER_DAYS="365" --from-literal=SCHEDULED_JOBS_REMOVE_BLOB_CONTENTS_DOCUMENT_CRON="@midnight" --from-literal=NATS_MAX_RECONNECT=60  --from-literal=CHES_CLIENT_ID="$CHES_CLIENT_ID" --from-literal=CHES_CLIENT_SECRET="$CHES_CLIENT_SECRET" --from-literal=CHES_TOKEN_URL="$CHES_TOKEN_URL" --from-literal=CHES_ENDPOINT_URL="$CHES_ENDPOINT_URL" --from-literal=NOTIFICATION_EMAIL_SWITCH_ON="true" --from-literal=EMAIL_SUBJECT_EDX_SCHOOL_USER_ACTIVATION_INVITE="Activate Your Account for the Education Data Exchange" --from-literal=EMAIL_FROM_EDX_SCHOOL_USER_ACTIVATION_INVITE="edx-noreply@gov.bc.ca" --from-literal=EMAIL_TEMPLATE_EDX_DISTRICT_USER_ACTIVATION_INVITE="$EMAIL_TEMPLATE_EDX_DISTRICT_USER_ACTIVATION_INVITE_LITERAL" --from-literal=SITE_URL="$SITE_URL" --from-literal=EDX_SCHOOL_USER_ACTIVATION_INVITE_VALIDITY_HOURS="72" --from-literal=EDX_SCHOOL_USER_ACTIVATION_INVITE_URL_APPEND="/api/edx/activate-user-verification?validationCode=" --from-literal=EMAIL_SUBJECT_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="$EMAIL_SUBJECT_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION" --from-literal=EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION" --from-literal=EMAIL_TEMPLATE_EDX_SCHOOL_USER_ACTIVATION_INVITE="$EMAIL_TEMPLATE_EDX_SCHOOL_USER_ACTIVATION_INVITE_LITERAL" --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON" --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_LEAST_FOR="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_LEAST_FOR"  --from-literal=EMAIL_SUBJECT_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION="New Secure Exchange Message" --from-literal=EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION_LITERAL" --from-literal=EMAIL_SUBJECT_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="Message Added to Secure Exchange" --from-literal=EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL" --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR" --from-literal=SCHEDULED_JOBS_PURGE_CLOSED_MESSAGES_CRON="@midnight" --from-literal=PURGE_CLOSED_SECURE_EXCHANGE_AFTER_DAYS="365" --from-literal=EDX_ACTIVATION_CODE_LENGTH="$EDX_ACTIVATION_CODE_LENGTH" --from-literal=EDX_ACTIVATION_CODE_VALID_CHARACTERS="$EDX_ACTIVATION_CODE_VALID_CHARACTERS" --from-literal=INSTITUTE_API_ENDPOINT="http://institute-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/institute" --dry-run -o yaml | oc apply -f -
+oc create -n "$OPENSHIFT_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map \
+  --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student/" \
+  --from-literal=EDX_API_CLIENT_ID="edx-api-service" \
+  --from-literal=EDX_API_CLIENT_SECRET="$PME_APIServiceClientSecret" \
+  --from-literal=TZ=$TZVALUE \
+  --from-literal=TOKEN_ISSUER_URL="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID" \
+  --from-literal=NATS_URL="$NATS_URL" \
+  --from-literal=NATS_CLUSTER=$NATS_CLUSTER \
+  --from-literal=JDBC_URL="$DB_JDBC_CONNECT_STRING" \
+  --from-literal=DB_USERNAME="$DB_USER" \
+  --from-literal=DB_PASSWORD="$DB_PWD" \
+  --from-literal=SPRING_SECURITY_LOG_LEVEL=INFO \
+  --from-literal=SPRING_SHOW_SQL=false \
+  --from-literal=SPRING_WEB_LOG_LEVEL=INFO \
+  --from-literal=APP_LOG_LEVEL=INFO \
+  --from-literal=HIBERNATE_STATISTICS=false \
+  --from-literal=SPRING_BOOT_AUTOCONFIG_LOG_LEVEL=INFO \
+  --from-literal=SPRING_SHOW_REQUEST_DETAILS=false \
+  --from-literal=FILE_EXTENSIONS="image/jpeg,image/png,application/pdf,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.jpg,.jpeg,.jpe,.jfif,.jif,.jfi,.std,.ver,.csv,.doc,.docx,.xls,.xlsx" \
+  --from-literal=FILE_MAXSIZE=10485760  \
+  --from-literal=FILE_MAX_ENCODED_SIZE=15485760  \
+  --from-literal=BCSC_AUTO_MATCH_OUTCOMES="RIGHTPEN,WRONGPEN,ZEROMATCHES,MANYMATCHES,ONEMATCH" \
+  --from-literal=ROLES_ALLOW_LIST="$ROLES_ALLOW_LIST" \
+  --from-literal=REMOVE_BLOB_CONTENTS_DOCUMENT_AFTER_DAYS="365" \
+  --from-literal=SCHEDULED_JOBS_REMOVE_BLOB_CONTENTS_DOCUMENT_CRON="@midnight" \
+  --from-literal=NATS_MAX_RECONNECT=60  \
+  --from-literal=CHES_CLIENT_ID="$CHES_CLIENT_ID" \
+  --from-literal=CHES_CLIENT_SECRET="$CHES_CLIENT_SECRET" \
+  --from-literal=CHES_TOKEN_URL="$CHES_TOKEN_URL" \
+  --from-literal=CHES_ENDPOINT_URL="$CHES_ENDPOINT_URL" \
+  --from-literal=NOTIFICATION_EMAIL_SWITCH_ON="true" \
+  --from-literal=EMAIL_SUBJECT_EDX_SCHOOL_USER_ACTIVATION_INVITE="Activate Your Account for the Education Data Exchange" \
+  --from-literal=EMAIL_FROM_EDX_SCHOOL_USER_ACTIVATION_INVITE="edx-noreply@gov.bc.ca" \
+  --from-literal=EMAIL_TEMPLATE_EDX_DISTRICT_USER_ACTIVATION_INVITE="$EMAIL_TEMPLATE_EDX_DISTRICT_USER_ACTIVATION_INVITE_LITERAL" \
+  --from-literal=SITE_URL="$SITE_URL" \
+  --from-literal=EDX_SCHOOL_USER_ACTIVATION_INVITE_VALIDITY_HOURS="72" \
+  --from-literal=EDX_SCHOOL_USER_ACTIVATION_INVITE_URL_APPEND="/api/edx/activate-user-verification?validationCode=" \
+  --from-literal=EMAIL_TEMPLATE_EDX_SCHOOL_USER_ACTIVATION_INVITE="$EMAIL_TEMPLATE_EDX_SCHOOL_USER_ACTIVATION_INVITE_LITERAL" \
+  --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON" \
+  --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_LEAST_FOR="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_LEAST_FOR"  \
+  --from-literal=EMAIL_SUBJECT_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION="New Secure Exchange Message" \
+  --from-literal=EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_NEW_SECURE_EXCHANGE_NOTIFICATION_LITERAL" \
+  --from-literal=EMAIL_SUBJECT_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="Message Added to Secure Exchange" \
+  --from-literal=EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL" \
+  --from-literal=EMAIL_SUBJECT_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="Primary Access Code for Education Data Exchange" \
+  --from-literal=EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION="$EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL" \
+  --from-literal=SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR="$SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON_LOCK_AT_MOST_FOR" \
+  --from-literal=SCHEDULED_JOBS_PURGE_CLOSED_MESSAGES_CRON="@midnight" \
+  --from-literal=PURGE_CLOSED_SECURE_EXCHANGE_AFTER_DAYS="365" \
+  --from-literal=EDX_ACTIVATION_CODE_LENGTH="$EDX_ACTIVATION_CODE_LENGTH" \
+  --from-literal=EDX_ACTIVATION_CODE_VALID_CHARACTERS="$EDX_ACTIVATION_CODE_VALID_CHARACTERS" \
+  --from-literal=INSTITUTE_API_ENDPOINT="http://institute-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/institute" --dry-run -o yaml | oc apply -f -
 echo
 
 echo Setting environment variables for "$APP_NAME"-$SOAM_KC_REALM_ID application
