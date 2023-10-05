@@ -6,14 +6,16 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxUsersController;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -21,10 +23,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsNull.notNullValue;
@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
+class EdxUsersControllerTest extends BaseEdxControllerTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -62,6 +62,8 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   @Autowired
   private EdxActivationRoleRepository edxActivationRoleRepository;
 
+  @Autowired
+  private RestUtils restUtils;
   @BeforeEach
   public void setUp() {
     MockitoAnnotations.openMocks(this);
@@ -128,6 +130,28 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
   }
 
   @Test
+  void testFindAllEdxUsersByDistrict_GivenValidDistrictID_ShouldReturnOkStatusWithResult() throws Exception {
+    List<UUID> schoolIDList1 = new ArrayList<>();
+    schoolIDList1.add(UUID.randomUUID());
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
+    List<UUID> schoolIDList2 = new ArrayList<>();
+    schoolIDList2.add(UUID.randomUUID());
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList2);
+
+    var districtSchoolsMap = new HashMap<String, List<UUID>>();
+    var districtID = UUID.randomUUID();
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(schoolIDList1.get(0),schoolIDList2.get(0)));
+    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + "/districtSchools/" + districtID)
+        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isOk())
+      .andExpect(jsonPath("$.[0].schoolID", in(Arrays.asList(schoolIDList1.get(0).toString(),schoolIDList2.get(0).toString()))))
+      .andExpect(jsonPath("$.[1].schoolID", in(Arrays.asList(schoolIDList1.get(0).toString(),schoolIDList2.get(0).toString()))));
+  }
+
+
+  @Test
   void testFindEdxUsers_GivenValidFirstNameAndLastName_ShouldReturnOkStatusWithResult() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
@@ -144,8 +168,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     List<UUID> schoolIDList = new ArrayList<>();
     schoolIDList.add(UUID.randomUUID());
 
-    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository,
-        this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList);
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList);
 
     //should return user with all their schools and districts access.
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
@@ -351,16 +374,17 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
+    edxUserSchool.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
 
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
-
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate())))
       .andDo(print()).andExpect(status().isCreated());
 
   }
@@ -714,6 +738,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserSchool edxUserSchool = createEdxUserSchool(edxUsr);
+    edxUserSchool.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
     String jsonEdxUserSchool = getJsonString(edxUserSchool);
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
       .contentType(MediaType.APPLICATION_JSON)
@@ -722,6 +747,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate())))
       .andDo(print()).andExpect(status().isCreated());
 
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
@@ -1171,6 +1197,81 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions
       .andExpect(jsonPath("$.subErrors[0].message", is("SchoolID or DistrictID Information is required for User Activation")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereSchoolIDAndDistrictIdBothFilled_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setDistrictID(UUID.randomUUID());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("Either SchoolID or DistrictID Information should be present per User Activation Request")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereInvalidExpiryDateFormat_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setEdxUserExpiryDate("ABCD");
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date provided is invalid, should be ISO_LOCAL_DATE_TIME format")))
+            .andDo(print()).andExpect(status().isBadRequest());
+
+  }
+
+  @Test
+  void testEdxActivateUsers_GivenInValidInput_WhereInvalidExpiryDatePast_WithErrorResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    EdxUserEntity userEntity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setPersonalActivationCode("WXYZ");
+    edxActivateUser.setPrimaryEdxCode("ABCDE");
+    edxActivateUser.setDigitalId(userEntity.getDigitalIdentityID().toString());
+    edxActivateUser.setUpdateUser("ABC");
+    edxActivateUser.setSchoolID(UUID.randomUUID());
+    edxActivateUser.setEdxUserExpiryDate(LocalDateTime.now().minusDays(1).toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(activateUserJson)
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions
+      .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date must be in the future")))
             .andDo(print()).andExpect(status().isBadRequest());
 
   }
@@ -1928,6 +2029,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
 
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
@@ -1938,6 +2040,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andExpect(jsonPath("$.expiryDate", is(edxUserDistrict.getExpiryDate())))
             .andDo(print()).andExpect(status().isCreated());
 
   }
@@ -2266,6 +2369,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
+    edxUserDistrict.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
             .contentType(MediaType.APPLICATION_JSON)
@@ -2274,6 +2378,7 @@ class EdxUsersControllerTest extends BaseSecureExchangeControllerTest {
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
+            .andExpect(jsonPath("$.expiryDate", is(edxUserDistrict.getExpiryDate())))
             .andDo(print()).andExpect(status().isCreated());
 
     val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);

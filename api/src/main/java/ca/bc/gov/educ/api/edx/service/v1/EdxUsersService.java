@@ -7,9 +7,11 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import com.google.common.primitives.Chars;
+import jakarta.persistence.EntityExistsException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +24,11 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import jakarta.persistence.EntityExistsException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -37,99 +39,48 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class EdxUsersService {
 
-  /**
-   * The Ministry ownership team repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
 
-  /**
-   * The Edx user repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserRepository edxUserRepository;
 
-  /**
-   * The Edx user schools repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRepository edxUserSchoolsRepository;
 
-  /**
-   * The Edx user district roles repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
 
-  /**
-   * The Edx user district repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserDistrictRepository edxUserDistrictRepository;
 
-  /**
-   * The Edx user school role repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
 
-  /**
-   * The Edx role repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxRoleRepository edxRoleRepository;
 
-
-  /**
-   * The Edx activation code repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationCodeRepository edxActivationCodeRepository;
 
-  /**
-   * The Edx activation role repository.
-   */
   @Getter(AccessLevel.PRIVATE)
   private final EdxActivationRoleRepository edxActivationRoleRepository;
 
-  /**
-   * The constant EDX_USER_ID.
-   */
+  private final RestUtils restUtils;
+
   private static final String EDX_USER_ID = "edxUserID";
 
-  /**
-   * The constant EDX_ACTIVATION_CODE_ID.
-   */
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
 
-  /**
-   * The constant INSTITUTE_IDENTIFIER.
-   */
   private static final String INSTITUTE_IDENTIFIER = "institute_identifier";
-  /**
-   * The Props.
-   */
+
   @Getter(AccessLevel.PRIVATE)
   private final ApplicationProperties props;
 
   private static final String EDX_USER_DISTRICT_ID="edxUserDistrictID";
 
-  /**
-   * Instantiates a new Edx users service.
-   *
-   * @param ministryOwnershipTeamRepository the ministry ownership team repository
-   * @param edxUserSchoolsRepository        the edx user schools repository
-   * @param edxUserRepository               the edx user repository
-   * @param edxUserDistrictRoleRepository   the edx user district role repository
-   * @param edxUserDistrictRepository       the edx user district repository
-   * @param edxUserSchoolRoleRepository     the edx user school role repository
-   * @param edxRoleRepository               the edx role repository
-   * @param edxActivationCodeRepository     the edx activation code repository
-   * @param edxActivationRoleRepository     the edx activation role repository
-   * @param props                           the props
-   */
   @Autowired
-  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, ApplicationProperties props) {
+  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
     this.edxUserSchoolsRepository = edxUserSchoolsRepository;
     this.edxUserRepository = edxUserRepository;
@@ -139,33 +90,18 @@ public class EdxUsersService {
     this.edxRoleRepository = edxRoleRepository;
     this.edxActivationCodeRepository = edxActivationCodeRepository;
     this.edxActivationRoleRepository = edxActivationRoleRepository;
+    this.restUtils = restUtils;
     this.props = props;
   }
 
-  /**
-   * Gets ministry teams list.
-   *
-   * @return the ministry teams list
-   */
   public List<MinistryOwnershipTeamEntity> getMinistryTeamsList() {
     return this.getMinistryOwnershipTeamRepository().findAll();
   }
 
-  /**
-   * Gets edx user schools list.
-   *
-   * @return the edx user schools list
-   */
   public List<EdxUserSchoolEntity> getEdxUserSchoolsList() {
     return this.getEdxUserSchoolsRepository().findAll();
   }
 
-  /**
-   * Retrieve edx user by id edx user entity.
-   *
-   * @param edxUserID the edx user id
-   * @return the edx user entity
-   */
   public EdxUserEntity retrieveEdxUserByID(final UUID edxUserID) {
     var res = this.getEdxUserRepository().findById(edxUserID);
     if (res.isPresent()) {
@@ -175,46 +111,48 @@ public class EdxUsersService {
     }
   }
 
-  /**
-   * Gets edx user schools list.
-   *
-   * @param permissionCode the permission code
-   * @return the edx user schools list
-   */
   public List<String> getEdxUserSchoolsList(String permissionCode) {
     List<EdxUserSchoolEntity> schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
     return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
   }
 
-  /**
-   * Gets edx user districts list
-   * @param permissionCode permission code
-   * @return list of districts
-   */
   public List<String> getEdxUserDistrictsList(String permissionCode) {
     List<EdxUserDistrictEntity> districtIDs = edxUserDistrictRepository.findDistrictsByPermission(permissionCode);
     return districtIDs.stream().map(district -> district.getDistrictID().toString()).distinct().toList();
   }
 
-  /**
-   * Find edx users list.
-   *
-   * @param digitalId the digital id
-   * @param schoolID   the schoolID
-   * @param firstName the first name
-   * @param lastName  the last name
-   * @return the list
-   */
   public List<EdxUserEntity> findEdxUsers(Optional<UUID> digitalId, Optional<UUID> schoolID, String firstName, String lastName, Optional<UUID> districtID) {
     return this.getEdxUserRepository().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID);
   }
 
-  /**
-   * Create edx user edx user entity.
-   *
-   * @param edxUserEntity the edx user entity
-   * @return the edx user entity
-   */
+  public List<EdxSchool> findAllDistrictEdxUsers(String districtID) {
+    Map<String, List<UUID>> districtSchoolIDsMap = restUtils.getDistrictSchoolsMap();
+    List<EdxUserSchoolEntity> edxUserSchoolEntities = this.getEdxUserSchoolsRepository().findAllBySchoolIDIn(districtSchoolIDsMap.get(districtID));
+    Map<String, EdxSchool> edxSchools = new HashMap<>();
+    edxUserSchoolEntities.stream().forEach(edxUserSchoolEntity -> {
+      String schoolID = edxUserSchoolEntity.getSchoolID().toString();
+      if(!edxSchools.containsKey(schoolID)){
+        EdxSchool school = new EdxSchool();
+        school.setSchoolID(schoolID);
+        school.setEdxDistrictSchoolUsers(new ArrayList<>());
+        edxSchools.put(schoolID, school);
+      }
+
+      EdxDistrictSchoolUserTombstone tomb = new EdxDistrictSchoolUserTombstone();
+      var edxUserEntity = edxUserSchoolEntity.getEdxUserEntity();
+      tomb.setEdxUserID(edxUserEntity.getEdxUserID().toString());
+      tomb.setDigitalIdentityID(edxUserEntity.getDigitalIdentityID().toString());
+      tomb.setEmail(edxUserEntity.getEmail());
+      tomb.setFullName(edxUserEntity.getFirstName() + " " + edxUserEntity.getLastName());
+      var rolesMap = getEdxRolesMap();
+      tomb.setSchoolRoles(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().stream().map(edxSchool -> rolesMap.get(edxSchool.getEdxRoleCode()).getLabel()).toList());
+
+      edxSchools.get(schoolID).getEdxDistrictSchoolUsers().add(tomb);
+    });
+
+    return edxSchools.values().stream().toList();
+  }
+
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
 
     mapEdxUserSchoolAndRole(edxUserEntity);
@@ -254,13 +192,6 @@ public class EdxUsersService {
     }
   }
 
-  /**
-   * Create edx user school edx user school entity.
-   *
-   * @param edxUserID           the edx user id
-   * @param edxUserSchoolEntity the edx user school entity
-   * @return the edx user school entity
-   */
   public EdxUserSchoolEntity createEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -273,13 +204,6 @@ public class EdxUsersService {
     }
   }
 
-  /**
-   * Update edx user school edx user school entity.
-   *
-   * @param edxUserID           the edx user id
-   * @param edxUserSchoolEntity the edx user school entity
-   * @return the edx user school entity
-   */
   public EdxUserSchoolEntity updateEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
     val entityOptional = getEdxUserRepository().findById(edxUserID);
     val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
@@ -411,6 +335,10 @@ public class EdxUsersService {
    */
   public List<EdxRoleEntity> findAllEdxRoles() {
     return this.getEdxRoleRepository().findAll();
+  }
+
+  public Map<String, EdxRoleEntity> getEdxRolesMap() {
+    return this.getEdxRoleRepository().findAll().stream().collect(Collectors.toMap(EdxRoleEntity::getEdxRoleCode, item -> item));
   }
 
   /**

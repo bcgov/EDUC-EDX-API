@@ -1,10 +1,9 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
-
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EmailNotificationService;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,7 +17,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 
-class EmailNotificationServiceTest extends BaseSecureExchangeAPITest {
+class EmailNotificationServiceTest extends BaseEdxAPITest {
 
   @Autowired
   EmailNotificationService emailNotificationService;

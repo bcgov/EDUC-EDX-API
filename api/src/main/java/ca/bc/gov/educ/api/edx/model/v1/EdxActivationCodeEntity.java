@@ -49,6 +49,9 @@ public class EdxActivationCodeEntity {
   @Column(name = "EXPIRY_DATE")
   LocalDateTime expiryDate;
 
+  @Column(name = "EDX_USER_EXPIRY_DATE")
+  LocalDateTime edxUserExpiryDate;
+
   @NotNull(message = "createUser cannot be null")
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;

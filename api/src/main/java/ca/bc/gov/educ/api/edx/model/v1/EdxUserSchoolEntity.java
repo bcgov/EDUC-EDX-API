@@ -36,6 +36,9 @@ public class EdxUserSchoolEntity {
   @Column(name = "SCHOOL_ID", columnDefinition = "BINARY(16)")
   UUID schoolID;
 
+  @Column(name = "EXPIRY_DATE")
+  LocalDateTime expiryDate;
+
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 

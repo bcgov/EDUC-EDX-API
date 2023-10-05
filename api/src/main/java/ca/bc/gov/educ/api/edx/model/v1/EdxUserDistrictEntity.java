@@ -24,9 +24,7 @@ import java.util.UUID;
 @Table(name = "EDX_USER_DISTRICT" , uniqueConstraints = {@UniqueConstraint(name = "EDX_USER_ID_DISTRICT_ID_UK", columnNames = {"EDX_USER_ID", "DISTRICT_ID"})})
 @DynamicUpdate
 public class EdxUserDistrictEntity {
-  /**
-   * The Edx user district id.
-   */
+
   @Id
   @GeneratedValue(generator = "UUID")
   @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator", parameters = {
@@ -34,51 +32,31 @@ public class EdxUserDistrictEntity {
   @Column(name = "EDX_USER_DISTRICT_ID", updatable = false, columnDefinition = "BINARY(16)")
   UUID edxUserDistrictID;
 
-  /**
-   * The Edx user entity.
-   */
   @ManyToOne(optional = false,targetEntity = EdxUserEntity.class)
   @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   @JoinColumn(name = "EDX_USER_ID", referencedColumnName = "EDX_USER_ID")
   EdxUserEntity edxUserEntity;
 
-  /**
-   * The District id.
-   */
   @Column(name = "DISTRICT_ID", columnDefinition = "BINARY(16)")
   UUID districtID;
 
-  /**
-   * The Create user.
-   */
+  @Column(name = "EXPIRY_DATE")
+  LocalDateTime expiryDate;
+
   @Column(name = "CREATE_USER", updatable = false)
   String createUser;
 
-  /**
-   * The Create date.
-   */
   @PastOrPresent
   @Column(name = "CREATE_DATE", updatable = false)
   LocalDateTime createDate;
 
-  /**
-   * The Update user.
-   */
   @Column(name = "update_user")
   String updateUser;
 
-  /**
-   * The Update date.
-   */
   @PastOrPresent
   @Column(name = "update_date")
   LocalDateTime updateDate;
 
-  /**
-   * Gets edx user district role entities.
-   *
-   * @return the edx user district role entities
-   */
   public Set<EdxUserDistrictRoleEntity> getEdxUserDistrictRoleEntities() {
     if(this.edxUserDistrictRoleEntities == null){
       this.edxUserDistrictRoleEntities = new HashSet<>();
@@ -86,17 +64,11 @@ public class EdxUserDistrictEntity {
     return this.edxUserDistrictRoleEntities;
   }
 
-  /**
-   * The Edx user district role entities.
-   */
   @ToString.Exclude
   @EqualsAndHashCode.Exclude
   @OneToMany(mappedBy = "edxUserDistrictEntity", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EdxUserDistrictRoleEntity.class)
   private Set<EdxUserDistrictRoleEntity> edxUserDistrictRoleEntities;
 
-  /**
-   * Pre remove.
-   */
   @PreRemove
   public void preRemove() {
     if(this.edxUserEntity != null) {

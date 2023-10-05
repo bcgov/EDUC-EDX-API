@@ -6,13 +6,15 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -30,10 +32,16 @@ import static ca.bc.gov.educ.api.edx.utils.JsonUtil.createMapper;
 @SpringBootTest(classes = {EdxApiResourceApplication.class})
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public abstract class BaseSecureExchangeAPITest {
+public abstract class BaseEdxAPITest {
   protected final static ObjectMapper objectMapper = createMapper();
   @Autowired
   protected SecureExchangeAPITestUtils secureExchangeAPITestUtils;
+
+  @MockBean
+  ClientRegistrationRepository clientRegistrationRepository;
+
+  @MockBean
+  OAuth2AuthorizedClientRepository oAuth2AuthorizedClientRepository;
 
   @BeforeEach
   public void before() {

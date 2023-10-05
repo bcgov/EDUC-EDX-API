@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.edx.service;
 
-import ca.bc.gov.educ.api.edx.BaseSecureExchangeAPITest;
+import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeDocumentEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //import javax.transaction.Transactional;
 
 
-class SecureExchangeDocumentServiceTests extends BaseSecureExchangeAPITest {
+class EdxDocumentServiceTests extends BaseEdxAPITest {
 
   @Autowired
   DocumentService service;

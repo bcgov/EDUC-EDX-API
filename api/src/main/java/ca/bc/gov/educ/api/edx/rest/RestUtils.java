@@ -35,6 +35,7 @@ import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 @Component
 @Slf4j
 public class RestUtils {
+  public static final String NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID = "Either NATS timed out or the response is null , correlationID :: ";
   private final WebClient chesWebClient;
   private final WebClient webClient;
   private final ApplicationProperties props;
@@ -123,8 +124,21 @@ public class RestUtils {
     }
 
     return schoolMap;
-
   }
+
+  public Map<String, List<UUID>> getDistrictSchoolsMap() {
+    Map<String, List<UUID>> districtSchoolsMap = new ConcurrentHashMap<>();
+    for (val school : this.getSchools()) {
+      if(!districtSchoolsMap.containsKey(school.getDistrictId())){
+        districtSchoolsMap.put(school.getDistrictId(),new ArrayList<>());
+      }
+
+      districtSchoolsMap.get(school.getDistrictId()).add(UUID.fromString(school.getSchoolId()));
+    }
+
+    return districtSchoolsMap;
+  }
+
   public List<School> getSchools() {
     log.info("Calling Institute api to get list of schools");
     return this.webClient.get()
@@ -157,7 +171,7 @@ public class RestUtils {
         .block();
   }
 
-  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
+  @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public List<School> getSchoolNumberInDistrict(UUID correlationID, String schoolNumber, String districtId) {
     try {
       final SearchCriteria schoolNumberCriteria = this.getCriteria("schoolNumber", FilterOperation.EQUAL, schoolNumber , ValueType.STRING);
@@ -177,16 +191,16 @@ public class RestUtils {
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
       } else {
-        throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID);
+        throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID);
       }
 
     } catch (final Exception ex) {
       Thread.currentThread().interrupt();
-      throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID + ex.getMessage());
+      throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID + ex.getMessage());
     }
   }
 
-  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
+  @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public List<School> getSchoolById(UUID correlationID, String schoolId) {
     try {
       final SearchCriteria schoolIdCriteria = this.getCriteria("schoolId", FilterOperation.EQUAL, schoolId , ValueType.UUID);
@@ -203,16 +217,16 @@ public class RestUtils {
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
       } else {
-        throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID);
+        throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID);
       }
 
     } catch (final Exception ex) {
       Thread.currentThread().interrupt();
-      throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID + ex.getMessage());
+      throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID + ex.getMessage());
     }
   }
 
-  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
+  @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School createSchool(UUID correlationID,School school) {
     try {
       Object event = Event.builder().sagaId(correlationID).eventType(EventType.CREATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
@@ -222,15 +236,15 @@ public class RestUtils {
         return JsonUtil.getJsonObjectFromBytes(School.class,
                 eventPayload.getEventPayload().getBytes());
       } else {
-        throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID);
+        throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID);
       }
     } catch (final Exception ex) {
       Thread.currentThread().interrupt();
-      throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID + ex.getMessage());
+      throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID + ex.getMessage());
     }
   }
 
-  @Retryable(value = {Exception.class}, exclude = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
+  @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School updateSchool(UUID correlationID,School school) {
     try {
       Object event = Event.builder().sagaId(correlationID).eventType(EventType.UPDATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
@@ -240,11 +254,11 @@ public class RestUtils {
         return JsonUtil.getJsonObjectFromBytes(School.class,
                 eventPayload.getEventPayload().getBytes());
       } else {
-        throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID);
+        throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID);
       }
     } catch (final Exception ex) {
       Thread.currentThread().interrupt();
-      throw new SagaRuntimeException("Either NATS timed out or the response is null , correlationID :: " + correlationID + ex.getMessage());
+      throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID + ex.getMessage());
     }
   }
 

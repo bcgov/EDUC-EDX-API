@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestNoteRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeNote;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import jakarta.transaction.Transactional;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class SecureExchangeNoteControllerTest extends BaseSecureExchangeControllerTest {
+class EdxNoteControllerTest extends BaseEdxControllerTest {
 
     private static final SecureExchangeNoteMapper noteMapper = SecureExchangeNoteMapper.mapper;
     private static final SecureExchangeEntityMapper exchangeMapper = SecureExchangeEntityMapper.mapper;
