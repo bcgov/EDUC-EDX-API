@@ -604,7 +604,7 @@ public class EdxUsersService {
     EdxUserSchoolEntity userSchoolEntity = new EdxUserSchoolEntity();
     userSchoolEntity.setEdxUserEntity(edxUser);
     userSchoolEntity.setSchoolID(activationCode.getSchoolID());
-    userSchoolEntity.setExpiryDate(activationCode.getExpiryDate());
+    userSchoolEntity.setExpiryDate(activationCode.getEdxUserExpiryDate());
     updateAuditColumnsForEdxUserSchoolEntity(edxActivateUser, userSchoolEntity);
     return userSchoolEntity;
   }
@@ -613,7 +613,7 @@ public class EdxUsersService {
     EdxUserDistrictEntity userDistrictEntity = new EdxUserDistrictEntity();
     userDistrictEntity.setEdxUserEntity(edxUser);
     userDistrictEntity.setDistrictID(activationCode.getDistrictID());
-    userDistrictEntity.setExpiryDate(activationCode.getExpiryDate());
+    userDistrictEntity.setExpiryDate(activationCode.getEdxUserExpiryDate());
     updateAuditColumnsForEdxUserDistrictEntity(edxActivateUser, userDistrictEntity);
     return userDistrictEntity;
   }
