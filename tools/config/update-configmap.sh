@@ -257,6 +257,13 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
     -d "{\"description\": \"Write MOVE_SCHOOL_SAGA \",\"id\": \"MOVE_SCHOOL_SAGA\",\"name\": \"MOVE_SCHOOL_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
+echo Writing scope CREATE_SCHOOL_SAGA
+curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer $TKN" \
+    -d "{\"description\": \"Write CREATE_SCHOOL_SAGA \",\"id\": \"CREATE_SCHOOL_SAGA\",\"name\": \"CREATE_SCHOOL_SAGA\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
+
+echo
 echo Writing scope CREATE_SECURE_EXCHANGE_SAGA
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
