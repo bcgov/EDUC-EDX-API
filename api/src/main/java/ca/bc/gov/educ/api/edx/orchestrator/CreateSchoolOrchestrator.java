@@ -100,7 +100,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final Event.EventBuilder eventBuilder = Event.builder()
       .eventType(CREATE_SCHOOL)
       .replyTo(this.getTopicToSubscribe())
-      .eventPayload(JsonUtil.getJsonStringFromObject(school));
+      .eventPayload(JsonUtil.getJsonStringFromObject(school))
+      .sagaId(event.getSagaId());
 
     if (sagaData.getInitialEdxUser().isEmpty()) {
       eventBuilder.eventOutcome(CREATE_SCHOOL_SAGA_HAS_NO_ADMIN);
