@@ -259,9 +259,9 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
   private Optional<EdxUser> createMockInitialUser() {
     EdxUser mockUser = new EdxUser();
-    mockUser.setEmail("trevor.richards@gov.bc.ca");
-    mockUser.setFirstName("Trevor");
-    mockUser.setLastName("Richards");
+    mockUser.setEmail("test@gov.bc.ca");
+    mockUser.setFirstName("TestFirst");
+    mockUser.setLastName("TestLast");
     mockUser.setDigitalIdentityID(UUID.randomUUID().toString());
     return Optional.of(mockUser);
   }
