@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -133,14 +134,21 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUsersByDistrict_GivenValidDistrictID_ShouldReturnOkStatusWithResult() throws Exception {
     List<UUID> schoolIDList1 = new ArrayList<>();
     schoolIDList1.add(UUID.randomUUID());
+    School school1 = new School();
+    school1.setSchoolCategoryCode("PUBLIC");
+    school1.setSchoolId(schoolIDList1.get(0).toString());
+
     this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
     List<UUID> schoolIDList2 = new ArrayList<>();
     schoolIDList2.add(UUID.randomUUID());
+    School school2 = new School();
+    school2.setSchoolCategoryCode("PUBLIC");
+    school2.setSchoolId(schoolIDList2.get(0).toString());
     this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList2);
 
-    var districtSchoolsMap = new HashMap<String, List<UUID>>();
+    var districtSchoolsMap = new HashMap<String, List<School>>();
     var districtID = UUID.randomUUID();
-    districtSchoolsMap.put(districtID.toString(), Arrays.asList(schoolIDList1.get(0),schoolIDList2.get(0)));
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1,school2));
     Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/districtSchools/" + districtID)
@@ -2028,8 +2036,9 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
+    DateTimeFormatter dtf = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     EdxUserDistrict edxUserDistrict = createEdxUserDistrict(edxUsr);
-    edxUserDistrict.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).toString());
+    edxUserDistrict.setExpiryDate(LocalDateTime.now().plusDays(5).truncatedTo(ChronoUnit.SECONDS).format(dtf).toString());
     String jsonEdxUserDistrict = getJsonString(edxUserDistrict);
 
     val resultActions1 = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())

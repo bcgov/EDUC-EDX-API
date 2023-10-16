@@ -79,6 +79,8 @@ public class EdxUsersService {
 
   private static final String EDX_USER_DISTRICT_ID="edxUserDistrictID";
 
+  private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS");
+
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
@@ -125,9 +127,21 @@ public class EdxUsersService {
     return this.getEdxUserRepository().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID);
   }
 
+  private List<UUID> getDistrictSchoolsWithoutIndependents(String districtID){
+    var districtSchoolIDsMap = restUtils.getDistrictSchoolsMap();
+    var fullSchooList = districtSchoolIDsMap.get(districtID);
+    var filteredSchoolList = new ArrayList<UUID>();
+
+    fullSchooList.forEach(school -> {
+      if(!INDEPENDENT_SCHOOL_CATEGORIES.contains(school.getSchoolCategoryCode())){
+        filteredSchoolList.add(UUID.fromString(school.getSchoolId()));
+      }
+    });
+    return filteredSchoolList;
+  }
+
   public List<EdxSchool> findAllDistrictEdxUsers(String districtID) {
-    Map<String, List<UUID>> districtSchoolIDsMap = restUtils.getDistrictSchoolsMap();
-    List<EdxUserSchoolEntity> edxUserSchoolEntities = this.getEdxUserSchoolsRepository().findAllBySchoolIDIn(districtSchoolIDsMap.get(districtID));
+    List<EdxUserSchoolEntity> edxUserSchoolEntities = this.getEdxUserSchoolsRepository().findAllBySchoolIDIn(getDistrictSchoolsWithoutIndependents(districtID));
     Map<String, EdxSchool> edxSchools = new HashMap<>();
     edxUserSchoolEntities.stream().forEach(edxUserSchoolEntity -> {
       String schoolID = edxUserSchoolEntity.getSchoolID().toString();
