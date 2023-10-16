@@ -13,7 +13,6 @@ import static ca.bc.gov.educ.api.edx.constants.SagaEnum.CREATE_NEW_SCHOOL_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
-import static org.springframework.beans.BeanUtils.copyProperties;
 
 import org.springframework.stereotype.Component;
 
@@ -115,8 +114,12 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
 
   public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
   throws JsonProcessingException {
+    School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+    sagaData.setSchool(createdSchoolFromInstitute);
+    String updatedEventPayload = JsonUtil.getJsonStringFromObject(sagaData);
+
     final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), updatedEventPayload);
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -139,9 +142,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(SEND_PRIMARY_ACTIVATION_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
-
-    School school = JsonUtil.getJsonObjectFromString(School.class, saga.getPayload());
-    copyProperties(school, sagaData);
 
     this.orchestratorService.sendPrimaryActivationCodeNotification(sagaData);
 

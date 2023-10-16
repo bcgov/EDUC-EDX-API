@@ -21,6 +21,7 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.EdxSchoolUserActivationInviteOrchestrator;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
+import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
 import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
@@ -40,6 +41,8 @@ public class CreateSchoolOrchestratorService {
 
   private final EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator;
 
+  private final EdxActivationCodeRepository edxActivationCodeRepository;
+
   @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService service;
 
@@ -48,19 +51,21 @@ public class CreateSchoolOrchestratorService {
 
   public CreateSchoolOrchestratorService(
     SagaService sagaService,
+    EdxActivationCodeRepository edxActivationCodeRepository,
     EdxUsersService service,
     EmailProperties emailProperties,
     EmailNotificationService emailNotificationService,
     EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator
   ) {
     this.sagaService = sagaService;
+    this.edxActivationCodeRepository = edxActivationCodeRepository;
     this.service = service;
     this.emailProperties = emailProperties;
     this.emailNotificationService = emailNotificationService;
     this.activationInviteOrchestrator = activationInviteOrchestrator;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional
   public void createPrimaryActivationCode(CreateSchoolSagaData sagaData) {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();
     School school = sagaData.getSchool();
@@ -71,13 +76,14 @@ public class CreateSchoolOrchestratorService {
     service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, school.getSchoolId(), edxPrimaryActivationCode);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional
   public void sendPrimaryActivationCodeNotification(CreateSchoolSagaData sagaData) {
     EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
     School school = sagaData.getSchool();
+    UUID schoolId = UUID.fromString(school.getSchoolId());
 
-    EdxActivationCodeEntity edxActivationCodeEntity
-      = service.findPrimaryEdxActivationCode(SCHOOL, school.getSchoolId());
+    Optional<EdxActivationCodeEntity> edxActivationCodeEntity
+      = edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(schoolId);
 
     EmailNotification emailNotification = EmailNotification.builder()
       .fromEmail(emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
@@ -89,14 +95,14 @@ public class CreateSchoolOrchestratorService {
         "lastName", user.getLastName(),
         "minCode", school.getMincode(),
         "instituteName", school.getDisplayName(),
-        "primaryCode", edxActivationCodeEntity.getActivationCode()
+        "primaryCode", edxActivationCodeEntity.orElseThrow().getActivationCode()
       ))
       .build();
 
     emailNotificationService.sendEmail(emailNotification);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional
   public void startEdxSchoolUserInviteSaga(CreateSchoolSagaData sagaData) {
     EdxUserSchoolActivationInviteSagaData inviteSagaData = new EdxUserSchoolActivationInviteSagaData();
     EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
