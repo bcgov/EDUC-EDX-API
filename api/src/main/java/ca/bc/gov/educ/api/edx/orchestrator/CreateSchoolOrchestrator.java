@@ -115,21 +115,23 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
   public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
   throws JsonProcessingException {
     School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
-    sagaData.setSchool(createdSchoolFromInstitute);
-    String updatedEventPayload = JsonUtil.getJsonStringFromObject(sagaData);
+    CreateSchoolSagaData updatedSagaData = new CreateSchoolSagaData();
+    updatedSagaData.setSchool(createdSchoolFromInstitute);
+    updatedSagaData.setInitialEdxUser(sagaData.getInitialEdxUser());
+    saga.setPayload(JsonUtil.getJsonStringFromObject(updatedSagaData));
 
     final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), updatedEventPayload);
+      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
-    this.orchestratorService.createPrimaryActivationCode(sagaData);
+    this.orchestratorService.createPrimaryActivationCode(updatedSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
       .eventType(CREATE_SCHOOL_PRIMARY_CODE)
       .eventOutcome(SCHOOL_PRIMARY_CODE_CREATED)
       .replyTo(getTopicToSubscribe())
-      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
+      .eventPayload(JsonUtil.getJsonStringFromObject(updatedSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
     publishToJetStream(nextEvent, saga);
