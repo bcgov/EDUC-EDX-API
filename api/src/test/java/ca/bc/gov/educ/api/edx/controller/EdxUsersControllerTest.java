@@ -134,28 +134,46 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUsersByDistrict_GivenValidDistrictID_ShouldReturnOkStatusWithResult() throws Exception {
     List<UUID> schoolIDList1 = new ArrayList<>();
     schoolIDList1.add(UUID.randomUUID());
+    schoolIDList1.add(UUID.randomUUID());
+    schoolIDList1.add(UUID.randomUUID());
+    schoolIDList1.add(UUID.randomUUID());
+
     School school1 = new School();
     school1.setSchoolCategoryCode("PUBLIC");
     school1.setSchoolId(schoolIDList1.get(0).toString());
 
-    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
-    List<UUID> schoolIDList2 = new ArrayList<>();
-    schoolIDList2.add(UUID.randomUUID());
     School school2 = new School();
     school2.setSchoolCategoryCode("PUBLIC");
-    school2.setSchoolId(schoolIDList2.get(0).toString());
-    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList2);
+    school2.setSchoolId(schoolIDList1.get(1).toString());
+
+    School school3 = new School();
+    school3.setSchoolCategoryCode("INDEPEND");
+    school3.setSchoolId(schoolIDList1.get(2).toString());
+
+    School school4 = new School();
+    school4.setSchoolCategoryCode("PUBLIC");
+    school4.setSchoolId(schoolIDList1.get(3).toString());
+    school4.setOpenedDate("1900-01-01T00:00:00");
+    school4.setClosedDate("1901-01-01T00:00:00");
+
+    this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
 
     var districtSchoolsMap = new HashMap<String, List<School>>();
     var districtID = UUID.randomUUID();
-    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1,school2));
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3, school4));
     Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    List<String> expectedSchoolIDs = Arrays.asList(school1.getSchoolId(), school2.getSchoolId());
+    List<String> unexpectedSchoolIDs = Arrays.asList(school3.getSchoolId(), school4.getSchoolId());
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/districtSchools/" + districtID)
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
-      .andExpect(jsonPath("$.[0].schoolID", in(Arrays.asList(schoolIDList1.get(0).toString(),schoolIDList2.get(0).toString()))))
-      .andExpect(jsonPath("$.[1].schoolID", in(Arrays.asList(schoolIDList1.get(0).toString(),schoolIDList2.get(0).toString()))));
+      .andExpect(jsonPath("$.[*]", hasSize(2)))
+      .andExpect(jsonPath("$.[0].schoolID", in(expectedSchoolIDs)))
+      .andExpect(jsonPath("$.[1].schoolID", in(expectedSchoolIDs)))
+      .andExpect(jsonPath("$.[0].schoolID", not(in(unexpectedSchoolIDs))))
+      .andExpect(jsonPath("$.[1].schoolID", not(in(unexpectedSchoolIDs))));
   }
 
 
