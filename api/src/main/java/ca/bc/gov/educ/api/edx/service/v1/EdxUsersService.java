@@ -854,9 +854,9 @@ public class EdxUsersService {
   private Optional<EdxActivationCodeEntity> findPrimaryEdxActivationCodeForInstitute(InstituteTypeCode instituteType, String contactIdentifier) {
     switch (instituteType) {
       case SCHOOL:
-        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(UUID.fromString(contactIdentifier));
       case DISTRICT:
-        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrue(UUID.fromString(contactIdentifier));
+        return getEdxActivationCodeRepository().findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrueAndSchoolIDIsNull(UUID.fromString(contactIdentifier));
       default:
         return Optional.empty();
     }
