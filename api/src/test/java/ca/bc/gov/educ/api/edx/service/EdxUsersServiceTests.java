@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -153,6 +154,70 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
 
     var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
     assertThat(edxSchools).isNotNull().hasSize(1);
+  }
+
+  @Test
+  void findAllEdxUsersByDistrictIDNoClosedSchools() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    List<UUID> schoolIDs = new ArrayList<UUID>();
+    for (int i = 0; i < 6; i++){
+      schoolIDs.add(UUID.randomUUID());
+      var schoolEntity = getEdxUserSchoolEntity(entity);
+      schoolEntity.setSchoolID(schoolIDs.get(i));
+      EdxUserSchoolRoleEntity roleEntity1 = new EdxUserSchoolRoleEntity();
+      roleEntity1.setEdxUserSchoolEntity(schoolEntity);
+      roleEntity1.setCreateUser("ABC");
+      roleEntity1.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+      roleEntity1.setCreateDate(LocalDateTime.now());
+      schoolEntity.getEdxUserSchoolRoleEntities().add(roleEntity1);
+      edxUserSchoolRepository.save(schoolEntity);
+    }
+
+    LocalDateTime currentDate = LocalDate.now().atStartOfDay();
+
+    School school1 = new School();
+    school1.setSchoolCategoryCode("PUBLIC");
+    school1.setSchoolId(schoolIDs.get(0).toString());
+    school1.setOpenedDate(currentDate.toString());
+    school1.setClosedDate(null);
+
+    School school2 = new School();
+    school2.setSchoolCategoryCode("PUBLIC");
+    school2.setSchoolId(schoolIDs.get(1).toString());
+    school2.setOpenedDate("1900-01-01T00:00:00");
+    school2.setClosedDate("1901-01-01T00:00:00");
+
+    School school3 = new School();
+    school3.setSchoolCategoryCode("PUBLIC");
+    school3.setSchoolId(schoolIDs.get(2).toString());
+    school3.setOpenedDate(currentDate.plusDays(1).toString());
+    school3.setClosedDate(null);
+
+    School school4 = new School();
+    school4.setSchoolCategoryCode("PUBLIC");
+    school4.setSchoolId(schoolIDs.get(3).toString());
+    school4.setOpenedDate(currentDate.minusDays(2).toString());
+    school4.setClosedDate(currentDate.minusDays(1).toString());
+
+    School school5 = new School();
+    school5.setSchoolCategoryCode("PUBLIC");
+    school5.setSchoolId(schoolIDs.get(4).toString());
+    school5.setOpenedDate(currentDate.minusDays(1).toString());
+    school5.setClosedDate(currentDate.toString());
+
+    School school6 = new School();
+    school6.setSchoolCategoryCode("PUBLIC");
+    school6.setSchoolId(schoolIDs.get(5).toString());
+    school6.setOpenedDate(currentDate.toString());
+    school6.setClosedDate(currentDate.plusDays(2).toString());
+
+    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtID = UUID.randomUUID();
+    districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3, school4, school5, school6));
+    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+
+    var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
+    assertThat(edxSchools).isNotNull().hasSize(3);
   }
 
   @Test

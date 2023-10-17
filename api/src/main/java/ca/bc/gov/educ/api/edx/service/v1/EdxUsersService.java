@@ -26,7 +26,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -127,21 +129,29 @@ public class EdxUsersService {
     return this.getEdxUserRepository().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID);
   }
 
-  private List<UUID> getDistrictSchoolsWithoutIndependents(String districtID){
+  private List<UUID> getFilteredDistrictSchools(String districtID){
     var districtSchoolIDsMap = restUtils.getDistrictSchoolsMap();
     var fullSchooList = districtSchoolIDsMap.get(districtID);
     var filteredSchoolList = new ArrayList<UUID>();
+    LocalDateTime currentDate = LocalDateTime.now();
 
     fullSchooList.forEach(school -> {
-      if(!INDEPENDENT_SCHOOL_CATEGORIES.contains(school.getSchoolCategoryCode())){
-        filteredSchoolList.add(UUID.fromString(school.getSchoolId()));
+      if (INDEPENDENT_SCHOOL_CATEGORIES.contains(school.getSchoolCategoryCode())) {
+        return;
       }
+      if (school.getClosedDate() != null) {
+        LocalDateTime closedDate = LocalDateTime.parse(school.getClosedDate());
+        if (currentDate.isAfter(closedDate)) {
+          return;
+        }
+      }
+      filteredSchoolList.add(UUID.fromString(school.getSchoolId()));
     });
     return filteredSchoolList;
   }
 
   public List<EdxSchool> findAllDistrictEdxUsers(String districtID) {
-    List<EdxUserSchoolEntity> edxUserSchoolEntities = this.getEdxUserSchoolsRepository().findAllBySchoolIDIn(getDistrictSchoolsWithoutIndependents(districtID));
+    List<EdxUserSchoolEntity> edxUserSchoolEntities = this.getEdxUserSchoolsRepository().findAllBySchoolIDIn(getFilteredDistrictSchools(districtID));
     Map<String, EdxSchool> edxSchools = new HashMap<>();
     edxUserSchoolEntities.stream().forEach(edxUserSchoolEntity -> {
       String schoolID = edxUserSchoolEntity.getSchoolID().toString();
