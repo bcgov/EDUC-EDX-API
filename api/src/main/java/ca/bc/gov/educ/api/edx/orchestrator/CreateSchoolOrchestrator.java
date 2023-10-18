@@ -130,7 +130,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
 
     Event nextEvent = nextEventBuilder.build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    publishToJetStream(nextEvent, saga);
     log.info("message sent to EDX_API_TOPIC for ONBOARD_INITIAL_USER Event. :: {}", saga.getSagaId());
   }
 
@@ -156,7 +155,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .eventPayload(JsonUtil.getJsonStringFromObject(updatedSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    publishToJetStream(nextEvent, saga);
     log.info("message sent to EDX_API_TOPIC for CREATE_SCHOOL_PRIMARY_CODE Event. :: {}", saga.getSagaId());
   }
 
@@ -174,7 +172,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    publishToJetStream(nextEvent, saga);
     log.info("message sent to EDX_API_TOPIC for SEND_PRIMARY_ACTIVATION_CODE Event. :: {}", saga.getSagaId());
   }
 
@@ -192,7 +189,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    publishToJetStream(nextEvent, saga);
     log.info("message sent to EDX_API_TOPIC for INVITE_INITIAL_USER Event. :: {}", saga.getSagaId());
   }
 
@@ -202,9 +198,5 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final CreateSchoolSagaData sagaData
   ) throws JsonProcessingException {
     log.info("CREATE_NEW_SCHOOL_SAGA has ended with NO_INITIAL_USER_FOUND :: {}", saga.getSagaId());
-  }
-
-  private void publishToJetStream(final Event event, SagaEntity saga) {
-    publisher.dispatchChoreographyEvent(event, saga);
   }
 }
