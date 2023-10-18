@@ -16,6 +16,8 @@ import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
 
+import java.util.UUID;
+
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -111,6 +113,13 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
 
   public void checkForInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
   throws JsonProcessingException {
+    School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+    CreateSchoolSagaData updatedSagaData = new CreateSchoolSagaData();
+    updatedSagaData.setSchool(createdSchoolFromInstitute);
+    updatedSagaData.setInitialEdxUser(sagaData.getInitialEdxUser());
+    saga.setPayload(JsonUtil.getJsonStringFromObject(updatedSagaData));
+    saga.setSchoolID(UUID.fromString(createdSchoolFromInstitute.getSchoolId()));
+
     final SagaEventStatesEntity eventStates =
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(ONBOARD_INITIAL_USER.toString());
@@ -119,10 +128,10 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final Event.EventBuilder nextEventBuilder = Event.builder()
       .eventType(ONBOARD_INITIAL_USER)
       .replyTo(this.getTopicToSubscribe())
-      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
+      .eventPayload(JsonUtil.getJsonStringFromObject(updatedSagaData))
       .sagaId(event.getSagaId());
 
-    if (sagaData.getInitialEdxUser().isPresent()) {
+    if (updatedSagaData.getInitialEdxUser().isPresent()) {
       nextEventBuilder.eventOutcome(INITIAL_USER_FOUND);
     } else {
       nextEventBuilder.eventOutcome(NO_INITIAL_USER_FOUND);
@@ -135,24 +144,18 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
 
   public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
   throws JsonProcessingException {
-    School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
-    CreateSchoolSagaData updatedSagaData = new CreateSchoolSagaData();
-    updatedSagaData.setSchool(createdSchoolFromInstitute);
-    updatedSagaData.setInitialEdxUser(sagaData.getInitialEdxUser());
-    saga.setPayload(JsonUtil.getJsonStringFromObject(updatedSagaData));
-
     final SagaEventStatesEntity eventStates =
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
-    this.orchestratorService.createPrimaryActivationCode(updatedSagaData);
+    this.orchestratorService.createPrimaryActivationCode(sagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
       .eventType(CREATE_SCHOOL_PRIMARY_CODE)
       .eventOutcome(SCHOOL_PRIMARY_CODE_CREATED)
       .replyTo(getTopicToSubscribe())
-      .eventPayload(JsonUtil.getJsonStringFromObject(updatedSagaData))
+      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
     log.info("message sent to EDX_API_TOPIC for CREATE_SCHOOL_PRIMARY_CODE Event. :: {}", saga.getSagaId());
