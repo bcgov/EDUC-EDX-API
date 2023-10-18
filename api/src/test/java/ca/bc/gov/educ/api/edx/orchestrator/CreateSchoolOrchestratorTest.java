@@ -1,5 +1,44 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_FOUND;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_INVITED;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIATE_SUCCESS;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.NO_INITIAL_USER_FOUND;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SAGA_COMPLETED;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_CREATED;
+import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_PRIMARY_CODE_CREATED;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_PRIMARY_CODE;
+import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
+import static ca.bc.gov.educ.api.edx.constants.EventType.INVITE_INITIAL_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventType.MARK_SAGA_COMPLETE;
+import static ca.bc.gov.educ.api.edx.constants.EventType.ONBOARD_INITIAL_USER;
+import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.mockingDetails;
+import static org.mockito.Mockito.verify;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeoutException;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.constants.SagaStatusEnum;
 import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
@@ -9,7 +48,12 @@ import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
-import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
+import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
+import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
+import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
+import ca.bc.gov.educ.api.edx.repository.SagaEventStateRepository;
+import ca.bc.gov.educ.api.edx.repository.SagaRepository;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
@@ -18,30 +62,6 @@ import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeoutException;
-
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
-import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
-import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.COMPLETED;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
