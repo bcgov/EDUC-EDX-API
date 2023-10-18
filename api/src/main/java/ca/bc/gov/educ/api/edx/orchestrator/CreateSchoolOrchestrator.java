@@ -197,6 +197,14 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final SagaEntity saga,
     final CreateSchoolSagaData sagaData
   ) throws JsonProcessingException {
+    final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
+      .eventType(ONBOARD_INITIAL_USER)
+      .eventOutcome(NO_INITIAL_USER_FOUND)
+      .replyTo(getTopicToSubscribe())
+      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
+      .build();
+    this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
+
     log.info("CREATE_NEW_SCHOOL_SAGA has ended with NO_INITIAL_USER_FOUND :: {}", saga.getSagaId());
   }
 }
