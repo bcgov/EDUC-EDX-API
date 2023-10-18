@@ -52,6 +52,7 @@ public class MoveSchoolOrchestratorService {
             newEdxUserSchoolEntity.setUpdateDate(LocalDateTime.now());
             newEdxUserSchoolEntity.setUpdateUser(moveSchoolData.getCreateUser());
             newEdxUserSchoolEntity.setCreateDate(LocalDateTime.now());
+            newEdxUserSchoolEntity.setExpiryDate(edxUserSchoolEntity.getExpiryDate());
 
             Set<EdxUserSchoolRoleEntity> edxUserSchoolRoleEntitySet = new HashSet<>();
 
