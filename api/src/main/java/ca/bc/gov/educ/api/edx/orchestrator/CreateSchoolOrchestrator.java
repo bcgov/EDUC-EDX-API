@@ -113,13 +113,6 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
 
   public void checkForInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
   throws JsonProcessingException {
-    School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
-    CreateSchoolSagaData updatedSagaData = new CreateSchoolSagaData();
-    updatedSagaData.setSchool(createdSchoolFromInstitute);
-    updatedSagaData.setInitialEdxUser(sagaData.getInitialEdxUser());
-    saga.setPayload(JsonUtil.getJsonStringFromObject(updatedSagaData));
-    saga.setSchoolID(UUID.fromString(createdSchoolFromInstitute.getSchoolId()));
-
     final SagaEventStatesEntity eventStates =
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(ONBOARD_INITIAL_USER.toString());
@@ -128,10 +121,12 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final Event.EventBuilder nextEventBuilder = Event.builder()
       .eventType(ONBOARD_INITIAL_USER)
       .replyTo(this.getTopicToSubscribe())
-      .eventPayload(JsonUtil.getJsonStringFromObject(updatedSagaData))
+      .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .sagaId(event.getSagaId());
 
-    if (updatedSagaData.getInitialEdxUser().isPresent()) {
+    if (sagaData.getInitialEdxUser().isPresent()) {
+      School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
+      this.orchestratorService.attachInstituteSchoolToSaga(createdSchoolFromInstitute.getSchoolId(), saga);
       nextEventBuilder.eventOutcome(INITIAL_USER_FOUND);
     } else {
       nextEventBuilder.eventOutcome(NO_INITIAL_USER_FOUND);

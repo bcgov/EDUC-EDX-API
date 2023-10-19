@@ -20,8 +20,10 @@ import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -100,10 +103,20 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Autowired
   EdxActivationCodeRepository edxActivationCodeRepository;
 
+  private School mockSchool;
+  private School mockInstituteSchool;
+
   @Captor
   ArgumentCaptor<byte[]> eventCaptor;
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
+
+  @BeforeEach
+  public void before() {
+    this.mockSchool = createMockSchool();
+    this.mockInstituteSchool = createMockSchoolFromInstitute(this.mockSchool);
+    doReturn(List.of(this.mockInstituteSchool)).when(this.restUtils).getSchoolById(any(), any());
+  }
 
   @AfterEach
   public void after() {
@@ -112,7 +125,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
   @Test
   void testCreateSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws JsonProcessingException {
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.createMockSchool());
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockSchool);
     final SagaEntity saga = saveMockSaga(mockData);
 
     final int invocations = mockingDetails(messagePublisher).getInvocations().size();
@@ -142,8 +155,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testCheckForIntitialUser_GivenAnInitialUser_sagaShouldOnboardUser()
   throws JsonProcessingException, IOException, TimeoutException, InterruptedException {
-    final School mockSchoolFromInstitute = this.createMockSchool();
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(mockSchoolFromInstitute);
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockSchool);
     mockData.setInitialEdxUser(createMockInitialUser());
     SagaEntity saga = saveMockSaga(mockData);
 
@@ -152,7 +164,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       .eventType(CREATE_SCHOOL)
       .eventOutcome(SCHOOL_CREATED)
       .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockSchoolFromInstitute))
+      .eventPayload(getJsonString(this.mockInstituteSchool))
       .build();
     orchestrator.handleEvent(event);
 
@@ -171,8 +183,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testCheckForIntitialUser_GivenNoIntialUser_sagaShouldBeCompleted()
   throws JsonProcessingException, IOException, TimeoutException, InterruptedException {
-    final School mockSchoolFromInstitute = this.createMockSchool();
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(mockSchoolFromInstitute);
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockSchool);
     SagaEntity saga = saveMockSaga(mockData);
 
     final int invocations = mockingDetails(messagePublisher).getInvocations().size();
@@ -180,7 +191,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       .eventType(CREATE_SCHOOL)
       .eventOutcome(SCHOOL_CREATED)
       .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockSchoolFromInstitute))
+      .eventPayload(getJsonString(this.mockInstituteSchool))
       .build();
     orchestrator.handleEvent(event);
 
@@ -207,8 +218,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testCreatePrimaryCode_GivenAnInitialUserAndSchool_sagaShouldCreatePrimarySchoolCode()
   throws TimeoutException, IOException, InterruptedException {
-    final School mockSchoolFromInstitute = this.createMockSchool();
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(mockSchoolFromInstitute);
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockInstituteSchool);
     mockData.setInitialEdxUser(createMockInitialUser());
     SagaEntity saga = saveMockSaga(mockData);
 
@@ -217,7 +227,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       .eventType(ONBOARD_INITIAL_USER)
       .eventOutcome(INITIAL_USER_FOUND)
       .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockSchoolFromInstitute))
+      .eventPayload(getJsonString(mockData))
       .build();
     orchestrator.handleEvent(event);
 
@@ -241,8 +251,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testSendPrimaryCode_GivenAnInitialUser_School_AndPrimaryCode_sagaShouldSendAPrimaryCodeToUser()
   throws TimeoutException, IOException, InterruptedException {
-    final School mockSchoolFromInstitute = this.createMockSchool();
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(mockSchoolFromInstitute);
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockInstituteSchool);
     mockData.setInitialEdxUser(createMockInitialUser());
     SagaEntity saga = saveMockSaga(mockData);
 
@@ -251,7 +260,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       .eventType(ONBOARD_INITIAL_USER)
       .eventOutcome(INITIAL_USER_FOUND)
       .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockSchoolFromInstitute))
+      .eventPayload(getJsonString(mockData))
       .build();
     orchestrator.handleEvent(event);
 
@@ -272,7 +281,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
   @Test
   void testInviteInitialUser_GivenEventAndSaga_sagaShouldStartInviteSaga() throws IOException, InterruptedException, TimeoutException {
-    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(createMockSchool());
+    final CreateSchoolSagaData mockData = createMockCreateSchoolSagaData(this.mockInstituteSchool);
     mockData.setInitialEdxUser(createMockInitialUser());
     SagaEntity saga = saveMockSaga(mockData);
     createRoleAndPermissionData(edxPermissionRepository, edxRoleRepository);
@@ -328,10 +337,16 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
     school.setWebsite("abc@sd99.edu");
     school.setCreateUser("TEST");
     school.setUpdateUser("TEST");
-    school.setSchoolId(UUID.randomUUID().toString());
     school.setDistrictId(UUID.randomUUID().toString());
 
     return school;
+  }
+
+  private School createMockSchoolFromInstitute(School school) {
+    School updatedSchool = this.createMockSchool();
+    updatedSchool.setSchoolId(UUID.randomUUID().toString());
+    updatedSchool.setDistrictId(school.getDistrictId());
+    return updatedSchool;
   }
 
   private Optional<EdxUser> createMockInitialUser() {

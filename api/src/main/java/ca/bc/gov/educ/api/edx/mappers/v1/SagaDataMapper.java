@@ -40,8 +40,8 @@ public interface SagaDataMapper {
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
   @Mapping(target = "emailId", expression = "java(sagaData.getInitialEdxUser().isPresent() ? sagaData.getInitialEdxUser().get().getEmail() : \"\")")
   @Mapping(target = "edxUserId", ignore = true)
-  @Mapping(target = "schoolID", ignore = true)
-  @Mapping(target = "districtID", ignore = true)
+  @Mapping(target = "schoolID", source = "sagaData.school.schoolId")
+  @Mapping(target = "districtID", source = "sagaData.school.districtId")
   SagaEntity toModel(String sagaName, CreateSchoolSagaData sagaData) throws JsonProcessingException;
 
   @Mapping(target = "status", ignore = true)

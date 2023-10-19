@@ -22,17 +22,20 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.EdxSchoolUserActivationInviteOrchestrator;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
+import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import lombok.AccessLevel;
-import lombok.Getter;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 public class CreateSchoolOrchestratorService {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
@@ -43,11 +46,11 @@ public class CreateSchoolOrchestratorService {
 
   private final EdxActivationCodeRepository edxActivationCodeRepository;
 
-  @Getter(AccessLevel.PRIVATE)
   private final EdxUsersService service;
 
   private final EmailProperties emailProperties;
   private final EmailNotificationService emailNotificationService;
+  private final RestUtils restUtils;
 
   public CreateSchoolOrchestratorService(
     SagaService sagaService,
@@ -55,7 +58,8 @@ public class CreateSchoolOrchestratorService {
     EdxUsersService service,
     EmailProperties emailProperties,
     EmailNotificationService emailNotificationService,
-    EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator
+    EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator,
+    RestUtils restUtils
   ) {
     this.sagaService = sagaService;
     this.edxActivationCodeRepository = edxActivationCodeRepository;
@@ -63,9 +67,28 @@ public class CreateSchoolOrchestratorService {
     this.emailProperties = emailProperties;
     this.emailNotificationService = emailNotificationService;
     this.activationInviteOrchestrator = activationInviteOrchestrator;
+    this.restUtils = restUtils;
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void attachInstituteSchoolToSaga(String schoolId, SagaEntity saga)
+  throws JsonProcessingException {
+    List<School> result = restUtils.getSchoolById(saga.getSagaId(), schoolId);
+
+    if (result.isEmpty()) {
+      log.error("Could find School in Institute API :: {}", saga.getSagaId());
+      throw new EntityNotFoundException("School entity not found");
+    }
+
+    School school = result.get(0);
+    saga.setSchoolID(UUID.fromString(school.getSchoolId()));
+    CreateSchoolSagaData payload = JsonUtil.getJsonObjectFromString(CreateSchoolSagaData.class, saga.getPayload());
+    payload.setSchool(school);
+    saga.setPayload(JsonUtil.getJsonStringFromObject(payload));
+    sagaService.updateAttachedEntityDuringSagaProcess(saga);
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void createPrimaryActivationCode(CreateSchoolSagaData sagaData) {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();
     School school = sagaData.getSchool();
@@ -76,7 +99,7 @@ public class CreateSchoolOrchestratorService {
     service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, school.getSchoolId(), edxPrimaryActivationCode);
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendPrimaryActivationCodeNotification(CreateSchoolSagaData sagaData) {
     EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
     School school = sagaData.getSchool();
@@ -102,7 +125,7 @@ public class CreateSchoolOrchestratorService {
     emailNotificationService.sendEmail(emailNotification);
   }
 
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void startEdxSchoolUserInviteSaga(CreateSchoolSagaData sagaData) {
     EdxUserSchoolActivationInviteSagaData inviteSagaData = new EdxUserSchoolActivationInviteSagaData();
     EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
