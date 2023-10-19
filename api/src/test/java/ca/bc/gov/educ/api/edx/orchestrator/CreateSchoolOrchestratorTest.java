@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_FOUND;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIAL_USER_INVITED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.INITIATE_SUCCESS;
-import static ca.bc.gov.educ.api.edx.constants.EventOutcome.NO_INITIAL_USER_FOUND;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.PRIMARY_ACTIVATION_CODE_SENT;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SAGA_COMPLETED;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.SCHOOL_CREATED;
