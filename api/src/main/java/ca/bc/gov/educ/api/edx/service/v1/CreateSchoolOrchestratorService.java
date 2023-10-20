@@ -73,7 +73,7 @@ public class CreateSchoolOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void attachInstituteSchoolToSaga(String schoolId, SagaEntity saga)
   throws JsonProcessingException {
-    List<School> result = restUtils.getSchoolById(saga.getSagaId(), schoolId);
+    List<School> result = this.restUtils.getSchoolById(saga.getSagaId(), schoolId);
 
     if (result.isEmpty()) {
       log.error("Could find School in Institute API :: {}", saga.getSagaId());
@@ -85,7 +85,7 @@ public class CreateSchoolOrchestratorService {
     CreateSchoolSagaData payload = JsonUtil.getJsonObjectFromString(CreateSchoolSagaData.class, saga.getPayload());
     payload.setSchool(school);
     saga.setPayload(JsonUtil.getJsonStringFromObject(payload));
-    sagaService.updateAttachedEntityDuringSagaProcess(saga);
+    this.sagaService.updateAttachedEntityDuringSagaProcess(saga);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -96,7 +96,7 @@ public class CreateSchoolOrchestratorService {
     edxPrimaryActivationCode.setDistrictID(UUID.fromString(school.getDistrictId()));
     RequestUtil.setAuditColumnsForCreate(edxPrimaryActivationCode);
 
-    service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, school.getSchoolId(), edxPrimaryActivationCode);
+    this.service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, school.getSchoolId(), edxPrimaryActivationCode);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -106,12 +106,12 @@ public class CreateSchoolOrchestratorService {
     UUID schoolId = UUID.fromString(school.getSchoolId());
 
     Optional<EdxActivationCodeEntity> edxActivationCodeEntity
-      = edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(schoolId);
+      = this.edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(schoolId);
 
     EmailNotification emailNotification = EmailNotification.builder()
-      .fromEmail(emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
+      .fromEmail(this.emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
       .toEmail(user.getEmail())
-      .subject(emailProperties.getEdxSecureExchangePrimaryCodeNotificationEmailSubject())
+      .subject(this.emailProperties.getEdxSecureExchangePrimaryCodeNotificationEmailSubject())
       .templateName("edx.school.primary-code.notification")
       .emailFields(Map.of(
         "firstName", user.getFirstName(),
@@ -122,7 +122,7 @@ public class CreateSchoolOrchestratorService {
       ))
       .build();
 
-    emailNotificationService.sendEmail(emailNotification);
+    this.emailNotificationService.sendEmail(emailNotification);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -152,8 +152,8 @@ public class CreateSchoolOrchestratorService {
     if (sagaInProgress.isEmpty()) {
       try {
         SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName), inviteSagaData);
-        final SagaEntity saga = activationInviteOrchestrator.createSaga(sagaEntity);
-        activationInviteOrchestrator.startSaga(saga);
+        final SagaEntity saga = this.activationInviteOrchestrator.createSaga(sagaEntity);
+        this.activationInviteOrchestrator.startSaga(saga);
       } catch (JsonProcessingException e) {
         throw new SagaRuntimeException(e);
       }
@@ -161,7 +161,7 @@ public class CreateSchoolOrchestratorService {
   }
 
   public EdxActivationCodeEntity findPrimaryCode(String schoolId) {
-    return service.findPrimaryEdxActivationCode(SCHOOL, schoolId);
+    return this.service.findPrimaryEdxActivationCode(SCHOOL, schoolId);
   }
 
 }
