@@ -11,12 +11,11 @@ import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL_PRIMARY_C
 import static ca.bc.gov.educ.api.edx.constants.EventType.INVITE_INITIAL_USER;
 import static ca.bc.gov.educ.api.edx.constants.EventType.ONBOARD_INITIAL_USER;
 import static ca.bc.gov.educ.api.edx.constants.EventType.SEND_PRIMARY_ACTIVATION_CODE;
+import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.CREATE_NEW_SCHOOL_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
 import static lombok.AccessLevel.PRIVATE;
-
-import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
@@ -83,9 +82,9 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     this.stepBuilder()
       .begin(CREATE_SCHOOL, this::createSchool)
       .step(CREATE_SCHOOL, SCHOOL_CREATED, ONBOARD_INITIAL_USER, this::checkForInitialUser)
+      .step(ONBOARD_INITIAL_USER, INITIAL_USER_FOUND, CREATE_SCHOOL_PRIMARY_CODE, this::createPrimaryCode)
       .end(ONBOARD_INITIAL_USER, NO_INITIAL_USER_FOUND, this::completeCreateSchoolSagaWithNoUser)
       .or()
-      .step(ONBOARD_INITIAL_USER, INITIAL_USER_FOUND, CREATE_SCHOOL_PRIMARY_CODE, this::createPrimaryCode)
       .step(CREATE_SCHOOL_PRIMARY_CODE, SCHOOL_PRIMARY_CODE_CREATED, SEND_PRIMARY_ACTIVATION_CODE, this::sendPrimaryCode)
       .step(SEND_PRIMARY_ACTIVATION_CODE, PRIMARY_ACTIVATION_CODE_SENT, INVITE_INITIAL_USER, this::inviteInitialUser)
       .end(INVITE_INITIAL_USER, INITIAL_USER_INVITED);
@@ -96,6 +95,7 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     final SagaEventStatesEntity eventStates =
       this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL.toString());
+    saga.setStatus(IN_PROGRESS.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
     School school = sagaData.getSchool();
