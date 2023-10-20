@@ -239,7 +239,7 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     UUID schooId = UUID.fromString(newData.getSchool().getSchoolId());
     Optional<EdxActivationCodeEntity> codeOptional =
-      this.edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(schooId);
+      edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schooId);
 
     assertThat(codeOptional).isPresent();
     assertThat(newData.getInitialEdxUser()).isPresent();

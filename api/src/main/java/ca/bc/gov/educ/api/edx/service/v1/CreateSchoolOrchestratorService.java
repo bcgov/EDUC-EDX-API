@@ -93,7 +93,6 @@ public class CreateSchoolOrchestratorService {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();
     School school = sagaData.getSchool();
     edxPrimaryActivationCode.setSchoolID(UUID.fromString(school.getSchoolId()));
-    edxPrimaryActivationCode.setDistrictID(UUID.fromString(school.getDistrictId()));
     RequestUtil.setAuditColumnsForCreate(edxPrimaryActivationCode);
 
     this.service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, school.getSchoolId(), edxPrimaryActivationCode);
@@ -105,8 +104,8 @@ public class CreateSchoolOrchestratorService {
     School school = sagaData.getSchool();
     UUID schoolId = UUID.fromString(school.getSchoolId());
 
-    Optional<EdxActivationCodeEntity> edxActivationCodeEntity
-      = this.edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrue(schoolId);
+    Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
+      edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schoolId);
 
     EmailNotification emailNotification = EmailNotification.builder()
       .fromEmail(this.emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
