@@ -80,10 +80,10 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
         MoveSchoolData moveSchoolDataFromEvent = objectMapper.readValue(event.getEventPayload(), MoveSchoolData.class);
 
         if(!getMoveSchoolOrchestratorService().hasCopiedUsersAlready(moveSchoolDataFromEvent)) {
-            log.info("Copying school users to new school ID :: {}", moveSchoolData.getToSchool().getSchoolId());
+            log.info("Copying school users to new school ID :: {}", moveSchoolDataFromEvent.getToSchool().getSchoolId());
             getMoveSchoolOrchestratorService().copyUsersToNewSchool(moveSchoolDataFromEvent);
         }else{
-            log.info("School users were already copied to new school ID :: {}", moveSchoolData.getToSchool().getSchoolId());
+            log.info("School users were already copied to new school ID :: {}", moveSchoolDataFromEvent.getToSchool().getSchoolId());
         }
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
