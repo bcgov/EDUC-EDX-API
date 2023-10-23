@@ -82,7 +82,7 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .eventType(CREATE_SCHOOL)
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(school))
-      .sagaId(event.getSagaId())
+      .sagaId(saga.getSagaId())
       .build();
 
     this.postMessageToTopic(INSTITUTE_API_TOPIC.toString(), instituteEvent);
@@ -98,7 +98,7 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .eventType(ONBOARD_INITIAL_USER)
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
-      .sagaId(event.getSagaId());
+      .sagaId(saga.getSagaId());
 
     if (sagaData.getInitialEdxUser().isPresent()) {
       School createdSchoolFromInstitute = JsonUtil.getJsonObjectFromString(School.class, event.getEventPayload());
