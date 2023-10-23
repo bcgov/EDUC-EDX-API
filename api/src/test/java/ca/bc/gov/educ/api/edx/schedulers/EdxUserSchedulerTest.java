@@ -41,6 +41,9 @@ class EdxUserSchedulerTest extends BaseEdxAPITest {
 
   @BeforeEach
   public void setUp() {
+    this.userSchoolRepository.deleteAll();
+    this.userDistrictRepository.deleteAll();
+    this.userRepository.deleteAll();
     LockAssert.TestHelper.makeAllAssertsPass(true);
   }
 

@@ -50,28 +50,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
   private final CreateSchoolOrchestratorService orchestratorService;
 
 
-  /**
-     * Instantiates a new Base orchestrator.
-     *
-     * @param sagaService                   the saga service
-     * @param messagePublisher              the message publisher
-     * @param inviteOrchestratorService
-     * @param publisher
-     */
-  protected CreateSchoolOrchestrator(
-    SagaService sagaService,
-    MessagePublisher messagePublisher,
-    CreateSchoolOrchestratorService orchestratorService,
-    Publisher publisher,
-    EdxUsersService edxUsersService
-  ) {
-    super(
-      sagaService,
-      messagePublisher,
-      CreateSchoolSagaData.class,
-      CREATE_NEW_SCHOOL_SAGA.toString(),
-      EDX_API_TOPIC.toString()
-    );
+  protected CreateSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, CreateSchoolOrchestratorService orchestratorService, Publisher publisher, EdxUsersService edxUsersService) {
+    super(sagaService, messagePublisher, CreateSchoolSagaData.class, CREATE_NEW_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString());
     this.publisher = publisher;
     this.edxUsersService = edxUsersService;
     this.orchestratorService = orchestratorService;
@@ -90,10 +70,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
       .end(INVITE_INITIAL_USER, INITIAL_USER_INVITED);
   }
 
-  public void createSchool(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
-  throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+  public void createSchool(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL.toString());
     saga.setStatus(IN_PROGRESS.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -111,10 +89,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to INSTITUTE_API_TOPIC for CREATE_SCHOOL Event. :: {}", saga.getSagaId());
   }
 
-  public void checkForInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
-  throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+  public void checkForInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(ONBOARD_INITIAL_USER.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -137,10 +113,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to EDX_API_TOPIC for ONBOARD_INITIAL_USER Event. :: {}", saga.getSagaId());
   }
 
-  public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
-  throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+  public void createPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -156,10 +130,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to EDX_API_TOPIC for CREATE_SCHOOL_PRIMARY_CODE Event. :: {}", saga.getSagaId());
   }
 
-  public void sendPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
-  throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+  public void sendPrimaryCode(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(SEND_PRIMARY_ACTIVATION_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -173,10 +145,8 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to EDX_API_TOPIC for SEND_PRIMARY_ACTIVATION_CODE Event. :: {}", saga.getSagaId());
   }
 
-  private void inviteInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData)
-  throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates =
-      this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+  private void inviteInitialUser(Event event, SagaEntity saga, CreateSchoolSagaData sagaData) throws JsonProcessingException {
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(INVITE_INITIAL_USER.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -190,11 +160,7 @@ public class CreateSchoolOrchestrator extends BaseOrchestrator<CreateSchoolSagaD
     log.info("message sent to EDX_API_TOPIC for INVITE_INITIAL_USER Event. :: {}", saga.getSagaId());
   }
 
-  private void completeCreateSchoolSagaWithNoUser(
-    final Event event,
-    final SagaEntity saga,
-    final CreateSchoolSagaData sagaData
-  ) throws JsonProcessingException {
+  private void completeCreateSchoolSagaWithNoUser(final Event event, final SagaEntity saga, final CreateSchoolSagaData sagaData) {
     log.info("CREATE_NEW_SCHOOL_SAGA has ended with NO_INITIAL_USER_FOUND :: {}", saga.getSagaId());
   }
 }
