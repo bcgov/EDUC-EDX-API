@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.orchestrator;
 
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
@@ -15,6 +16,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
@@ -75,7 +79,12 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
         ObjectMapper objectMapper = new ObjectMapper();
         MoveSchoolData moveSchoolDataFromEvent = objectMapper.readValue(event.getEventPayload(), MoveSchoolData.class);
 
-        getMoveSchoolOrchestratorService().copyUsersToNewSchool(moveSchoolDataFromEvent);
+        if(!getMoveSchoolOrchestratorService().hasCopiedUsersAlready(moveSchoolDataFromEvent)) {
+            log.info("Copying school users to new school ID :: {}", moveSchoolData.getToSchool().getSchoolId());
+            getMoveSchoolOrchestratorService().copyUsersToNewSchool(moveSchoolDataFromEvent);
+        }else{
+            log.info("School users were already copied to new school ID :: {}", moveSchoolData.getToSchool().getSchoolId());
+        }
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
                 .eventType(COPY_USERS_TO_NEW_SCHOOL).eventOutcome(USERS_TO_NEW_SCHOOL_COPIED)

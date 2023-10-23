@@ -34,6 +34,10 @@ public class MoveSchoolOrchestratorService {
         this.edxUserSchoolsRepository = edxUserSchoolRepository;
     }
 
+    public boolean hasCopiedUsersAlready(MoveSchoolData moveSchoolData) {
+        return !edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(moveSchoolData.getToSchool().getSchoolId())).isEmpty();
+    }
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void copyUsersToNewSchool(MoveSchoolData moveSchoolData) {
 
