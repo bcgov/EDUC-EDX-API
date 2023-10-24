@@ -410,11 +410,11 @@ EMAIL_TEMPLATE_EDX_SECURE_EXCHANGE_COMMENT_NOTIFICATION_LITERAL="<!DOCTYPE html>
 
 EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>New Secure Exchange Message</title></head><body><p>Hi <span th:text=\"\${\$}{firstName}\"></span> <span th:text=\"\${\$}{lastName}\"></span>,</p><p>Here is the Primary Access Code for the Education Data Exchange (EDX) for <span th:text=\"\${\$}{minCode}\"></span> - <span th:text=\"\${\$}{instituteName}\"></span>: <span th:text=\"\${\$}{primaryCode}\"></span></p><p>Please keep this code safe. It will be required for the activation of each EDX account at your school. Once you have activated your EDX Admin Account, you will be able to view the Primary Access Code through the EDX User Management screen - available under the \"Administration\" menu option.</p><p>Regards,<br/>The Ministry of Education and Child Care's EDX Team</p></body></html>"
 
-ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT"
+ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT,EDX_SCHOOL_ADMIN,EDX_EDIT_DISTRICT"
 
 if [ "$envValue" = "prod" ]
 then
-  ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT"
+  ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT,EDX_SCHOOL_ADMIN,EDX_EDIT_DISTRICT"
 fi
 
 SCHEDULED_JOBS_EXTRACT_UNCOMPLETED_SAGAS_CRON="0 0/1 * * * *"
