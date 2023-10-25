@@ -38,7 +38,7 @@ public interface SagaDataMapper {
   @Mapping(target = "sagaCompensated", ignore = true)
   @Mapping(target = "retryCount", ignore = true)
   @Mapping(target = "payload", expression = "java(ca.bc.gov.educ.api.edx.utils.JsonUtil.getJsonStringFromObject(sagaData))")
-  @Mapping(target = "emailId", expression = "java(sagaData.getInitialEdxUser().isPresent() ? sagaData.getInitialEdxUser().get().getEmail() : \"\")")
+  @Mapping(target = "emailId", expression = "java(sagaData.getInitialEdxUser() != null ? sagaData.getInitialEdxUser().getEmail() : \"\")")
   @Mapping(target = "edxUserId", ignore = true)
   @Mapping(target = "schoolID", source = "sagaData.school.schoolId")
   @Mapping(target = "districtID", source = "sagaData.school.districtId")
