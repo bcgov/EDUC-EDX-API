@@ -1,38 +1,26 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
-import static ca.bc.gov.educ.api.edx.constants.InstituteTypeCode.SCHOOL;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA;
+import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
+import ca.bc.gov.educ.api.edx.props.EmailProperties;
+import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
+import ca.bc.gov.educ.api.edx.utils.JsonUtil;
+import ca.bc.gov.educ.api.edx.utils.RequestUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-
-import ca.bc.gov.educ.api.edx.constants.SagaStatusEnum;
-import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
-import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
-import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
-import ca.bc.gov.educ.api.edx.orchestrator.EdxSchoolUserActivationInviteOrchestrator;
-import ca.bc.gov.educ.api.edx.props.EmailProperties;
-import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
-import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
-import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
-import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
-import ca.bc.gov.educ.api.edx.utils.JsonUtil;
-import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.extern.slf4j.Slf4j;
+import static ca.bc.gov.educ.api.edx.constants.InstituteTypeCode.SCHOOL;
 
 @Service
 @Slf4j
@@ -65,7 +53,7 @@ public class CreateSchoolOrchestratorService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void attachInstituteSchoolToSaga(String schoolId, SagaEntity saga)
+  public void attachSchoolAndUserInviteToSaga(String schoolId, CreateSchoolSagaData createSchoolSagaData, SagaEntity saga)
   throws JsonProcessingException {
     List<School> result = this.restUtils.getSchoolById(saga.getSagaId(), schoolId);
 
@@ -76,9 +64,17 @@ public class CreateSchoolOrchestratorService {
 
     School school = result.get(0);
     saga.setSchoolID(UUID.fromString(school.getSchoolId()));
-    CreateSchoolSagaData payload = JsonUtil.getJsonObjectFromString(CreateSchoolSagaData.class, saga.getPayload());
-    payload.setSchool(school);
-    saga.setPayload(JsonUtil.getJsonStringFromObject(payload));
+    createSchoolSagaData.setSchool(school);
+    EdxUser user = createSchoolSagaData.getInitialEdxUser();
+    List<String> roles = List.of("EDX_SCHOOL_ADMIN");
+    createSchoolSagaData.setSchoolID(UUID.fromString(school.getSchoolId()));
+    createSchoolSagaData.setSchoolName(school.getDisplayName());
+    createSchoolSagaData.setFirstName(user.getFirstName());
+    createSchoolSagaData.setLastName(user.getLastName());
+    createSchoolSagaData.setEmail(user.getEmail());
+    createSchoolSagaData.setEdxActivationRoleCodes(roles);
+
+    saga.setPayload(JsonUtil.getJsonStringFromObject(createSchoolSagaData));
     this.sagaService.updateAttachedEntityDuringSagaProcess(saga);
   }
 
@@ -94,7 +90,7 @@ public class CreateSchoolOrchestratorService {
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendPrimaryActivationCodeNotification(CreateSchoolSagaData sagaData) {
-    EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
+    EdxUser user = sagaData.getInitialEdxUser();
     School school = sagaData.getSchool();
     UUID schoolId = UUID.fromString(school.getSchoolId());
 
@@ -116,10 +112,6 @@ public class CreateSchoolOrchestratorService {
       .build();
 
     this.emailNotificationService.sendEmail(emailNotification);
-  }
-
-  public EdxActivationCodeEntity findPrimaryCode(String schoolId) {
-    return this.service.findPrimaryEdxActivationCode(SCHOOL, schoolId);
   }
 
 }

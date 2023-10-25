@@ -9,7 +9,6 @@ import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
-import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxActivationCode;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EmailNotification;
@@ -77,50 +76,24 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     }
   }
 
-  private void saveSagaPayload(SagaEntity sagaEntity, Object object) throws JsonProcessingException {
-    sagaEntity.setPayload(JsonUtil.getJsonStringFromObject(object)); // update the payload which will be updated in DB.
-    this.sagaService.updateSagaRecord(sagaEntity);
-  }
-
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void createPersonalActivationCodeAndUpdateSagaData(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, SagaEntity sagaEntity) {
-    try {
-      EdxActivationCodeEntity personalActivationCodeEntity = createActivationCode(edxUserActivationInviteSagaData);
-      updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity);
-      saveSagaPayload(sagaEntity, edxUserActivationInviteSagaData);
-    } catch (JsonProcessingException e) {
-      throw new SagaRuntimeException(e);
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void createPersonalActivationCodeAndUpdateSagaData(CreateSchoolSagaData createSchoolSagaData, SagaEntity sagaEntity) {
-    try {
-      EdxActivationCodeEntity personalActivationCodeEntity = createActivationCode(createSchoolSagaData.getInviteSagaData());
-      updateSagaDataInternal(createSchoolSagaData.getInviteSagaData(), personalActivationCodeEntity);
-      saveSagaPayload(sagaEntity, createSchoolSagaData);
-    } catch (JsonProcessingException e) {
-      throw new SagaRuntimeException(e);
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW) // this makes sure it is done in a new transaction when used through proxy, so call on line#84 won't have a new transaction.
-  public void updateSagaData(CreateSchoolSagaData createSchoolSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
-    updateSagaDataInternal(createSchoolSagaData.getInviteSagaData(), personalActivationCodeEntity);
-    saveSagaPayload(sagaEntity, createSchoolSagaData);
+  public void createPersonalActivationCodeAndUpdateSagaData(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, SagaEntity sagaEntity) throws JsonProcessingException {
+    EdxActivationCodeEntity personalActivationCodeEntity = createActivationCode(edxUserActivationInviteSagaData);
+    updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity, sagaEntity);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW) // this makes sure it is done in a new transaction when used through proxy, so call on line#84 won't have a new transaction.
   public void updateSagaData(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
-    updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity);
-    saveSagaPayload(sagaEntity, edxUserActivationInviteSagaData);
+    updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity, sagaEntity);
   }
 
-  private void updateSagaDataInternal(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity) {
+  private void updateSagaDataInternal(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, EdxActivationCodeEntity personalActivationCodeEntity, SagaEntity sagaEntity) throws JsonProcessingException {
     edxUserActivationInviteSagaData.setEdxActivationCodeId(personalActivationCodeEntity.getEdxActivationCodeId().toString());
     edxUserActivationInviteSagaData.setValidationCode(personalActivationCodeEntity.getValidationCode().toString());
     edxUserActivationInviteSagaData.setExpiryDate(personalActivationCodeEntity.getExpiryDate());
     edxUserActivationInviteSagaData.setPersonalActivationCode(personalActivationCodeEntity.getActivationCode());
+    sagaEntity.setPayload(JsonUtil.getJsonStringFromObject(edxUserActivationInviteSagaData)); // update the payload which will be updated in DB.
+    this.sagaService.updateSagaRecord(sagaEntity);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
