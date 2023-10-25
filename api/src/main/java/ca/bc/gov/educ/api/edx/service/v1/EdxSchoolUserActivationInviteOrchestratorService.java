@@ -63,19 +63,23 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     this.sagaService = sagaService;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void createPersonalActivationCodeAndUpdateSagaData(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, SagaEntity sagaEntity) {
+  private EdxActivationCodeEntity createActivationCode(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData){
     EdxActivationCode edxActivationCode = EDX_USER_ACTIVATION_INVITE_SAGA_DATA_MAPPER.toEdxActivationCode(edxUserActivationInviteSagaData);
     RequestUtil.setAuditColumnsForCreate(edxActivationCode);
     if (!CollectionUtils.isEmpty(edxActivationCode.getEdxActivationRoles())) {
       edxActivationCode.getEdxActivationRoles().forEach(RequestUtil::setAuditColumnsForCreate);
     }
     try {
-      EdxActivationCodeEntity personalActivationCodeEntity = getEdxUsersService().createPersonalEdxActivationCode(EDX_ACTIVATION_CODE_MAPPER.toModel(edxActivationCode));
-      updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity, sagaEntity);
-    } catch (NoSuchAlgorithmException | JsonProcessingException e) {
+      return getEdxUsersService().createPersonalEdxActivationCode(EDX_ACTIVATION_CODE_MAPPER.toModel(edxActivationCode));
+    } catch (NoSuchAlgorithmException e) {
       throw new SagaRuntimeException(e);
     }
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public void createPersonalActivationCodeAndUpdateSagaData(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData, SagaEntity sagaEntity) throws JsonProcessingException {
+    EdxActivationCodeEntity personalActivationCodeEntity = createActivationCode(edxUserActivationInviteSagaData);
+    updateSagaDataInternal(edxUserActivationInviteSagaData, personalActivationCodeEntity, sagaEntity);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW) // this makes sure it is done in a new transaction when used through proxy, so call on line#84 won't have a new transaction.
@@ -89,7 +93,7 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     edxUserActivationInviteSagaData.setExpiryDate(personalActivationCodeEntity.getExpiryDate());
     edxUserActivationInviteSagaData.setPersonalActivationCode(personalActivationCodeEntity.getActivationCode());
     sagaEntity.setPayload(JsonUtil.getJsonStringFromObject(edxUserActivationInviteSagaData)); // update the payload which will be updated in DB.
-    this.sagaService.updateSagaRecord(sagaEntity); // save updated payload to DB again.
+    this.sagaService.updateSagaRecord(sagaEntity);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -106,7 +110,6 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
-
   }
 
   private String createUserActivationLink(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {

@@ -12,11 +12,7 @@ import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import ca.bc.gov.educ.api.edx.validator.CreateSecureExchangeSagaPayloadValidator;
-import ca.bc.gov.educ.api.edx.validator.EdxActivationCodeSagaDataPayloadValidator;
-import ca.bc.gov.educ.api.edx.validator.EdxUserPayloadValidator;
-import ca.bc.gov.educ.api.edx.validator.SecureExchangeCommentSagaValidator;
-import ca.bc.gov.educ.api.edx.validator.SecureExchangePayloadValidator;
+import ca.bc.gov.educ.api.edx.validator.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
@@ -121,9 +116,9 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   @Override
   public ResponseEntity<String> createSchool(CreateSchoolSagaData edxSchoolCreationSagaData) {
-    Optional<EdxUser> userOptional = edxSchoolCreationSagaData.getInitialEdxUser();
-    if (userOptional.isPresent()) {
-      validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(userOptional.get(), true));
+    EdxUser edxUser = edxSchoolCreationSagaData.getInitialEdxUser();
+    if (edxUser != null) {
+      validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(edxUser, true));
     }
     return this.processNewSchoolSaga(CREATE_NEW_SCHOOL_SAGA, edxSchoolCreationSagaData);
   }
