@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.BaseOrchestrator;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
+import ca.bc.gov.educ.api.edx.struct.v1.CreateSchoolSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUserSchoolActivationInviteSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;

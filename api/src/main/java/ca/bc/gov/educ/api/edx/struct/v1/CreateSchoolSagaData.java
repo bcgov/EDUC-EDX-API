@@ -15,4 +15,5 @@ import lombok.EqualsAndHashCode;
 public class CreateSchoolSagaData extends BaseRequest implements Serializable {
   private School school;
   private Optional<EdxUser> initialEdxUser;
+  private EdxUserSchoolActivationInviteSagaData inviteSagaData;
 }

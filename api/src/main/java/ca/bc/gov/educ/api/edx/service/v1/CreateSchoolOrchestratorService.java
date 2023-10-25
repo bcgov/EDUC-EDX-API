@@ -38,11 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CreateSchoolOrchestratorService {
 
-  private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
-
   protected final SagaService sagaService;
-
-  private final EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator;
 
   private final EdxActivationCodeRepository edxActivationCodeRepository;
 
@@ -58,7 +54,6 @@ public class CreateSchoolOrchestratorService {
     EdxUsersService service,
     EmailProperties emailProperties,
     EmailNotificationService emailNotificationService,
-    EdxSchoolUserActivationInviteOrchestrator activationInviteOrchestrator,
     RestUtils restUtils
   ) {
     this.sagaService = sagaService;
@@ -66,7 +61,6 @@ public class CreateSchoolOrchestratorService {
     this.service = service;
     this.emailProperties = emailProperties;
     this.emailNotificationService = emailNotificationService;
-    this.activationInviteOrchestrator = activationInviteOrchestrator;
     this.restUtils = restUtils;
   }
 
@@ -122,41 +116,6 @@ public class CreateSchoolOrchestratorService {
       .build();
 
     this.emailNotificationService.sendEmail(emailNotification);
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void startEdxSchoolUserInviteSaga(CreateSchoolSagaData sagaData) {
-    EdxUserSchoolActivationInviteSagaData inviteSagaData = new EdxUserSchoolActivationInviteSagaData();
-    EdxUser user = sagaData.getInitialEdxUser().orElseThrow();
-    School school = sagaData.getSchool();
-    List<String> roles = List.of("EDX_SCHOOL_ADMIN");
-    List<String> statusFilters = List.of(SagaStatusEnum.IN_PROGRESS.toString(), SagaStatusEnum.STARTED.toString());
-    String sagaName = EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA.toString();
-
-    inviteSagaData.setSchoolID(UUID.fromString(school.getSchoolId()));
-    inviteSagaData.setSchoolName(school.getDisplayName());
-    inviteSagaData.setFirstName(user.getFirstName());
-    inviteSagaData.setLastName(user.getLastName());
-    inviteSagaData.setEmail(user.getEmail());
-    inviteSagaData.setEdxActivationRoleCodes(roles);
-    RequestUtil.setAuditColumnsForCreate(inviteSagaData);
-
-    final Optional<SagaEntity> sagaInProgress = sagaService.
-      findAllActiveUserActivationInviteSagasBySchoolIDAndEmailId(
-        inviteSagaData.getSchoolID(),
-        inviteSagaData.getEmail(),
-        sagaName,
-        statusFilters);
-
-    if (sagaInProgress.isEmpty()) {
-      try {
-        SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(sagaName), inviteSagaData);
-        final SagaEntity saga = this.activationInviteOrchestrator.createSaga(sagaEntity);
-        this.activationInviteOrchestrator.startSaga(saga);
-      } catch (JsonProcessingException e) {
-        throw new SagaRuntimeException(e);
-      }
-    }
   }
 
   public EdxActivationCodeEntity findPrimaryCode(String schoolId) {
