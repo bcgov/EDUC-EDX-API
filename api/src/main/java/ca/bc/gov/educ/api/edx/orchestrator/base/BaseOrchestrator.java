@@ -451,6 +451,7 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
       val saga = sagaOptional.get();
       if (!COMPLETED.toString().equalsIgnoreCase(sagaOptional.get().getStatus())) {//possible duplicate message or force stop scenario check
         final T sagaData = JsonUtil.getJsonObjectFromString(this.clazz, saga.getPayload());
+        log.info("Steps registered: " + this.nextStepsToExecute);
         final var sagaEventState = this.findNextSagaEventState(event.getEventType(), event.getEventOutcome(), sagaData);
         log.trace("found next event as {}", sagaEventState);
         if (sagaEventState.isPresent()) {
