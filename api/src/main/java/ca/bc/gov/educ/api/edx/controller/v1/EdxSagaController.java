@@ -73,7 +73,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   @Override
   public ResponseEntity<String> edxSchoolUserActivationInvite(EdxUserSchoolActivationInviteSagaData edxUserActivationInviteSagaData) {
-    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxActivationCodeSagaDataPayload(edxUserActivationInviteSagaData));
+    validatePayload(() -> getEdxActivationCodeSagaDataPayLoadValidator().validateEdxSchoolUserActivationCodeSagaDataPayload(edxUserActivationInviteSagaData));
     RequestUtil.setAuditColumnsForCreate(edxUserActivationInviteSagaData);
     return this.processEdxSchoolUserActivationLinkSaga(EDX_SCHOOL_USER_ACTIVATION_INVITE_SAGA, edxUserActivationInviteSagaData);
   }

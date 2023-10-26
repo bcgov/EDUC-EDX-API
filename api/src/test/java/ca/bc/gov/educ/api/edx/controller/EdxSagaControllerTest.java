@@ -133,7 +133,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -148,7 +148,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -163,7 +163,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -178,7 +178,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -193,8 +193,8 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School ID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -208,8 +208,8 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Roles list cannot be empty.")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -264,7 +264,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -279,7 +279,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -294,7 +294,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -309,7 +309,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("School Name cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
@@ -324,8 +324,8 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("schoolID cannot be null")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("School ID cannot be null")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -339,8 +339,8 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "SCHOOL_USER_ACTIVATION_INVITE_SAGA"))))
-      .andExpect(jsonPath("$.message", is("Validation error")))
-      .andExpect(jsonPath("$.subErrors[0].message", is("Activation Roles cannot be null or empty")))
+      .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
+      .andExpect(jsonPath("$.subErrors[0].message", is("Roles list cannot be empty.")))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
