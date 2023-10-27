@@ -21,8 +21,7 @@ import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.CREATE_NEW_SCHOOL_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.*;
 import static lombok.AccessLevel.PRIVATE;
 
 @Component
@@ -41,7 +40,7 @@ public class CreateSchoolOrchestrator extends SchoolUserActivationBaseOrchestrat
   private final EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService;
 
   protected CreateSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, CreateSchoolOrchestratorService orchestratorService, Publisher publisher, EdxUsersService edxUsersService, EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService) {
-    super(sagaService, messagePublisher, CreateSchoolSagaData.class, CREATE_NEW_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString(), edxSchoolUserActivationInviteOrchestratorService);
+    super(sagaService, messagePublisher, CreateSchoolSagaData.class, CREATE_NEW_SCHOOL_SAGA.toString(), EDX_CREATE_SCHOOL_TOPIC.toString(), edxSchoolUserActivationInviteOrchestratorService);
     this.publisher = publisher;
     this.edxUsersService = edxUsersService;
     this.orchestratorService = orchestratorService;

@@ -23,8 +23,7 @@ import java.util.UUID;
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.MOVE_SCHOOL_SAGA;
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_API_TOPIC;
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.*;
 import static lombok.AccessLevel.PRIVATE;
 
 @Component
@@ -44,7 +43,7 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
      * @param publisher
      */
     protected MoveSchoolOrchestrator(SagaService sagaService, MessagePublisher messagePublisher, MoveSchoolOrchestratorService moveSchoolOrchestratorService, Publisher publisher) {
-        super(sagaService, messagePublisher, MoveSchoolData.class, MOVE_SCHOOL_SAGA.toString(), EDX_API_TOPIC.toString());
+        super(sagaService, messagePublisher, MoveSchoolData.class, MOVE_SCHOOL_SAGA.toString(), EDX_MOVE_SCHOOL_TOPIC.toString());
         this.moveSchoolOrchestratorService = moveSchoolOrchestratorService;
         this.publisher = publisher;
     }
