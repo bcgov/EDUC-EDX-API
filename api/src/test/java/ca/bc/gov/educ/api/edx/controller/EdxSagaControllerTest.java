@@ -829,6 +829,59 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
+  void testCreateSchool_GivenAValidPayload_ShouldReturnStatusAcceptedRequest() throws Exception {
+    School school = createDummySchool();
+    EdxUser user = createDummyUser();
+
+    CreateSchoolSagaData sagaData = new CreateSchoolSagaData();
+    sagaData.setSchool(school);
+    sagaData.setInitialEdxUser(user);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/create-school-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getJsonString(sagaData))
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
+      .andDo(print()).andExpect(status().isAccepted());
+  }
+
+  @Test
+  void testCreateSchool_GivenInvalidEdxUser_ShouldReturnBadRequest() throws Exception {
+    School school = createDummySchool();
+    EdxUser user = createDummyUser();
+
+    // The invalid data
+    user.setEdxUserID(UUID.randomUUID().toString());
+
+    CreateSchoolSagaData sagaData = new CreateSchoolSagaData();
+    sagaData.setSchool(school);
+    sagaData.setInitialEdxUser(user);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/create-school-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getJsonString(sagaData))
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testCreateSchool_GivenNoInitialUserAndIndependentOffshoreCategory_ShouldReturnBadRequest() throws Exception {
+    School school = createDummySchool();
+    school.setSchoolCategoryCode("INDEPEND");
+
+    CreateSchoolSagaData sagaData = new CreateSchoolSagaData();
+    sagaData.setSchool(school);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/create-school-saga")
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(getJsonString(sagaData))
+      .accept(MediaType.APPLICATION_JSON)
+      .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testEdxMoveSchoolWithDisplayNameNoSpecChars_GivenValidInput_ShouldReturnStatusAcceptedRequest() throws Exception {
     School school = createDummySchool();
     school.setDisplayNameNoSpecialChars("Test Special Chars.");
@@ -871,6 +924,14 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
     school.setGrades(List.of(createSchoolGrade()));
     school.setNeighborhoodLearning(List.of(createNeighborhoodLearning()));
     return school;
+  }
+
+  private EdxUser createDummyUser() {
+    EdxUser user = new EdxUser();
+    user.setFirstName("TestFirst");
+    user.setLastName("TestLast");
+    user.setEmail("test@test.ca");
+    return user;
   }
 
   private SchoolGrade createSchoolGrade() {

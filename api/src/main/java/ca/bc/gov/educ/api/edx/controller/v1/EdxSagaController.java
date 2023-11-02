@@ -50,6 +50,9 @@ public class EdxSagaController implements EdxSagaEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator;
 
+  @Getter(AccessLevel.PRIVATE)
+  private final CreateSchoolSagaPayloadValidator createSchoolSagaPayloadValidator;
+
   private final CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator;
 
   @Getter(PRIVATE)
@@ -60,13 +63,14 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator, EdxUserPayloadValidator edxUserPayLoadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator, EdxUserPayloadValidator edxUserPayLoadValidator, CreateSchoolSagaPayloadValidator createSchoolSagaPayloadValidator) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
     this.secureExchangeCommentSagaValidator = secureExchangeCommentSagaValidator;
     this.createSecureExchangeSagaPayloadValidator = createSecureExchangeSagaPayloadValidator;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
+    this.createSchoolSagaPayloadValidator = createSchoolSagaPayloadValidator;
     orchestrators.forEach(orchestrator -> this.orchestratorMap.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
@@ -115,12 +119,13 @@ public class EdxSagaController implements EdxSagaEndpoint {
   }
 
   @Override
-  public ResponseEntity<String> createSchool(CreateSchoolSagaData edxSchoolCreationSagaData) {
-    EdxUser edxUser = edxSchoolCreationSagaData.getInitialEdxUser();
+  public ResponseEntity<String> createSchool(CreateSchoolSagaData sagaData) {
+    EdxUser edxUser = sagaData.getInitialEdxUser();
     if (edxUser != null) {
       validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserPayload(edxUser, true));
     }
-    return this.processNewSchoolSaga(CREATE_NEW_SCHOOL_SAGA, edxSchoolCreationSagaData);
+    validatePayload(() -> getCreateSchoolSagaPayloadValidator().validateCreateSchoolSagaPayload(sagaData));
+    return this.processNewSchoolSaga(CREATE_NEW_SCHOOL_SAGA, sagaData);
   }
 
   @Override
