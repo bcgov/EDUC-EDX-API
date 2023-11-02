@@ -101,12 +101,20 @@ public class EdxSchoolUserActivationInviteOrchestratorService {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     final var edxAdmins = edxUserRepository.findEdxUserNamesBySchoolIDAndPermissionCode(edxUserActivationInviteSagaData.getSchoolID(), "EDX_USER_SCHOOL_ADMIN").stream().sorted().collect(Collectors.joining(", "));
+    final String recipient = (edxUserActivationInviteSagaData.getFirstName()
+      + " " + edxUserActivationInviteSagaData.getLastName()).trim();
+
     final var emailNotification = EmailNotification.builder()
       .fromEmail(from)
       .toEmail(edxUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.school.user.activation.invite")
-      .emailFields(Map.of("firstName", edxUserActivationInviteSagaData.getFirstName(), "schoolName", edxUserActivationInviteSagaData.getSchoolName(), "activationLink", createUserActivationLink(edxUserActivationInviteSagaData), "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", edxAdmins))
+      .emailFields(Map.of(
+        "recipient", recipient,
+        "activationLink", createUserActivationLink(edxUserActivationInviteSagaData),
+        "personalActivationCode", edxUserActivationInviteSagaData.getPersonalActivationCode(),
+        "edxAdmins", edxAdmins
+      ))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);

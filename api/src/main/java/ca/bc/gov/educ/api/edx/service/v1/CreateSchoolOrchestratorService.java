@@ -96,6 +96,8 @@ public class CreateSchoolOrchestratorService {
 
     Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
       edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schoolId);
+    final String recipient = (user.getFirstName()
+      + " " + user.getLastName()).trim();
 
     EmailNotification emailNotification = EmailNotification.builder()
       .fromEmail(this.emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
@@ -103,8 +105,7 @@ public class CreateSchoolOrchestratorService {
       .subject(this.emailProperties.getEdxSecureExchangePrimaryCodeNotificationEmailSubject())
       .templateName("edx.school.primary-code.notification")
       .emailFields(Map.of(
-        "firstName", user.getFirstName(),
-        "lastName", user.getLastName(),
+        "recipient", recipient,
         "minCode", school.getMincode(),
         "instituteName", school.getDisplayName(),
         "primaryCode", edxActivationCodeEntity.orElseThrow().getActivationCode()

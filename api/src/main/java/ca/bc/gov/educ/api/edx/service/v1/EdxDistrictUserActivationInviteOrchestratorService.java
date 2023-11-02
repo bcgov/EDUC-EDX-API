@@ -107,12 +107,20 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
     final var subject = emailProperties.getEdxSchoolUserActivationInviteEmailSubject();
     final var from = emailProperties.getEdxSchoolUserActivationInviteEmailFrom();
     final var edxAdmins = edxUserRepository.findEdxUserNamesByDistrictIDAndPermissionCode(edxDistrictUserActivationInviteSagaData.getDistrictID(), "EDX_USER_DISTRICT_ADMIN").stream().sorted().collect(Collectors.joining(", "));
+    final String recipient = (edxDistrictUserActivationInviteSagaData.getFirstName()
+      + " " + edxDistrictUserActivationInviteSagaData.getLastName()).trim();
+
     final var emailNotification = EmailNotification.builder()
       .fromEmail(from)
       .toEmail(edxDistrictUserActivationInviteSagaData.getEmail())
       .subject(subject)
       .templateName("edx.district.user.activation.invite")
-      .emailFields(Map.of("firstName", edxDistrictUserActivationInviteSagaData.getFirstName(), "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(), "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData), "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(), "edxAdmins", edxAdmins))
+      .emailFields(Map.of(
+        "recipient", recipient,
+        "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData),
+        "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(),
+        "edxAdmins", edxAdmins
+      ))
       .build();
 
     this.getEmailNotificationService().sendEmail(emailNotification);
