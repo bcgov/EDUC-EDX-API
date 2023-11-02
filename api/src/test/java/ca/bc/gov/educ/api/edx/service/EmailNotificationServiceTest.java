@@ -44,8 +44,6 @@ class EmailNotificationServiceTest extends BaseEdxAPITest {
     assertThat(this.emailBodyCaptor.getValue()).contains("FirstName");
   }
 
-
-
   EmailNotification createEmailNotificationEntity(String templateName, Map<String, String> emailFields) {
     return EmailNotification.builder()
       .fromEmail("test@email.co")
