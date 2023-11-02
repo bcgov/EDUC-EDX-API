@@ -36,13 +36,12 @@ class EmailNotificationServiceTest extends BaseEdxAPITest {
 
   @Test
   void sendEmail_givenGMP_ADDITIONAL_INFO_EmailNotificationEntity_shouldSendCorrectEmail() {
-    final var emailNotificationEntity = this.createEmailNotificationEntity("edx.school.user.activation.invite", Map.of("firstName", "FirstName"));
+    final var emailNotificationEntity = this.createEmailNotificationEntity("edx.school.user.activation.invite", Map.of("recipient", "FirstName"));
     this.emailNotificationService.sendEmail(emailNotificationEntity);
     verify(this.restUtils, atLeastOnce()).sendEmail(eq(emailNotificationEntity.getFromEmail()), eq(emailNotificationEntity.getToEmail()), this.emailBodyCaptor.capture(), eq(emailNotificationEntity.getSubject()));
     assertThat(this.emailBodyCaptor.getValue()).doesNotContainPattern("\\{\\d\\}");
     assertThat(this.emailBodyCaptor.getValue()).contains("Edx School User Activation");
     assertThat(this.emailBodyCaptor.getValue()).contains("FirstName");
-
   }
 
 
