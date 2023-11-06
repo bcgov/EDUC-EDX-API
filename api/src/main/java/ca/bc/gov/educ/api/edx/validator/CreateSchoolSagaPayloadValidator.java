@@ -14,7 +14,7 @@ import java.util.List;
 public class CreateSchoolSagaPayloadValidator {
     public List<FieldError> validateCreateSchoolSagaPayload(CreateSchoolSagaData sagaData) {
         List<FieldError> apiValidationErrors = new ArrayList<>();
-        List<String> categoriesRequiringAdmin = List.of("INDEPEND", "INDP_FNS", "OFFSHORE");
+        List<String> categoriesRequiringAdmin = List.of("INDEPEND", "INDP_FNS");
 
         School school = sagaData.getSchool();
         EdxUser user = sagaData.getInitialEdxUser();
