@@ -117,6 +117,7 @@ public class EdxDistrictUserActivationInviteOrchestratorService {
       .templateName("edx.district.user.activation.invite")
       .emailFields(Map.of(
         "recipient", recipient,
+        "districtName", edxDistrictUserActivationInviteSagaData.getDistrictName(),
         "activationLink", createUserActivationLink(edxDistrictUserActivationInviteSagaData),
         "personalActivationCode", edxDistrictUserActivationInviteSagaData.getPersonalActivationCode(),
         "edxAdmins", edxAdmins
