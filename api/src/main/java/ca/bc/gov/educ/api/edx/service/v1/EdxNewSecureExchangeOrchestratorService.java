@@ -95,11 +95,14 @@ public class EdxNewSecureExchangeOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCreateSagaData secureExchangeCreateSagaData) {
     Set<String> emailIds = null;
+    String recipient = null;
 
     if(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString())) {
       emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCreateSagaData.getSchoolID(), "SECURE_EXCHANGE");
+      recipient = secureExchangeCreateSagaData.getSchoolName();
     } else if(secureExchangeCreateSagaData.getSecureExchangeCreate().getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.DISTRICT.toString())) {
       emailIds = getEdxUsersService().findEdxUserEmailByDistrictIDAndPermissionCode(secureExchangeCreateSagaData.getDistrictID(), "SECURE_EXCHANGE");
+      recipient = secureExchangeCreateSagaData.getDistrictName();
     }
 
     final var subject = emailProperties.getEdxNewSecureExchangeNotificationEmailSubject();
@@ -111,7 +114,12 @@ public class EdxNewSecureExchangeOrchestratorService {
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.new.secure.exchange.notification")
-        .emailFields(Map.of("instituteName", instituteName, "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl()))
+        .emailFields(Map.of(
+          "recipient", recipient,
+          "instituteName", instituteName,
+          "ministryTeamName", secureExchangeCreateSagaData.getMinistryTeamName(),
+          "linkToEDX", props.getEdxApplicationBaseUrl()
+        ))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
