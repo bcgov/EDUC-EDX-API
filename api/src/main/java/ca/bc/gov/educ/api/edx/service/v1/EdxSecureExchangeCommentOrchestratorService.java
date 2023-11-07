@@ -112,15 +112,12 @@ public class EdxSecureExchangeCommentOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
     Set<String> emailIds = null;
-    String recipient = null;
 
     // query to find all the users to whom it should be sent
     if(secureExchangeCommentSagaData.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString())) {
       emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCommentSagaData.getSchoolID(), "SECURE_EXCHANGE");
-      recipient = secureExchangeCommentSagaData.getSchoolName();
     } else if(secureExchangeCommentSagaData.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.DISTRICT.toString())) {
       emailIds = getEdxUsersService().findEdxUserEmailByDistrictIDAndPermissionCode(secureExchangeCommentSagaData.getDistrictID(), "SECURE_EXCHANGE");
-      recipient = secureExchangeCommentSagaData.getDistrictName();
     }
 
     final var subject = emailProperties.getEdxSecureExchangeCommentNotificationEmailSubject();
@@ -133,7 +130,7 @@ public class EdxSecureExchangeCommentOrchestratorService {
         .subject(subject)
         .templateName("edx.secure.exchange.comment.notification")
         .emailFields(Map.of(
-          "recipient", recipient,
+          "recipient", instituteName,
           "instituteName", instituteName,
           "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(),
           "linkToEDX", props.getEdxApplicationBaseUrl(),
