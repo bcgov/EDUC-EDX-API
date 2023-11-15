@@ -137,7 +137,7 @@ class EdxStatsControllerTest extends BaseEdxControllerTest {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE+"/stats/count-schools-with-active-edx-users")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
-            .param("permissionCode", "Exchange"))
+            .param("permissionCode", "SECURE_EXCHANGE"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$", is(1)));;
   }
@@ -152,7 +152,7 @@ class EdxStatsControllerTest extends BaseEdxControllerTest {
     Mockito.when(this.restUtils.getSchools()).thenReturn(List.of(createDummySchool(UUID.randomUUID().toString()), dummySchoolWithUser));
 
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/stats/school-list-without-active-edx-users")
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))).param("permissionCode", "Exchange"))
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))).param("permissionCode", "SECURE_EXCHANGE"))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].schoolName", is("Test School")))
         .andExpect(jsonPath("$.[0].schoolCategory", is("FED_BAND")))

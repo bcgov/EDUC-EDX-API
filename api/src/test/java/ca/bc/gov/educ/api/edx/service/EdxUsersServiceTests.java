@@ -253,7 +253,7 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   void getEdxUserSchoolsByPermissionName() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
-    final List<String> edxUserSchoolEntities = this.service.getEdxUserSchoolsList("Exchange");
+    final List<String> edxUserSchoolEntities = this.service.getEdxUserSchoolsList("SECURE_EXCHANGE");
     assertThat(edxUserSchoolEntities).isNotNull().hasSize(1);
     assertThat(edxUserSchoolEntities.get(0)).isEqualTo(entity.getEdxUserSchoolEntities().iterator().next().getSchoolID().toString());
   }

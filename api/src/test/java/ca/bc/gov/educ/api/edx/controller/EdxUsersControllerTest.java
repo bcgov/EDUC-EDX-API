@@ -101,7 +101,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUserSchoolIDs_GivenValidPermissionName_ShouldReturnOkStatusAndSchoolIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOLS)
-        .param("permissionCode", "Exchange")
+        .param("permissionCode", "SECURE_EXCHANGE")
         .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
@@ -112,7 +112,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUserDistrictIDs_GivenValidPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
-                    .param("permissionCode", "Exchange")
+                    .param("permissionCode", "SECURE_EXCHANGE")
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))

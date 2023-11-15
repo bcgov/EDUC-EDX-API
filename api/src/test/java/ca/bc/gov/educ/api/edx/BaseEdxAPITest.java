@@ -69,7 +69,7 @@ public abstract class BaseEdxAPITest {
     edxUserDistrictRepository.save(userDistrictEntity);
     entity.getEdxUserDistrictEntities().add(userDistrictEntity);
 
-    return entity;
+    return edxUserRepository.save(entity);
   }
 
   protected EdxUserEntity createUserEntityWithMultipleSchools(EdxUserRepository edxUserRepository, EdxPermissionRepository edxPermissionRepository, EdxRoleRepository edxRoleRepository, EdxUserSchoolRepository edxUserSchoolRepository, EdxUserDistrictRepository edxUserDistrictRepository, List<UUID> schoolIDs) {
@@ -158,7 +158,7 @@ public abstract class BaseEdxAPITest {
 
   protected EdxPermissionEntity getEdxPermissionEntity() {
     EdxPermissionEntity entity = new EdxPermissionEntity();
-    entity.setEdxPermissionCode("Exchange");
+    entity.setEdxPermissionCode("SECURE_EXCHANGE");
     entity.setCreateUser("test");
     entity.setCreateDate(LocalDateTime.now());
     entity.setUpdateUser("test");
