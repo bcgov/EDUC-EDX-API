@@ -112,6 +112,7 @@ public class EdxSecureExchangeCommentOrchestratorService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void sendEmail(SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
     Set<String> emailIds = null;
+
     // query to find all the users to whom it should be sent
     if(secureExchangeCommentSagaData.getSecureExchangeContactTypeCode().equals(SecureExchangeContactTypeCode.SCHOOL.toString())) {
       emailIds = getEdxUsersService().findEdxUserEmailBySchoolIDAndPermissionCode(secureExchangeCommentSagaData.getSchoolID(), "SECURE_EXCHANGE");
@@ -128,7 +129,13 @@ public class EdxSecureExchangeCommentOrchestratorService {
         .toEmail(emailId)
         .subject(subject)
         .templateName("edx.secure.exchange.comment.notification")
-        .emailFields(Map.of("instituteName", instituteName, "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(), "linkToEDX", props.getEdxApplicationBaseUrl(),"messageSequenceNumber",secureExchangeCommentSagaData.getSequenceNumber()))
+        .emailFields(Map.of(
+          "recipient", instituteName,
+          "instituteName", instituteName,
+          "ministryTeamName", secureExchangeCommentSagaData.getMinistryTeamName(),
+          "linkToEDX", props.getEdxApplicationBaseUrl(),
+          "messageSequenceNumber", secureExchangeCommentSagaData.getSequenceNumber()
+        ))
         .build();
 
       this.getEmailNotificationService().sendEmail(emailNotification);
