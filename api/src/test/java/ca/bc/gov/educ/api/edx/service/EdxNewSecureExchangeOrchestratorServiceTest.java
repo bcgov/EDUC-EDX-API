@@ -126,9 +126,10 @@ class EdxNewSecureExchangeOrchestratorServiceTest extends BaseEdxAPITest {
       );
 
     final String emailBody = this.emailBodyCaptor.getValue();
-    assertThat(emailBody).contains("Test Ministry");
-    assertThat(emailBody).contains(sagaData.getSchoolName());
-    assertThat(emailBody).contains(props.getEdxApplicationBaseUrl());
+    assertThat(emailBody)
+      .contains("Test Ministry")
+      .contains(sagaData.getSchoolName())
+      .contains(props.getEdxApplicationBaseUrl());
     assertThat(this.emailBodyCaptor.getValue()).doesNotContainPattern("\\{\\d\\}");
   }
 
@@ -157,9 +158,9 @@ class EdxNewSecureExchangeOrchestratorServiceTest extends BaseEdxAPITest {
       );
 
     final String emailBody = this.emailBodyCaptor.getValue();
-    assertThat(emailBody).contains("Test Ministry");
-    assertThat(emailBody).contains(sagaData.getDistrictName());
-    assertThat(emailBody).contains(props.getEdxApplicationBaseUrl());
+    assertThat(emailBody).contains("Test Ministry")
+      .contains(sagaData.getDistrictName())
+      .contains(props.getEdxApplicationBaseUrl());
     assertThat(this.emailBodyCaptor.getValue()).doesNotContainPattern("\\{\\d\\}");
   }
 
