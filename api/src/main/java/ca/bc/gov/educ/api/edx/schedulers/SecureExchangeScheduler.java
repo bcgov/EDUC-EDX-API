@@ -87,7 +87,6 @@ public class SecureExchangeScheduler {
     documentRepository.deleteByCreateDateBefore(createDate);
     secureExchangeRepository.deleteByCreateDateBefore(createDate);
     log.info("Purged closed messages scheduler");
-
   }
 
   private LocalDateTime calculateCreateDateBasedOnMessageAge() {

@@ -51,5 +51,7 @@ public class EdxActivationCode extends BaseRequest implements Serializable {
 
   String edxUserId;
 
+  String linkedEdxUserId;
+
   String edxUserExpiryDate;
 }

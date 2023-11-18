@@ -17,6 +17,7 @@ public final class URL {
   public static final String MINISTRY_TEAMS = "/ministry-teams";
   public static final String USER_SCHOOLS = "/user-schools";
   public static final String USER_DISTRICTS = "/user-districts";
+  public static final String INVITATIONS = "/user-invitations";
 
   private URL(){
 

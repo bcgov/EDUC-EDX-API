@@ -68,6 +68,12 @@ public interface EdxUsersEndpoint {
   EdxUser retrieveEdxUser(@PathVariable String id);
 
 
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
+  @GetMapping(URL.INVITATIONS)
+  @Transactional(readOnly = true)
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+  List<EdxActivationCode> findAllInvitations(@RequestParam(name = "instituteType") String instituteType);
+
   /**
    *   This api method will accept all or individual parameters and search the DB. if any parameter is null then it will be not included in the query.
    *
