@@ -88,6 +88,30 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
+  void testFindAllSchoolInvitations_ShouldReturnOkStatus() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    UUID schoolID = UUID.randomUUID();
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, schoolID);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.INVITATIONS + "?instituteType=SCHOOL")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)));
+  }
+
+  @Test
+  void testFindAllDistrictInvitations_ShouldReturnOkStatus() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    UUID districtID = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID);
+    UUID districtID2 = UUID.randomUUID();
+    this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID2);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.INVITATIONS + "?instituteType=DISTRICT")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+  }
+
+  @Test
   void testRetrieveUsers_GivenValidID_ShouldReturnOkStatus() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())

@@ -95,6 +95,11 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
+  public List<EdxActivationCode> findAllInvitations(String instituteType) {
+    return getService().getEdxUserInvitations(instituteType).stream().map(EDX_ACTIVATION_CODE_MAPPER::toStructure).collect(Collectors.toList());
+  }
+
+  @Override
   public List<EdxUser> findEdxUsers(Optional<UUID> digitalId, Optional<UUID> schoolID, String firstName, String lastName, Optional<UUID> districtID) {
     return getService().findEdxUsers(digitalId, schoolID, firstName, lastName, districtID).stream().map(userMapper::toStructure).collect(Collectors.toList());
   }

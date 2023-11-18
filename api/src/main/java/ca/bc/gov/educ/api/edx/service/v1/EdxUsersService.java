@@ -120,6 +120,15 @@ public class EdxUsersService {
     return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
   }
 
+  public List<EdxActivationCodeEntity> getEdxUserInvitations(String instituteType) {
+    if(instituteType.equalsIgnoreCase(InstituteTypeCode.DISTRICT.toString())){
+      return edxActivationCodeRepository.findAllByDistrictIDIsNotNullAndIsPrimaryIsFalse();
+    }else if(instituteType.equalsIgnoreCase(InstituteTypeCode.SCHOOL.toString())){
+      return edxActivationCodeRepository.findAllBySchoolIDIsNotNullAndIsPrimaryIsFalse();
+    }
+    return edxActivationCodeRepository.findAll();
+  }
+
   public List<String> getEdxUserDistrictsList(String permissionCode) {
     List<EdxUserDistrictEntity> districtIDs = edxUserDistrictRepository.findDistrictsByPermission(permissionCode);
     return districtIDs.stream().map(district -> district.getDistrictID().toString()).distinct().toList();
@@ -503,8 +512,8 @@ public class EdxUsersService {
     val edxUserEntity = getEdxUserRepository().findById(edxUsers.get(0).getEdxUserID()).get();
     createEdxUserDetails(edxActivateUser, edxActivationCodeEntity, edxUserEntity);
     updateAuditColumnsForEdxUserEntityUpdate(edxUserEntity, edxActivateUser);
-    val updatedUser = edxUserRepository.save(edxUserEntity);
-    expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
+    EdxUserEntity updatedUser = edxUserRepository.save(edxUserEntity);
+    expireActivationCodes(edxActivationCodeEntity, edxActivateUser, updatedUser);
     return updatedUser;
   }
 
@@ -520,9 +529,9 @@ public class EdxUsersService {
     val edxUserEntity = createEdxUserFromActivationCodeDetails(edxUser, edxActivateUser, edxActivationCodeEntity);
     createEdxUserDetails(edxActivateUser, edxActivationCodeEntity, edxUserEntity);
 
-    val savedEntity = edxUserRepository.save(edxUserEntity);
+    EdxUserEntity savedEntity = edxUserRepository.save(edxUserEntity);
     //expire the activationCodes
-    expireActivationCodes(edxActivationCodeEntity, edxActivateUser);
+    expireActivationCodes(edxActivationCodeEntity, edxActivateUser, savedEntity);
     return savedEntity;
   }
 
@@ -573,11 +582,12 @@ public class EdxUsersService {
    * @param edxActivationCode the edx activation code
    * @param edxActivateUser   the edx activate user
    */
-  private void expireActivationCodes(EdxActivationCodeEntity edxActivationCode, EdxActivateUser edxActivateUser) {
+  private void expireActivationCodes(EdxActivationCodeEntity edxActivationCode, EdxActivateUser edxActivateUser, EdxUserEntity user) {
     val optionalEdxActivationCodeEntity = getEdxActivationCodeRepository().findById(edxActivationCode.getEdxActivationCodeId());
     val activationCodeEntity = optionalEdxActivationCodeEntity.orElseThrow(() -> new EntityNotFoundException(EdxActivationCodeEntity.class, EDX_ACTIVATION_CODE_ID, edxActivationCode.getEdxActivationCodeId().toString()));
     if (!activationCodeEntity.getIsPrimary()) {//expire only the personal activation code
       activationCodeEntity.setExpiryDate(LocalDateTime.now());
+      activationCodeEntity.setLinkedEdxUserId(user.getEdxUserID());
       activationCodeEntity.setUpdateUser(edxActivateUser.getUpdateUser());
       activationCodeEntity.setUpdateDate(LocalDateTime.now());
       getEdxActivationCodeRepository().save(activationCodeEntity);
