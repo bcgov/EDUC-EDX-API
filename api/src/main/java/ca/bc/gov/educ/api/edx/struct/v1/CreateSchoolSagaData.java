@@ -4,13 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
-import java.util.Optional;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateSchoolSagaData extends EdxUserSchoolActivationInviteSagaData implements Serializable {
+public class CreateSchoolSagaData extends EdxUserSchoolActivationInviteSagaData {
   private School school;
   private EdxUser initialEdxUser;
 }
