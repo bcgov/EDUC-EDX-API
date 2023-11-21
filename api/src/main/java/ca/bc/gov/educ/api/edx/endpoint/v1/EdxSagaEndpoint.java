@@ -4,10 +4,13 @@ import ca.bc.gov.educ.api.edx.constants.v1.URL;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -102,4 +105,12 @@ public interface EdxSagaEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "202", description = "ACCEPTED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST."), @ApiResponse(responseCode = "409", description = "CONFLICT.")})
   @ResponseStatus(ACCEPTED)
   ResponseEntity<String> moveSchool(@Validated @RequestBody MoveSchoolData moveSchoolData);
+
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_ACTIVATION_CODE')")
+  @PostMapping("onboarding-file")
+  @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
+  @Transactional
+  @Tag(name = "Endpoint to Upload an excel file and convert to json structure.", description = "Endpoint to upload an onboarding CSV file")
+  @Schema(name = "OnboardingFileUpload", implementation = OnboardingFileUpload.class)
+  OnboardingFileProcessResponse processOnboardingFile(@Validated @RequestBody OnboardingFileUpload fileUpload);
 }
