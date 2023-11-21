@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OnboardUserSagaData extends EdxUserSchoolActivationInviteSagaData {
+public class OnboardDistrictUserSagaData extends EdxUserDistrictActivationInviteSagaData {
   private String mincode;
 }

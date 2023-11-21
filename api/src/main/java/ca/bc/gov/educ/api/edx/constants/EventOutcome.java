@@ -24,6 +24,7 @@ public enum EventOutcome {
    */
   PERSONAL_ACTIVATION_CODE_CREATED,
   SCHOOL_PRIMARY_CODE_CREATED,
+  DISTRICT_PRIMARY_CODE_CREATED,
   /**
    * User activation email sent outcome
    */

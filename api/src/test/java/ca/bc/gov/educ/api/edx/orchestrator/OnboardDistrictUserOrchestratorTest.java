@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.OnboardSchoolUserSagaData;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
@@ -33,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
+class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.
@@ -60,6 +61,9 @@ class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
 
   @Autowired
   private MessagePublisher messagePublisher;
+
+  @Autowired
+  RestUtils restUtils;
 
   @Autowired
   OnboardSchoolUserOrchestrator orchestrator;
@@ -140,7 +144,7 @@ class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testSendEdxUserActivationEmail_GivenEventAndSaga_sagaShouldSendEmail() throws IOException, InterruptedException, TimeoutException {
     final OnboardSchoolUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
-    List<String> roles = List.of("EDX_SCHOOL_ADMIN");
+    List<String> roles = List.of("EDX_DISTRICT_ADMIN");
     mockData.setSchoolID(UUID.fromString(this.mockInstituteSchool.getSchoolId()));
     mockData.setSchoolName(this.mockInstituteSchool.getDisplayName());
     mockData.setEdxActivationRoleCodes(roles);

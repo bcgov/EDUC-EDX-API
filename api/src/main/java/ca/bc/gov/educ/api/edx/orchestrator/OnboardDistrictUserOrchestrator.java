@@ -4,12 +4,12 @@ import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
-import ca.bc.gov.educ.api.edx.service.v1.EdxSchoolUserActivationInviteOrchestratorService;
+import ca.bc.gov.educ.api.edx.service.v1.EdxDistrictUserActivationInviteOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.service.v1.OnboardUserOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
-import ca.bc.gov.educ.api.edx.struct.v1.OnboardSchoolUserSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.OnboardDistrictUserSagaData;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Getter;
@@ -18,14 +18,14 @@ import org.springframework.stereotype.Component;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.ONBOARD_SCHOOL_USER_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.ONBOARD_DISTRICT_USER_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.*;
 import static lombok.AccessLevel.PRIVATE;
 
 @Component
 @Slf4j
-public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrchestrator<OnboardSchoolUserSagaData> {
+public class OnboardDistrictUserOrchestrator extends DistrictUserActivationBaseOrchestrator<OnboardDistrictUserSagaData> {
 
   @Getter(PRIVATE)
   private final Publisher publisher;
@@ -36,41 +36,41 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
   @Getter(PRIVATE)
   private final OnboardUserOrchestratorService orchestratorService;
   @Getter(PRIVATE)
-  private final EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService;
+  private final EdxDistrictUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService;
 
-  protected OnboardSchoolUserOrchestrator(
+  protected OnboardDistrictUserOrchestrator(
     SagaService sagaService,
     MessagePublisher messagePublisher,
     OnboardUserOrchestratorService orchestratorService,
     Publisher publisher,
     EdxUsersService edxUsersService,
-    EdxSchoolUserActivationInviteOrchestratorService edxSchoolUserActivationInviteOrchestratorService
+    EdxDistrictUserActivationInviteOrchestratorService edxDistrictUserActivationInviteOrchestratorService
   ) {
     super(
       sagaService,
       messagePublisher,
-      OnboardSchoolUserSagaData.class,
-      ONBOARD_SCHOOL_USER_SAGA.toString(),
-      EDX_ONBOARD_SCHOOL_USER_TOPIC.toString(),
-      edxSchoolUserActivationInviteOrchestratorService
+      OnboardDistrictUserSagaData.class,
+      ONBOARD_DISTRICT_USER_SAGA.toString(),
+      EDX_ONBOARD_DISTRICT_USER_TOPIC.toString(),
+      edxDistrictUserActivationInviteOrchestratorService
     );
     this.publisher = publisher;
     this.edxUsersService = edxUsersService;
     this.orchestratorService = orchestratorService;
-    this.edxSchoolUserActivationInviteOrchestratorService = edxSchoolUserActivationInviteOrchestratorService;
+    this.edxSchoolUserActivationInviteOrchestratorService = edxDistrictUserActivationInviteOrchestratorService;
   }
 
   @Override
   public void populateStepsToExecuteMap() {
     this.stepBuilder()
-      .begin(CREATE_SCHOOL_PRIMARY_CODE, this::createPrimaryCode)
-      .step(CREATE_SCHOOL_PRIMARY_CODE, SCHOOL_PRIMARY_CODE_CREATED, SEND_PRIMARY_ACTIVATION_CODE, this::sendPrimaryCode)
+      .begin(CREATE_DISTRICT_PRIMARY_CODE, this::createPrimaryCode)
+      .step(CREATE_DISTRICT_PRIMARY_CODE, DISTRICT_PRIMARY_CODE_CREATED, SEND_PRIMARY_ACTIVATION_CODE, this::sendPrimaryCode)
       .step(SEND_PRIMARY_ACTIVATION_CODE, PRIMARY_ACTIVATION_CODE_SENT, CREATE_PERSONAL_ACTIVATION_CODE, this::createPersonalActivationCode)
       .step(CREATE_PERSONAL_ACTIVATION_CODE, PERSONAL_ACTIVATION_CODE_CREATED, SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, this::sendEdxUserActivationEmail)
       .end(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
   }
 
-  public void createPrimaryCode(Event event, SagaEntity saga, OnboardSchoolUserSagaData sagaData) throws JsonProcessingException {
+  public void createPrimaryCode(Event event, SagaEntity saga, OnboardDistrictUserSagaData sagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     saga.setStatus(IN_PROGRESS.toString());
@@ -85,10 +85,10 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    log.info("message sent to EDX_ONBOARD_SCHOOL_USER_TOPIC for CREATE_SCHOOL_PRIMARY_CODE Event. :: {}", saga.getSagaId());
+    log.info("message sent to EDX_ONBOARD_DISTRICT_USER_TOPIC for CREATE_SCHOOL_PRIMARY_CODE Event. :: {}", saga.getSagaId());
   }
 
-  public void sendPrimaryCode(Event event, SagaEntity saga, OnboardSchoolUserSagaData sagaData) throws JsonProcessingException {
+  public void sendPrimaryCode(Event event, SagaEntity saga, OnboardDistrictUserSagaData sagaData) throws JsonProcessingException {
     final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
     saga.setSagaState(SEND_PRIMARY_ACTIVATION_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -100,6 +100,6 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
-    log.info("message sent to EDX_ONBOARD_SCHOOL_USER_TOPIC for SEND_PRIMARY_ACTIVATION_CODE Event. :: {}", saga.getSagaId());
+    log.info("message sent to EDX_ONBOARD_DISTRICT_USER_TOPIC for SEND_PRIMARY_ACTIVATION_CODE Event. :: {}", saga.getSagaId());
   }
 }

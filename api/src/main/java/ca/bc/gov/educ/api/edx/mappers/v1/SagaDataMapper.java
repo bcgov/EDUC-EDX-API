@@ -42,7 +42,7 @@ public interface SagaDataMapper {
   @Mapping(target = "edxUserId", ignore = true)
   @Mapping(target = "schoolID", ignore = true)
   @Mapping(target = "districtID", ignore = true)
-  SagaEntity toModel(String sagaName, OnboardUserSagaData sagaData) throws JsonProcessingException;
+  SagaEntity toModel(String sagaName, OnboardSchoolUserSagaData sagaData) throws JsonProcessingException;
 
   @Mapping(target = "status", ignore = true)
   @Mapping(target = "secureExchangeId", ignore = true)
