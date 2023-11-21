@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
-import ca.bc.gov.educ.api.edx.constants.SagaEnum;
 import ca.bc.gov.educ.api.edx.exception.EdxRuntimeException;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
@@ -22,7 +21,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
-import static ca.bc.gov.educ.api.edx.constants.SagaEnum.CREATE_NEW_SCHOOL_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.ONBOARD_DISTRICT_USER_SAGA;
+import static ca.bc.gov.educ.api.edx.constants.SagaEnum.ONBOARD_SCHOOL_USER_SAGA;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.STARTED;
 import static lombok.AccessLevel.PRIVATE;
 
@@ -97,7 +97,7 @@ public class EdxFileOnboardingService {
             .createUser(createUser)
             .updateUser(createUser)
             .payload(JsonUtil.getJsonStringFromObject(onboardingFileRow))
-            .sagaName(districtID != null ? CREATE_NEW_SCHOOL_SAGA.toString() : SagaEnum.MOVE_SCHOOL_SAGA.toString())
+            .sagaName(districtID != null ? ONBOARD_DISTRICT_USER_SAGA.toString() : ONBOARD_SCHOOL_USER_SAGA.toString())
             .status(STARTED.toString())
             .sagaState(INITIATED.toString())
             .schoolID(schoolID)
