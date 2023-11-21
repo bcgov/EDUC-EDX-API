@@ -195,7 +195,6 @@ class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
     school.setUpdateUser("TEST");
     school.setDistrictId(UUID.randomUUID().toString());
     school.setSchoolId(UUID.randomUUID().toString());
-    school.setDistrictId(school.getDistrictId());
     return school;
   }
 
