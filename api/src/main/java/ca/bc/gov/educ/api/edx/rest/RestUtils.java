@@ -9,7 +9,6 @@ import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +22,7 @@ import reactor.core.publisher.Mono;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
@@ -126,6 +126,15 @@ public class RestUtils {
     return schoolMap;
   }
 
+  public Map<String, School> getSchoolMincodeMap() {
+    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+    for (val school : this.getSchools()) {
+      schoolMap.put(school.getMincode(), school);
+    }
+
+    return schoolMap;
+  }
+
   public Map<String, List<School>> getDistrictSchoolsMap() {
     Map<String, List<School>> districtSchoolsMap = new ConcurrentHashMap<>();
     for (val school : this.getSchools()) {
@@ -157,7 +166,15 @@ public class RestUtils {
     }
 
     return districtMap;
+  }
 
+  public Map<String, District> getDistrictNumberMap() {
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    for (val district : this.getDistricts()) {
+      districtMap.put(district.getDistrictNumber(), district);
+    }
+
+    return districtMap;
   }
 
   public List<District> getDistricts() {
