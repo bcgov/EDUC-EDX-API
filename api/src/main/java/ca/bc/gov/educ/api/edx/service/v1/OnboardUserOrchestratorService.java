@@ -52,38 +52,6 @@ public class OnboardUserOrchestratorService {
     this.restUtils = restUtils;
   }
 
-  public void findAndAttachSchoolInfo(UUID sagaId, OnboardUserSagaData onboardUserSagaData) {
-    School school = this.restUtils.getSchoolByMincode(sagaId, onboardUserSagaData.getMincode());
-    onboardUserSagaData.setSchoolID(UUID.fromString(school.getSchoolId()));
-    onboardUserSagaData.setSchoolName(school.getDisplayName());
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void attachSchoolAndUserInviteToSaga(String schoolId, CreateSchoolSagaData createSchoolSagaData, SagaEntity saga)
-  throws JsonProcessingException {
-    List<School> result = this.restUtils.getSchoolById(saga.getSagaId(), schoolId);
-
-    if (result.isEmpty()) {
-      log.error("Could find School in Institute API :: {}", saga.getSagaId());
-      throw new EntityNotFoundException("School entity not found");
-    }
-
-    School school = result.get(0);
-    saga.setSchoolID(UUID.fromString(school.getSchoolId()));
-    createSchoolSagaData.setSchool(school);
-    EdxUser user = createSchoolSagaData.getInitialEdxUser();
-    List<String> roles = List.of("EDX_SCHOOL_ADMIN");
-    createSchoolSagaData.setSchoolID(UUID.fromString(school.getSchoolId()));
-    createSchoolSagaData.setSchoolName(school.getDisplayName());
-    createSchoolSagaData.setFirstName(user.getFirstName());
-    createSchoolSagaData.setLastName(user.getLastName());
-    createSchoolSagaData.setEmail(user.getEmail());
-    createSchoolSagaData.setEdxActivationRoleCodes(roles);
-
-    saga.setPayload(JsonUtil.getJsonStringFromObject(createSchoolSagaData));
-    this.sagaService.updateAttachedEntityDuringSagaProcess(saga);
-  }
-
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void createPrimaryActivationCode(OnboardUserSagaData sagaData) {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();

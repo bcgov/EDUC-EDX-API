@@ -5,9 +5,7 @@ import ca.bc.gov.educ.api.edx.controller.BaseSagaControllerTest;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
-import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
-import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
@@ -16,7 +14,6 @@ import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,18 +25,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import static ca.bc.gov.educ.api.edx.constants.EventOutcome.*;
 import static ca.bc.gov.educ.api.edx.constants.EventType.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class OnboardUserOrchestratorTest extends BaseSagaControllerTest {
+class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
 
   /**
    * The Repository.
@@ -71,7 +66,7 @@ class OnboardUserOrchestratorTest extends BaseSagaControllerTest {
   RestUtils restUtils;
 
   @Autowired
-  OnboardUserOrchestrator orchestrator;
+  OnboardSchoolUserOrchestrator orchestrator;
 
   @Autowired
   EdxActivationCodeRepository edxActivationCodeRepository;
@@ -86,71 +81,11 @@ class OnboardUserOrchestratorTest extends BaseSagaControllerTest {
   @BeforeEach
   public void before() {
     this.mockInstituteSchool = this.createMockSchoolFromInstitute();
-    doReturn(this.mockInstituteSchool).when(this.restUtils).getSchoolByMincode(any(), any());
   }
 
   @AfterEach
   public void after() {
     tearDown();
-  }
-
-  @Test
-  void testFindSchool_GivenEventAndSagaData_shouldAttachSchoolIdToSaga() throws JsonProcessingException {
-    final OnboardUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
-    final SagaEntity saga = this.saveMockSaga(mockData);
-
-    final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
-    final Event event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(INITIATE_SUCCESS)
-      .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockData))
-      .build();
-
-    this.orchestrator.findSchool(event, saga, mockData);
-
-    verify(this.messagePublisher, atMost(invocations + 1))
-      .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-
-    final Optional<SagaEntity> sagaFromDB = this.sagaService.findSagaById(saga.getSagaId());
-    assertThat(sagaFromDB).isPresent();
-    assertThat(sagaFromDB.get().getSagaState()).isEqualTo(FIND_SCHOOL.toString());
-
-    final List<SagaEventStatesEntity> sagaStates = this.sagaService.findAllSagaStates(saga);
-    assertThat(sagaStates).hasSize(1);
-
-    assertThat(sagaStates.get(0).getSagaEventState()).isEqualTo(INITIATED.toString());
-    assertThat(sagaStates.get(0).getSagaEventOutcome()).isEqualTo(INITIATE_SUCCESS.toString());
-  }
-
-  @Test
-  void testCreatePrimaryCode_GivenEventAndSaga_sagaShouldCreatePrimarySchoolCode() throws TimeoutException, IOException, InterruptedException {
-    final OnboardUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
-    SagaEntity saga = this.saveMockSaga(mockData);
-
-    final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
-    final Event event = Event.builder()
-      .eventType(FIND_SCHOOL)
-      .eventOutcome(SCHOOL_FOUND)
-      .sagaId(saga.getSagaId())
-      .eventPayload(getJsonString(mockData))
-      .build();
-    this.orchestrator.handleEvent(event);
-
-    verify(this.messagePublisher, atMost(invocations + 1))
-      .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
-
-    final Event newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    OnboardUserSagaData newData =
-      JsonUtil.getJsonObjectFromString(OnboardUserSagaData.class, newEvent.getEventPayload());
-
-    UUID schooId = newData.getSchoolID();
-    Optional<EdxActivationCodeEntity> codeOptional =
-      edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schooId);
-
-    assertThat(codeOptional).isPresent();
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL_PRIMARY_CODE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_PRIMARY_CODE_CREATED);
   }
 
   @Test
@@ -161,20 +96,20 @@ class OnboardUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(FIND_SCHOOL)
-      .eventOutcome(SCHOOL_FOUND)
+      .eventType(INITIATED)
+      .eventOutcome(INITIATE_SUCCESS)
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
     this.orchestrator.handleEvent(event);
 
-    verify(this.messagePublisher, atMost(invocations + 1))
+    verify(this.messagePublisher, atMost(invocations + 2))
       .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     final Event createCodeEvent = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
     this.orchestrator.handleEvent(createCodeEvent);
 
-    verify(this.messagePublisher, atMost(invocations + 2))
+    verify(this.messagePublisher, atMost(invocations + 3))
       .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     final Event sendCodeEvent = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
@@ -280,7 +215,7 @@ class OnboardUserOrchestratorTest extends BaseSagaControllerTest {
   private SagaEntity saveMockSaga(OnboardUserSagaData mockSaga) {
     MockitoAnnotations.openMocks(this);
     try {
-      SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.ONBOARD_USER_SAGA), mockSaga);
+      SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.ONBOARD_SCHOOL_USER_SAGA), mockSaga);
       return this.sagaService.createSagaRecordInDB(sagaEntity);
     } catch (Exception e) {
       throw new SagaRuntimeException(e);

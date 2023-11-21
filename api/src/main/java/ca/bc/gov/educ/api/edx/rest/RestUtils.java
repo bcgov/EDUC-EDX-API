@@ -18,7 +18,6 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.thymeleaf.util.StringUtils;
 
 import reactor.core.publisher.Mono;
 
@@ -200,31 +199,6 @@ public class RestUtils {
       Thread.currentThread().interrupt();
       throw new SagaRuntimeException(NATS_TIMED_OUT_OR_THE_RESPONSE_IS_NULL_CORRELATION_ID + correlationID + ex.getMessage());
     }
-  }
-
-  @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
-  public School getSchoolByMincode(UUID correlationID, String mincode) {
-    String districtNumber = mincode.substring(0, 3);
-    String schoolNumber = mincode.substring(3);
-
-    List<District> allDistricts = this.getDistricts();
-    Optional<District> districtOptional = allDistricts.stream()
-      .filter(d -> StringUtils.equals(districtNumber, d.getDistrictNumber()))
-      .findFirst();
-
-    if (districtOptional.isEmpty()) {
-      throw new SagaRuntimeException("District may not exist");
-    }
-
-    District district = districtOptional.get();
-    List<School> schools = this.getSchoolNumberInDistrict(correlationID, schoolNumber, district.getDistrictId());
-    Optional<School> schoolOptional = schools.stream().findFirst();
-
-    if (schoolOptional.isEmpty()) {
-      throw new SagaRuntimeException("School may not exist");
-    }
-
-    return schoolOptional.get();
   }
 
   @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
