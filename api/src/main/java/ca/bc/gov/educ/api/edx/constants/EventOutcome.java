@@ -24,6 +24,7 @@ public enum EventOutcome {
    */
   PERSONAL_ACTIVATION_CODE_CREATED,
   SCHOOL_PRIMARY_CODE_CREATED,
+  DISTRICT_PRIMARY_CODE_CREATED,
   /**
    * User activation email sent outcome
    */
@@ -53,6 +54,7 @@ public enum EventOutcome {
   // Create/move school Events Outcome
   SCHOOL_CREATED,
   SCHOOL_UPDATED,
+  SCHOOL_FOUND,
   SCHOOL_MOVED,
   USERS_TO_NEW_SCHOOL_COPIED,
   NO_INITIAL_USER_FOUND,

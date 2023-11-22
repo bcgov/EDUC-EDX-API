@@ -13,24 +13,29 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
+import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.restassured.internal.util.IOUtils;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.FileInputStream;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -900,6 +905,81 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "MOVE_SCHOOL_SAGA"))))
       .andDo(print()).andExpect(status().isAccepted());
+  }
+
+  @Test
+  void testProcessOnboardingFile_givenValidPayloadSchoolsMissing_ShouldReturnStatusOk() throws Exception {
+    final FileInputStream fis = new FileInputStream("src/test/resources/edx-onboading-sample.csv");
+    final String fileContents = Base64.getEncoder().encodeToString(IOUtils.toByteArray(fis));
+    assertThat(fileContents).isNotEmpty();
+    val body = OnboardingFileUpload.builder().fileContents(fileContents).createUser("test").build();
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/onboarding-file")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE")))
+            .content(JsonUtil.getJsonStringFromObject(body))
+            .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$.processedCount", is("0")));
+  }
+
+  @Test
+  void testProcessOnboardingFile_givenValidPayload_ShouldReturnStatusOk() throws Exception {
+    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+    schoolMap.put("12345678", createFakeSchool(UUID.randomUUID().toString(), "12345678"));
+    schoolMap.put("98765432", createFakeSchool(UUID.randomUUID().toString(), "98765432"));
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    Mockito.when(this.restUtils.getDistrictNumberMap()).thenReturn(districtMap);
+    Mockito.when(this.restUtils.getSchoolMincodeMap()).thenReturn(schoolMap);
+    final FileInputStream fis = new FileInputStream("src/test/resources/edx-onboading-sample.csv");
+    final String fileContents = Base64.getEncoder().encodeToString(IOUtils.toByteArray(fis));
+    assertThat(fileContents).isNotEmpty();
+    val body = OnboardingFileUpload.builder().fileContents(fileContents).createUser("test").build();
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/onboarding-file")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE")))
+            .content(JsonUtil.getJsonStringFromObject(body))
+            .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$.processedCount", is("2")));
+  }
+
+  @Test
+  void testProcessOnboardingFileWithDistrict_givenValidPayload_ShouldReturnStatusOk() throws Exception {
+    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+    schoolMap.put("12345678", createFakeSchool(UUID.randomUUID().toString(), "12345678"));
+    schoolMap.put("98765432", createFakeSchool(UUID.randomUUID().toString(), "98765432"));
+
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    districtMap.put("123", createFakeDistrict(UUID.randomUUID().toString(), "123"));
+    districtMap.put("987", createFakeDistrict(UUID.randomUUID().toString(), "987"));
+
+    Mockito.when(this.restUtils.getDistrictNumberMap()).thenReturn(districtMap);
+    Mockito.when(this.restUtils.getSchoolMincodeMap()).thenReturn(schoolMap);
+    final FileInputStream fis = new FileInputStream("src/test/resources/edx-onboading-sample.csv");
+    final String fileContents = Base64.getEncoder().encodeToString(IOUtils.toByteArray(fis));
+    assertThat(fileContents).isNotEmpty();
+    val body = OnboardingFileUpload.builder().fileContents(fileContents).createUser("test").build();
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/onboarding-file")
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE")))
+            .content(JsonUtil.getJsonStringFromObject(body))
+            .contentType(APPLICATION_JSON)).andExpect(status().isOk()).andExpect(jsonPath("$.processedCount", is("3")));
+  }
+
+  private School createFakeSchool(String schoolId, String mincode) {
+    School school = new School();
+    school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
+    school.setSchoolId(schoolId);
+    school.setMincode(mincode);
+    school.setSchoolNumber("00002");
+    school.setDisplayName("Test School");
+    school.setSchoolOrganizationCode("TRIMESTER");
+    school.setSchoolCategoryCode("FED_BAND");
+    school.setFacilityTypeCode("STANDARD");
+    return school;
+  }
+
+  private District createFakeDistrict(String districtId, String districtNumber) {
+    District district = new District();
+    district.setDistrictId(districtId);
+    district.setDistrictNumber(districtNumber);
+    district.setDisplayName("Test District");
+    district.setDistrictRegionCode("METRO");
+    district.setDistrictStatusCode("ACTIVE");
+    return district;
   }
 
   private MoveSchoolData createDummyMoveSchoolSagaData() {

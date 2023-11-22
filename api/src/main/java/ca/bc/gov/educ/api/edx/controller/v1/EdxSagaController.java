@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.mappers.v1.SagaDataMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
+import ca.bc.gov.educ.api.edx.service.v1.EdxFileOnboardingService;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
@@ -24,10 +25,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static ca.bc.gov.educ.api.edx.constants.SagaEnum.*;
@@ -53,6 +51,9 @@ public class EdxSagaController implements EdxSagaEndpoint {
   @Getter(AccessLevel.PRIVATE)
   private final CreateSchoolSagaPayloadValidator createSchoolSagaPayloadValidator;
 
+  @Getter(AccessLevel.PRIVATE)
+  private final EdxFileOnboardingService edxFileOnboardingService;
+
   private final CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator;
 
   @Getter(PRIVATE)
@@ -63,7 +64,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
 
   private static final SagaDataMapper SAGA_DATA_MAPPER = SagaDataMapper.mapper;
 
-  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator, EdxUserPayloadValidator edxUserPayLoadValidator, CreateSchoolSagaPayloadValidator createSchoolSagaPayloadValidator) {
+  public EdxSagaController(EdxActivationCodeSagaDataPayloadValidator edxActivationCodeSagaDataPayLoadValidator, SagaService sagaService, List<Orchestrator> orchestrators, SecureExchangePayloadValidator secureExchangePayloadValidator, SecureExchangeCommentSagaValidator secureExchangeCommentSagaValidator, CreateSecureExchangeSagaPayloadValidator createSecureExchangeSagaPayloadValidator, EdxUserPayloadValidator edxUserPayLoadValidator, CreateSchoolSagaPayloadValidator createSchoolSagaPayloadValidator, EdxFileOnboardingService edxFileOnboardingService) {
     this.edxActivationCodeSagaDataPayLoadValidator = edxActivationCodeSagaDataPayLoadValidator;
     this.sagaService = sagaService;
     this.secureExchangePayloadValidator = secureExchangePayloadValidator;
@@ -71,6 +72,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
     this.createSecureExchangeSagaPayloadValidator = createSecureExchangeSagaPayloadValidator;
     this.edxUserPayLoadValidator = edxUserPayLoadValidator;
     this.createSchoolSagaPayloadValidator = createSchoolSagaPayloadValidator;
+    this.edxFileOnboardingService = edxFileOnboardingService;
     orchestrators.forEach(orchestrator -> this.orchestratorMap.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.orchestratorMap.keySet()));
   }
@@ -131,6 +133,15 @@ public class EdxSagaController implements EdxSagaEndpoint {
   @Override
   public ResponseEntity<String> moveSchool(MoveSchoolData moveSchoolData) {
     return this.processMoveSchoolSaga(MOVE_SCHOOL_SAGA, moveSchoolData);
+  }
+
+  @Override
+  public OnboardingFileProcessResponse processOnboardingFile(OnboardingFileUpload fileUpload) {
+    List<SagaEntity> sagaEntities = this.edxFileOnboardingService.processOnboardingFile(Base64.getDecoder().decode(fileUpload.getFileContents()), fileUpload.getCreateUser());
+    sagaEntities.forEach(sagaEntity -> processServicesSaga(sagaEntity.getSagaName().equals(ONBOARD_SCHOOL_USER_SAGA.toString()) ? ONBOARD_SCHOOL_USER_SAGA : ONBOARD_DISTRICT_USER_SAGA, sagaEntity));
+    OnboardingFileProcessResponse response = new OnboardingFileProcessResponse();
+    response.setProcessedCount(Integer.toString(sagaEntities.size()));
+    return response;
   }
 
   private ResponseEntity<String> processNewSchoolSaga(SagaEnum sagaName, CreateSchoolSagaData newSchoolSagaData) {

@@ -20,6 +20,7 @@ public enum EventType {
   REMOVE_USER_DISTRICT_ACCESS,
   CREATE_PERSONAL_ACTIVATION_CODE,
   CREATE_SCHOOL_PRIMARY_CODE,
+  CREATE_DISTRICT_PRIMARY_CODE,
   /**
    * Send edx user activation email event type.
    */
@@ -65,6 +66,7 @@ public enum EventType {
   // Create/move School Events
   CREATE_SCHOOL,
   UPDATE_SCHOOL,
+  FIND_SCHOOL,
   COPY_USERS_TO_NEW_SCHOOL,
   GET_PAGINATED_SCHOOLS,
   MOVE_SCHOOL,

@@ -4,10 +4,12 @@ import ca.bc.gov.educ.api.edx.struct.BaseRequest;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * The type Base address.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public abstract class BaseAddress extends BaseRequest {
 

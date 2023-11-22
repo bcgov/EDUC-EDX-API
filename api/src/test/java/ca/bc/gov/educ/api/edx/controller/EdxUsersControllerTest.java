@@ -2788,5 +2788,4 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     return entity;
   }
 
-
 }
