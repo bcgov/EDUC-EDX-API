@@ -924,7 +924,8 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
     Map<String, School> schoolMap = new ConcurrentHashMap<>();
     schoolMap.put("12345678", createFakeSchool(UUID.randomUUID().toString(), "12345678"));
     schoolMap.put("98765432", createFakeSchool(UUID.randomUUID().toString(), "98765432"));
-
+    Map<String, District> districtMap = new ConcurrentHashMap<>();
+    Mockito.when(this.restUtils.getDistrictNumberMap()).thenReturn(districtMap);
     Mockito.when(this.restUtils.getSchoolMincodeMap()).thenReturn(schoolMap);
     final FileInputStream fis = new FileInputStream("src/test/resources/edx-onboading-sample.csv");
     final String fileContents = Base64.getEncoder().encodeToString(IOUtils.toByteArray(fis));
