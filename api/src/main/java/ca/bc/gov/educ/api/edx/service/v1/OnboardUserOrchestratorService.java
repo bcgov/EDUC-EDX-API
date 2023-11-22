@@ -3,10 +3,8 @@ package ca.bc.gov.educ.api.edx.service.v1;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
 import ca.bc.gov.educ.api.edx.repository.EdxActivationCodeRepository;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,8 +33,7 @@ public class OnboardUserOrchestratorService {
     EdxActivationCodeRepository edxActivationCodeRepository,
     EdxUsersService service,
     EmailProperties emailProperties,
-    EmailNotificationService emailNotificationService,
-    RestUtils restUtils
+    EmailNotificationService emailNotificationService
   ) {
     this.sagaService = sagaService;
     this.edxActivationCodeRepository = edxActivationCodeRepository;
@@ -95,7 +92,7 @@ public class OnboardUserOrchestratorService {
     UUID districtId = sagaData.getDistrictID();
 
     Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
-      edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(districtId);
+      edxActivationCodeRepository.findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrueAndSchoolIDIsNull(districtId);
     final String recipient = (sagaData.getFirstName()
       + " " + sagaData.getLastName()).trim();
 

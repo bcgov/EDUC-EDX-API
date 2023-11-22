@@ -9,9 +9,9 @@ import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
-import ca.bc.gov.educ.api.edx.struct.v1.OnboardSchoolUserSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.OnboardDistrictUserSagaData;
+import ca.bc.gov.educ.api.edx.struct.v1.District;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.RequestUtil;
 import org.junit.jupiter.api.AfterEach;
@@ -66,12 +66,12 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
   RestUtils restUtils;
 
   @Autowired
-  OnboardSchoolUserOrchestrator orchestrator;
+  OnboardDistrictUserOrchestrator orchestrator;
 
   @Autowired
   EdxActivationCodeRepository edxActivationCodeRepository;
 
-  private School mockInstituteSchool;
+  private District mockDistrict;
 
   @Captor
   ArgumentCaptor<byte[]> eventCaptor;
@@ -80,7 +80,7 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
   @BeforeEach
   public void before() {
-    this.mockInstituteSchool = this.createMockSchoolFromInstitute();
+    this.mockDistrict = this.createMockDistrict();
   }
 
   @AfterEach
@@ -91,7 +91,7 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
   @Test
   void testSendPrimaryCode_GivenEventAndSaga_sagaShouldSendAPrimaryCodeToUser()
   throws TimeoutException, IOException, InterruptedException {
-    final OnboardSchoolUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
+    final OnboardDistrictUserSagaData mockData = createMockOnboardUserSagaData(this.mockDistrict);
     SagaEntity saga = this.saveMockSaga(mockData);
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
@@ -120,7 +120,7 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
   @Test
   void testCreatePersonalCodeForUser_GivenEventAndSaga_sagaShouldGenerateCode() throws IOException, InterruptedException, TimeoutException {
-    final OnboardSchoolUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
+    final OnboardDistrictUserSagaData mockData = createMockOnboardUserSagaData(this.mockDistrict);
     SagaEntity saga = this.saveMockSaga(mockData);
     createRoleAndPermissionData(this.edxPermissionRepository, this.edxRoleRepository);
 
@@ -143,10 +143,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
   @Test
   void testSendEdxUserActivationEmail_GivenEventAndSaga_sagaShouldSendEmail() throws IOException, InterruptedException, TimeoutException {
-    final OnboardSchoolUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
+    final OnboardDistrictUserSagaData mockData = createMockOnboardUserSagaData(this.mockDistrict);
     List<String> roles = List.of("EDX_DISTRICT_ADMIN");
-    mockData.setSchoolID(UUID.fromString(this.mockInstituteSchool.getSchoolId()));
-    mockData.setSchoolName(this.mockInstituteSchool.getDisplayName());
     mockData.setEdxActivationRoleCodes(roles);
     mockData.setEdxActivationCodeId(UUID.randomUUID().toString());
     mockData.setValidationCode("FEDCBA");
@@ -157,49 +155,42 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-            .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
-            .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
-            .sagaId(saga.getSagaId())
-            .eventPayload(getJsonString(mockData))
-            .build();
+      .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
+      .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
+      .sagaId(saga.getSagaId())
+      .eventPayload(getJsonString(mockData))
+      .build();
     this.orchestrator.handleEvent(event);
 
     verify(this.messagePublisher, atMost(invocations + 2))
             .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
-    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL);
-    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL);
+    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT);
   }
 
-  private OnboardSchoolUserSagaData createMockOnboardUserSagaData(School school) {
-    OnboardSchoolUserSagaData sagaData = new OnboardSchoolUserSagaData();
+  private OnboardDistrictUserSagaData createMockOnboardUserSagaData(District district) {
+    OnboardDistrictUserSagaData sagaData = new OnboardDistrictUserSagaData();
     RequestUtil.setAuditColumnsForCreate(sagaData);
-    sagaData.setSchoolID(UUID.fromString(school.getSchoolId()));
-    sagaData.setMincode(school.getMincode());
+    sagaData.setDistrictID(UUID.fromString(district.getDistrictId()));
+    sagaData.setMincode(district.getDistrictNumber());
     sagaData.setFirstName("First Name");
     sagaData.setLastName("Last Name");
     sagaData.setEmail("test@test.com");
-    sagaData.setSchoolName(school.getDisplayName());
+    sagaData.setDistrictName(district.getDisplayName());
     return sagaData;
   }
 
-  private School createMockSchoolFromInstitute() {
-    School school = new School();
-    school.setSchoolNumber("12345");
-    school.setMincode("12312345");
-    school.setDisplayName("School Name");
-    school.setOpenedDate(LocalDateTime.now().minusDays(1).withNano(0).toString());
-    school.setSchoolCategoryCode("PUBLIC");
-    school.setSchoolOrganizationCode("TWO_SEM");
-    school.setSchoolReportingRequirementCode("REGULAR");
-    school.setFacilityTypeCode("DISTONLINE");
-    school.setWebsite("abc@sd99.edu");
-    school.setCreateUser("TEST");
-    school.setUpdateUser("TEST");
-    school.setDistrictId(UUID.randomUUID().toString());
-    school.setSchoolId(UUID.randomUUID().toString());
-    return school;
+  private District createMockDistrict() {
+    District district = new District();
+    district.setDistrictNumber("123");
+    district.setDisplayName("District Name");
+    district.setWebsite("abc@sd99.edu");
+    district.setCreateUser("TEST");
+    district.setUpdateUser("TEST");
+    district.setDistrictId(UUID.randomUUID().toString());
+    return district;
   }
 
   private void tearDown() {
@@ -211,10 +202,10 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
     this.edxPermissionRepository.deleteAll();
   }
 
-  private SagaEntity saveMockSaga(OnboardSchoolUserSagaData mockSaga) {
+  private SagaEntity saveMockSaga(OnboardDistrictUserSagaData mockSaga) {
     MockitoAnnotations.openMocks(this);
     try {
-      SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.ONBOARD_SCHOOL_USER_SAGA), mockSaga);
+      SagaEntity sagaEntity = SAGA_DATA_MAPPER.toModel(String.valueOf(SagaEnum.ONBOARD_DISTRICT_USER_SAGA), mockSaga);
       return this.sagaService.createSagaRecordInDB(sagaEntity);
     } catch (Exception e) {
       throw new SagaRuntimeException(e);

@@ -66,8 +66,8 @@ public class OnboardDistrictUserOrchestrator extends DistrictUserActivationBaseO
       .begin(CREATE_DISTRICT_PRIMARY_CODE, this::createPrimaryCode)
       .step(CREATE_DISTRICT_PRIMARY_CODE, DISTRICT_PRIMARY_CODE_CREATED, SEND_PRIMARY_ACTIVATION_CODE, this::sendPrimaryCode)
       .step(SEND_PRIMARY_ACTIVATION_CODE, PRIMARY_ACTIVATION_CODE_SENT, CREATE_PERSONAL_ACTIVATION_CODE, this::createPersonalActivationCode)
-      .step(CREATE_PERSONAL_ACTIVATION_CODE, PERSONAL_ACTIVATION_CODE_CREATED, SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, this::sendEdxUserActivationEmail)
-      .end(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL, EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+      .step(CREATE_PERSONAL_ACTIVATION_CODE, PERSONAL_ACTIVATION_CODE_CREATED, SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL, this::sendEdxUserActivationEmail)
+      .end(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL, EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT);
   }
 
   public void createPrimaryCode(Event event, SagaEntity saga, OnboardDistrictUserSagaData sagaData) throws JsonProcessingException {
@@ -79,8 +79,8 @@ public class OnboardDistrictUserOrchestrator extends DistrictUserActivationBaseO
     this.orchestratorService.createPrimaryActivationCode(sagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(CREATE_SCHOOL_PRIMARY_CODE)
-      .eventOutcome(SCHOOL_PRIMARY_CODE_CREATED)
+      .eventType(CREATE_DISTRICT_PRIMARY_CODE)
+      .eventOutcome(DISTRICT_PRIMARY_CODE_CREATED)
       .replyTo(getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
