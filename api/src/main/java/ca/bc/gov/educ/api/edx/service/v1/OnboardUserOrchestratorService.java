@@ -49,7 +49,12 @@ public class OnboardUserOrchestratorService {
     edxPrimaryActivationCode.setSchoolID(schoolId);
     RequestUtil.setAuditColumnsForCreate(edxPrimaryActivationCode);
 
-    this.service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, schoolId.toString(), edxPrimaryActivationCode);
+    Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
+      edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schoolId);
+
+    if (edxActivationCodeEntity.isEmpty()) {
+      this.service.generateOrRegeneratePrimaryEdxActivationCode(SCHOOL, schoolId.toString(), edxPrimaryActivationCode);
+    }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -59,7 +64,12 @@ public class OnboardUserOrchestratorService {
     edxPrimaryActivationCode.setDistrictID(districtId);
     RequestUtil.setAuditColumnsForCreate(edxPrimaryActivationCode);
 
-    this.service.generateOrRegeneratePrimaryEdxActivationCode(DISTRICT, districtId.toString(), edxPrimaryActivationCode);
+    Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
+      edxActivationCodeRepository.findEdxActivationCodeEntitiesByDistrictIDAndIsPrimaryTrueAndSchoolIDIsNull(districtId);
+
+    if (edxActivationCodeEntity.isEmpty()) {
+      this.service.generateOrRegeneratePrimaryEdxActivationCode(DISTRICT, districtId.toString(), edxPrimaryActivationCode);
+    }
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
