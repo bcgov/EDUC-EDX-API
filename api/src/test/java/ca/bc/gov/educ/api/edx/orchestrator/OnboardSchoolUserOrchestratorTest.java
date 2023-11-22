@@ -141,8 +141,6 @@ class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
   void testSendEdxUserActivationEmail_GivenEventAndSaga_sagaShouldSendEmail() throws IOException, InterruptedException, TimeoutException {
     final OnboardSchoolUserSagaData mockData = createMockOnboardUserSagaData(this.mockInstituteSchool);
     List<String> roles = List.of("EDX_SCHOOL_ADMIN");
-    mockData.setSchoolID(UUID.fromString(this.mockInstituteSchool.getSchoolId()));
-    mockData.setSchoolName(this.mockInstituteSchool.getDisplayName());
     mockData.setEdxActivationRoleCodes(roles);
     mockData.setEdxActivationCodeId(UUID.randomUUID().toString());
     mockData.setValidationCode("FEDCBA");
@@ -153,11 +151,11 @@ class OnboardSchoolUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-            .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
-            .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
-            .sagaId(saga.getSagaId())
-            .eventPayload(getJsonString(mockData))
-            .build();
+      .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
+      .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
+      .sagaId(saga.getSagaId())
+      .eventPayload(getJsonString(mockData))
+      .build();
     this.orchestrator.handleEvent(event);
 
     verify(this.messagePublisher, atMost(invocations + 2))
