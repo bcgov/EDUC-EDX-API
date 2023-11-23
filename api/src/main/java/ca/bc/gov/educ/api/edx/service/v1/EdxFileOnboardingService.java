@@ -116,6 +116,7 @@ public class EdxFileOnboardingService {
       payload.setFirstName(onboardingFileRow.getFirstName());
       payload.setLastName(onboardingFileRow.getLastName());
       payload.setEmail(onboardingFileRow.getEmail());
+      payload.setMincode(onboardingFileRow.getMincode());
       payload.setSchoolID(schoolID);
       builder.sagaName(ONBOARD_SCHOOL_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
@@ -124,6 +125,7 @@ public class EdxFileOnboardingService {
       payload.setFirstName(onboardingFileRow.getFirstName());
       payload.setLastName(onboardingFileRow.getLastName());
       payload.setEmail(onboardingFileRow.getEmail());
+      payload.setMincode(onboardingFileRow.getMincode());
       payload.setDistrictID(districtID);
       builder.sagaName(ONBOARD_DISTRICT_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
