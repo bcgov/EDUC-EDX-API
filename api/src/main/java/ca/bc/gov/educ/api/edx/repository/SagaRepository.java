@@ -23,7 +23,7 @@ public interface SagaRepository extends JpaRepository<SagaEntity, UUID> {
    * @param statuses the statuses
    * @return the list
    */
-  List<SagaEntity> findAllByStatusIn(List<String> statuses);
+  List<SagaEntity> findTop10ByStatusInOrderByCreateDate(List<String> statuses);
 
   /**
    * Find all by create date before list.

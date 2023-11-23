@@ -59,7 +59,7 @@ public class EventTaskScheduler {
   @SchedulerLock(name = "EXTRACT_UNCOMPLETED_SAGAS",
     lockAtLeastFor = "${scheduled.jobs.extract.uncompleted.sagas.cron.lockAtLeastFor}", lockAtMostFor = "${scheduled.jobs.extract.uncompleted.sagas.cron.lockAtMostFor}")
   public void findAndProcessUncompletedSagas() {
-    final List<SagaEntity> sagas = this.getSagaRepository().findAllByStatusIn(this.getStatusFilters());
+    final List<SagaEntity> sagas = this.getSagaRepository().findTop10ByStatusInOrderByCreateDate(this.getStatusFilters());
     if (!sagas.isEmpty()) {
       this.processUncompletedSagas(sagas);
     }
