@@ -78,8 +78,7 @@ public class OnboardUserOrchestratorService {
 
     Optional<EdxActivationCodeEntity> edxActivationCodeEntity =
       edxActivationCodeRepository.findEdxActivationCodeEntitiesBySchoolIDAndIsPrimaryTrueAndDistrictIDIsNull(schoolId);
-    final String recipient = (sagaData.getFirstName()
-      + " " + sagaData.getLastName()).trim();
+    final String recipient = (sagaData.getFirstName() + " " + sagaData.getLastName()).trim();
 
     EmailNotification emailNotification = EmailNotification.builder()
       .fromEmail(this.emailProperties.getEdxSchoolUserActivationInviteEmailFrom())

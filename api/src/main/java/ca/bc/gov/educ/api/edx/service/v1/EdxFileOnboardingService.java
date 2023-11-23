@@ -75,7 +75,7 @@ public class EdxFileOnboardingService {
           var district = districtMap.get(onboardingFileRow.getMincode());
           if (district != null) {
             log.info("Writing onboarding saga record for district number :: " + onboardingFileRow.getMincode());
-            var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, UUID.fromString(district.getDistrictId()), null);
+            var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, UUID.fromString(district.getDistrictId()), null, district.getDisplayName());
             sagaEntities.add(sagaService.createSagaRecord(sagaRecord));
           } else {
             log.info("Skipped district code :: " + onboardingFileRow.getMincode() + " :: no district was found in the cache containing this value");
@@ -84,7 +84,7 @@ public class EdxFileOnboardingService {
           var school = schoolMap.get(onboardingFileRow.getMincode());
           if (school != null) {
             log.info("Writing onboarding saga record for school mincode :: " + onboardingFileRow.getMincode());
-            var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, null, UUID.fromString(school.getSchoolId()));
+            var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, null, UUID.fromString(school.getSchoolId()), school.getDisplayName());
             sagaEntities.add(sagaService.createSagaRecord(sagaRecord));
           } else {
             log.info("Skipped school mincode :: " + onboardingFileRow.getMincode() + " :: no school was found in the cache containing this value");
@@ -97,7 +97,7 @@ public class EdxFileOnboardingService {
     return sagaEntities;
   }
 
-  private SagaEntity prepareSagaRecord(final OnboardingFileRow onboardingFileRow, final String createUser, UUID districtID, UUID schoolID) throws JsonProcessingException {
+  private SagaEntity prepareSagaRecord(final OnboardingFileRow onboardingFileRow, final String createUser, UUID districtID, UUID schoolID, String displayName) throws JsonProcessingException {
     SagaEntityBuilder builder = SagaEntity.builder()
       .createUser(createUser)
       .updateUser(createUser)
@@ -116,6 +116,7 @@ public class EdxFileOnboardingService {
       payload.setLastName(onboardingFileRow.getLastName());
       payload.setEmail(onboardingFileRow.getEmail());
       payload.setMincode(onboardingFileRow.getMincode());
+      payload.setSchoolName(displayName);
       payload.setSchoolID(schoolID);
       builder.sagaName(ONBOARD_SCHOOL_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
@@ -125,6 +126,7 @@ public class EdxFileOnboardingService {
       payload.setLastName(onboardingFileRow.getLastName());
       payload.setEmail(onboardingFileRow.getEmail());
       payload.setMincode(onboardingFileRow.getMincode());
+      payload.setDistrictName(displayName);
       payload.setDistrictID(districtID);
       builder.sagaName(ONBOARD_DISTRICT_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
