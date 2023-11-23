@@ -42,7 +42,7 @@ public class OnboardUserOrchestratorService {
     this.emailNotificationService = emailNotificationService;
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.REQUIRED)
   public void createPrimaryActivationCode(OnboardSchoolUserSagaData sagaData) {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();
     UUID schoolId = sagaData.getSchoolID();
@@ -57,7 +57,7 @@ public class OnboardUserOrchestratorService {
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.REQUIRED)
   public void createPrimaryActivationCode(OnboardDistrictUserSagaData sagaData) {
     EdxPrimaryActivationCode edxPrimaryActivationCode = new EdxPrimaryActivationCode();
     UUID districtId = sagaData.getDistrictID();
@@ -72,7 +72,7 @@ public class OnboardUserOrchestratorService {
     }
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.REQUIRED)
   public void sendPrimaryActivationCodeNotification(OnboardSchoolUserSagaData sagaData) {
     UUID schoolId = sagaData.getSchoolID();
 
@@ -96,7 +96,7 @@ public class OnboardUserOrchestratorService {
     this.emailNotificationService.sendEmail(emailNotification);
   }
 
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Transactional(propagation = Propagation.REQUIRED)
   public void sendPrimaryActivationCodeNotification(OnboardDistrictUserSagaData sagaData) {
     UUID districtId = sagaData.getDistrictID();
 
