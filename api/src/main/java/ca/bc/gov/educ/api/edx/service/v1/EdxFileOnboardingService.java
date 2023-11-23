@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.edx.service.v1;
 
-import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EdxRuntimeException;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity.SagaEntityBuilder;
@@ -14,8 +13,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.opencsv.bean.CsvToBeanBuilder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -77,6 +74,7 @@ public class EdxFileOnboardingService {
         if (onboardingFileRow.getMincode().length() < 4) {
           var district = districtMap.get(onboardingFileRow.getMincode());
           if (district != null) {
+            log.info("Writing onboarding saga record for district number :: " + onboardingFileRow.getMincode());
             var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, UUID.fromString(district.getDistrictId()), null);
             sagaEntities.add(sagaService.createSagaRecord(sagaRecord));
           } else {
@@ -85,6 +83,7 @@ public class EdxFileOnboardingService {
         } else {
           var school = schoolMap.get(onboardingFileRow.getMincode());
           if (school != null) {
+            log.info("Writing onboarding saga record for school mincode :: " + onboardingFileRow.getMincode());
             var sagaRecord = prepareSagaRecord(onboardingFileRow, createUser, null, UUID.fromString(school.getSchoolId()));
             sagaEntities.add(sagaService.createSagaRecord(sagaRecord));
           } else {
