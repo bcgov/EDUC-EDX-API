@@ -139,8 +139,8 @@ public class EdxSagaController implements EdxSagaEndpoint {
   public OnboardingFileProcessResponse processOnboardingFile(OnboardingFileUpload fileUpload) {
     List<SagaEntity> sagaEntities = this.edxFileOnboardingService.processOnboardingFile(Base64.getDecoder().decode(fileUpload.getFileContents()), fileUpload.getCreateUser());
     log.info("Number of onboarded sagas stored is: " + sagaEntities.size());
-    List<SagaEntity> first10Sagas = sagaEntities.stream().limit(10).toList();
-    first10Sagas.forEach(sagaEntity -> startServicesSaga(sagaEntity.getSagaName().equals(ONBOARD_SCHOOL_USER_SAGA.toString()) ? ONBOARD_SCHOOL_USER_SAGA : ONBOARD_DISTRICT_USER_SAGA, sagaEntity));
+    List<SagaEntity> first100Sagas = sagaEntities.stream().limit(100).toList();
+    first100Sagas.forEach(sagaEntity -> startServicesSaga(sagaEntity.getSagaName().equals(ONBOARD_SCHOOL_USER_SAGA.toString()) ? ONBOARD_SCHOOL_USER_SAGA : ONBOARD_DISTRICT_USER_SAGA, sagaEntity));
     OnboardingFileProcessResponse response = new OnboardingFileProcessResponse();
     response.setProcessedCount(Integer.toString(sagaEntities.size()));
     return response;
