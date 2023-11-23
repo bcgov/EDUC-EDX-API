@@ -139,7 +139,7 @@ public class EdxSagaController implements EdxSagaEndpoint {
   public OnboardingFileProcessResponse processOnboardingFile(OnboardingFileUpload fileUpload) {
     List<SagaEntity> sagaEntities = this.edxFileOnboardingService.processOnboardingFile(Base64.getDecoder().decode(fileUpload.getFileContents()), fileUpload.getCreateUser());
     log.info("Number of onboarded sagas stored is: " + sagaEntities.size());
-    sagaEntities.forEach(sagaEntity -> processServicesSaga(sagaEntity.getSagaName().equals(ONBOARD_SCHOOL_USER_SAGA.toString()) ? ONBOARD_SCHOOL_USER_SAGA : ONBOARD_DISTRICT_USER_SAGA, sagaEntity));
+    sagaEntities.forEach(sagaEntity -> startServicesSaga(sagaEntity.getSagaName().equals(ONBOARD_SCHOOL_USER_SAGA.toString()) ? ONBOARD_SCHOOL_USER_SAGA : ONBOARD_DISTRICT_USER_SAGA, sagaEntity));
     OnboardingFileProcessResponse response = new OnboardingFileProcessResponse();
     response.setProcessedCount(Integer.toString(sagaEntities.size()));
     return response;
@@ -236,6 +236,16 @@ public class EdxSagaController implements EdxSagaEndpoint {
         .createSaga(sagaEntity);
       orchestrator.startSaga(saga);
       return ResponseEntity.status(HttpStatus.ACCEPTED).body(saga.getSagaId().toString());
+    } catch (final Exception e) {
+      throw new SagaRuntimeException(e.getMessage());
+    }
+  }
+
+  private void startServicesSaga(final SagaEnum sagaName, SagaEntity sagaEntity) {
+    try {
+      this.getOrchestratorMap()
+              .get(sagaName.toString())
+              .startSaga(sagaEntity);
     } catch (final Exception e) {
       throw new SagaRuntimeException(e.getMessage());
     }
