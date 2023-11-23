@@ -21,10 +21,10 @@ public class OnboardingFileRow {
     private String schoolOrDistrictName;
 
     @CsvBindByPosition(position = 2)
-    private String firstName;
+    private String lastName;
 
     @CsvBindByPosition(position = 3)
-    private String lastName;
+    private String firstName;
 
     @CsvBindByPosition(position = 4)
     private String email;
