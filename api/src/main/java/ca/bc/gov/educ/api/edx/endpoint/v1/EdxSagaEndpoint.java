@@ -109,7 +109,6 @@ public interface EdxSagaEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_WRITE_ACTIVATION_CODE')")
   @PostMapping("onboarding-file")
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
-  @Transactional
   @Tag(name = "Endpoint to Upload an excel file and convert to json structure.", description = "Endpoint to upload an onboarding CSV file")
   @Schema(name = "OnboardingFileUpload", implementation = OnboardingFileUpload.class)
   OnboardingFileProcessResponse processOnboardingFile(@Validated @RequestBody OnboardingFileUpload fileUpload);
