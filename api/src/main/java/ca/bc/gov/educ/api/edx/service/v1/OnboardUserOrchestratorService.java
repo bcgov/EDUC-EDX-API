@@ -107,7 +107,7 @@ public class OnboardUserOrchestratorService {
       .fromEmail(this.emailProperties.getEdxSchoolUserActivationInviteEmailFrom())
       .toEmail(sagaData.getEmail())
       .subject(this.emailProperties.getEdxSecureExchangePrimaryCodeNotificationEmailSubject())
-      .templateName("edx.school.primary-code.notification")
+      .templateName("edx.district.primary-code.notification")
       .emailFields(Map.of(
         "recipient", recipient,
         "minCode", sagaData.getMincode(),
