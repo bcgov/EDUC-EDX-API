@@ -388,6 +388,7 @@ public class EdxUsersService {
     } else {
       activationCodes = edxActivationCodeRepository.findEdxActivationCodeByActivationCodeInAndDistrictID(acCodes, edxActivateUser.getDistrictID());
     }
+    validateIncomingActivationCodeTypes(edxActivateUser, activationCodes);
     if (!CollectionUtils.isEmpty(activationCodes) && activationCodes.size() == 2) {
       EdxActivationCodeEntity userCodeEntity = validateExpiryAndSetEdxUserIdForPersonalActivationCode(edxActivateUser, activationCodes);
 
@@ -395,6 +396,16 @@ public class EdxUsersService {
       return activateUser(edxActivateUser, userCodeEntity);
     } else {
       throw new EntityNotFoundException(EdxActivationCode.class, EDX_ACTIVATION_CODE_ID, edxActivateUser.getPrimaryEdxCode());
+    }
+  }
+
+  private void validateIncomingActivationCodeTypes(EdxActivateUser user, List<EdxActivationCodeEntity> activationCodes){
+    for (val activationCode : activationCodes) {
+      if((activationCode.getIsPrimary() && !activationCode.getActivationCode().equalsIgnoreCase(user.getPrimaryEdxCode())) ||
+              (!activationCode.getIsPrimary() && !activationCode.getActivationCode().equalsIgnoreCase(user.getPersonalActivationCode()))){
+        ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid code provided.").status(BAD_REQUEST).build();
+        throw new InvalidPayloadException(error);
+      }
     }
   }
 

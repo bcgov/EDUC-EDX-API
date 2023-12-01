@@ -1100,7 +1100,25 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
       .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxUserSchoolRoleID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
+  }
 
+  @Test
+  void testEdxActivateUsers_GivenValidInput_UserIsCreated_WithBadRequestResponse() throws Exception {
+    UUID validationCode = UUID.randomUUID();
+    UUID schoolID = UUID.randomUUID();
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, schoolID);
+    EdxActivateUser edxActivateUser = new EdxActivateUser();
+    edxActivateUser.setSchoolID(schoolID);
+    edxActivateUser.setPersonalActivationCode("ABCDE");
+    edxActivateUser.setPrimaryEdxCode("WXYZ");
+    edxActivateUser.setDigitalId(UUID.randomUUID().toString());
+    String activateUserJson = getJsonString(edxActivateUser);
+    val resultActions = this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(activateUserJson)
+            .accept(MediaType.APPLICATION_JSON)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+    resultActions.andDo(print()).andExpect(status().isBadRequest());
   }
 
   @Test
