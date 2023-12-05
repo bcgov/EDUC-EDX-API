@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.edx.endpoint.v1;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeContactTypeCode;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
-import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStatusCode;
+import ca.bc.gov.educ.api.edx.struct.v1.*;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -108,17 +105,11 @@ public interface SecureExchangeEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "204", description = "NO CONTENT"), @ApiResponse(responseCode = "404", description = "NOT FOUND."), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   ResponseEntity<Void> deleteById(@PathVariable UUID id);
 
-  /**
-   * Claim all secure exchanges provided
-   *
-   * @param secureExchangeIDs the secure exchange IDs
-   * @return the response entity
-   */
   @PostMapping(URL.CLAIM_ALL)
   @PreAuthorize("hasAuthority('SCOPE_WRITE_SECURE_EXCHANGE')")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR.")})
   @Tag(name = "Endpoint to claim all secure exchanges provided by ID.", description = "Endpoint to claim all secure exchanges provided by ID.")
-  ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(@RequestParam List<UUID> secureExchangeIDs, @RequestParam String reviewer);
+  ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(@Validated @RequestBody SecureExchangeClaimRequest claimRequest);
 
   /**
    * Find all completable future.

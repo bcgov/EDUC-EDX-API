@@ -120,6 +120,17 @@ public class SecureExchangeController extends BaseController implements SecureEx
     }
   }
 
+  private void validatePayload(SecureExchangeClaimRequest claimRequest) {
+    for(String possibleUUID: claimRequest.getSecureExchangeIDs()){
+      try {
+        UUID.fromString(possibleUUID);
+      }catch (Exception e){
+        ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Payload contains invalid secure exchange ID.").status(BAD_REQUEST).build();
+        throw new InvalidPayloadException(error);
+      }
+    }
+  }
+
   @Override
   @Transactional
   public ResponseEntity<Void> deleteById(final UUID id) {
@@ -128,9 +139,11 @@ public class SecureExchangeController extends BaseController implements SecureEx
   }
 
   @Override
-  public ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(List<UUID> secureExchangeIDs, String reviewer) {
-    getService().claimAllSecureExchanges(secureExchangeIDs, reviewer);
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<List<SecureExchange>> claimAllSecureExchanges(SecureExchangeClaimRequest secureExchangeClaimRequest) {
+    validatePayload(secureExchangeClaimRequest);
+    setAuditColumns(secureExchangeClaimRequest);
+    var savedExchanges = getService().claimAllSecureExchanges(secureExchangeClaimRequest);
+    return ResponseEntity.ok(savedExchanges.stream().map(mapper::toStructure).collect(Collectors.toList()));
   }
 
   @Override

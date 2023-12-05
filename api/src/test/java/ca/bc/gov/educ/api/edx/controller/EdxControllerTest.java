@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SearchCriteria;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeClaimRequest;
 import ca.bc.gov.educ.api.edx.struct.v1.ValueType;
 import ca.bc.gov.educ.api.edx.support.DocumentBuilder;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
@@ -189,26 +190,57 @@ class EdxControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
-  void testClaimSecureExchange_ShouldReturnStatusNoContent() throws Exception {
+  void testClaimSecureExchange_ShouldReturnStatusOk() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+    List<String> exchangeList = new ArrayList<>();
+    exchangeList.add(entity.getSecureExchangeID().toString());
+    SecureExchangeClaimRequest request = new SecureExchangeClaimRequest();
+    request.setSecureExchangeIDs(exchangeList);
+    request.setReviewer("TESTMIN");
 
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL).param(
-           "secureExchangeIDs", new String[]{String.valueOf(entity.getSecureExchangeID())}).param("reviewer", "TESTMIN")
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
-      .contentType(APPLICATION_JSON)
-      .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                    .contentType(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .content(asJsonString(request)))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(1)));;
   }
 
   @Test
-  void testClaimSecureExchanges_ShouldReturnStatusNoContent() throws Exception {
+  void testClaimSecureExchanges_ShouldReturnStatusOk() throws Exception {
     final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
     final SecureExchangeEntity entity2 = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+    List<String> exchangeList = new ArrayList<>();
+    exchangeList.add(entity.getSecureExchangeID().toString());
+    exchangeList.add(entity2.getSecureExchangeID().toString());
+    SecureExchangeClaimRequest request = new SecureExchangeClaimRequest();
+    request.setSecureExchangeIDs(exchangeList);
+    request.setReviewer("TESTMIN");
 
-    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL).param(
-                    "secureExchangeIDs", new String[]{String.valueOf(entity.getSecureExchangeID()), String.valueOf(entity2.getSecureExchangeID())}).param("reviewer", "TESTMIN")
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
-      .contentType(APPLICATION_JSON)
-      .accept(APPLICATION_JSON)).andDo(print()).andExpect(status().isNoContent());
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL)
+            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+            .contentType(APPLICATION_JSON)
+            .accept(APPLICATION_JSON)
+            .content(asJsonString(request)))
+            .andDo(print()).andExpect(status().isOk()).andExpect(jsonPath("$", hasSize(2)));;
+  }
+
+  @Test
+  void testClaimSecureExchanges_ShouldReturnStatusBadRequest() throws Exception {
+    final SecureExchangeEntity entity = this.repository.save(mapper.toModel(this.getSecureExchangeEntityFromJsonString()));
+    List<String> exchangeList = new ArrayList<>();
+    exchangeList.add(entity.getSecureExchangeID().toString());
+    exchangeList.add("ABCD");
+    SecureExchangeClaimRequest request = new SecureExchangeClaimRequest();
+    request.setSecureExchangeIDs(exchangeList);
+    request.setReviewer("TESTMIN");
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + URL.CLAIM_ALL)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE")))
+                    .contentType(APPLICATION_JSON)
+                    .accept(APPLICATION_JSON)
+                    .content(asJsonString(request)))
+            .andDo(print()).andExpect(status().isBadRequest());;
   }
 
   @Test

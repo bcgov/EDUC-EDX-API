@@ -3,6 +3,8 @@ package ca.bc.gov.educ.api.edx.controller;
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 public abstract class BaseEdxControllerTest extends BaseEdxAPITest {
 
@@ -59,13 +61,21 @@ public abstract class BaseEdxControllerTest extends BaseEdxAPITest {
 
   protected SecureExchange getSecureExchangeEntityFromJsonString() {
     try {
-      System.out.println(this.dummySecureExchangeJson());
       return new ObjectMapper().readValue(this.dummySecureExchangeJson(), SecureExchange.class);
     } catch (final Exception e) {
       throw new RuntimeException(e);
     }
   }
 
+  public static String asJsonString(final Object obj) {
+    try {
+      ObjectMapper om = new ObjectMapper();
+      om.registerModule(new JavaTimeModule()).configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+      return om.writeValueAsString(obj);
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
 
   protected SecureExchange getSecureExchangeEntityFromJsonStringNoCreateUpdateDate() {

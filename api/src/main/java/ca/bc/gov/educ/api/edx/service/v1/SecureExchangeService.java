@@ -5,10 +5,12 @@ import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity;
-import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
+import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeClaimRequest;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -110,23 +111,25 @@ public class SecureExchangeService {
   }
 
   @Transactional
-  public void claimAllSecureExchanges(final List<UUID> secureExchangeIds, String reviewer) {
-    for(final UUID secureExchangeId : secureExchangeIds) {
-      final Optional<SecureExchangeEntity> curSecureExchange = this.getSecureExchangeRequestRepository().findById(secureExchangeId);
+  public List<SecureExchangeEntity> claimAllSecureExchanges(final SecureExchangeClaimRequest secureExchangeClaimRequest) {
+    List<SecureExchangeEntity> savedEntities = new ArrayList<>();
+    for(final String secureExchangeId : secureExchangeClaimRequest.getSecureExchangeIDs()) {
+      final Optional<SecureExchangeEntity> curSecureExchange = this.getSecureExchangeRequestRepository().findById(UUID.fromString(secureExchangeId));
       if (curSecureExchange.isPresent()) {
         final SecureExchangeEntity secureExchange = curSecureExchange.get();
-        if(StringUtils.isNotEmpty(reviewer)) {
-          secureExchange.setReviewer(reviewer);
-          secureExchange.setUpdateUser(reviewer);
+        if(StringUtils.isNotEmpty(secureExchangeClaimRequest.getReviewer())) {
+          secureExchange.setReviewer(secureExchangeClaimRequest.getReviewer());
+          secureExchange.setUpdateUser(secureExchangeClaimRequest.getReviewer());
         }else{
           secureExchange.setReviewer(null);
-          secureExchange.setUpdateUser(ApplicationProperties.CLIENT_ID);
+          secureExchange.setUpdateUser(secureExchangeClaimRequest.getUpdateUser());
         }
         secureExchange.setUpdateDate(LocalDateTime.now());
 
-        this.secureExchangeRequestRepository.save(secureExchange);
+        savedEntities.add(this.secureExchangeRequestRepository.save(secureExchange));
       }
     }
+    return savedEntities;
   }
 
   /**
