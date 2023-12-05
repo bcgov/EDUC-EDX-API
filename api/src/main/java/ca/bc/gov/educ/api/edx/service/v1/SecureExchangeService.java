@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeContactTypeCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStatusCodeEntity;
+import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
@@ -114,9 +115,15 @@ public class SecureExchangeService {
       final Optional<SecureExchangeEntity> curSecureExchange = this.getSecureExchangeRequestRepository().findById(secureExchangeId);
       if (curSecureExchange.isPresent()) {
         final SecureExchangeEntity secureExchange = curSecureExchange.get();
-        secureExchange.setReviewer(reviewer);
+        if(StringUtils.isNotEmpty(reviewer)) {
+          secureExchange.setReviewer(reviewer);
+          secureExchange.setUpdateUser(reviewer);
+        }else{
+          secureExchange.setReviewer(null);
+          secureExchange.setUpdateUser(ApplicationProperties.CLIENT_ID);
+        }
         secureExchange.setUpdateDate(LocalDateTime.now());
-        secureExchange.setUpdateUser(reviewer);
+
         this.secureExchangeRequestRepository.save(secureExchange);
       }
     }
