@@ -81,7 +81,7 @@ public class EdxUsersService {
 
   private static final String EDX_USER_DISTRICT_ID="edxUserDistrictID";
 
-  private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS");
+  private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS", "FED_BAND");
 
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
