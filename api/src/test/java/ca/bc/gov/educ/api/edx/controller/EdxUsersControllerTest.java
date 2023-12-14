@@ -1466,6 +1466,30 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .andExpect(content().string("\"SCHOOL\""));
 
     this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string("\"SCHOOL\""));
+
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string("\"SCHOOL\""));
+
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonString)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(content().string("\"SCHOOL\""));
+
+    this.mockMvc.perform(post(URL.BASE_URL_USERS + "/activation-code/url")
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
@@ -1476,7 +1500,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   @Test
   void testUpdateIsUrlClicked_GivenValidationLinkIsAlreadyClicked_WillReturnErrorResponse() throws Exception {
     UUID validationCode = UUID.randomUUID();
-    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,2, UUID.randomUUID());
+    this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode,5, UUID.randomUUID());
     EdxActivationCode edxActivationCode = new EdxActivationCode();
     edxActivationCode.setValidationCode(validationCode.toString());
     String jsonString = getJsonString(edxActivationCode);
