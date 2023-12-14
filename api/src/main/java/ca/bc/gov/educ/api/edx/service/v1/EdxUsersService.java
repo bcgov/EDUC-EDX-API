@@ -26,9 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -755,7 +753,7 @@ public class EdxUsersService {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("Invalid Link Provided").status(BAD_REQUEST).build();
       throw new InvalidPayloadException(error);
     }
-    if (activationCodeEntities.stream().anyMatch(el -> el.getNumberOfClicks() >= 2)) {
+    if (activationCodeEntities.stream().anyMatch(el -> el.getNumberOfClicks() >= 5)) {
       ApiError error = ApiError.builder().timestamp(LocalDateTime.now()).message("This User Activation Link has already expired").status(GONE).build();
       throw new InvalidPayloadException(error);
     }
