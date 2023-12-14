@@ -118,6 +118,7 @@ public class EdxFileOnboardingService {
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setSchoolName(displayName);
       payload.setSchoolID(schoolID);
+      payload.getEdxActivationRoleCodes().addAll(this.allowedSchoolRoles());
       builder.sagaName(ONBOARD_SCHOOL_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
     } else {
@@ -128,11 +129,30 @@ public class EdxFileOnboardingService {
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setDistrictName(displayName);
       payload.setDistrictID(districtID);
+      payload.getEdxActivationRoleCodes().addAll(this.allowedDistrictRoles());
       builder.sagaName(ONBOARD_DISTRICT_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
     }
 
     return builder.build();
+  }
+
+  private List<String> allowedDistrictRoles() {
+    List<String> districtRoles = new ArrayList<>();
+    districtRoles.add("EDX_DISTRICT_ADMIN");
+    districtRoles.add("SECURE_EXCHANGE_DISTRICT");
+    districtRoles.add("EDX_EDIT_DISTRICT");
+
+    return districtRoles;
+  }
+
+  private List<String> allowedSchoolRoles() {
+    List<String> schoolRoles = new ArrayList<>();
+    schoolRoles.add("EDX_SCHOOL_ADMIN");
+    schoolRoles.add("SECURE_EXCHANGE_SCHOOL");
+    schoolRoles.add("EDX_EDIT_SCHOOL");
+
+    return schoolRoles;
   }
 
 }
