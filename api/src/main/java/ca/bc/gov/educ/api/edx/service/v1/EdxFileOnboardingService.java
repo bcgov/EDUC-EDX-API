@@ -118,7 +118,7 @@ public class EdxFileOnboardingService {
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setSchoolName(displayName);
       payload.setSchoolID(schoolID);
-      payload.getEdxActivationRoleCodes().addAll(this.allowedSchoolRoles());
+      payload.setEdxActivationRoleCodes(this.allowedSchoolRoles());
       builder.sagaName(ONBOARD_SCHOOL_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
     } else {
@@ -129,7 +129,7 @@ public class EdxFileOnboardingService {
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setDistrictName(displayName);
       payload.setDistrictID(districtID);
-      payload.getEdxActivationRoleCodes().addAll(this.allowedDistrictRoles());
+      payload.setEdxActivationRoleCodes(this.allowedDistrictRoles());
       builder.sagaName(ONBOARD_DISTRICT_USER_SAGA.toString());
       builder.payload(JsonUtil.getJsonStringFromObject(payload));
     }
