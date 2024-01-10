@@ -24,7 +24,7 @@ import static org.springframework.http.HttpStatus.*;
  * The interface EDX Users.
  */
 @RequestMapping(URL.BASE_URL_USERS)
-@OpenAPIDefinition(info = @Info(title = "API for EDX user management.", description = "This CRUD API is for EDX user management.", version = "1"), security = {@SecurityRequirement(name = "bearer-key")})
+@OpenAPIDefinition(info = @Info(title = "API for EDX user management.", description = "This CRUD API is for EDX user management.", version = "1"), security = {@SecurityRequirement(name = "OAUTH2", scopes = {"READ_MINISTRY_TEAMS"})})
 public interface EdxUsersEndpoint {
 
   /**
