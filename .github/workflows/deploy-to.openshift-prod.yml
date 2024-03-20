@@ -36,7 +36,7 @@ env:
   TAG: "latest"
   TARGET_ENV: "prod"
   MIN_REPLICAS: "3"
-  MAX_REPLICAS: "3"
+  MAX_REPLICAS: "5"
   MIN_CPU: "200m"
   MAX_CPU: "400m"
   MIN_MEM: "800Mi"
