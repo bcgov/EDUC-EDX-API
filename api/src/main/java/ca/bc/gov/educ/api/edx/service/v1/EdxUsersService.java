@@ -238,12 +238,9 @@ public class EdxUsersService {
     }
   }
 
-  public EdxUserSchoolEntity updateEdxUserSchool(UUID edxUserID, EdxUserSchoolEntity edxUserSchoolEntity) {
-    val entityOptional = getEdxUserRepository().findById(edxUserID);
-    val userEntity = entityOptional.orElseThrow(() -> new EntityNotFoundException(EdxUserEntity.class, EDX_USER_ID, edxUserID.toString()));
-
+  public EdxUserSchoolEntity updateEdxUserSchool(EdxUserSchoolEntity edxUserSchoolEntity) {
     //check for school
-    val optionalSchool = getEdxUserSchoolsRepository().findEdxUserSchoolEntitiesBySchoolIDAndEdxUserEntity(edxUserSchoolEntity.getSchoolID(), userEntity);
+    val optionalSchool = getEdxUserSchoolsRepository().findById(edxUserSchoolEntity.getEdxUserSchoolID());
     if (optionalSchool.isPresent()) {
       EdxUserSchoolEntity currentEdxUserSchoolEntity = optionalSchool.get();
       logUpdatesEdxUserSchool(currentEdxUserSchoolEntity, edxUserSchoolEntity);

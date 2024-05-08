@@ -164,7 +164,7 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   public EdxUserSchool updateEdxUserSchool(UUID id, EdxUserSchool edxUserSchool) {
     validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserSchoolPayload(id, edxUserSchool, false));
     RequestUtil.setAuditColumnsForUpdate(edxUserSchool);
-    return USER_SCHOOL_MAPPER.toStructure(getService().updateEdxUserSchool(id, USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
+    return USER_SCHOOL_MAPPER.toStructure(getService().updateEdxUserSchool(USER_SCHOOL_MAPPER.toModel(edxUserSchool)));
   }
 
   @Override
