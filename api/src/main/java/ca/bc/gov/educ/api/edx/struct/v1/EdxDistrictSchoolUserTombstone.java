@@ -13,6 +13,8 @@ public class EdxDistrictSchoolUserTombstone implements Serializable {
 
   String edxUserID;
 
+  String edxUserSchoolID;
+
   String digitalIdentityID;
 
   String fullName;
