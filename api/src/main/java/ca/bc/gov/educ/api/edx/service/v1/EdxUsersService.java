@@ -173,6 +173,7 @@ public class EdxUsersService {
       var edxUserEntity = edxUserSchoolEntity.getEdxUserEntity();
       tomb.setEdxUserID(edxUserEntity.getEdxUserID().toString());
       tomb.setEdxUserSchoolID(edxUserSchoolEntity.getEdxUserSchoolID().toString());
+      tomb.setExpiryDate(edxUserSchoolEntity.getExpiryDate().toString());
       tomb.setDigitalIdentityID(edxUserEntity.getDigitalIdentityID().toString());
       tomb.setEmail(edxUserEntity.getEmail());
       tomb.setFullName(edxUserEntity.getFirstName() + " " + edxUserEntity.getLastName());

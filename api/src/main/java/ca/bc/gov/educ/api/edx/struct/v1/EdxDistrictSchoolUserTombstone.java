@@ -17,6 +17,8 @@ public class EdxDistrictSchoolUserTombstone implements Serializable {
 
   String digitalIdentityID;
 
+  String expiryDate;
+
   String fullName;
 
   private List<String> schoolRoles;
