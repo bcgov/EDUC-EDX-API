@@ -179,6 +179,7 @@ public class EdxUsersService {
       tomb.setFullName(edxUserEntity.getFirstName() + " " + edxUserEntity.getLastName());
       var rolesMap = getEdxRolesMap();
       tomb.setSchoolRoles(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().stream().map(edxSchool -> rolesMap.get(edxSchool.getEdxRoleCode()).getLabel()).toList());
+      tomb.setSchoolRoleCodes(edxUserSchoolEntity.getEdxUserSchoolRoleEntities().stream().map(edxSchool -> rolesMap.get(edxSchool.getEdxRoleCode()).getEdxRoleCode()).toList());
 
       edxSchools.get(schoolID).getEdxDistrictSchoolUsers().add(tomb);
     });

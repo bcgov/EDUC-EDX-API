@@ -23,6 +23,8 @@ public class EdxDistrictSchoolUserTombstone implements Serializable {
 
   private List<String> schoolRoles;
 
+  private List<String> schoolRoleCodes;
+
   String email;
 }
 
