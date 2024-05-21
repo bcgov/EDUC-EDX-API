@@ -45,7 +45,7 @@ public interface EdxUsersEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping(URL.USER_SCHOOLS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<String> findAllEdxUserSchoolIDs(@RequestParam(name = "permissionCode") String permissionCode);
+  List<String> findAllEdxUserSchoolIDs(@RequestParam(name = "permissionCode", required = false) String permissionCode);
 
   /**
    * Retrieves user district ID by permission code
@@ -55,7 +55,7 @@ public interface EdxUsersEndpoint {
   @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
   @GetMapping(URL.USER_DISTRICTS)
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
-  List<String> findAllEdxUserDistrictIDs(@RequestParam(name = "permissionCode") String permissionCode);
+  List<String> findAllEdxUserDistrictIDs(@RequestParam(name = "permissionCode", required = false) String permissionCode);
 
   /**
    * Retrieve edx user.

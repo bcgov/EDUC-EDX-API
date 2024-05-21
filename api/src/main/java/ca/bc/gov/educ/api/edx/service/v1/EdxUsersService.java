@@ -114,7 +114,12 @@ public class EdxUsersService {
   }
 
   public List<String> getEdxUserSchoolsList(String permissionCode) {
-    List<EdxUserSchoolEntity> schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
+    List<EdxUserSchoolEntity> schoolIDBytes;
+    if(permissionCode != null) {
+      schoolIDBytes = this.getEdxUserSchoolsRepository().findSchoolsByPermission(permissionCode);
+    }else{
+      schoolIDBytes = this.getEdxUserSchoolsRepository().findAll();
+    }
     return schoolIDBytes.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
   }
 
@@ -128,7 +133,12 @@ public class EdxUsersService {
   }
 
   public List<String> getEdxUserDistrictsList(String permissionCode) {
-    List<EdxUserDistrictEntity> districtIDs = edxUserDistrictRepository.findDistrictsByPermission(permissionCode);
+    List<EdxUserDistrictEntity> districtIDs;
+    if(permissionCode != null) {
+      districtIDs = edxUserDistrictRepository.findDistrictsByPermission(permissionCode);
+    }else{
+      districtIDs = edxUserDistrictRepository.findAll();
+    }
     return districtIDs.stream().map(district -> district.getDistrictID().toString()).distinct().toList();
   }
 
