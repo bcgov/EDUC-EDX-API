@@ -133,10 +133,30 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
+  void testFindAllEdxUserSchoolIDs_GivenNoPermissionName_ShouldReturnOkStatusAndSchoolIDs() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOLS)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$.[0]", is(entity.getEdxUserSchoolEntities().iterator().next().getSchoolID().toString())));
+  }
+
+  @Test
   void testFindAllEdxUserDistrictIDs_GivenValidPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
                     .param("permissionCode", "SECURE_EXCHANGE")
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .andDo(print()).andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$.[0]", is(entity.getEdxUserDistrictEntities().iterator().next().getDistrictID().toString())));
+  }
+
+  @Test
+  void testFindAllEdxUserDistrictIDs_GivenNoPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+    this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
                     .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
