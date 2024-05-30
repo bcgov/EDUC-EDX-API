@@ -107,14 +107,14 @@ public class EdxFileOnboardingService {
       .districtID(districtID)
       .createDate(LocalDateTime.now())
       .updateDate(LocalDateTime.now())
-      .emailId(onboardingFileRow.getEmail())
+      .emailId(StringUtils.deleteWhitespace(onboardingFileRow.getEmail()))
       .sagaCompensated(false);
 
     if (districtID == null) {
       OnboardSchoolUserSagaData payload = new OnboardSchoolUserSagaData();
       payload.setFirstName(onboardingFileRow.getFirstName());
       payload.setLastName(onboardingFileRow.getLastName());
-      payload.setEmail(onboardingFileRow.getEmail());
+      payload.setEmail(StringUtils.deleteWhitespace(onboardingFileRow.getEmail()));
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setSchoolName(displayName);
       payload.setSchoolID(schoolID);
@@ -125,7 +125,7 @@ public class EdxFileOnboardingService {
       OnboardDistrictUserSagaData payload = new OnboardDistrictUserSagaData();
       payload.setFirstName(onboardingFileRow.getFirstName());
       payload.setLastName(onboardingFileRow.getLastName());
-      payload.setEmail(onboardingFileRow.getEmail());
+      payload.setEmail(StringUtils.deleteWhitespace(onboardingFileRow.getEmail()));
       payload.setMincode(onboardingFileRow.getMincode());
       payload.setDistrictName(displayName);
       payload.setDistrictID(districtID);
