@@ -871,7 +871,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
-  void testCreateSchool_GivenNoInitialUserAndIndependentOffshoreCategory_ShouldReturnBadRequest() throws Exception {
+  void testCreateSchool_GivenNoInitialUserAndIndependentOffshoreCategory_ShouldReturnOk() throws Exception {
     School school = createDummySchool();
     school.setSchoolCategoryCode("INDEPEND");
 
@@ -883,7 +883,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
       .content(getJsonString(sagaData))
       .accept(MediaType.APPLICATION_JSON)
       .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
-      .andDo(print()).andExpect(status().isBadRequest());
+      .andDo(print()).andExpect(status().isAccepted());
   }
 
   @Test
