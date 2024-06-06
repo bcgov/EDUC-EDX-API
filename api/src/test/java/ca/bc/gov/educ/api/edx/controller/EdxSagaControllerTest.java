@@ -868,7 +868,7 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(getJsonString(sagaData))
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
             .andDo(print()).andExpect(status().isBadRequest());
   }
 
