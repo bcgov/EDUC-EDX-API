@@ -851,6 +851,28 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
   }
 
   @Test
+  void testCreateSchool_GivenInvalidPayload_ShouldReturnStatusBadRequest() throws Exception {
+    School school = createDummySchool();
+    school.setSchoolCategoryCode("OFFSHORE");
+    var addresses = new ArrayList<SchoolAddress>();
+    addresses.add(createSchoolAddress(school.getSchoolId(),"MAILING"));
+    addresses.add(createSchoolAddress(school.getSchoolId(),"PHYSICAL"));
+    school.setAddresses(addresses);
+    EdxUser user = createDummyUser();
+
+    CreateSchoolSagaData sagaData = new CreateSchoolSagaData();
+    sagaData.setSchool(school);
+    sagaData.setInitialEdxUser(user);
+
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/create-school-saga")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(getJsonString(sagaData))
+                    .accept(MediaType.APPLICATION_JSON)
+                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "CREATE_SCHOOL_SAGA"))))
+            .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void testCreateSchool_GivenInvalidEdxUser_ShouldReturnBadRequest() throws Exception {
     School school = createDummySchool();
     EdxUser user = createDummyUser();
@@ -1014,6 +1036,14 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
     return user;
   }
 
+  private SchoolAddress createSchoolAddress(String schoolID, String addressTypeCode) {
+    SchoolAddress schoolAddress = new SchoolAddress();
+    schoolAddress.setSchoolId(schoolID);
+    schoolAddress.setAddressTypeCode(addressTypeCode);
+    schoolAddress.setCreateUser("TEST");
+    schoolAddress.setUpdateUser("TEST");
+    return schoolAddress;
+  }
   private SchoolGrade createSchoolGrade() {
     SchoolGrade schoolGrade = new SchoolGrade();
     schoolGrade.setSchoolGradeCode("01");
