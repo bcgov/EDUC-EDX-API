@@ -197,6 +197,12 @@ public class EdxUsersService {
     return edxSchools.values().stream().toList();
   }
 
+  public Set<String> findSchool1701EdxUserEmails(List<String> schoolIDs) {
+    List<UUID> schoolUUIDs = schoolIDs.stream().map(UUID::fromString).toList();
+
+    return this.getEdxUserRepository().findEdxUserEmailBySchoolIDsAndRole(schoolUUIDs, 'SCHOOL_SDC');
+  }
+
   public EdxUserEntity createEdxUser(EdxUserEntity edxUserEntity) {
 
     mapEdxUserSchoolAndRole(edxUserEntity);

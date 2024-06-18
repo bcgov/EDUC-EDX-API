@@ -72,4 +72,27 @@ public interface EdxUserRepository extends JpaRepository<EdxUserEntity, UUID>, E
     "                        AND ES.DISTRICT_ID = :districtID)", nativeQuery = true)
   Set<String> findEdxUserNamesByDistrictIDAndPermissionCode(UUID districtID, String permissionCode);
 
+  @Query(value = " SELECT DISTINCT EMAIL\n" +
+          "FROM EDX_USER\n" +
+          "WHERE EDX_USER_ID IN (SELECT EUS.EDX_USER_ID\n" +
+          "                      FROM EDX_USER_SCHOOL EUS,\n" +
+          "                           EDX_USER_SCHOOL_ROLE EUSR,\n" +
+          "                           EDX_ROLE ER,\n" +
+          "                      WHERE EUSR.EDX_ROLE_CODE = ER.EDX_ROLE_CODE\n" +
+          "                        AND EUS.EDX_USER_SCHOOL_ID = EUSR.EDX_USER_SCHOOL_ID\n" +
+          "                        AND ER.EDX_ROLE_CODE = :roleCode\n" +
+          "                        AND EUS.SCHOOL_ID IN(:schoolIDs))", nativeQuery = true)
+  Set<String> findEdxUserEmailBySchoolIDsAndRole(List<UUID> schoolIDs, String roleCode)
+
+  @Query(value = " SELECT DISTINCT EMAIL\n" +
+          "FROM EDX_USER\n" +
+          "WHERE EDX_USER_ID IN (SELECT EUD.EDX_USER_ID\n" +
+          "                      FROM EDX_USER_DISTRICT EUD,\n" +
+          "                           EDX_USER_DISTRICT_ROLE EUDR,\n" +
+          "                           EDX_ROLE ER,\n" +
+          "                      WHERE EUDR.EDX_ROLE_CODE = ER.EDX_ROLE_CODE\n" +
+          "                        AND EUD.EDX_USER_SCHOOL_ID = EUDR.EDX_USER_SCHOOL_ID\n" +
+          "                        AND ER.EDX_ROLE_CODE = :roleCode\n" +
+          "                        AND EUD.DISTRICT_ID IN(:districtIDs))", nativeQuery = true)
+  Set<String> findEdxUserEmailByDistrictIDsAndRole(List<UUID> districtIDs, String roleCode)
 }

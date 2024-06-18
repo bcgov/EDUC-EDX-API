@@ -91,6 +91,9 @@ public interface EdxUsersEndpoint {
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
   List<EdxSchool> findAllDistrictEdxUsers(@PathVariable String districtID);
 
+  @PreAuthorize("hasAuthority('SCOPE_READ_EDX_USERS')")
+  @GetMapping()
+
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
