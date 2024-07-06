@@ -187,7 +187,7 @@ jobs:
   deploy-test:
     name: Deploy to OpenShift TEST
     needs: build-and-deploy-dev
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     environment: test
 
     outputs:
