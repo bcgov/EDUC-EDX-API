@@ -412,7 +412,7 @@ EMAIL_TEMPLATE_EDX_SCHOOL_PRIMARY_CODE_NOTIFICATION_LITERAL="<!DOCTYPE html><htm
 
 EMAIL_TEMPLATE_EDX_DISTRICT_PRIMARY_CODE_NOTIFICATION_LITERAL="<!DOCTYPE html><html xmlns:th=\"http://www.thymeleaf.org\"><head><meta charset=\"ISO-8859-1\"><title>Primary Activation Code</title></head><body><p>Hi <span th:text=\"\${\$}{recipient}\"></span>,</p><p>Here is the EDX Primary Activation Code for <span th:text=\"\${\$}{minCode}\"></span> - <span th:text=\"\${\$}{instituteName}\"></span>: <span th:text=\"\${\$}{primaryCode}\"></span></p><p>Once you have activated your EDX District Account Manager account, you will be able to grant access to others. You will find your district’s Primary Activation Code from your dashboard by clicking Menu, Administration, District User Management.</p><br><b>The EDX Team</b><br>Ministry of Education and Child Care<br>educationdataexchange@gov.bc.ca</body></html>"
 
-ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT,EDX_EDIT_SCHOOL,EDX_EDIT_DISTRICT,SCHOOL_SDC,DISTRICT_SDC,SUPERINT,SECR_TRES"
+ROLES_ALLOW_LIST="EDX_DISTRICT_ADMIN,EDX_SCHOOL_ADMIN,STUDENT_DATA_COLLECTION,SECURE_EXCHANGE_SCHOOL,SECURE_EXCHANGE_DISTRICT,EDX_EDIT_SCHOOL,EDX_EDIT_DISTRICT,SCHOOL_SDC,DISTRICT_SDC,SUPERINT,SECR_TRES,DIS_SDC_RO,SCH_SDC_RO"
 
 if [ "$envValue" = "prod" ]
 then
