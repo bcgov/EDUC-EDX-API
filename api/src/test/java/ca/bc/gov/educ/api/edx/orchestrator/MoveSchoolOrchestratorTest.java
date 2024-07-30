@@ -15,7 +15,6 @@ import ca.bc.gov.educ.api.edx.service.v1.SagaService;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -51,7 +49,13 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     private EdxUserRepository edxUserRepository;
 
     @Autowired
+    private EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
+
+    @Autowired
     private EdxUserSchoolRepository edxUserSchoolRepository;
+
+    @Autowired
+    private EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
 
     @Autowired
     private EdxUserDistrictRepository edxUserDistrictRepository;
@@ -95,8 +99,9 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     public void after() {
         sagaEventStateRepository.deleteAll();
         sagaRepository.deleteAll();
+        edxUserDistrictRoleRepository.deleteAll();
+        edxUserSchoolRoleRepository.deleteAll();
         edxUserSchoolRepository.deleteAll();
-
     }
 
     @BeforeEach
@@ -119,7 +124,7 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     }
 
     @Test
-    void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException, InterruptedException, TimeoutException {
+    void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
             .eventType(INITIATED)

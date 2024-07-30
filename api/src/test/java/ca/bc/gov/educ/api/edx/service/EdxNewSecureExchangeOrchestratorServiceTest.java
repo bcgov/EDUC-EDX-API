@@ -7,26 +7,16 @@ import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.props.EmailProperties;
-import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserDistrictRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRoleRepository;
+import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxNewSecureExchangeOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.EdxSecureExchangeCommentOrchestratorService;
 import ca.bc.gov.educ.api.edx.service.v1.EmailNotificationService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreate;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeCreateSagaData;
-
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +25,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
 
-
-@TestInstance(Lifecycle.PER_CLASS)
 class EdxNewSecureExchangeOrchestratorServiceTest extends BaseEdxAPITest {
 
   @Autowired
@@ -67,6 +55,9 @@ class EdxNewSecureExchangeOrchestratorServiceTest extends BaseEdxAPITest {
   EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
 
   @Autowired
+  EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
+
+  @Autowired
   EdxPermissionRepository edxPermissionRepository;
 
   @Autowired
@@ -78,27 +69,21 @@ class EdxNewSecureExchangeOrchestratorServiceTest extends BaseEdxAPITest {
   @Captor
   private ArgumentCaptor<String> emailBodyCaptor;
 
-  @BeforeAll
-  public void beforeAll() {
-    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
-  }
-
-  @AfterAll
-  public void afterAll() {
-    this.edxRoleRepository.deleteAll();
-    this.edxPermissionRepository.deleteAll();
-  }
-
   @BeforeEach
   public void setUp() {
     openMocks(this);
     doNothing().when(this.restUtils).sendEmail(any(), any(), any(), any());
+    this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
   }
 
   @AfterEach
   public void tearDown() {
+    this.edxUserDistrictRoleRepository.deleteAll();
+    this.edxUserSchoolRoleRepository.deleteAll();
     this.edxUserSchoolRepository.deleteAll();
     this.edxUserDistrictRepository.deleteAll();
+    this.edxRoleRepository.deleteAll();
+    this.edxPermissionRepository.deleteAll();
   }
 
   @Test

@@ -1,26 +1,23 @@
 package ca.bc.gov.educ.api.edx.schedulers;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserDistrictMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserMapper;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxUserSchoolMapper;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserDistrictEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
-import ca.bc.gov.educ.api.edx.repository.EdxUserDistrictRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
-import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
+import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxUser;
 import net.javacrumbs.shedlock.core.LockAssert;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class EdxUserSchedulerTest extends BaseEdxAPITest {
   @Autowired
@@ -33,6 +30,12 @@ class EdxUserSchedulerTest extends BaseEdxAPITest {
   private EdxUserRepository userRepository;
 
   @Autowired
+  EdxUserSchoolRoleRepository edxUserSchoolRoleRepository;
+
+  @Autowired
+  EdxUserDistrictRoleRepository edxUserDistrictRoleRepository;
+
+  @Autowired
   private EdxUserScheduler scheduler;
 
   private EdxUserSchoolMapper userSchoolMapper = EdxUserSchoolMapper.mapper;
@@ -41,6 +44,8 @@ class EdxUserSchedulerTest extends BaseEdxAPITest {
 
   @BeforeEach
   public void setUp() {
+    this.edxUserDistrictRoleRepository.deleteAll();
+    this.edxUserSchoolRoleRepository.deleteAll();
     this.userSchoolRepository.deleteAll();
     this.userDistrictRepository.deleteAll();
     this.userRepository.deleteAll();
@@ -49,6 +54,8 @@ class EdxUserSchedulerTest extends BaseEdxAPITest {
 
   @AfterEach
   public void tearDown() {
+    this.edxUserDistrictRoleRepository.deleteAll();
+    this.edxUserSchoolRoleRepository.deleteAll();
     this.userSchoolRepository.deleteAll();
     this.userDistrictRepository.deleteAll();
     this.userRepository.deleteAll();
