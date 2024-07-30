@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testRetrieveMinistryTeams_ShouldReturnOkStatus() throws Exception {
     this.ministryOwnershipTeamRepository.save(getMinistryOwnershipTeam());
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.MINISTRY_TEAMS)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_MINISTRY_TEAMS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_MINISTRY_TEAMS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[0].description", is("THISISDESCRIPTION")));
   }
@@ -93,7 +94,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     UUID schoolID = UUID.randomUUID();
     this.createActivationCodeTableDataForSchoolUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, schoolID);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.INVITATIONS + "?instituteType=SCHOOL")
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)));
   }
@@ -106,7 +107,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     UUID districtID2 = UUID.randomUUID();
     this.createActivationCodeTableDataForDistrictUser(this.edxActivationCodeRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxActivationRoleRepository, true,validationCode, 2, districtID2);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.INVITATIONS + "?instituteType=DISTRICT")
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(2)));
   }
@@ -115,7 +116,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testRetrieveUsers_GivenValidID_ShouldReturnOkStatus() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/" + entity.getEdxUserID().toString())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.edxUserSchools[0].edxUserSchoolRoles[0].edxRoleCode", is("EDX_SCHOOL_ADMIN")))
       .andExpect(jsonPath("$.edxUserDistricts[0].edxUserDistrictRoles[0].edxRoleCode", is("EDX_SCHOOL_ADMIN")));
@@ -126,7 +127,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOLS)
         .param("permissionCode", "SECURE_EXCHANGE")
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", hasSize(1)))
       .andExpect(jsonPath("$.[0]", is(entity.getEdxUserSchoolEntities().iterator().next().getSchoolID().toString())));
@@ -136,7 +137,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUserSchoolIDs_GivenNoPermissionName_ShouldReturnOkStatusAndSchoolIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_SCHOOLS)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$.[0]", is(entity.getEdxUserSchoolEntities().iterator().next().getSchoolID().toString())));
@@ -147,7 +148,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
                     .param("permissionCode", "SECURE_EXCHANGE")
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$.[0]", is(entity.getEdxUserDistrictEntities().iterator().next().getDistrictID().toString())));
@@ -157,7 +158,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindAllEdxUserDistrictIDs_GivenNoPermissionName_ShouldReturnOkStatusAndDistrictIDs() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS + URL.USER_DISTRICTS)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$.[0]", is(entity.getEdxUserDistrictEntities().iterator().next().getDistrictID().toString())));
@@ -169,7 +170,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     UUID digitalIdentityID = entity.getDigitalIdentityID();
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("digitalId", String.valueOf(digitalIdentityID))
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[0].digitalIdentityID", is(digitalIdentityID.toString())));
   }
@@ -211,7 +212,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     List<String> unexpectedSchoolIDs = Arrays.asList(school3.getSchoolId(), school4.getSchoolId());
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/districtSchools/" + districtID)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[*]", hasSize(2)))
       .andExpect(jsonPath("$.[0].schoolID", in(expectedSchoolIDs)))
@@ -228,7 +229,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("firstName",entity.getFirstName())
         .param("lastName", entity.getLastName())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$.[0].firstName", is(entity.getFirstName())));
 
@@ -242,7 +243,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     //should return user with all their schools and districts access.
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS")))
             .param("schoolID", schoolIDList.get(0).toString()))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$.[0].edxUserSchools[0].schoolID", Matchers.is(schoolIDList.get(0).toString())))
@@ -253,7 +254,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$", Matchers.hasSize(1)));
   }
@@ -263,7 +264,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository,
         this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS")))
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS")))
             .param("schoolID", UUID.randomUUID().toString()))
         .andDo(print()).andExpect(status().isOk())
         .andExpect(jsonPath("$", Matchers.hasSize(0)));
@@ -274,7 +275,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     this.mockMvc.perform(get(URL.BASE_URL_USERS)
         .param("digitalId", UUID.randomUUID().toString())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$", Matchers.hasSize(0)));
   }
@@ -287,7 +288,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
   }
@@ -301,7 +302,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USERS"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -315,7 +316,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.message", containsString("digitalIdentityId must be unique")));
   }
@@ -329,7 +330,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID should be null for post operation.")));
 
@@ -344,7 +345,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("firstName")))
       .andExpect(jsonPath("$.subErrors[0].message", is("First Name can have max 255 characters")));
@@ -360,7 +361,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("lastName")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Last Name can have max 255 characters")));
@@ -376,7 +377,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("email")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email address should be a valid email address")));
@@ -392,7 +393,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest())
       .andExpect(jsonPath("$.subErrors[0].field", is("email")))
       .andExpect(jsonPath("$.subErrors[0].message", is("Email cannot be null")));
@@ -408,13 +409,13 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
     val edxUsr = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER"))))
       .andDo(print()).andExpect(status().isNoContent());
 
   }
@@ -423,7 +424,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testDeleteEdxUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}", UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER"))))
       .andDo(print()).andExpect(status().isNotFound());
 
   }
@@ -437,7 +438,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -451,10 +452,10 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
-      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate())))
+      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate().substring(0,19))))
       .andDo(print()).andExpect(status().isCreated());
 
   }
@@ -467,7 +468,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -482,7 +483,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxUserSchoolID should be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -497,7 +498,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -510,7 +511,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -519,7 +520,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
       .andExpect(jsonPath("$.message", is("EdxUser to EdxUserSchool association already exists")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -533,7 +534,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -548,7 +549,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID should not be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -562,7 +563,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -577,7 +578,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID in path and payload edxUserId mismatch.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -592,7 +593,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
         .andDo(print()).andExpect(status().isCreated());
 
@@ -606,7 +607,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUserSchool)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
 
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
         .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
@@ -634,7 +635,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     val resultActions2 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUsrSchool).accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
 
     resultActions2.andExpect(jsonPath("$.edxUserSchoolRoles", hasSize(1))).andDo(print()).andExpect(status().isOk());
 
@@ -644,7 +645,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     val resultActions3 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/school", edxUsr.getEdxUserID())
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonEdxUsrSchoolWithoutRole).accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
 
     resultActions3.andExpect(jsonPath("$.edxUserSchoolRoles", hasSize(0))).andDo(print()).andExpect(status().isOk());
   }
@@ -665,7 +666,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andDo(print()).andExpect(status().isBadRequest());
 
     objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
@@ -675,7 +676,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", UUID.randomUUID(), UUID.randomUUID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound());
 
 
@@ -689,7 +690,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -702,14 +703,14 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
     objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), randomId)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserSchoolEntity was not found for parameters {edxUserSchoolID=" + randomId + "}")));
   }
@@ -723,7 +724,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -736,7 +737,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -744,7 +745,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", randomId, edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxUserEntity was not found for parameters {edxUserID=" + randomId + "}")));
   }
@@ -757,7 +758,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -774,18 +775,18 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", edxUsr.getEdxUserID(), edxUsrSchool.getEdxUserSchoolID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_SCHOOL"))))
       .andDo(print()).andExpect(status().isNoContent());
 
     ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk());
 
     val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
@@ -801,7 +802,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -814,10 +815,10 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
-      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate())))
+      .andExpect(jsonPath("$.expiryDate", is(edxUserSchool.getExpiryDate().substring(0,19))))
       .andDo(print()).andExpect(status().isCreated());
 
     val edxUsrSchool = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserSchool.class);
@@ -838,7 +839,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.edxUserSchoolRoleID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserSchoolID", is(edxUsrSchool.getEdxUserSchoolID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -853,7 +854,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -865,7 +866,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -889,7 +890,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserSchoolRoleID should be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -903,7 +904,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -915,7 +916,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -938,7 +939,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserSchoolId in path and payload mismatch.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -952,7 +953,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -964,7 +965,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -987,7 +988,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.message", is("EdxUserSchoolEntity was not found for parameters {edxUserSchoolId=" + guid + "}")))
       .andDo(print()).andExpect(status().isNotFound());
 
@@ -1001,7 +1002,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -1013,7 +1014,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -1036,7 +1037,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.message", is("This EdxSchoolRole cannot be added for this EdxUser " + guid)))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -1050,7 +1051,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(json)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
 
@@ -1062,7 +1063,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonEdxUserSchool)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL"))));
     resultActions1.andExpect(jsonPath("$.edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -1084,7 +1085,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions2.andExpect(jsonPath("$.edxUserSchoolRoleID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserSchoolID", is(edxUsrSchool.getEdxUserSchoolID())))
       .andDo(print()).andExpect(status().isCreated());
@@ -1093,7 +1094,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonRole)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_SCHOOL_ROLE"))));
     resultActions3.andExpect(jsonPath("$.message", is("EdxUserSchoolRole to EdxUserSchool association already exists")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -1114,7 +1115,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
       .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolRoles", hasSize(1)))
@@ -1137,7 +1138,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(activateUserJson)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -1156,7 +1157,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.message", is("This Activation Code has expired")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -1174,7 +1175,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.message", is("EdxActivationCode was not found for parameters {edxActivationCodeId=" + edxActivateUser.getPrimaryEdxCode() + "}")))
       .andDo(print()).andExpect(status().isNotFound());
 
@@ -1202,7 +1203,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
           )
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNoContent());
   }
   @Test
@@ -1222,7 +1223,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andExpect(jsonPath("$.updateUser", is("ABC")))
       .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
@@ -1252,7 +1253,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
       .andExpect(jsonPath("$.updateUser", is("ABC")))
       .andExpect(jsonPath("$.edxUserSchools.[0].edxUserSchoolID", is(notNullValue())))
@@ -1282,7 +1283,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions
       .andExpect(jsonPath("$.subErrors[0].message", is("SchoolID or DistrictID Information is required for User Activation")))
             .andDo(print()).andExpect(status().isBadRequest());
@@ -1307,7 +1308,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions
       .andExpect(jsonPath("$.subErrors[0].message", is("Either SchoolID or DistrictID Information should be present per User Activation Request")))
             .andDo(print()).andExpect(status().isBadRequest());
@@ -1332,7 +1333,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions
       .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date provided is invalid, should be ISO_LOCAL_DATE_TIME format")))
             .andDo(print()).andExpect(status().isBadRequest());
@@ -1357,7 +1358,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions
       .andExpect(jsonPath("$.subErrors[0].message", is("EDX User expiry date must be in the future")))
             .andDo(print()).andExpect(status().isBadRequest());
@@ -1383,7 +1384,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
 
       .andExpect(jsonPath("$.updateUser", is("ABC")))
@@ -1413,7 +1414,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
 
       .andExpect(jsonPath("$.updateUser", is("ABC")))
@@ -1439,7 +1440,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(activateUserJson)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "ACTIVATE_EDX_USER"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "ACTIVATE_EDX_USER"))))
       .andExpect(jsonPath("$.message", is("This user is already associated to the school")))
       .andDo(print()).andExpect(status().isConflict());
   }
@@ -1455,7 +1456,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string("\"SCHOOL\""));
 
@@ -1473,7 +1474,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string("\"SCHOOL\""));
 
@@ -1481,7 +1482,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(content().string("\"SCHOOL\""));
 
@@ -1489,7 +1490,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonString)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(content().string("\"SCHOOL\""));
 
@@ -1497,7 +1498,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonString)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(content().string("\"SCHOOL\""));
 
@@ -1505,7 +1506,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonString)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
             .andDo(print()).andExpect(status().isOk())
             .andExpect(content().string("\"SCHOOL\""));
 
@@ -1513,7 +1514,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isGone());
   }
 
@@ -1529,7 +1530,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isGone());
 
       resultActions.andExpect(jsonPath("$.message", is("This User Activation Link has already expired")));
@@ -1550,7 +1551,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("This User Activation Link has already expired")))
       .andDo(print()).andExpect(status().isGone());
 
@@ -1568,7 +1569,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
 
     resultActions.andExpect(jsonPath("$.message", is("Invalid Link Provided")));
@@ -1585,7 +1586,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", is(notNullValue())))
       .andExpect(jsonPath("$.edxActivationRoles.[0].edxActivationRoleId", is(notNullValue())))
       .andDo(print()).andExpect(status().isCreated());
@@ -1603,7 +1604,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationCodeId should be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -1623,7 +1624,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationCodeId should be null for post operation.")))
       .andExpect(jsonPath("$.subErrors[1].message", is("edxActivationRoleId should be null for post operation.")))
@@ -1644,7 +1645,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andDo(print()).andExpect(status().isBadRequest());
 
@@ -1661,7 +1662,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(jsonString)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.message", is("Payload contains invalid data.")))
       .andExpect(jsonPath("$.subErrors[0].message", is("edxActivationRoles should be null for post operation.")))
       .andDo(print()).andExpect(status().isBadRequest());
@@ -1676,7 +1677,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+entityList.get(0).getEdxActivationCodeId())
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNoContent());
 
   }
@@ -1689,7 +1690,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/activation-code/"+validationCode)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound())
       .andExpect(jsonPath("$.message", is("EdxActivationCodeEntity was not found for parameters {edxActivationCodeId="+validationCode+"}")));
 
@@ -1700,7 +1701,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + primaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.schoolID", not(emptyOrNullString())))
       .andExpect(jsonPath("$.schoolID", equalTo(primaryActivationCode.getSchoolID().toString())))
       .andExpect(jsonPath("$.districtID", is(nullValue())))
@@ -1714,7 +1715,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity primaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), true, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + primaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.schoolID", is(nullValue())))
       .andExpect(jsonPath("$.districtID", not(emptyOrNullString())))
       .andExpect(jsonPath("$.districtID", equalTo(primaryActivationCode.getDistrictID().toString())))
@@ -1730,7 +1731,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, schoolID));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + secondaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
       .andExpect(jsonPath("$.schoolID", not(emptyOrNullString())))
@@ -1748,7 +1749,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity secondaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, districtID));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + secondaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
       .andExpect(jsonPath("$.schoolID", is(nullValue())))
@@ -1763,7 +1764,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindPrimaryEdxActivationCode_ForSchool_GivenInvalidInput_WillReturnNotFound() throws Exception {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
@@ -1771,7 +1772,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testFindPrimaryEdxActivationCode_ForDistrict_GivenInvalidInput_WillReturnNotFound() throws Exception {
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + UUID.randomUUID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
@@ -1780,7 +1781,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, UUID.randomUUID(), null));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/SCHOOL/" + nonPrimaryActivationCode.getSchoolID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
@@ -1789,7 +1790,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     EdxActivationCodeEntity nonPrimaryActivationCode = this.edxActivationCodeRepository.save(this.createEdxActivationCodeEntity(UUID.randomUUID().toString(), false, true, UUID.randomUUID(), 0, null, UUID.randomUUID()));
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/activation-code/primary/DISTRICT/" + nonPrimaryActivationCode.getDistrictID()).contentType(MediaType.APPLICATION_JSON)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
@@ -1803,7 +1804,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
       .andExpect(jsonPath("$.activationCode", not(equalTo(primaryActivationCode.getActivationCode()))))
       .andDo(print()).andExpect(status().isCreated());
@@ -1818,7 +1819,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.activationCode", not(emptyOrNullString())))
       .andExpect(jsonPath("$.activationCode", not(equalTo(primaryActivationCode.getActivationCode()))))
       .andDo(print()).andExpect(status().isCreated());
@@ -1833,7 +1834,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.schoolID", not(emptyOrNullString())))
       .andExpect(jsonPath("$.schoolID", equalTo(schoolID.toString())))
@@ -1852,7 +1853,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.schoolID", is(nullValue())))
       .andExpect(jsonPath("$.districtID", not(emptyOrNullString())))
@@ -1873,7 +1874,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
       .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
@@ -1897,7 +1898,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", equalTo(primaryActivationCode.getEdxActivationCodeId().toString())))
       .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
@@ -1920,7 +1921,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
       .andExpect(jsonPath("$.schoolID", not(emptyOrNullString())))
@@ -1942,7 +1943,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andExpect(jsonPath("$.edxActivationCodeId", not(emptyOrNullString())))
       .andExpect(jsonPath("$.edxActivationCodeId", not(equalTo(secondaryActivationCode.getEdxActivationCodeId().toString()))))
       .andExpect(jsonPath("$.schoolID", is(nullValue())))
@@ -1963,7 +1964,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -1976,7 +1977,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -1988,7 +1989,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2001,7 +2002,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2015,7 +2016,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2029,7 +2030,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2041,7 +2042,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2053,7 +2054,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
       .contentType(MediaType.APPLICATION_JSON)
       .content(jsonString)
       .accept(MediaType.APPLICATION_JSON)
-      .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
+      .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_PRIMARY_ACTIVATION_CODE"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -2062,7 +2063,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     this.createEdxRoleForSchoolAndDistrict(this.edxRoleRepository, this.edxPermissionRepository);
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(3)))
       .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
@@ -2080,7 +2081,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
         .param("instituteType",InstituteTypeCode.SCHOOL.toString())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(2)))
       .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
@@ -2102,7 +2103,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
         .param("instituteType",InstituteTypeCode.SCHOOL.toString())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(2)))
       .andExpect(jsonPath("$.[0].edxRoleCode", is("SECURE_EXCHANGE_SCHOOL")))
@@ -2118,7 +2119,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     this.mockMvc.perform(get(URL.BASE_URL_USERS + "/roles")
         .param("instituteType", InstituteTypeCode.DISTRICT.toString())
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
       .andDo(print()).andExpect(status().isOk())
       .andExpect(jsonPath("$",  hasSize(1)))
       .andExpect(jsonPath("$.[0].edxRoleCode", is("EDX_DISTRICT_ADMIN")))
@@ -2134,7 +2135,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2150,7 +2151,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andExpect(jsonPath("$.expiryDate", is(edxUserDistrict.getExpiryDate())))
@@ -2166,7 +2167,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2182,7 +2183,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
             .andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictID should be null for post operation.")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2196,7 +2197,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2209,7 +2210,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2218,7 +2219,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
             .andExpect(jsonPath("$.message", is("EdxUser to EdxUserDistrict association already exists")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2232,7 +2233,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2247,7 +2248,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
             .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID should not be null for post operation.")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2261,7 +2262,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2276,7 +2277,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonEdxUserDistrict)
                     .accept(MediaType.APPLICATION_JSON)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))))
             .andExpect(jsonPath("$.subErrors[0].message", is("edxUserID in path and payload edxUserId mismatch.")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2290,7 +2291,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2304,7 +2305,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
 
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
@@ -2332,7 +2333,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     val resultActions2 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUsrDistrict).accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
 
     resultActions2.andExpect(jsonPath("$.edxUserDistrictRoles", hasSize(1))).andDo(print()).andExpect(status().isOk());
 
@@ -2342,7 +2343,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     val resultActions3 = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}" + "/district", edxUsr.getEdxUserID())
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUsrDistrictWithoutRole).accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
 
     resultActions3.andExpect(jsonPath("$.edxUserDistrictRoles", hasSize(0))).andDo(print()).andExpect(status().isOk());
   }
@@ -2351,7 +2352,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   void testDeleteEdxUserDistrict_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", UUID.randomUUID(), UUID.randomUUID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
             .andDo(print()).andExpect(status().isNotFound());
 
 
@@ -2365,7 +2366,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2378,14 +2379,14 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
     objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), randomId)
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
             .andDo(print()).andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", is("EdxUserDistrictEntity was not found for parameters {edxUserDistrictID=" + randomId + "}")));
   }
@@ -2398,7 +2399,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2411,7 +2412,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2419,7 +2420,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     UUID randomId = UUID.randomUUID();
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", randomId, userDistrict.getEdxUserDistrictID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
             .andDo(print()).andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", is("EdxUserEntity was not found for parameters {edxUserID=" + randomId + "}")));
   }
@@ -2432,7 +2433,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2449,18 +2450,18 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
     val userDistrict = objectMapper.readValue(resultActions1.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrict.class);
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/" + "{edxUserDistrictID}", edxUsr.getEdxUserID(), userDistrict.getEdxUserDistrictID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT"))))
             .andDo(print()).andExpect(status().isNoContent());
 
     ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk());
 
     val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
@@ -2475,7 +2476,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2488,7 +2489,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andExpect(jsonPath("$.expiryDate", is(edxUserDistrict.getExpiryDate())))
@@ -2512,7 +2513,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2527,7 +2528,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2539,7 +2540,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2563,7 +2564,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictRoleID should be null for post operation.")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2577,7 +2578,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2589,7 +2590,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2612,7 +2613,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.subErrors[0].message", is("edxUserDistrictId in path and payload mismatch.")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2626,7 +2627,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2638,7 +2639,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2661,7 +2662,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.message", is("EdxUserDistrictEntity was not found for parameters {edxUserDistrictID=" + guid + "}")))
             .andDo(print()).andExpect(status().isNotFound());
 
@@ -2676,7 +2677,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2688,7 +2689,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2711,7 +2712,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.message", is("This EdxUserDistrictRole cannot be added for this EdxUser " + guid)))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2725,7 +2726,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2737,7 +2738,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2759,7 +2760,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2768,7 +2769,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions3.andExpect(jsonPath("$.message", is("EdxUserDistrictRole to EdxUserDistrict association already exists")))
             .andDo(print()).andExpect(status().isBadRequest());
 
@@ -2783,7 +2784,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(json)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
     resultActions.andExpect(jsonPath("$.edxUserID", is(notNullValue())))
             .andDo(print()).andExpect(status().isCreated());
 
@@ -2795,7 +2796,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonEdxUserDistrict)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT"))));
     resultActions1.andExpect(jsonPath("$.edxUserDistrictID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserID", is(edxUsr.getEdxUserID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2817,7 +2818,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRole)
             .accept(MediaType.APPLICATION_JSON)
-            .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
+            .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_DISTRICT_ROLE"))));
     resultActions2.andExpect(jsonPath("$.edxUserDistrictRoleID", is(notNullValue())))
             .andExpect(jsonPath("$.edxUserDistrictID", is(userDistrict.getEdxUserDistrictID())))
             .andDo(print()).andExpect(status().isCreated());
@@ -2825,11 +2826,11 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     val userDistrictRole = objectMapper.readValue(resultActions2.andReturn().getResponse().getContentAsByteArray(), EdxUserDistrictRole.class);
 
    this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/district/role/" + "{edxUserDistrictRoleID}", edxUsr.getEdxUserID(), userDistrictRole.getEdxUserDistrictRoleID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT_ROLE"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "DELETE_EDX_USER_DISTRICT_ROLE"))))
             .andDo(print()).andExpect(status().isNoContent());
 
     ResultActions response = this.mockMvc.perform(get(URL.BASE_URL_USERS + "/{id}", edxUsr.getEdxUserID())
-                    .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))))
+                    .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
             .andDo(print()).andExpect(status().isOk());
     val edxUsrResponse = objectMapper.readValue(response.andReturn().getResponse().getContentAsByteArray(), EdxUser.class);
     Assertions.assertFalse(edxUsrResponse.getEdxUserDistricts().isEmpty());
