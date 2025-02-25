@@ -5,10 +5,12 @@ import ca.bc.gov.educ.api.edx.helpers.LogHelper;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.orchestrator.base.Orchestrator;
 import ca.bc.gov.educ.api.edx.repository.SagaRepository;
+import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -37,6 +39,8 @@ public class EventTaskScheduler {
    */
   @Getter(PRIVATE)
   private final SagaRepository sagaRepository;
+
+  private final EdxUsersService edxUsersService;
   /**
    * The Status filters.
    */
@@ -49,8 +53,9 @@ public class EventTaskScheduler {
    * @param sagaRepository the saga repository
    * @param orchestrators  the orchestrators
    */
-  public EventTaskScheduler(final SagaRepository sagaRepository, final List<Orchestrator> orchestrators) {
+  public EventTaskScheduler(final SagaRepository sagaRepository, final List<Orchestrator> orchestrators, EdxUsersService edxUsersService) {
     this.sagaRepository = sagaRepository;
+    this.edxUsersService = edxUsersService;
     orchestrators.forEach(orchestrator -> this.sagaOrchestrators.put(orchestrator.getSagaName(), orchestrator));
     log.info("'{}' Saga Orchestrators are loaded.", String.join(",", this.sagaOrchestrators.keySet()));
   }
@@ -63,6 +68,13 @@ public class EventTaskScheduler {
     if (!sagas.isEmpty()) {
       this.processUncompletedSagas(sagas);
     }
+  }
+
+  @Scheduled(cron = "${scheduled.jobs.update.user.role.for.closed.school.cron}")
+  @SchedulerLock(name = "UPDATE_USER_ROLE_FOR_CLOSED_SCHOOLS", lockAtLeastFor = "${scheduled.jobs.update.user.role.for.closed.school.cron.lockAtLeastFor}", lockAtMostFor = "${scheduled.jobs.update.user.role.for.closed.school.cron.lockAtMostFor}")
+  public void updateUserRolesForClosedSchools() {
+    LockAssert.assertLocked();
+    edxUsersService.updateUserRolesForClosedSchools();
   }
 
   /**

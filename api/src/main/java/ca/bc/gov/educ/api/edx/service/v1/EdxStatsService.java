@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.model.v1.custom.IStatsSecureExchangeCreatedWithIns
 import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.CountSecureExchangeCreatedWithInstituteByMonth;
 import ca.bc.gov.educ.api.edx.struct.v1.CountSecureExchangesCreatedWithInstituteTypeGroupedByInstitute;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
@@ -93,7 +94,7 @@ public class EdxStatsService {
     List<EdxUserSchoolEntity> listOfUsers = this.edxUserSchoolRepository.findSchoolsByPermission(permissionCode);
     List<String> listOfSchoolsWithExchangeUser = listOfUsers.stream().map(school -> school.getSchoolID().toString()).distinct().toList();
 
-    List<School> schoolList = this.restUtils.getSchools();
+    List<SchoolTombstone> schoolList = this.restUtils.getSchools();
 
     List<SchoolWithoutActiveSecureExchangeUser> schoolWithoutActiveSecureExchangeUserList = new ArrayList<>();
     for (var school : schoolList) {
