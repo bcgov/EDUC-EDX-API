@@ -46,7 +46,7 @@ public class MessageSubscriber {
     this.connection = con;
     eventHandlers.forEach(handler -> {
       this.handlerMap.put(handler.getTopicToSubscribe(), handler);
-      this.subscribeForSAGA(handler.getTopicToSubscribe(), handler);
+      this.subscribe(handler.getTopicToSubscribe(), handler);
     });
   }
 
@@ -56,7 +56,7 @@ public class MessageSubscriber {
    * @param eventHandler the orchestrator
    * @return the message handler
    */
-  private static MessageHandler onMessageForSAGA(final EventHandler eventHandler) {
+  private static MessageHandler onMessage(final EventHandler eventHandler) {
     return (Message message) -> {
       if (message != null) {
         log.info("Message received subject :: {},  replyTo :: {}, subscriptionID :: {}", message.getSubject(), message.getReplyTo(), message.getSID());
@@ -80,10 +80,10 @@ public class MessageSubscriber {
    * @param topic        the topic name
    * @param eventHandler the orchestrator
    */
-  private void subscribeForSAGA(final String topic, final EventHandler eventHandler) {
+  private void subscribe(final String topic, final EventHandler eventHandler) {
     this.handlerMap.computeIfAbsent(topic, k -> eventHandler);
     final String queue = topic.replace("_", "-");
-    final var dispatcher = this.connection.createDispatcher(MessageSubscriber.onMessageForSAGA(eventHandler));
+    final var dispatcher = this.connection.createDispatcher(MessageSubscriber.onMessage(eventHandler));
     dispatcher.subscribe(topic, queue);
   }
 

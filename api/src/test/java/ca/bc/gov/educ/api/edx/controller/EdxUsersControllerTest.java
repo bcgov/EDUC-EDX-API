@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.edx.mappers.v1.EdxRoleMapper;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.EDXUserControllerTestUtils;
 import lombok.val;
@@ -183,19 +184,19 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     schoolIDList1.add(UUID.randomUUID());
     schoolIDList1.add(UUID.randomUUID());
 
-    School school1 = new School();
+    SchoolTombstone school1 = new SchoolTombstone();
     school1.setSchoolCategoryCode("PUBLIC");
     school1.setSchoolId(schoolIDList1.get(0).toString());
 
-    School school2 = new School();
+    SchoolTombstone school2 = new SchoolTombstone();
     school2.setSchoolCategoryCode("PUBLIC");
     school2.setSchoolId(schoolIDList1.get(1).toString());
 
-    School school3 = new School();
+    SchoolTombstone school3 = new SchoolTombstone();
     school3.setSchoolCategoryCode("INDEPEND");
     school3.setSchoolId(schoolIDList1.get(2).toString());
 
-    School school4 = new School();
+    SchoolTombstone school4 = new SchoolTombstone();
     school4.setSchoolCategoryCode("PUBLIC");
     school4.setSchoolId(schoolIDList1.get(3).toString());
     school4.setOpenedDate("1900-01-01T00:00:00");
@@ -203,7 +204,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
     this.createUserEntityWithMultipleSchools(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository, schoolIDList1);
 
-    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtSchoolsMap = new HashMap<String, List<SchoolTombstone>>();
     var districtID = UUID.randomUUID();
     districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3, school4));
     Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
