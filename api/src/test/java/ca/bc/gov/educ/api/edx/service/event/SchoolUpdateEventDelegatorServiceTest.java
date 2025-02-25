@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.event.SchoolUpdateEventDelegatorService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.MockitoAnnotations;
@@ -21,8 +22,12 @@ import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
+import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL;
 import static ca.bc.gov.educ.api.edx.constants.EventType.UPDATE_SCHOOL;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atMost;
+import static org.mockito.Mockito.verify;
 
 public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
 
@@ -41,7 +46,7 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
+    
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsOpen_shouldNotUpdateExpiryDate() throws IOException {
         var sagaId = UUID.randomUUID();
@@ -64,11 +69,11 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         edxUserSchoolRepository.save(userSchoolEntity);
 
         final Event event = Event.builder().eventType(UPDATE_SCHOOL).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleSchoolUpdateEvent(event);
+        schoolUpdateEventDelegatorService.handleEvent(event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
-        assertThat(userSchoolEntityAfterUpdate.size()).isEqualTo(1);
+        assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
     }
 
@@ -94,11 +99,11 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         edxUserSchoolRepository.save(userSchoolEntity);
 
         final Event event = Event.builder().eventType(UPDATE_SCHOOL).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleSchoolUpdateEvent(event);
+        schoolUpdateEventDelegatorService.handleEvent(event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
-        assertThat(userSchoolEntityAfterUpdate.size()).isEqualTo(1);
+        assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
     }
 
@@ -125,11 +130,11 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         edxUserSchoolRepository.save(userSchoolEntity);
 
         final Event event = Event.builder().eventType(UPDATE_SCHOOL).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleSchoolUpdateEvent(event);
+        schoolUpdateEventDelegatorService.handleEvent(event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
-        assertThat(userSchoolEntityAfterUpdate.size()).isEqualTo(1);
+        assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNotNull();
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isEqualTo(schoolCloseDate.plusMonths(3));
     }
