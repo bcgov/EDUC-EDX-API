@@ -22,12 +22,8 @@ import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.edx.constants.EventType.CREATE_SCHOOL;
 import static ca.bc.gov.educ.api.edx.constants.EventType.UPDATE_SCHOOL;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.verify;
 
 public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
 
@@ -46,7 +42,7 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-    
+
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsOpen_shouldNotUpdateExpiryDate() throws IOException {
         var sagaId = UUID.randomUUID();
