@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.edx.constants;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 /**
  * The enum Event type.

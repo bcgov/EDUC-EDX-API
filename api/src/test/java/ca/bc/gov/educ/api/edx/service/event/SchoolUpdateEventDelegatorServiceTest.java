@@ -1,25 +1,17 @@
 package ca.bc.gov.educ.api.edx.service.event;
 
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
-import ca.bc.gov.educ.api.edx.constants.EventOutcome;
-import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserSchoolRepository;
-import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.event.SchoolUpdateEventDelegatorService;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.io.IOException;
 import java.time.LocalDate;
