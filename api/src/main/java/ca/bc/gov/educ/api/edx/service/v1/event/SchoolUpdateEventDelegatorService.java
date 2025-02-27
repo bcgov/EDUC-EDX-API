@@ -50,9 +50,10 @@ public class SchoolUpdateEventDelegatorService implements EventHandler {
 
     public void handleSchoolUpdateEvent(Event event) throws IOException {
      var school = JsonUtil.getJsonObjectFromBytes(School.class, event.getEventPayload().getBytes());
-     if(Boolean.TRUE.equals(school.getCanIssueTranscripts()) && school.getClosedDate() != null
-             && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isAfter(LocalDateTime.now())) {
+     if(school.getClosedDate() != null) {
          edxUsersService.setExpiryDateOnUsersOfClosedSchool(school);
+     } else if(Boolean.FALSE.equals(school.getCanIssueTranscripts())) {
+         edxUsersService.removeGradAdminRoleIfExists(school);
      }
     }
 }
