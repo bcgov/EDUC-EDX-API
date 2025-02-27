@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.edx.messaging;
 
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.orchestrator.base.EventHandler;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
@@ -63,7 +64,13 @@ public class MessageSubscriber {
         try {
           final var eventString = new String(message.getData());
           final var event = JsonUtil.getJsonObjectFromString(Event.class, eventString);
-          eventHandler.handleEvent(event);
+
+          if(EventType.isAValidEvent(event.getEventType())) {
+            eventHandler.handleEvent(event);
+          } else {
+            log.info("silently ignoring other events.");
+          }
+
         } catch (final InterruptedException e) {
           Thread.currentThread().interrupt();
           log.error("Exception ", e);

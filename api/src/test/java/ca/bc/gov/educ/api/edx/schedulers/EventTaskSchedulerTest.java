@@ -76,7 +76,7 @@ class EventTaskSchedulerTest extends BaseEdxAPITest {
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToYes_And_SchoolIsClosed() {
     var school = createMockSchoolTombstone();
     school.setCanIssueTranscripts(true);
-    school.setClosedDate(String.valueOf(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)));
+    school.setClosedDate(String.valueOf(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(1)));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 

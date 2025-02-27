@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
@@ -57,12 +59,14 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
     }
 
     public void moveSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException {
-        final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+        final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+        final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+        final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
         saga.setSagaState(MOVE_SCHOOL.toString());
         this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-            .eventType(MOVE_SCHOOL)
+            .eventType(MOVE_SCHOOL.toString())
             .replyTo(this.getTopicToSubscribe())
             .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolData))
             .build();
@@ -71,7 +75,9 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
     }
 
     private void copyUsersToNewSchool(Event event, SagaEntity saga, MoveSchoolData moveSchoolData) throws JsonProcessingException{
-        final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+        final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+        final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+        final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
         saga.setSagaState(COPY_USERS_TO_NEW_SCHOOL.toString());
         this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
@@ -86,7 +92,7 @@ public class MoveSchoolOrchestrator extends BaseOrchestrator<MoveSchoolData> {
         }
 
         final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-                .eventType(COPY_USERS_TO_NEW_SCHOOL).eventOutcome(USERS_TO_NEW_SCHOOL_COPIED)
+                .eventType(COPY_USERS_TO_NEW_SCHOOL.toString()).eventOutcome(USERS_TO_NEW_SCHOOL_COPIED.toString())
                 .eventPayload(JsonUtil.getJsonStringFromObject(moveSchoolDataFromEvent))
                 .build();
         this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);

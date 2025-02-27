@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -71,7 +73,9 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
   }
 
   public void createPrimaryCode(Event event, SagaEntity saga, OnboardSchoolUserSagaData sagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(CREATE_SCHOOL_PRIMARY_CODE.toString());
     saga.setStatus(IN_PROGRESS.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -79,8 +83,8 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
     this.orchestratorService.createPrimaryActivationCode(sagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(CREATE_SCHOOL_PRIMARY_CODE)
-      .eventOutcome(SCHOOL_PRIMARY_CODE_CREATED)
+      .eventType(CREATE_SCHOOL_PRIMARY_CODE.toString())
+      .eventOutcome(SCHOOL_PRIMARY_CODE_CREATED.toString())
       .replyTo(getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
@@ -89,14 +93,16 @@ public class OnboardSchoolUserOrchestrator extends SchoolUserActivationBaseOrche
   }
 
   public void sendPrimaryCode(Event event, SagaEntity saga, OnboardSchoolUserSagaData sagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(SEND_PRIMARY_ACTIVATION_CODE.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
 
     this.orchestratorService.sendPrimaryActivationCodeNotification(sagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(SEND_PRIMARY_ACTIVATION_CODE).eventOutcome(PRIMARY_ACTIVATION_CODE_SENT)
+      .eventType(SEND_PRIMARY_ACTIVATION_CODE.toString()).eventOutcome(PRIMARY_ACTIVATION_CODE_SENT.toString())
       .eventPayload(JsonUtil.getJsonStringFromObject(sagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);

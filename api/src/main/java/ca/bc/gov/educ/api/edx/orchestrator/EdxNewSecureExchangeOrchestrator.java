@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.messaging.jetstream.Publisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
@@ -71,8 +73,9 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
    * @throws JsonProcessingException the json processing exception
    */
   private void createNewSecureExchange(Event event, SagaEntity saga, SecureExchangeCreateSagaData secureExchangeCreateSagaData) throws JsonProcessingException {
-
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_NEW_SECURE_EXCHANGE.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -84,7 +87,7 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
     }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(CREATE_NEW_SECURE_EXCHANGE).eventOutcome(NEW_SECURE_EXCHANGE_CREATED)
+      .eventType(CREATE_NEW_SECURE_EXCHANGE.toString()).eventOutcome(NEW_SECURE_EXCHANGE_CREATED.toString())
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCreateSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
@@ -100,16 +103,17 @@ public class EdxNewSecureExchangeOrchestrator extends BaseOrchestrator<SecureExc
    * @throws JsonProcessingException the json processing exception
    */
   private void sendEmailForNewSecureExchange(Event event, SagaEntity saga, SecureExchangeCreateSagaData secureExchangeCreateSagaData) throws JsonProcessingException {
-
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
     log.debug("secureExchangeCreateSagaData :: {}", secureExchangeCreateSagaData);
     getEdxNewSecureExchangeOrchestratorService().sendEmail(secureExchangeCreateSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE)
-      .eventOutcome(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT)
+      .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE.toString())
+      .eventOutcome(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT.toString())
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCreateSagaData))
       .build();

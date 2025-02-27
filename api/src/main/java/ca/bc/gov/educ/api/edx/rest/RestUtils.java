@@ -205,7 +205,7 @@ public class RestUtils {
       log.debug("Sys Criteria: {}", searches);
       final TypeReference<List<School>> ref = new TypeReference<>() {
       };
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS.toString()).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).completeOnTimeout(null, 60, TimeUnit.SECONDS).get();
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
@@ -231,7 +231,7 @@ public class RestUtils {
       log.debug("Sys Criteria: {}", searches);
       final TypeReference<List<School>> ref = new TypeReference<>() {
       };
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS.toString()).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).completeOnTimeout(null, 60, TimeUnit.SECONDS).get();
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
@@ -248,7 +248,7 @@ public class RestUtils {
   @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School createSchool(UUID correlationID,School school) {
     try {
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.CREATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.CREATE_SCHOOL.toString()).eventPayload(objectMapper.writeValueAsString(school)).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).get();
       if (null != responseMessage) {
         Event eventPayload = JsonUtil.getJsonObjectFromBytes(Event.class, responseMessage.getData());
@@ -266,7 +266,7 @@ public class RestUtils {
   @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School updateSchool(UUID correlationID,School school) {
     try {
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.UPDATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.UPDATE_SCHOOL.toString()).eventPayload(objectMapper.writeValueAsString(school)).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).get();
       if (null != responseMessage) {
         Event eventPayload = JsonUtil.getJsonObjectFromBytes(Event.class, responseMessage.getData());

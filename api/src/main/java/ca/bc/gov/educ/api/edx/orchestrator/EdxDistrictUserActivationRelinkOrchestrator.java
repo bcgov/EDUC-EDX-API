@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
@@ -61,7 +63,9 @@ public class EdxDistrictUserActivationRelinkOrchestrator extends DistrictUserAct
    * @param edxUserActivationRelinkSagaData
    */
   protected void removeUserDistrictAccess(Event event, SagaEntity saga, EdxUserDistrictActivationRelinkSagaData edxUserActivationRelinkSagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(REMOVE_USER_DISTRICT_ACCESS.toString());
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -73,7 +77,7 @@ public class EdxDistrictUserActivationRelinkOrchestrator extends DistrictUserAct
     }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(REMOVE_USER_DISTRICT_ACCESS).eventOutcome(EDX_USER_DISTRICT_REMOVED)
+      .eventType(REMOVE_USER_DISTRICT_ACCESS.toString()).eventOutcome(EDX_USER_DISTRICT_REMOVED.toString())
       .eventPayload(JsonUtil.getJsonStringFromObject(edxUserActivationRelinkSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);

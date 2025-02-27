@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEventStatesEntity;
@@ -68,15 +70,17 @@ public class EdxSecureExchangeCommentOrchestrator extends BaseOrchestrator<Secur
    * @throws JsonProcessingException the json processing exception
    */
   private void sendEmailForSecureExchangeComment(Event event, SagaEntity saga, SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
     log.debug("secureExchangeCommentSagaData :: {}", secureExchangeCommentSagaData);
     getEdxSecureExchangeCommentOrchestratorService().sendEmail(secureExchangeCommentSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT)
-      .eventOutcome(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT)
+      .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT.toString())
+      .eventOutcome(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT.toString())
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCommentSagaData))
       .build();
@@ -94,8 +98,9 @@ public class EdxSecureExchangeCommentOrchestrator extends BaseOrchestrator<Secur
    * @throws JsonProcessingException the json processing exception
    */
   private void createSecureExchangeComment(Event event, SagaEntity saga, SecureExchangeCommentSagaData secureExchangeCommentSagaData) throws JsonProcessingException {
-
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_SECURE_EXCHANGE_COMMENT.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -106,7 +111,7 @@ public class EdxSecureExchangeCommentOrchestrator extends BaseOrchestrator<Secur
       getEdxSecureExchangeCommentOrchestratorService().createSecureExchangeComment(secureExchangeCommentSagaData, saga);
     }
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(CREATE_SECURE_EXCHANGE_COMMENT).eventOutcome(SECURE_EXCHANGE_COMMENT_CREATED)
+      .eventType(CREATE_SECURE_EXCHANGE_COMMENT.toString()).eventOutcome(SECURE_EXCHANGE_COMMENT_CREATED.toString())
       .eventPayload(JsonUtil.getJsonStringFromObject(secureExchangeCommentSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);

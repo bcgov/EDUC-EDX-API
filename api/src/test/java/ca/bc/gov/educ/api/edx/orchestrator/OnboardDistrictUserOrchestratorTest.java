@@ -96,8 +96,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(INITIATE_SUCCESS.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -114,8 +114,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
     final Event sendCodeEvent = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
 
-    assertThat(sendCodeEvent.getEventType()).isEqualTo(SEND_PRIMARY_ACTIVATION_CODE);
-    assertThat(sendCodeEvent.getEventOutcome()).isEqualTo(PRIMARY_ACTIVATION_CODE_SENT);
+    assertThat(sendCodeEvent.getEventType()).isEqualTo(SEND_PRIMARY_ACTIVATION_CODE.toString());
+    assertThat(sendCodeEvent.getEventOutcome()).isEqualTo(PRIMARY_ACTIVATION_CODE_SENT.toString());
   }
 
   @Test
@@ -126,8 +126,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(SEND_PRIMARY_ACTIVATION_CODE)
-      .eventOutcome(PRIMARY_ACTIVATION_CODE_SENT)
+      .eventType(SEND_PRIMARY_ACTIVATION_CODE.toString())
+      .eventOutcome(PRIMARY_ACTIVATION_CODE_SENT.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -137,8 +137,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
       .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
-    assertThat(currentEventState.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE);
-    assertThat(currentEventState.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED);
+    assertThat(currentEventState.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
+    assertThat(currentEventState.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED.toString());
   }
 
   @Test
@@ -155,8 +155,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
-      .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
+      .eventType(CREATE_PERSONAL_ACTIVATION_CODE.toString())
+      .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -166,8 +166,8 @@ class OnboardDistrictUserOrchestratorTest extends BaseSagaControllerTest {
             .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
-    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL);
-    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT);
+    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL.toString());
+    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT.toString());
   }
 
   private OnboardDistrictUserSagaData createMockOnboardUserSagaData(District district) {
