@@ -1,5 +1,8 @@
 package ca.bc.gov.educ.api.edx.constants;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * The enum Event type.
  */
@@ -72,5 +75,9 @@ public enum EventType {
   MOVE_SCHOOL,
   ONBOARD_INITIAL_USER,
   INVITE_INITIAL_USER
+;
+  public static boolean isAValidEvent(String incomingEvent) {
+    return Arrays.stream(values()).anyMatch(eventType -> eventType.toString().equalsIgnoreCase(incomingEvent));
+  }
 
 }

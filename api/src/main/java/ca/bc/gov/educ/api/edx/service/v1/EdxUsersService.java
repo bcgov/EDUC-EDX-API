@@ -1090,7 +1090,7 @@ public class EdxUsersService {
     List<UUID> closedSchoolIds = schools.stream()
             .filter(school -> StringUtils.isNotBlank(school.getClosedDate())
                     && Boolean.TRUE.equals(school.getCanIssueTranscripts())
-                    && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isEqual(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
+                    && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
             .map(SchoolTombstone::getSchoolId)
             .map(UUID::fromString).toList();
 

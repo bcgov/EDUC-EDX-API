@@ -105,8 +105,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(INITIATE_SUCCESS.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -136,8 +136,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(CREATE_SCHOOL)
-      .eventOutcome(SCHOOL_CREATED)
+      .eventType(CREATE_SCHOOL.toString())
+      .eventOutcome(SCHOOL_CREATED.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(this.mockInstituteSchool))
       .build();
@@ -151,8 +151,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       JsonUtil.getJsonObjectFromString(CreateSchoolSagaData.class, nextEvent.getEventPayload());
 
     assertThat(newData.getInitialEdxUser()).isNotNull();
-    assertThat(nextEvent.getEventType()).isEqualTo(ONBOARD_INITIAL_USER);
-    assertThat(nextEvent.getEventOutcome()).isEqualTo(INITIAL_USER_FOUND);
+    assertThat(nextEvent.getEventType()).isEqualTo(ONBOARD_INITIAL_USER.toString());
+    assertThat(nextEvent.getEventOutcome()).isEqualTo(INITIAL_USER_FOUND.toString());
   }
 
   @Test
@@ -162,8 +162,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(CREATE_SCHOOL)
-      .eventOutcome(SCHOOL_CREATED)
+      .eventType(CREATE_SCHOOL.toString())
+      .eventOutcome(SCHOOL_CREATED.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(this.mockInstituteSchool))
       .build();
@@ -185,8 +185,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final Event lastEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
 
-    assertThat(lastEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE);
-    assertThat(lastEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
+    assertThat(lastEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE.toString());
+    assertThat(lastEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED.toString());
   }
 
   @Test
@@ -197,8 +197,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(ONBOARD_INITIAL_USER)
-      .eventOutcome(INITIAL_USER_FOUND)
+      .eventType(ONBOARD_INITIAL_USER.toString())
+      .eventOutcome(INITIAL_USER_FOUND.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -217,8 +217,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     assertThat(codeOptional).isPresent();
     assertThat(newData.getInitialEdxUser()).isNotNull();
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL_PRIMARY_CODE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_PRIMARY_CODE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SCHOOL_PRIMARY_CODE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SCHOOL_PRIMARY_CODE_CREATED.toString());
   }
 
   @Test
@@ -230,8 +230,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(ONBOARD_INITIAL_USER)
-      .eventOutcome(INITIAL_USER_FOUND)
+      .eventType(ONBOARD_INITIAL_USER.toString())
+      .eventOutcome(INITIAL_USER_FOUND.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -248,8 +248,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final Event sendCodeEvent = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
 
-    assertThat(sendCodeEvent.getEventType()).isEqualTo(SEND_PRIMARY_ACTIVATION_CODE);
-    assertThat(sendCodeEvent.getEventOutcome()).isEqualTo(PRIMARY_ACTIVATION_CODE_SENT);
+    assertThat(sendCodeEvent.getEventType()).isEqualTo(SEND_PRIMARY_ACTIVATION_CODE.toString());
+    assertThat(sendCodeEvent.getEventOutcome()).isEqualTo(PRIMARY_ACTIVATION_CODE_SENT.toString());
   }
 
   @Test
@@ -261,8 +261,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-      .eventType(SEND_PRIMARY_ACTIVATION_CODE)
-      .eventOutcome(PRIMARY_ACTIVATION_CODE_SENT)
+      .eventType(SEND_PRIMARY_ACTIVATION_CODE.toString())
+      .eventOutcome(PRIMARY_ACTIVATION_CODE_SENT.toString())
       .sagaId(saga.getSagaId())
       .eventPayload(getJsonString(mockData))
       .build();
@@ -272,8 +272,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
       .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
-    assertThat(currentEventState.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE);
-    assertThat(currentEventState.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED);
+    assertThat(currentEventState.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
+    assertThat(currentEventState.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED.toString());
   }
 
   @Test
@@ -297,8 +297,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
 
     final int invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final Event event = Event.builder()
-            .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
-            .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
+            .eventType(CREATE_PERSONAL_ACTIVATION_CODE.toString())
+            .eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED.toString())
             .sagaId(saga.getSagaId())
             .eventPayload(getJsonString(mockData))
             .build();
@@ -308,8 +308,8 @@ class CreateSchoolOrchestratorTest extends BaseSagaControllerTest {
             .dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
 
     Event currentEventState = JsonUtil.getJsonObjectFromBytes(Event.class, this.eventCaptor.getValue());
-    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL);
-    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+    assertThat(currentEventState.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL.toString());
+    assertThat(currentEventState.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT.toString());
   }
 
   private CreateSchoolSagaData createMockCreateSchoolSagaData(School school) {

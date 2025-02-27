@@ -31,7 +31,7 @@ public class SchoolUpdateEventDelegatorService implements EventHandler {
     @Override
     public void handleEvent(Event event) {
       try {
-        if(event.getEventType() == EventType.UPDATE_SCHOOL) {
+        if(event.getEventType().equalsIgnoreCase(EventType.UPDATE_SCHOOL.toString())) {
            log.info("Received UPDATE_SCHOOL event :: {}", event.getSagaId());
            log.trace(PAYLOAD_LOG, event.getEventPayload());
            this.handleSchoolUpdateEvent(event);
