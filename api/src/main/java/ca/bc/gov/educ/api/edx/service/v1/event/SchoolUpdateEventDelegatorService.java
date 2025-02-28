@@ -31,7 +31,6 @@ public class SchoolUpdateEventDelegatorService implements EventHandler {
     @Async("subscriberExecutor")
     @Override
     public void handleEvent(Event event) {
-        log.info("Handle Event :: {}", event.getEventType());
       try {
         if(event.getEventType().equalsIgnoreCase(EventType.UPDATE_SCHOOL.toString())) {
            log.info("Received UPDATE_SCHOOL event :: {}", event.getSagaId());
