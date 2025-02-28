@@ -65,6 +65,7 @@ public class MessageSubscriber {
           final var eventString = new String(message.getData());
           final var event = JsonUtil.getJsonObjectFromString(Event.class, eventString);
 
+          log.info("Event Type :: {}", event.getEventType());
           if(EventType.isAValidEvent(event.getEventType())) {
             eventHandler.handleEvent(event);
           } else {
