@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_API_TOPIC;
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.INSTITUTE_EVENTS_TOPIC;
 
 @Service
 @Slf4j
@@ -46,7 +47,7 @@ public class SchoolUpdateEventDelegatorService implements EventHandler {
 
     @Override
     public String getTopicToSubscribe() {
-        return INSTITUTE_API_TOPIC.toString();
+        return INSTITUTE_EVENTS_TOPIC.toString();
     }
 
     public void handleSchoolUpdateEvent(Event event) throws IOException {
