@@ -12,16 +12,13 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -467,7 +464,7 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
     assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
     assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(0);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
   }
 
   @Test
@@ -497,7 +494,7 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
     assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
     assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(0);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
   }
 
   @Test
