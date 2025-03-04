@@ -86,8 +86,9 @@ public class EdxUsersService {
   private static final String EDX_USER_DISTRICT_ID="edxUserDistrictID";
 
   private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS", "FED_BAND");
-  private static final List<String> ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH = Arrays.asList("GRAD_SCH_ADMIN", "SECURE_EXCHANGE_SCHOOL");
   private static final String GRAD_SCHOOL_ADMIN_ROLE = "GRAD_SCH_ADMIN";
+  private static final String SECURE_EXCHANGE_SCHOOL_ROLE = "SECURE_EXCHANGE_SCHOOL";
+  private static final List<String> ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH = Arrays.asList(GRAD_SCHOOL_ADMIN_ROLE, SECURE_EXCHANGE_SCHOOL_ROLE);
 
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
@@ -1062,51 +1063,43 @@ public class EdxUsersService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void setExpiryDateOnUsersOfClosedSchool(School school) {
-    LocalDateTime schoolCloseDate = LocalDateTime.parse(school.getClosedDate());
-    if(Boolean.TRUE.equals(school.getCanIssueTranscripts())
-            && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isAfter(LocalDateTime.now())) {
-      schoolCloseDate = schoolCloseDate.plusMonths(3);
-    }
-
-    List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDAndExpiryDateIsNull(UUID.fromString(school.getSchoolId()));
-    if(!edxSchoolUsers.isEmpty()) {
-      LocalDateTime finalSchoolCloseDate = schoolCloseDate;
-      edxSchoolUsers.forEach(schoolUser -> {
-        schoolUser.setExpiryDate(finalSchoolCloseDate);
-        schoolUser.setCreateDate(LocalDateTime.now());
-        schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
-        schoolUser.setUpdateDate(LocalDateTime.now());
-        schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
-      });
-      edxUserSchoolsRepository.saveAll(edxSchoolUsers);
-    }
-  }
-
-  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void updateUserRolesForClosedSchools() {
     List<SchoolTombstone> schools = restUtils.getSchools();
+    List<EdxUserSchoolEntity> updatedUserSchoolEntities = new ArrayList<>();
 
-    List<UUID> closedSchoolIds = schools.stream()
+//     closed date is not null and transcript eligibility is true and today's date is past closed date + 3 months
+//     OR
+//     closed date is not null and transcript eligibility is false and today's date is past closed date
+    List<UUID> schoolsEligibleForUserRoleRemoval = schools.stream()
+            .filter(school ->
+                    (StringUtils.isNotBlank(school.getClosedDate())
+                            && Boolean.TRUE.equals(school.getCanIssueTranscripts())
+                            && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
+                            ||
+                            (StringUtils.isNotBlank(school.getClosedDate())
+                            && Boolean.FALSE.equals(school.getCanIssueTranscripts())
+                            && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
+            ).map(SchoolTombstone::getSchoolId)
+            .map(UUID::fromString).toList();
+
+    if(!schoolsEligibleForUserRoleRemoval.isEmpty()) {
+      updatedUserSchoolEntities.addAll(removeUserRoles(schoolsEligibleForUserRoleRemoval));
+    }
+
+    //closed date is not null and transcript eligibility is true and today's date is after closed date and before closed date + 3 months
+    List<UUID> transcriptEligibleClosedSchools = schools.stream()
             .filter(school -> StringUtils.isNotBlank(school.getClosedDate())
                     && Boolean.TRUE.equals(school.getCanIssueTranscripts())
-                    && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
+                    && LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isAfter(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                    && LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isBefore(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3)))
             .map(SchoolTombstone::getSchoolId)
             .map(UUID::fromString).toList();
 
-    List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(closedSchoolIds);
-    if(!edxSchoolUsers.isEmpty()) {
-      edxSchoolUsers.forEach(schoolUser -> {
-        schoolUser.setCreateDate(LocalDateTime.now());
-        schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
-        schoolUser.setUpdateDate(LocalDateTime.now());
-        schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
-
-        schoolUser.getEdxUserSchoolRoleEntities().clear();
-        schoolUser.getEdxUserSchoolRoleEntities().addAll(createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(schoolUser));
-        edxUserSchoolsRepository.save(schoolUser);
-      });
+    if(!transcriptEligibleClosedSchools.isEmpty()) {
+      updatedUserSchoolEntities.addAll(updateUsersForTranscriptEligibleSchools(transcriptEligibleClosedSchools));
     }
+
+    edxUserSchoolsRepository.saveAll(updatedUserSchoolEntities);
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -1123,6 +1116,29 @@ public class EdxUsersService {
         });
       }
     }
+  }
+
+  private List<EdxUserSchoolEntity> updateUsersForTranscriptEligibleSchools(List<UUID> transcriptEligibleClosedSchools) {
+    List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(transcriptEligibleClosedSchools);
+    List<EdxUserSchoolEntity> usersWithRolesToBeUpdated = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().noneMatch(role ->
+            role.getEdxRoleCode().equalsIgnoreCase(SECURE_EXCHANGE_SCHOOL_ROLE) || role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
+    usersWithRolesToBeUpdated.forEach(schoolUser -> {
+      schoolUser.setCreateDate(LocalDateTime.now());
+      schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
+      schoolUser.setUpdateDate(LocalDateTime.now());
+      schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
+
+      schoolUser.getEdxUserSchoolRoleEntities().clear();
+      schoolUser.getEdxUserSchoolRoleEntities().addAll(createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(schoolUser));
+    });
+    return usersWithRolesToBeUpdated;
+  }
+
+  private List<EdxUserSchoolEntity> removeUserRoles(List<UUID> schoolIdsForRemovingUserRole) {
+    List<EdxUserSchoolEntity> edxClosedSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(schoolIdsForRemovingUserRole);
+    List<EdxUserSchoolEntity> usersWithRoles = edxClosedSchoolUsers.stream().filter(user -> !user.getEdxUserSchoolRoleEntities().isEmpty()).toList();
+    usersWithRoles.forEach(user -> user.getEdxUserSchoolRoleEntities().clear());
+    return usersWithRoles;
   }
 
   private Set<EdxUserSchoolRoleEntity> createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(EdxUserSchoolEntity edxUserSchoolEntity) {

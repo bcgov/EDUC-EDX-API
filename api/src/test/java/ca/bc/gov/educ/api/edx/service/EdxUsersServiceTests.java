@@ -12,10 +12,8 @@ import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
@@ -443,7 +441,7 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToFalse() {
     var school = createMockSchoolTombstone();
     school.setCanIssueTranscripts(false);
-    school.setClosedDate(String.valueOf(LocalDateTime.now()));
+    school.setClosedDate(String.valueOf(LocalDateTime.now().minusDays(1)));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 
@@ -466,8 +464,37 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
     assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
     assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-    assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
-    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(1);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
+  }
+
+  @Test
+  void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToTrueAndIsPastClosedDateBy3Months() {
+    var school = createMockSchoolTombstone();
+    school.setCanIssueTranscripts(true);
+    school.setClosedDate(String.valueOf(LocalDateTime.now().minusMonths(3).minusDays(1)));
+
+    when(this.restUtils.getSchools()).thenReturn(List.of(school));
+
+    var userEntity = edxUserRepository.save(getEdxUserEntity());
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    edxRoleRepository.save(roleEntity);
+
+    var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+    var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
+    userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
+    userSchoolEntity.setExpiryDate(null);
+    edxUserSchoolRepository.save(userSchoolEntity);
+
+    service.updateUserRolesForClosedSchools();
+
+    var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+    assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
+    assertThat(userSchoolEntityAfterUpdate).hasSize(1);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
   }
 
   @Test
@@ -497,7 +524,6 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
     assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
     assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-    assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
     assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(1);
   }
 

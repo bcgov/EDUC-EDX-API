@@ -14,9 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -99,70 +96,6 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
         assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
-    }
-
-    @Test
-    public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsTrueAndSchoolIsClosed_shouldUpdateExpiryDate() throws IOException {
-        var sagaId = UUID.randomUUID();
-        var schoolCloseDate = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(2);
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(true);
-        school.setClosedDate(String.valueOf(schoolCloseDate));
-
-        var userEntity = edxUserRepository.save(getEdxUserEntity());
-        var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
-        var roleEntity = getEdxRoleEntity();
-        roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
-        var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
-        roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
-        edxRoleRepository.save(roleEntity);
-
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
-        var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
-        userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
-        userSchoolEntity.setExpiryDate(null);
-        edxUserSchoolRepository.save(userSchoolEntity);
-
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
-
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
-        assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
-        assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-        assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNotNull();
-        assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isEqualTo(schoolCloseDate.plusMonths(3));
-    }
-
-    @Test
-    public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsClosed_shouldUpdateExpiryDateToSameAsClosedDate() throws IOException {
-        var sagaId = UUID.randomUUID();
-        var schoolCloseDate = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).plusDays(2);
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(false);
-        school.setClosedDate(String.valueOf(schoolCloseDate));
-
-        var userEntity = edxUserRepository.save(getEdxUserEntity());
-        var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
-        var roleEntity = getEdxRoleEntity();
-        roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
-        var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
-        roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
-        edxRoleRepository.save(roleEntity);
-
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
-        var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
-        userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
-        userSchoolEntity.setExpiryDate(null);
-        edxUserSchoolRepository.save(userSchoolEntity);
-
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
-
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
-        assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
-        assertThat(userSchoolEntityAfterUpdate).hasSize(1);
-        assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNotNull();
-        assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isEqualTo(schoolCloseDate);
     }
 
     @Test
