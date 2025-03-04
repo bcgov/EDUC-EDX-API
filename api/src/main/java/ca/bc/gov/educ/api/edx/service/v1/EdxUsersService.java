@@ -88,6 +88,7 @@ public class EdxUsersService {
   private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS", "FED_BAND");
   private static final List<String> ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH = Arrays.asList("GRAD_SCH_ADMIN", "SECURE_EXCHANGE_SCHOOL");
   private static final String GRAD_SCHOOL_ADMIN_ROLE = "GRAD_SCH_ADMIN";
+  private static final String SECURE_EXCHANGE_SCHOOL_ROLE = "SECURE_EXCHANGE_SCHOOL";
 
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
@@ -1119,24 +1120,25 @@ public class EdxUsersService {
 
   private List<EdxUserSchoolEntity> updateUsersForTranscriptEligibleSchools(List<UUID> transcriptEligibleClosedSchools) {
     List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(transcriptEligibleClosedSchools);
-    if(!edxSchoolUsers.isEmpty()) {
-      edxSchoolUsers.forEach(schoolUser -> {
-        schoolUser.setCreateDate(LocalDateTime.now());
-        schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
-        schoolUser.setUpdateDate(LocalDateTime.now());
-        schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
+    List<EdxUserSchoolEntity> usersWithRolesToBeUpdated = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().noneMatch(role ->
+            role.getEdxRoleCode().equalsIgnoreCase(SECURE_EXCHANGE_SCHOOL_ROLE) || role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
+    usersWithRolesToBeUpdated.forEach(schoolUser -> {
+      schoolUser.setCreateDate(LocalDateTime.now());
+      schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
+      schoolUser.setUpdateDate(LocalDateTime.now());
+      schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
 
-        schoolUser.getEdxUserSchoolRoleEntities().clear();
-        schoolUser.getEdxUserSchoolRoleEntities().addAll(createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(schoolUser));
-      });
-    }
-    return edxSchoolUsers;
+      schoolUser.getEdxUserSchoolRoleEntities().clear();
+      schoolUser.getEdxUserSchoolRoleEntities().addAll(createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(schoolUser));
+    });
+    return usersWithRolesToBeUpdated;
   }
 
   private List<EdxUserSchoolEntity> removeUserRoles(List<UUID> schoolIdsForRemovingUserRole) {
     List<EdxUserSchoolEntity> edxClosedSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(schoolIdsForRemovingUserRole);
-    edxClosedSchoolUsers.forEach(user -> user.getEdxUserSchoolRoleEntities().clear());
-    return edxClosedSchoolUsers;
+    List<EdxUserSchoolEntity> usersWithRoles = edxClosedSchoolUsers.stream().filter(user -> !user.getEdxUserSchoolRoleEntities().isEmpty()).toList();
+    usersWithRoles.forEach(user -> user.getEdxUserSchoolRoleEntities().clear());
+    return usersWithRoles;
   }
 
   private Set<EdxUserSchoolRoleEntity> createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(EdxUserSchoolEntity edxUserSchoolEntity) {
