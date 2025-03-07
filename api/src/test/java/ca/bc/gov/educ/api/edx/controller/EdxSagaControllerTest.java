@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SagaService;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.support.DocumentTypeCodeBuilder;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
@@ -943,9 +944,9 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   void testProcessOnboardingFile_givenValidPayload_ShouldReturnStatusOk() throws Exception {
-    Map<String, School> schoolMap = new ConcurrentHashMap<>();
-    schoolMap.put("12345678", createFakeSchool(UUID.randomUUID().toString(), "12345678"));
-    schoolMap.put("98765432", createFakeSchool(UUID.randomUUID().toString(), "98765432"));
+    Map<String, SchoolTombstone> schoolMap = new ConcurrentHashMap<>();
+    schoolMap.put("12345678", createSchool(UUID.randomUUID().toString(), "12345678"));
+    schoolMap.put("98765432", createSchool(UUID.randomUUID().toString(), "98765432"));
     Map<String, District> districtMap = new ConcurrentHashMap<>();
     Mockito.when(this.restUtils.getDistrictNumberMap()).thenReturn(districtMap);
     Mockito.when(this.restUtils.getSchoolMincodeMap()).thenReturn(schoolMap);
@@ -961,9 +962,9 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   @Test
   void testProcessOnboardingFileWithDistrict_givenValidPayload_ShouldReturnStatusOk() throws Exception {
-    Map<String, School> schoolMap = new ConcurrentHashMap<>();
-    schoolMap.put("12345678", createFakeSchool(UUID.randomUUID().toString(), "12345678"));
-    schoolMap.put("98765432", createFakeSchool(UUID.randomUUID().toString(), "98765432"));
+    Map<String, SchoolTombstone> schoolMap = new ConcurrentHashMap<>();
+    schoolMap.put("12345678", createSchool(UUID.randomUUID().toString(), "12345678"));
+    schoolMap.put("98765432", createSchool(UUID.randomUUID().toString(), "98765432"));
 
     Map<String, District> districtMap = new ConcurrentHashMap<>();
     districtMap.put("123", createFakeDistrict(UUID.randomUUID().toString(), "123"));
@@ -983,6 +984,19 @@ class EdxSagaControllerTest extends BaseSagaControllerTest {
 
   private School createFakeSchool(String schoolId, String mincode) {
     School school = new School();
+    school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
+    school.setSchoolId(schoolId);
+    school.setMincode(mincode);
+    school.setSchoolNumber("00002");
+    school.setDisplayName("Test School");
+    school.setSchoolOrganizationCode("TRIMESTER");
+    school.setSchoolCategoryCode("FED_BAND");
+    school.setFacilityTypeCode("STANDARD");
+    return school;
+  }
+
+  private SchoolTombstone createSchool(String schoolId, String mincode) {
+    SchoolTombstone school = new SchoolTombstone();
     school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
     school.setSchoolId(schoolId);
     school.setMincode(mincode);

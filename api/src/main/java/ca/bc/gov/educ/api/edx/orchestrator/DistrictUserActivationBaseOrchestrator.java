@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.edx.orchestrator;
 
 
+import ca.bc.gov.educ.api.edx.constants.EventOutcome;
+import ca.bc.gov.educ.api.edx.constants.EventType;
 import ca.bc.gov.educ.api.edx.mappers.v1.EdxActivationCodeMapper;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
@@ -54,7 +56,9 @@ public abstract class DistrictUserActivationBaseOrchestrator<T> extends BaseOrch
   }
 
   protected void createPersonalActivationCode(Event event, SagaEntity saga, EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setStatus(IN_PROGRESS.toString());
     saga.setSagaState(CREATE_PERSONAL_ACTIVATION_CODE.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
@@ -66,7 +70,7 @@ public abstract class DistrictUserActivationBaseOrchestrator<T> extends BaseOrch
     }
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(CREATE_PERSONAL_ACTIVATION_CODE).eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED)
+      .eventType(CREATE_PERSONAL_ACTIVATION_CODE.toString()).eventOutcome(PERSONAL_ACTIVATION_CODE_CREATED.toString())
       .eventPayload(JsonUtil.getJsonStringFromObject(edxDistrictUserActivationInviteSagaData))
       .build();
     this.postMessageToTopic(this.getTopicToSubscribe(), nextEvent);
@@ -83,15 +87,17 @@ public abstract class DistrictUserActivationBaseOrchestrator<T> extends BaseOrch
    * @throws JsonProcessingException the json processing exception
    */
   protected void sendEdxUserActivationEmail(Event event, SagaEntity saga, EdxUserDistrictActivationInviteSagaData edxDistrictUserActivationInviteSagaData) throws JsonProcessingException {
-    final SagaEventStatesEntity eventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity eventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL.toString()); // set current event as saga state.
     this.getSagaService().updateAttachedSagaWithEvents(saga, eventStates);
     log.debug("edxDistrictUserActivationInviteSagaData :: {}", edxDistrictUserActivationInviteSagaData);
     getEdxDistrictUserActivationInviteOrchestratorService().sendEmail(edxDistrictUserActivationInviteSagaData);
 
     final Event nextEvent = Event.builder().sagaId(saga.getSagaId())
-      .eventType(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL)
-      .eventOutcome(EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT)
+      .eventType(SEND_EDX_DISTRICT_USER_ACTIVATION_EMAIL.toString())
+      .eventOutcome(EDX_DISTRICT_USER_ACTIVATION_EMAIL_SENT.toString())
       .replyTo(this.getTopicToSubscribe())
       .eventPayload(JsonUtil.getJsonStringFromObject(edxDistrictUserActivationInviteSagaData))
       .build();

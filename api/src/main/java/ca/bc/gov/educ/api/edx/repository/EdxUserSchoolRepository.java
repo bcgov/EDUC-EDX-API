@@ -29,4 +29,6 @@ public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEnti
 
   List<EdxUserSchoolEntity> findAllByExpiryDateBefore(LocalDateTime dateTime);
 
+  List<EdxUserSchoolEntity> findAllBySchoolIDAndExpiryDateIsNull(UUID schoolID);
+
 }

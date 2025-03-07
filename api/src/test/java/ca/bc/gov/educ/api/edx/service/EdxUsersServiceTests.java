@@ -10,11 +10,10 @@ import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
-import ca.bc.gov.educ.api.edx.struct.v1.School;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.NoSuchAlgorithmException;
@@ -24,6 +23,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 class EdxUsersServiceTests extends BaseEdxAPITest {
 
@@ -109,14 +109,14 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
 
     List<UUID> schoolIDList1 = new ArrayList<>();
     schoolIDList1.add(schoolEntity.getSchoolID());
-    School school1 = new School();
+    SchoolTombstone school1 = new SchoolTombstone();
     school1.setSchoolCategoryCode("PUBLIC");
     school1.setSchoolId(schoolIDList1.get(0).toString());
 
-    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtSchoolsMap = new HashMap<String, List<SchoolTombstone>>();
     var districtID = UUID.randomUUID();
     districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1));
-    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+    when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
 
     var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
     assertThat(edxSchools).isNotNull().hasSize(1);
@@ -135,22 +135,22 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     schoolEntity.getEdxUserSchoolRoleEntities().add(roleEntity);
     edxUserSchoolRepository.save(schoolEntity);
 
-    School school1 = new School();
+    SchoolTombstone school1 = new SchoolTombstone();
     school1.setSchoolCategoryCode("PUBLIC");
     school1.setSchoolId(schoolEntity.getSchoolID().toString());
 
-    School school2 = new School();
+    SchoolTombstone school2 = new SchoolTombstone();
     school2.setSchoolCategoryCode("INDP_FNS");
     school2.setSchoolId(UUID.randomUUID().toString());
 
-    School school3 = new School();
+    SchoolTombstone school3 = new SchoolTombstone();
     school3.setSchoolCategoryCode("INDEPEND");
     school3.setSchoolId(UUID.randomUUID().toString());
 
-    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtSchoolsMap = new HashMap<String, List<SchoolTombstone>>();
     var districtID = UUID.randomUUID();
     districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3));
-    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+    when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
 
     var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
     assertThat(edxSchools).isNotNull().hasSize(1);
@@ -175,46 +175,46 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
 
     LocalDateTime currentDate = LocalDate.now().atStartOfDay();
 
-    School school1 = new School();
+    SchoolTombstone school1 = new SchoolTombstone();
     school1.setSchoolCategoryCode("PUBLIC");
     school1.setSchoolId(schoolIDs.get(0).toString());
     school1.setOpenedDate(currentDate.toString());
     school1.setClosedDate(null);
 
-    School school2 = new School();
+    SchoolTombstone school2 = new SchoolTombstone();
     school2.setSchoolCategoryCode("PUBLIC");
     school2.setSchoolId(schoolIDs.get(1).toString());
     school2.setOpenedDate("1900-01-01T00:00:00");
     school2.setClosedDate("1901-01-01T00:00:00");
 
-    School school3 = new School();
+    SchoolTombstone school3 = new SchoolTombstone();
     school3.setSchoolCategoryCode("PUBLIC");
     school3.setSchoolId(schoolIDs.get(2).toString());
     school3.setOpenedDate(currentDate.plusDays(1).toString());
     school3.setClosedDate(null);
 
-    School school4 = new School();
+    SchoolTombstone school4 = new SchoolTombstone();
     school4.setSchoolCategoryCode("PUBLIC");
     school4.setSchoolId(schoolIDs.get(3).toString());
     school4.setOpenedDate(currentDate.minusDays(2).toString());
     school4.setClosedDate(currentDate.minusDays(1).toString());
 
-    School school5 = new School();
+    SchoolTombstone school5 = new SchoolTombstone();
     school5.setSchoolCategoryCode("PUBLIC");
     school5.setSchoolId(schoolIDs.get(4).toString());
     school5.setOpenedDate(currentDate.minusDays(1).toString());
     school5.setClosedDate(currentDate.toString());
 
-    School school6 = new School();
+    SchoolTombstone school6 = new SchoolTombstone();
     school6.setSchoolCategoryCode("PUBLIC");
     school6.setSchoolId(schoolIDs.get(5).toString());
     school6.setOpenedDate(currentDate.toString());
     school6.setClosedDate(currentDate.plusDays(2).toString());
 
-    var districtSchoolsMap = new HashMap<String, List<School>>();
+    var districtSchoolsMap = new HashMap<String, List<SchoolTombstone>>();
     var districtID = UUID.randomUUID();
     districtSchoolsMap.put(districtID.toString(), Arrays.asList(school1, school2, school3, school4, school5, school6));
-    Mockito.when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
+    when(this.restUtils.getDistrictSchoolsMap()).thenReturn(districtSchoolsMap);
 
     var edxSchools = this.service.findAllDistrictEdxUsers(districtID.toString());
     assertThat(edxSchools).isNotNull().hasSize(3);
@@ -435,6 +435,96 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     assertThat(regenerated.getIsPrimary()).isTrue();
     assertThat(regenerated.getCreateUser()).isEqualTo(existingPrimaryEdxActivationCode.getCreateUser());
     assertThat(regenerated.getUpdateUser()).isEqualTo(toRegenerate.getUpdateUser());
+  }
+
+  @Test
+  void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToFalse() {
+    var school = createMockSchoolTombstone();
+    school.setCanIssueTranscripts(false);
+    school.setClosedDate(String.valueOf(LocalDateTime.now().minusDays(1)));
+
+    when(this.restUtils.getSchools()).thenReturn(List.of(school));
+
+    var userEntity = edxUserRepository.save(getEdxUserEntity());
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    edxRoleRepository.save(roleEntity);
+
+    var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+    var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
+    userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
+    userSchoolEntity.setExpiryDate(null);
+    edxUserSchoolRepository.save(userSchoolEntity);
+
+    service.updateUserRolesForClosedSchools();
+
+    var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+    assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
+    assertThat(userSchoolEntityAfterUpdate).hasSize(1);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
+  }
+
+  @Test
+  void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToTrueAndIsPastClosedDateBy3Months() {
+    var school = createMockSchoolTombstone();
+    school.setCanIssueTranscripts(true);
+    school.setClosedDate(String.valueOf(LocalDateTime.now().minusMonths(3).minusDays(1)));
+
+    when(this.restUtils.getSchools()).thenReturn(List.of(school));
+
+    var userEntity = edxUserRepository.save(getEdxUserEntity());
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    edxRoleRepository.save(roleEntity);
+
+    var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+    var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
+    userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
+    userSchoolEntity.setExpiryDate(null);
+    edxUserSchoolRepository.save(userSchoolEntity);
+
+    service.updateUserRolesForClosedSchools();
+
+    var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+    assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
+    assertThat(userSchoolEntityAfterUpdate).hasSize(1);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).isEmpty();
+  }
+
+  @Test
+  void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToYes_And_SchoolIsOpen() {
+    var school = createMockSchoolTombstone();
+    school.setCanIssueTranscripts(true);
+    school.setClosedDate(null);
+
+    when(this.restUtils.getSchools()).thenReturn(List.of(school));
+
+    var userEntity = edxUserRepository.save(getEdxUserEntity());
+    var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
+    var roleEntity = getEdxRoleEntity();
+    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
+    roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
+    edxRoleRepository.save(roleEntity);
+
+    var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+    var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
+    userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
+    userSchoolEntity.setExpiryDate(null);
+    edxUserSchoolRepository.save(userSchoolEntity);
+
+    service.updateUserRolesForClosedSchools();
+
+    var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+    assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
+    assertThat(userSchoolEntityAfterUpdate).hasSize(1);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(1);
   }
 
   private MinistryOwnershipTeamEntity getMinistryOwnershipEntity(String teamName, String groupRoleIdentifier) {
