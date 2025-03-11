@@ -435,6 +435,7 @@ oc create -n "$OPENSHIFT_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map
   --from-literal=STUDENT_API_ENDPOINT="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/api/v1/student/" \
   --from-literal=EDX_API_CLIENT_ID="edx-api-service" \
   --from-literal=EDX_API_CLIENT_SECRET="$PME_APIServiceClientSecret" \
+  --from-literal=TOKEN_URL="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID/protocol/openid-connect/token" \
   --from-literal=TZ=$TZVALUE \
   --from-literal=TOKEN_ISSUER_URL="https://$SOAM_KC/auth/realms/$SOAM_KC_REALM_ID" \
   --from-literal=NATS_URL="$NATS_URL" \
