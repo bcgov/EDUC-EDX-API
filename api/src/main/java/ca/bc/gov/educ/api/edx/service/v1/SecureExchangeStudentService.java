@@ -28,15 +28,13 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
-    private final ApplicationProperties applicationProperties;
     private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
     private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
 
     @Autowired
-    public SecureExchangeStudentService(SecureExchangeService exchangeService, ApplicationProperties applicationProperties, SecureExchangeStudentRepository repository) {
+    public SecureExchangeStudentService(SecureExchangeService exchangeService, SecureExchangeStudentRepository repository) {
         this.exchangeService = exchangeService;
-        this.applicationProperties = applicationProperties;
         this.repository = repository;
     }
 
