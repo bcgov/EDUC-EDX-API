@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -71,7 +70,7 @@ class EdxStudentControllerTest extends BaseEdxControllerTest {
     final String sid = entity.getSecureExchangeID().toString();
     when(restUtils.getStudentByStudentID(anyString())).thenThrow(NotFoundException.class);
     this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
         .contentType(MediaType.APPLICATION_JSON)
         .content(getStudentJson(UUID.randomUUID().toString()))
         .accept(MediaType.APPLICATION_JSON))
