@@ -1082,8 +1082,6 @@ public class EdxUsersService {
             ).map(SchoolTombstone::getSchoolId)
             .map(UUID::fromString).toList();
 
-    log.info("condition 1  {}", schoolsEligibleForUserRoleRemoval.size());
-
     if(!schoolsEligibleForUserRoleRemoval.isEmpty()) {
       updatedUserSchoolEntities.addAll(removeUserRoles(schoolsEligibleForUserRoleRemoval));
     }
@@ -1097,13 +1095,10 @@ public class EdxUsersService {
             .map(SchoolTombstone::getSchoolId)
             .map(UUID::fromString).toList();
 
-    log.info("condition 2  {}", transcriptEligibleClosedSchools.size());
-
     if(!transcriptEligibleClosedSchools.isEmpty()) {
       updatedUserSchoolEntities.addAll(updateUsersForTranscriptEligibleSchools(transcriptEligibleClosedSchools));
     }
 
-    log.info("condition 2  {}", updatedUserSchoolEntities.size());
     edxUserSchoolsRepository.saveAll(updatedUserSchoolEntities);
   }
 
