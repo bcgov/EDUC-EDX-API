@@ -1,12 +1,14 @@
 package ca.bc.gov.educ.api.edx.controller;
 
 import ca.bc.gov.educ.api.edx.constants.v1.URL;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.mappers.v1.SecureExchangeEntityMapper;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeRequestRepository;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.service.v1.SecureExchangeStudentService;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -24,6 +27,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,6 +49,8 @@ class EdxStudentControllerTest extends BaseEdxControllerTest {
   @InjectMocks
   SecureExchangeStudentService studentService;
 
+  @MockBean
+  RestUtils restUtils;
   private static final String LEGIT_STUDENT_ID = "ac339d70-7649-1a2e-8176-49fbef5e0059";
 
   @BeforeEach
@@ -57,18 +64,19 @@ class EdxStudentControllerTest extends BaseEdxControllerTest {
   }
 
 
-//  @Test
-//  void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
-//    final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
-//    final String sid = entity.getSecureExchangeID().toString();
-//    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
-//        .with(jwt().jwt((jwt) -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
-//        .contentType(MediaType.APPLICATION_JSON)
-//        .content(getStudentJson(UUID.randomUUID().toString()))
-//        .accept(MediaType.APPLICATION_JSON))
-//      .andDo(print())
-//      .andExpect(status().isNotFound());
-//  }
+  @Test
+  void testAddSecureExchangeStudents_GivenInvalidStudentID_ShouldReturnStatusNotFound() throws Exception {
+    final SecureExchangeEntity entity = createSecureExchangeEntityWithStudents(null);
+    final String sid = entity.getSecureExchangeID().toString();
+    when(restUtils.getStudentByStudentID(anyString())).thenThrow(NotFoundException.class);
+    this.mockMvc.perform(post(URL.BASE_URL_SECURE_EXCHANGE + "/" + URL.SECURE_EXCHANGE_ID_STUDENTS, sid)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_SECURE_EXCHANGE_STUDENT")))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(getStudentJson(UUID.randomUUID().toString()))
+        .accept(MediaType.APPLICATION_JSON))
+      .andDo(print())
+      .andExpect(status().isNotFound());
+  }
 
   @Test
   void testAddExchangeStudents_GivenInvalidExchangeID_ShouldReturnStatusNotFound() throws Exception {

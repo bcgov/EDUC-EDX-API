@@ -1,11 +1,13 @@
 package ca.bc.gov.educ.api.edx.rest;
 
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
+import ca.bc.gov.educ.api.edx.struct.studentapi.v1.Student;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -73,6 +76,19 @@ public class RestUtils {
     } else {
       log.info("email outbound to CHES is switched off");
     }
+  }
+
+  public Student getStudentByStudentID(final String studentID) {
+    return this.webClient.get()
+            .uri(this.props.getStudentApiEndpoint(), uri -> uri.path("/{studentID}").build(studentID))
+            .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .onStatus(
+                    HttpStatus.NOT_FOUND::equals,
+                    clientResponse -> clientResponse.bodyToMono(String.class).map(NotFoundException::new)
+            )
+            .bodyToMono(Student.class)
+            .block();
   }
 
   private void logError(final Throwable throwable, final CHESEmail chesEmailEntity) {
