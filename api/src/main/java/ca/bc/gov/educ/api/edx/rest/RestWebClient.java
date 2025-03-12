@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.edx.rest;
 import ca.bc.gov.educ.api.edx.helpers.LogHelper;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import lombok.val;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -47,6 +48,32 @@ public class RestWebClient {
     this.connector = new ReactorClientHttpConnector(client);
   }
 
+  @Bean
+  @Autowired
+  WebClient webClient(final WebClient.Builder builder) {
+    val clientRegistryRepo = new InMemoryReactiveClientRegistrationRepository(ClientRegistration
+            .withRegistrationId(this.props.getEdxClientID())
+            .tokenUri(this.props.getTokenURL())
+            .clientId(this.props.getEdxClientID())
+            .clientSecret(this.props.getEdxClientSecret())
+            .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+            .build());
+    val clientService = new InMemoryReactiveOAuth2AuthorizedClientService(clientRegistryRepo);
+    val authorizedClientManager =
+            new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(clientRegistryRepo, clientService);
+    val oauthFilter = new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+    oauthFilter.setDefaultClientRegistrationId(this.props.getEdxClientID());
+    return builder
+            .defaultHeader("X-Client-Name", ApplicationProperties.CLIENT_ID)
+            .codecs(configurer -> configurer
+                    .defaultCodecs()
+                    .maxInMemorySize(100 * 1024 * 1024))
+            .filter(this.log())
+            .clientConnector(this.connector)
+            .uriBuilderFactory(this.factory)
+            .filter(oauthFilter)
+            .build();
+  }
 
   @Bean
   WebClient chesWebClient() {

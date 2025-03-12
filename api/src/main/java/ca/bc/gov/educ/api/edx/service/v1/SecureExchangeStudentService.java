@@ -28,24 +28,19 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
-
-    private final RESTService restService;
-    private final ApplicationProperties applicationProperties;
     private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
     private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
 
     @Autowired
-    public SecureExchangeStudentService(SecureExchangeService exchangeService, RESTService restService, ApplicationProperties applicationProperties, SecureExchangeStudentRepository repository) {
+    public SecureExchangeStudentService(SecureExchangeService exchangeService, SecureExchangeStudentRepository repository) {
         this.exchangeService = exchangeService;
-        this.restService = restService;
-        this.applicationProperties = applicationProperties;
         this.repository = repository;
     }
 
     public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
         // not found exception handler will fire if student not found
-        restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
+//        restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
         // entity not found will fire if not found
         SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
         if (secureExchangeEntity.getSecureExchangeStudents() == null) {
