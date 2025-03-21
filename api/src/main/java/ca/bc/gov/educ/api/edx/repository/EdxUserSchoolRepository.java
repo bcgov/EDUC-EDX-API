@@ -6,13 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEntity, UUID> {
+
   @Query(value = " SELECT userSchool.*\n" +
     "         FROM EDX_USER_SCHOOL userSchool inner join EDX_USER_SCHOOL_ROLE userSchoolRole on userSchool.EDX_USER_SCHOOL_ID = userSchoolRole.EDX_USER_SCHOOL_ID\n" +
     "         inner join EDX_ROLE role on role.EDX_ROLE_CODE = userSchoolRole.EDX_ROLE_CODE\n" +
@@ -26,9 +26,5 @@ public interface EdxUserSchoolRepository extends JpaRepository<EdxUserSchoolEnti
   List<EdxUserSchoolEntity> findAllBySchoolID(UUID schoolID);
 
   List<EdxUserSchoolEntity> findAllBySchoolIDIn(List<UUID> schoolIDs);
-
-  List<EdxUserSchoolEntity> findAllByExpiryDateBefore(LocalDateTime dateTime);
-
-  List<EdxUserSchoolEntity> findAllBySchoolIDAndExpiryDateIsNull(UUID schoolID);
 
 }
