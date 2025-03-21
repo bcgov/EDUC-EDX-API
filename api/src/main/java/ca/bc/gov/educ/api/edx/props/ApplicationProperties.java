@@ -66,4 +66,17 @@ public class ApplicationProperties {
 
   @Value("${roles.allow.list}")
   private List<String> allowRolesList;
+
+  @Value("${edx.client.id}")
+  private String edxClientID;
+  /**
+   * The Client secret.
+   */
+  @Value("${edx.client.secret}")
+  private String edxClientSecret;
+  /**
+   * The Token url.
+   */
+  @Value("${url.token}")
+  private String tokenURL;
 }

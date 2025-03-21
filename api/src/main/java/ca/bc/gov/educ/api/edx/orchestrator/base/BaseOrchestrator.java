@@ -289,15 +289,17 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
     if (this.shouldSendNotificationEvent) {
       final var finalEvent = new NotificationEvent();
       BeanUtils.copyProperties(event, finalEvent);
-      finalEvent.setEventType(MARK_SAGA_COMPLETE);
-      finalEvent.setEventOutcome(SAGA_COMPLETED);
+      finalEvent.setEventType(MARK_SAGA_COMPLETE.toString());
+      finalEvent.setEventOutcome(SAGA_COMPLETED.toString());
       finalEvent.setSagaStatus(COMPLETED.toString());
       finalEvent.setSagaName(this.getSagaName());
       finalEvent.setEventPayload(payloadToSubscribers);
       this.postMessageToTopic(this.getTopicToSubscribe(), finalEvent);
     }
 
-    final SagaEventStatesEntity sagaEventStates = this.createEventState(saga, event.getEventType(), event.getEventOutcome(), event.getEventPayload());
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+    final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+    final SagaEventStatesEntity sagaEventStates = this.createEventState(saga, eventTypeValue, eventOutcomeValue, event.getEventPayload());
     saga.setSagaState(COMPLETED.toString());
     saga.setStatus(COMPLETED.toString());
     saga.setUpdateDate(LocalDateTime.now());
@@ -382,8 +384,8 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
       final EventType currentEvent = EventType.valueOf(sagaEvent.getSagaEventState());
       final EventOutcome eventOutcome = EventOutcome.valueOf(sagaEvent.getSagaEventOutcome());
       final Event event = Event.builder()
-        .eventOutcome(eventOutcome)
-        .eventType(currentEvent)
+        .eventOutcome(eventOutcome.toString())
+        .eventType(currentEvent.toString())
         .eventPayload(sagaEvent.getSagaEventResponse())
         .build();
       this.findAndInvokeNextStep(saga, t, currentEvent, eventOutcome, event);
@@ -421,8 +423,8 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
    */
   private void replayFromBeginning(final SagaEntity saga, final T t) throws InterruptedException, TimeoutException, IOException {
     final Event event = Event.builder()
-      .eventOutcome(INITIATE_SUCCESS)
-      .eventType(INITIATED)
+      .eventOutcome(INITIATE_SUCCESS.toString())
+      .eventType(INITIATED.toString())
       .build();
     this.findAndInvokeNextStep(saga, t, INITIATED, INITIATE_SUCCESS, event);
   }
@@ -452,7 +454,9 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
       if (!COMPLETED.toString().equalsIgnoreCase(sagaOptional.get().getStatus())) {//possible duplicate message or force stop scenario check
         final T sagaData = JsonUtil.getJsonObjectFromString(this.clazz, saga.getPayload());
         log.info("Steps registered: " + this.nextStepsToExecute);
-        final var sagaEventState = this.findNextSagaEventState(event.getEventType(), event.getEventOutcome(), sagaData);
+        final EventType eventTypeValue = EventType.valueOf(event.getEventType());
+        final EventOutcome eventOutcomeValue = EventOutcome.valueOf(event.getEventOutcome());
+        final var sagaEventState = this.findNextSagaEventState(eventTypeValue, eventOutcomeValue, sagaData);
         log.trace("found next event as {}", sagaEventState);
         if (sagaEventState.isPresent()) {
           this.process(event, saga, sagaData, sagaEventState.get());
@@ -478,8 +482,8 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
   public void startSaga(@NotNull final SagaEntity saga) {
     try {
       this.handleEvent(Event.builder()
-        .eventType(EventType.INITIATED)
-        .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+        .eventType(EventType.INITIATED.toString())
+        .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
         .sagaId(saga.getSagaId())
         .eventPayload(saga.getPayload())
         .build());
@@ -507,8 +511,8 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
    * @return true if this message need not be processed further.
    */
   private boolean sagaEventExecutionNotRequired(@NotNull final Event event) {
-    return (event.getEventType() == INITIATED && event.getEventOutcome() == INITIATE_SUCCESS && SELF.equalsIgnoreCase(event.getReplyTo()))
-      || event.getEventType() == MARK_SAGA_COMPLETE && event.getEventOutcome() == SAGA_COMPLETED;
+    return (event.getEventType().equalsIgnoreCase(INITIATED.toString()) && event.getEventOutcome().equalsIgnoreCase(INITIATE_SUCCESS.toString()) && SELF.equalsIgnoreCase(event.getReplyTo()))
+      || event.getEventType().equalsIgnoreCase(MARK_SAGA_COMPLETE.toString()) && event.getEventOutcome().equalsIgnoreCase(SAGA_COMPLETED.toString());
   }
 
   /**
@@ -518,7 +522,7 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
    */
   private void broadcastSagaInitiatedMessage(@NotNull final Event event) {
     // !SELF.equalsIgnoreCase(event.getReplyTo()):- this check makes sure it is not broadcast-ed infinitely.
-    if (this.shouldSendNotificationEvent && event.getEventType() == INITIATED && event.getEventOutcome() == INITIATE_SUCCESS
+    if (this.shouldSendNotificationEvent && event.getEventType().equalsIgnoreCase(INITIATED.toString()) && event.getEventOutcome().equalsIgnoreCase(INITIATE_SUCCESS.toString())
       && !SELF.equalsIgnoreCase(event.getReplyTo())) {
       final var notificationEvent = new NotificationEvent();
       BeanUtils.copyProperties(event, notificationEvent);
@@ -556,8 +560,9 @@ public abstract class BaseOrchestrator<T> implements EventHandler, Orchestrator 
    * @throws IOException          if there is connectivity problem
    */
   protected void process(@NotNull final Event event, final SagaEntity saga, final T sagaData, final SagaEventState<T> sagaEventState) throws InterruptedException, TimeoutException, IOException {
+    final EventType eventTypeValue = EventType.valueOf(event.getEventType());
     if (!saga.getSagaState().equalsIgnoreCase(COMPLETED.toString())
-      && this.isNotProcessedEvent(event.getEventType(), saga, this.nextStepsToExecute.keySet())) {
+      && this.isNotProcessedEvent(eventTypeValue, saga, this.nextStepsToExecute.keySet())) {
       log.info(SYSTEM_IS_GOING_TO_EXECUTE_NEXT_EVENT_FOR_CURRENT_EVENT, sagaEventState.getNextEventType(), event, saga.getSagaId());
       this.invokeNextEvent(event, saga, sagaData, sagaEventState);
     } else {

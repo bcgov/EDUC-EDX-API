@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeStudentEntity;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.SecureExchangeStudentRepository;
+import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchange;
 import ca.bc.gov.educ.api.edx.struct.v1.SecureExchangeStudent;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
@@ -28,24 +29,21 @@ public class SecureExchangeStudentService {
 
     @Getter(AccessLevel.PRIVATE)
     private final SecureExchangeService exchangeService;
-
-    private final RESTService restService;
-    private final ApplicationProperties applicationProperties;
     private static final SecureExchangeEntityMapper secureExchangeMapper = SecureExchangeEntityMapper.mapper;
     private static final SecureExchangeStudentMapper studentMapper = SecureExchangeStudentMapper.mapper;
     private final SecureExchangeStudentRepository repository;
+    private final RestUtils restUtils;
 
     @Autowired
-    public SecureExchangeStudentService(SecureExchangeService exchangeService, RESTService restService, ApplicationProperties applicationProperties, SecureExchangeStudentRepository repository) {
+    public SecureExchangeStudentService(SecureExchangeService exchangeService, SecureExchangeStudentRepository repository, RestUtils restUtils) {
         this.exchangeService = exchangeService;
-        this.restService = restService;
-        this.applicationProperties = applicationProperties;
         this.repository = repository;
+        this.restUtils = restUtils;
     }
 
     public SecureExchange addStudentToExchange(UUID secureExchangeID, SecureExchangeStudent secureExchangeStudent) throws NotFoundException, EntityNotFoundException {
         // not found exception handler will fire if student not found
-        restService.get(applicationProperties.getStudentApiEndpoint() + secureExchangeStudent.getStudentId(), String.class);
+        restUtils.getStudentByStudentID(secureExchangeStudent.getStudentId());
         // entity not found will fire if not found
         SecureExchangeEntity secureExchangeEntity = this.exchangeService.retrieveSecureExchange(secureExchangeID);
         if (secureExchangeEntity.getSecureExchangeStudents() == null) {

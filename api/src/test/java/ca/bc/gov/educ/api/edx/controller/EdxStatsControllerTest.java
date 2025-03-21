@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.edx.controller.v1.EdxStatsController;
 import ca.bc.gov.educ.api.edx.model.v1.SecureExchangeEntity;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.District;
 import ca.bc.gov.educ.api.edx.struct.v1.School;
 import org.junit.jupiter.api.AfterEach;
@@ -96,8 +97,8 @@ class EdxStatsControllerTest extends BaseEdxControllerTest {
 
     String schoolId = UUID.randomUUID().toString();
 
-    Map<String, School> schoolMap = new ConcurrentHashMap<>();
-    schoolMap.put(schoolId, createDummySchool(schoolId));
+    Map<String, SchoolTombstone> schoolMap = new ConcurrentHashMap<>();
+    schoolMap.put(schoolId, createSchool(schoolId));
 
     Mockito.when(this.restUtils.getSchoolMap()).thenReturn(schoolMap);
 
@@ -146,10 +147,10 @@ class EdxStatsControllerTest extends BaseEdxControllerTest {
   void schoolListWithoutActiveSecureExchangeUser_WithEdxUsers_ShouldReturnOneSchoolWithoutExchangeUsers() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
     String schoolIdWithUser = entity.getEdxUserSchoolEntities().stream().findFirst().get().getSchoolID().toString();
-    School dummySchoolWithUser = createDummySchool(schoolIdWithUser);
+    SchoolTombstone dummySchoolWithUser = createSchool(schoolIdWithUser);
     dummySchoolWithUser.setDisplayName("School with user");
 
-    Mockito.when(this.restUtils.getSchools()).thenReturn(List.of(createDummySchool(UUID.randomUUID().toString()), dummySchoolWithUser));
+    Mockito.when(this.restUtils.getSchools()).thenReturn(List.of(createSchool(UUID.randomUUID().toString()), dummySchoolWithUser));
 
     this.mockMvc.perform(get(URL.BASE_URL_SECURE_EXCHANGE + "/stats/school-list-without-active-edx-users")
             .with(jwt().jwt((jwt) -> jwt.claim("scope", "READ_EDX_USERS"))).param("permissionCode", "SECURE_EXCHANGE"))
@@ -179,6 +180,19 @@ class EdxStatsControllerTest extends BaseEdxControllerTest {
 
   private School createDummySchool(String schoolId) {
     School school = new School();
+    school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
+    school.setSchoolId(schoolId);
+    school.setMincode("1234567");
+    school.setSchoolNumber("00002");
+    school.setDisplayName("Test School");
+    school.setSchoolOrganizationCode("TRIMESTER");
+    school.setSchoolCategoryCode("FED_BAND");
+    school.setFacilityTypeCode("STANDARD");
+    return school;
+  }
+
+  private SchoolTombstone createSchool(String schoolId) {
+    SchoolTombstone school = new SchoolTombstone();
     school.setDistrictId("34bb7566-ff59-653e-f778-2c1a4d669b00");
     school.setSchoolId(schoolId);
     school.setMincode("1234567");

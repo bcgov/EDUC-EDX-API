@@ -129,8 +129,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
   void testCreateNewSecureExchangeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -138,8 +138,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
@@ -160,8 +160,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
   void testCreateNewSecureExchangeEvent_GivenEventAndSagaDataWithRepeatScenarioAndSecureExchangeExistsInDB_ShouldSkipAddingTheSameSecureExchangeAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -169,8 +169,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
     this.orchestrator.replaySaga(this.sagaRepository.findById(this.saga.getSagaId()).orElseThrow());
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
@@ -192,8 +192,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -201,16 +201,16 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(NEW_SECURE_EXCHANGE_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_NEW_SECURE_EXCHANGE.toString());
 
     final var nextEvent = Event.builder()
-      .eventType(CREATE_NEW_SECURE_EXCHANGE)
-      .eventOutcome(EventOutcome.NEW_SECURE_EXCHANGE_CREATED)
+      .eventType(CREATE_NEW_SECURE_EXCHANGE.toString())
+      .eventOutcome(EventOutcome.NEW_SECURE_EXCHANGE_CREATED.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(newEvent.getEventPayload())
       .build();
@@ -218,8 +218,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE);
-    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT);
+    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE.toString());
+    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT.toString());
 
   }
 
@@ -227,8 +227,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
   void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE)
-      .eventOutcome(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT)
+      .eventType(SEND_EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE.toString())
+      .eventOutcome(EMAIL_NOTIFICATION_FOR_NEW_SECURE_EXCHANGE_SENT.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -236,8 +236,8 @@ class EdxNewEdxOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
+    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED.toString());
 
   }
 }

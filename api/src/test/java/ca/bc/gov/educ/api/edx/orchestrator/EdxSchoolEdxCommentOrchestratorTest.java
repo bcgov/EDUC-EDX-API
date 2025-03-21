@@ -133,8 +133,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
   void testCreateSecureExchangeCommentEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -142,8 +142,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
@@ -165,8 +165,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
   void testCreateSecureExchangeCommentEvent_GivenEventAndSagaDataWithRepeatScenarioAndCommentAlreadyExistInDB_ShouldSkipAddingTheSameCommentAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -176,8 +176,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
@@ -199,8 +199,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -208,16 +208,16 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SECURE_EXCHANGE_COMMENT_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_SECURE_EXCHANGE_COMMENT.toString());
 
     final var nextEvent = Event.builder()
-      .eventType(CREATE_SECURE_EXCHANGE_COMMENT)
-      .eventOutcome(EventOutcome.SECURE_EXCHANGE_COMMENT_CREATED)
+      .eventType(CREATE_SECURE_EXCHANGE_COMMENT.toString())
+      .eventOutcome(EventOutcome.SECURE_EXCHANGE_COMMENT_CREATED.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(newEvent.getEventPayload())
       .build();
@@ -225,8 +225,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT);
-    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT);
+    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT.toString());
+    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT.toString());
 
   }
 
@@ -234,8 +234,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
   void testMarkSagaCompleteEventForCreateSecureExchangeComment_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT)
-      .eventOutcome(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT)
+      .eventType(SEND_EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT.toString())
+      .eventOutcome(EMAIL_NOTIFICATION_FOR_SECURE_EXCHANGE_COMMENT_SENT.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -243,8 +243,8 @@ class EdxSchoolEdxCommentOrchestratorTest extends BaseSagaControllerTest {
 
     verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
+    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED.toString());
 
   }
 

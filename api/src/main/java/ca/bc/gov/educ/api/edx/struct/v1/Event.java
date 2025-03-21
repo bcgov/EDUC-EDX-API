@@ -22,11 +22,11 @@ public class Event {
   /**
    * The Event type.
    */
-  private EventType eventType;
+  private String eventType;
   /**
    * The Event outcome.
    */
-  private EventOutcome eventOutcome;
+  private String eventOutcome;
   /**
    * The Saga id.
    */

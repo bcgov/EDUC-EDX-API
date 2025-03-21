@@ -132,8 +132,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
   void testCreatePersonalActivationCodeEvent_GivenEventAndSagaData_ShouldCreateRecordInDBAndPostMessageToNats() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -141,8 +141,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
@@ -166,8 +166,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
     //to create the test data/
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(INITIATED)
-      .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+      .eventType(INITIATED.toString())
+      .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -175,16 +175,16 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
 
     verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED);
+    assertThat(newEvent.getEventType()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(PERSONAL_ACTIVATION_CODE_CREATED.toString());
 
     final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
     assertThat(sagaFromDB).isPresent();
     assertThat(sagaFromDB.get().getSagaState()).isEqualTo(CREATE_PERSONAL_ACTIVATION_CODE.toString());
 
     final var nextEvent = Event.builder()
-      .eventType(CREATE_PERSONAL_ACTIVATION_CODE)
-      .eventOutcome(EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED)
+      .eventType(CREATE_PERSONAL_ACTIVATION_CODE.toString())
+      .eventOutcome(EventOutcome.PERSONAL_ACTIVATION_CODE_CREATED.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(newEvent.getEventPayload())
       .build();
@@ -192,8 +192,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
 
     verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL);
-    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT);
+    assertThat(nextNewEvent.getEventType()).isEqualTo(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL.toString());
+    assertThat(nextNewEvent.getEventOutcome()).isEqualTo(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT.toString());
 
   }
 
@@ -201,8 +201,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
   void testMarkSagaCompleteEvent_GivenEventAndSagaData_ShouldMarkSagaCompleted() throws IOException, InterruptedException, TimeoutException {
     final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
     final var event = Event.builder()
-      .eventType(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL)
-      .eventOutcome(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT)
+      .eventType(SEND_EDX_SCHOOL_USER_ACTIVATION_EMAIL.toString())
+      .eventOutcome(EDX_SCHOOL_USER_ACTIVATION_EMAIL_SENT.toString())
       .sagaId(this.saga.getSagaId())
       .eventPayload(sagaPayload)
       .build();
@@ -210,8 +210,8 @@ class EdxSchoolUserActivationInviteOrchestratorTest extends BaseEdxAPITest {
 
     verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
     final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE);
-    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED);
+    assertThat(newEvent.getEventType()).isEqualTo(MARK_SAGA_COMPLETE.toString());
+    assertThat(newEvent.getEventOutcome()).isEqualTo(SAGA_COMPLETED.toString());
 
   }
 

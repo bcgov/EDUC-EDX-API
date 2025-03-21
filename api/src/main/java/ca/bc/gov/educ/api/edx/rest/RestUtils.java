@@ -1,10 +1,13 @@
 package ca.bc.gov.educ.api.edx.rest;
 
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.exception.NotFoundException;
 import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
+import ca.bc.gov.educ.api.edx.struct.studentapi.v1.Student;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -74,6 +78,19 @@ public class RestUtils {
     }
   }
 
+  public Student getStudentByStudentID(final String studentID) {
+    return this.webClient.get()
+            .uri(this.props.getStudentApiEndpoint(), uri -> uri.path("/{studentID}").build(studentID))
+            .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .onStatus(
+                    HttpStatus.NOT_FOUND::equals,
+                    clientResponse -> clientResponse.bodyToMono(String.class).map(NotFoundException::new)
+            )
+            .bodyToMono(Student.class)
+            .block();
+  }
+
   private void logError(final Throwable throwable, final CHESEmail chesEmailEntity) {
     log.error("Error from CHES API call :: {} ", chesEmailEntity, throwable);
   }
@@ -118,8 +135,8 @@ public class RestUtils {
     this.sendEmail(this.getChesEmail(fromEmail, toEmail, body, subject));
   }
 
-  public Map<String, School> getSchoolMap() {
-    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+  public Map<String, SchoolTombstone> getSchoolMap() {
+    Map<String, SchoolTombstone> schoolMap = new ConcurrentHashMap<>();
     for (val school : this.getSchools()) {
       schoolMap.put(school.getSchoolId(), school);
     }
@@ -127,8 +144,8 @@ public class RestUtils {
     return schoolMap;
   }
 
-  public Map<String, School> getSchoolMincodeMap() {
-    Map<String, School> schoolMap = new ConcurrentHashMap<>();
+  public Map<String, SchoolTombstone> getSchoolMincodeMap() {
+    Map<String, SchoolTombstone> schoolMap = new ConcurrentHashMap<>();
     for (val school : this.getSchools()) {
       schoolMap.put(school.getMincode(), school);
     }
@@ -136,8 +153,8 @@ public class RestUtils {
     return schoolMap;
   }
 
-  public Map<String, List<School>> getDistrictSchoolsMap() {
-    Map<String, List<School>> districtSchoolsMap = new ConcurrentHashMap<>();
+  public Map<String, List<SchoolTombstone>> getDistrictSchoolsMap() {
+    Map<String, List<SchoolTombstone>> districtSchoolsMap = new ConcurrentHashMap<>();
     for (val school : this.getSchools()) {
       if(!districtSchoolsMap.containsKey(school.getDistrictId())){
         districtSchoolsMap.put(school.getDistrictId(),new ArrayList<>());
@@ -149,13 +166,13 @@ public class RestUtils {
     return districtSchoolsMap;
   }
 
-  public List<School> getSchools() {
+  public List<SchoolTombstone> getSchools() {
     log.info("Calling Institute api to get list of schools");
     return this.webClient.get()
         .uri(this.props.getInstituteApiURL() + "/school")
         .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
         .retrieve()
-        .bodyToFlux(School.class)
+        .bodyToFlux(SchoolTombstone.class)
         .collectList()
         .block();
   }
@@ -204,7 +221,7 @@ public class RestUtils {
       log.debug("Sys Criteria: {}", searches);
       final TypeReference<List<School>> ref = new TypeReference<>() {
       };
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS.toString()).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).completeOnTimeout(null, 60, TimeUnit.SECONDS).get();
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
@@ -230,7 +247,7 @@ public class RestUtils {
       log.debug("Sys Criteria: {}", searches);
       final TypeReference<List<School>> ref = new TypeReference<>() {
       };
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.GET_PAGINATED_SCHOOLS.toString()).eventPayload("searchCriteriaList".concat("=").concat(URLEncoder.encode(this.objectMapper.writeValueAsString(searches), StandardCharsets.UTF_8)).concat("&").concat("pageSize").concat("=").concat("100000")).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).completeOnTimeout(null, 60, TimeUnit.SECONDS).get();
       if (null != responseMessage) {
         return objectMapper.readValue(responseMessage.getData(), ref);
@@ -247,7 +264,7 @@ public class RestUtils {
   @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School createSchool(UUID correlationID,School school) {
     try {
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.CREATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.CREATE_SCHOOL.toString()).eventPayload(objectMapper.writeValueAsString(school)).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).get();
       if (null != responseMessage) {
         Event eventPayload = JsonUtil.getJsonObjectFromBytes(Event.class, responseMessage.getData());
@@ -265,7 +282,7 @@ public class RestUtils {
   @Retryable(retryFor = {Exception.class}, noRetryFor = {SagaRuntimeException.class}, backoff = @Backoff(multiplier = 2, delay = 2000))
   public School updateSchool(UUID correlationID,School school) {
     try {
-      Object event = Event.builder().sagaId(correlationID).eventType(EventType.UPDATE_SCHOOL).eventPayload(objectMapper.writeValueAsString(school)).build();
+      Object event = Event.builder().sagaId(correlationID).eventType(EventType.UPDATE_SCHOOL.toString()).eventPayload(objectMapper.writeValueAsString(school)).build();
       val responseMessage = this.messagePublisher.requestPaginatedMessage(INSTITUTE_API_TOPIC, JsonUtil.getJsonSBytesFromObject(event)).get();
       if (null != responseMessage) {
         Event eventPayload = JsonUtil.getJsonObjectFromBytes(Event.class, responseMessage.getData());

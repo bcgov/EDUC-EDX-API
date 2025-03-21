@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx;
 
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -520,5 +521,19 @@ public abstract class BaseEdxAPITest {
 
   protected String getJsonString(Object obj) throws JsonProcessingException {
     return objectMapper.writeValueAsString(obj);
+  }
+
+  public SchoolTombstone createMockSchoolTombstone() {
+    final SchoolTombstone schoolTombstone = new SchoolTombstone();
+    schoolTombstone.setSchoolId(UUID.randomUUID().toString());
+    schoolTombstone.setDistrictId(UUID.randomUUID().toString());
+    schoolTombstone.setDisplayName("Test school");
+    schoolTombstone.setMincode("03636018");
+    schoolTombstone.setSchoolNumber("36018");
+    schoolTombstone.setOpenedDate("1964-09-01T00:00:00");
+    schoolTombstone.setSchoolCategoryCode("PUBLIC");
+    schoolTombstone.setSchoolReportingRequirementCode("REGULAR");
+    schoolTombstone.setFacilityTypeCode("STANDARD");
+    return schoolTombstone;
   }
 }

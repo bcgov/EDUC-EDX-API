@@ -127,8 +127,8 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     void testMoveSchool_GivenEventAndSagaData_shouldPostEventToInstituteApi() throws IOException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
-            .eventType(INITIATED)
-            .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+            .eventType(INITIATED.toString())
+            .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
             .sagaId(this.saga.getSagaId())
             .eventPayload(sagaPayload)
             .build();
@@ -136,7 +136,7 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 1)).dispatchMessage(eq(INSTITUTE_API_TOPIC.toString()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(MOVE_SCHOOL);
+        assertThat(newEvent.getEventType()).isEqualTo(MOVE_SCHOOL.toString());
         assertThat(newEvent.getEventPayload()).isEqualTo(sagaPayload);
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
@@ -151,8 +151,8 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
     void testMoveSchoolEvent_GivenEventAndSagaData_ShouldCreateRecordInDB() throws IOException, InterruptedException, TimeoutException {
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
-            .eventType(MOVE_SCHOOL)
-            .eventOutcome(EventOutcome.SCHOOL_MOVED)
+            .eventType(MOVE_SCHOOL.toString())
+            .eventOutcome(EventOutcome.SCHOOL_MOVED.toString())
             .sagaId(this.saga.getSagaId())
             .eventPayload(sagaPayload)
             .build();
@@ -160,8 +160,8 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED);
+        assertThat(newEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL.toString());
+        assertThat(newEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED.toString());
 
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
@@ -181,8 +181,8 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         final var invocations = mockingDetails(this.messagePublisher).getInvocations().size();
         final var event = Event.builder()
-                .eventType(INITIATED)
-                .eventOutcome(EventOutcome.INITIATE_SUCCESS)
+                .eventType(INITIATED.toString())
+                .eventOutcome(EventOutcome.INITIATE_SUCCESS.toString())
                 .sagaId(this.saga.getSagaId())
                 .eventPayload(sagaPayload)
                 .build();
@@ -190,16 +190,16 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 2)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var newEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(newEvent.getEventType()).isEqualTo(INITIATED);
-        assertThat(newEvent.getEventOutcome()).isEqualTo(INITIATE_SUCCESS);
+        assertThat(newEvent.getEventType()).isEqualTo(INITIATED.toString());
+        assertThat(newEvent.getEventOutcome()).isEqualTo(INITIATE_SUCCESS.toString());
 
         final var sagaFromDB = this.sagaService.findSagaById(this.saga.getSagaId());
         assertThat(sagaFromDB).isPresent();
         assertThat(sagaFromDB.get().getSagaState()).isEqualTo(MOVE_SCHOOL.toString());
 
         final var nextEvent = Event.builder()
-                .eventType(MOVE_SCHOOL)
-                .eventOutcome(SCHOOL_MOVED)
+                .eventType(MOVE_SCHOOL.toString())
+                .eventOutcome(SCHOOL_MOVED.toString())
                 .sagaId(this.saga.getSagaId())
                 .eventPayload(newEvent.getEventPayload())
                 .build();
@@ -207,8 +207,8 @@ class MoveSchoolOrchestratorTest extends BaseSagaControllerTest {
 
         verify(this.messagePublisher, atMost(invocations + 3)).dispatchMessage(eq(this.orchestrator.getTopicToSubscribe()), this.eventCaptor.capture());
         final var nextNewEvent = JsonUtil.getJsonObjectFromString(Event.class, new String(this.eventCaptor.getValue()));
-        assertThat(nextNewEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL);
-        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED);
+        assertThat(nextNewEvent.getEventType()).isEqualTo(COPY_USERS_TO_NEW_SCHOOL.toString());
+        assertThat(nextNewEvent.getEventOutcome()).isEqualTo(USERS_TO_NEW_SCHOOL_COPIED.toString());
 
         final List<EdxUserSchoolEntity> edxUserSchoolEntityList = this.edxUserSchoolRepository.findAll();
         assertThat(edxUserSchoolEntityList).hasSize(2);
