@@ -88,7 +88,7 @@ public class EdxUsersService {
   private static final List<String> INDEPENDENT_SCHOOL_CATEGORIES = Arrays.asList("INDEPEND", "INDP_FNS", "FED_BAND");
   private static final String GRAD_SCHOOL_ADMIN_ROLE = "GRAD_SCH_ADMIN";
   private static final String SECURE_EXCHANGE_SCHOOL_ROLE = "SECURE_EXCHANGE_SCHOOL";
-  private static final List<String> ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH = Arrays.asList(GRAD_SCHOOL_ADMIN_ROLE, SECURE_EXCHANGE_SCHOOL_ROLE);
+  private static final List<String> ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH = Arrays.asList(SECURE_EXCHANGE_SCHOOL_ROLE);
 
   @Autowired
   public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
@@ -1125,20 +1125,30 @@ public class EdxUsersService {
   }
 
   private List<EdxUserSchoolEntity> updateUsersForTranscriptEligibleSchools(List<UUID> transcriptEligibleClosedSchools) {
+    List<EdxUserSchoolEntity> usersWithRolesToBeUpdated = new ArrayList<>();
     List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(transcriptEligibleClosedSchools);
     log.info("edxSchoolUsers {}", edxSchoolUsers.size());
-    List<EdxUserSchoolEntity> usersWithRolesToBeUpdated = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().noneMatch(role ->
-            role.getEdxRoleCode().equalsIgnoreCase(SECURE_EXCHANGE_SCHOOL_ROLE) || role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
-    log.info("usersWithRolesToBeUpdated {}", usersWithRolesToBeUpdated.size());
-    usersWithRolesToBeUpdated.forEach(schoolUser -> {
+    List<EdxUserSchoolEntity> usersWithGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().anyMatch(role ->
+            role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
+    List<EdxUserSchoolEntity> usersWithoutGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().noneMatch(role ->
+            role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
+    log.info("usersWithRolesToBeUpdated {}", usersWithGradRole.size());
+    usersWithGradRole.forEach(schoolUser -> {
       schoolUser.setCreateDate(LocalDateTime.now());
       schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
       schoolUser.setUpdateDate(LocalDateTime.now());
       schoolUser.setUpdateUser(ApplicationProperties.CLIENT_ID);
 
+      List<EdxUserSchoolRoleEntity> allowedRoles = schoolUser.getEdxUserSchoolRoleEntities().stream().filter(userSchoolRole ->
+        userSchoolRole.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE) || userSchoolRole.getEdxRoleCode().equalsIgnoreCase(SECURE_EXCHANGE_SCHOOL_ROLE)
+      ).toList();
       schoolUser.getEdxUserSchoolRoleEntities().clear();
-      schoolUser.getEdxUserSchoolRoleEntities().addAll(createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(schoolUser));
+      schoolUser.getEdxUserSchoolRoleEntities().addAll(allowedRoles);
     });
+
+    usersWithoutGradRole.forEach(user -> user.getEdxUserSchoolRoleEntities().clear());
+    usersWithRolesToBeUpdated.addAll(usersWithGradRole);
+    usersWithRolesToBeUpdated.addAll(usersWithoutGradRole);
     return usersWithRolesToBeUpdated;
   }
 
@@ -1147,20 +1157,5 @@ public class EdxUsersService {
     List<EdxUserSchoolEntity> usersWithRoles = edxClosedSchoolUsers.stream().filter(user -> !user.getEdxUserSchoolRoleEntities().isEmpty()).toList();
     usersWithRoles.forEach(user -> user.getEdxUserSchoolRoleEntities().clear());
     return usersWithRoles;
-  }
-
-  private Set<EdxUserSchoolRoleEntity> createUserRoleEntityForClosedSchoolsWithTranscriptEligibility(EdxUserSchoolEntity edxUserSchoolEntity) {
-    Set<EdxUserSchoolRoleEntity> schoolRoleEntitySet = new HashSet<>();
-    ALLOWED_ROLES_FOR_CLOSED_TRANSCRIPT_ELIG_SCH.forEach(role -> {
-    final EdxUserSchoolRoleEntity schoolRoleEntity = new EdxUserSchoolRoleEntity();
-    schoolRoleEntity.setEdxUserSchoolEntity(edxUserSchoolEntity);
-    schoolRoleEntity.setEdxRoleCode(role);
-    schoolRoleEntity.setCreateDate(LocalDateTime.now());
-    schoolRoleEntity.setCreateUser(ApplicationProperties.CLIENT_ID);
-    schoolRoleEntity.setUpdateDate(LocalDateTime.now());
-    schoolRoleEntity.setUpdateUser(ApplicationProperties.CLIENT_ID);
-    schoolRoleEntitySet.add(schoolRoleEntity);
-    });
-    return schoolRoleEntitySet;
   }
 }
