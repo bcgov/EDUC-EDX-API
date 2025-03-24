@@ -83,7 +83,7 @@ class EventTaskSchedulerTest extends BaseEdxAPITest {
     var userEntity = edxUserRepository.save(getEdxUserEntity());
     var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
     var roleEntity = getEdxRoleEntity();
-    roleEntity.setEdxRoleCode("EDX_SCHOOL_ADMIN");
+    roleEntity.setEdxRoleCode("GRAD_SCH_ADMIN");
     var rolePermissionEntity = getEdxRolePermissionEntity(roleEntity, permissionEntity);
     roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
     edxRoleRepository.save(roleEntity);
@@ -100,12 +100,12 @@ class EventTaskSchedulerTest extends BaseEdxAPITest {
     assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
     assertThat(userSchoolEntityAfterUpdate.size()).isEqualTo(1);
     assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
-    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities().size()).isEqualTo(2);
+    assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities().size()).isEqualTo(1);
     var updateRoles =  userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities();
     var anyMatchRole1 = updateRoles.stream().anyMatch(role -> role.getEdxRoleCode().equalsIgnoreCase("GRAD_SCH_ADMIN"));
     assertThat(anyMatchRole1).isTrue();
     var anyMatchRole2 = updateRoles.stream().anyMatch(role -> role.getEdxRoleCode().equalsIgnoreCase("SECURE_EXCHANGE_SCHOOL"));
-    assertThat(anyMatchRole2).isTrue();
+    assertThat(anyMatchRole2).isFalse();
     var removedRole = updateRoles.stream().anyMatch(role -> role.getEdxRoleCode().equalsIgnoreCase("EDX_SCHOOL_ADMIN"));
     assertThat(removedRole).isFalse();
   }
