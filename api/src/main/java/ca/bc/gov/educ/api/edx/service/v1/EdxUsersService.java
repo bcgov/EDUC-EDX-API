@@ -1113,6 +1113,7 @@ public class EdxUsersService {
     List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
     if(!edxSchoolUsers.isEmpty()) {
       List<EdxUserSchoolEntity> usersWithGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().anyMatch(role -> role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
+      log.info("transcriptEligibleClosedSchools {}", usersWithGradRole.size());
       if(!usersWithGradRole.isEmpty()) {
         usersWithGradRole.forEach(role -> {
           List<EdxUserSchoolRoleEntity> rolesWithoutGradAdmin = role.getEdxUserSchoolRoleEntities().stream().filter(schoolRole -> !schoolRole.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE)).toList();
