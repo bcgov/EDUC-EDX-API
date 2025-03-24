@@ -74,7 +74,6 @@ public class EventTaskScheduler {
   @SchedulerLock(name = "UPDATE_USER_ROLE_FOR_CLOSED_SCHOOLS", lockAtLeastFor = "${scheduled.jobs.update.user.role.for.closed.school.cron.lockAtLeastFor}", lockAtMostFor = "${scheduled.jobs.update.user.role.for.closed.school.cron.lockAtMostFor}")
   public void updateUserRolesForClosedSchools() {
     LockAssert.assertLocked();
-    log.info("Starting updateUserRolesForClosedSchools");
     edxUsersService.updateUserRolesForClosedSchools();
   }
 

@@ -1081,8 +1081,6 @@ public class EdxUsersService {
             ).map(SchoolTombstone::getSchoolId)
             .map(UUID::fromString).toList();
 
-    log.info("schoolsEligibleForUserRoleRemoval {}", schoolsEligibleForUserRoleRemoval.size());
-
     if(!schoolsEligibleForUserRoleRemoval.isEmpty()) {
       updatedUserSchoolEntities.addAll(removeUserRoles(schoolsEligibleForUserRoleRemoval));
     }
@@ -1100,8 +1098,6 @@ public class EdxUsersService {
     if(!transcriptEligibleClosedSchools.isEmpty()) {
       updatedUserSchoolEntities.addAll(updateUsersForTranscriptEligibleSchools(transcriptEligibleClosedSchools));
     }
-
-    log.info("transcriptEligibleClosedSchools {}", transcriptEligibleClosedSchools.size());
 
     log.info("users to update {}", updatedUserSchoolEntities.size());
     edxUserSchoolsRepository.saveAll(updatedUserSchoolEntities);
@@ -1126,12 +1122,12 @@ public class EdxUsersService {
   private List<EdxUserSchoolEntity> updateUsersForTranscriptEligibleSchools(List<UUID> transcriptEligibleClosedSchools) {
     List<EdxUserSchoolEntity> usersWithRolesToBeUpdated = new ArrayList<>();
     List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolIDIn(transcriptEligibleClosedSchools);
-    log.info("edxSchoolUsers {}", edxSchoolUsers.size());
+
     List<EdxUserSchoolEntity> usersWithGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().anyMatch(role ->
             role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
     List<EdxUserSchoolEntity> usersWithoutGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().noneMatch(role ->
             role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
-    log.info("usersWithRolesToBeUpdated {}", usersWithGradRole.size());
+
     usersWithGradRole.forEach(schoolUser -> {
       schoolUser.setCreateDate(LocalDateTime.now());
       schoolUser.setCreateUser(ApplicationProperties.CLIENT_ID);
