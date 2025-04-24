@@ -6,6 +6,22 @@ UPDATE EDX_ROLE
 SET LABEL = 'Graduation Data Administrator'
 WHERE EDX_ROLE_CODE = 'GRAD_DIS_ADMIN';
 
+UPDATE EDX_ROLE
+SET LABEL = 'Enrolment Data Collection Viewer'
+WHERE EDX_ROLE_CODE = 'DIS_SDC_RO';
+
+UPDATE EDX_ROLE
+SET LABEL = 'Enrolment Data Collection Viewer'
+WHERE EDX_ROLE_CODE = 'SCH_SDC_RO';
+
+UPDATE EDX_ROLE
+SET LABEL = 'Enrolment Data Collection Administrator'
+WHERE EDX_ROLE_CODE = 'SCHOOL_SDC';
+
+UPDATE EDX_ROLE
+SET LABEL = 'Enrolment Data Collection Administrator'
+WHERE EDX_ROLE_CODE = 'DISTRICT_SDC';
+
 INSERT INTO EDX_ROLE (EDX_ROLE_CODE, LABEL, IS_DISTRICT_ROLE, DESCRIPTION, CREATE_USER, UPDATE_USER)
 VALUES ('GRAD_SCH_RO', 'Graduation Data Viewer', FALSE, 'Graduation Data Viewer', 'IDIR/MVILLENE', 'IDIR/MVILLENE');
 
