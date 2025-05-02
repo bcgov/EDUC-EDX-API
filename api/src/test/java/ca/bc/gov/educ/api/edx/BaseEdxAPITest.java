@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx;
 
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.struct.gradschool.v1.GradSchool;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.SecureExchangeAPITestUtils;
@@ -535,5 +536,14 @@ public abstract class BaseEdxAPITest {
     schoolTombstone.setSchoolReportingRequirementCode("REGULAR");
     schoolTombstone.setFacilityTypeCode("STANDARD");
     return schoolTombstone;
+  }
+
+  public GradSchool createMockGradSchool() {
+    final GradSchool gradSchool = new GradSchool();
+    gradSchool.setSchoolID(UUID.randomUUID().toString());
+    gradSchool.setCanIssueTranscripts("Y");
+    gradSchool.setCanIssueCertificates("Y");
+    gradSchool.setSubmissionModeCode("Append");
+    return gradSchool;
   }
 }

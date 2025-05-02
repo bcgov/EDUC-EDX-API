@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.edx.exception.SagaRuntimeException;
 import ca.bc.gov.educ.api.edx.filter.FilterOperation;
 import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
+import ca.bc.gov.educ.api.edx.struct.gradschool.v1.GradSchool;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.studentapi.v1.Student;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
@@ -142,6 +143,25 @@ public class RestUtils {
     }
 
     return schoolMap;
+  }
+
+  public Optional<GradSchool> getGradSchoolBySchoolID(final String schoolID) {
+    Map<String, GradSchool> gradSchoolMap = new ConcurrentHashMap<>();
+    for (val school : this.getGradSchools()) {
+      gradSchoolMap.put(school.getSchoolID(), school);
+    }
+    return Optional.ofNullable(gradSchoolMap.get(schoolID));
+  }
+
+  public List<GradSchool> getGradSchools() {
+    log.info("Calling Grad schools api to load schools");
+    return this.webClient.get()
+            .uri(this.props.getGradSchoolApiURL())
+            .header(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .retrieve()
+            .bodyToFlux(GradSchool.class)
+            .collectList()
+            .block();
   }
 
   public Map<String, SchoolTombstone> getSchoolMincodeMap() {
