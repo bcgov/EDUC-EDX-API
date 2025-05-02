@@ -22,14 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static ca.bc.gov.educ.api.edx.constants.EventType.INITIATED;
 import static ca.bc.gov.educ.api.edx.constants.SagaStatusEnum.IN_PROGRESS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class EventTaskSchedulerTest extends BaseEdxAPITest {
@@ -75,8 +73,12 @@ class EventTaskSchedulerTest extends BaseEdxAPITest {
   @Test
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToYes_And_SchoolIsClosed() {
     var school = createMockSchoolTombstone();
-    school.setCanIssueTranscripts(true);
     school.setClosedDate(String.valueOf(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).minusDays(1)));
+
+    var gradSchool = createMockGradSchool();
+    gradSchool.setSchoolID(school.getSchoolId());
+    gradSchool.setCanIssueTranscripts("Y");
+    when(this.restUtils.getGradSchoolBySchoolID(any())).thenReturn(Optional.of(gradSchool));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 

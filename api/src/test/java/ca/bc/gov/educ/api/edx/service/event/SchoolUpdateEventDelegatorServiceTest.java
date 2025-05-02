@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
-import static ca.bc.gov.educ.api.edx.constants.EventType.UPDATE_SCHOOL;
+import static ca.bc.gov.educ.api.edx.constants.EventType.UPDATE_GRAD_SCHOOL;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
@@ -41,9 +41,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsOpen_shouldNotUpdateExpiryDate() throws IOException {
         var sagaId = UUID.randomUUID();
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(false);
-        school.setClosedDate(null);
+        var school = createMockGradSchool();
+        school.setCanIssueTranscripts("N");
 
         var userEntity = edxUserRepository.save(getEdxUserEntity());
         var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
@@ -53,16 +52,16 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
         edxRoleRepository.save(roleEntity);
 
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolID()));
         var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
         userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
         schoolUpdateEventDelegatorService.handleEvent(event);
 
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
         assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
@@ -71,9 +70,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsTrueAndSchoolIsOpen_shouldNotUpdateExpiryDate() throws IOException {
         var sagaId = UUID.randomUUID();
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(true);
-        school.setClosedDate(null);
+        var school = createMockGradSchool();
+        school.setCanIssueTranscripts("Y");
 
         var userEntity = edxUserRepository.save(getEdxUserEntity());
         var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
@@ -83,16 +81,16 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
         edxRoleRepository.save(roleEntity);
 
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolID()));
         var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
         userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
         schoolUpdateEventDelegatorService.handleEvent(event);
 
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
         assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getExpiryDate()).isNull();
@@ -101,9 +99,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsOpenAndUserHasGRADRole_shouldRemoveGRADRole() throws IOException {
         var sagaId = UUID.randomUUID();
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(false);
-        school.setClosedDate(null);
+        var school = createMockGradSchool();
+        school.setCanIssueTranscripts("N");
 
         var userEntity = edxUserRepository.save(getEdxUserEntity());
         var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
@@ -118,20 +115,20 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         edxRoleRepository.save(roleEntity1);
         edxRoleRepository.save(roleEntity2);
 
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolID()));
         var userSchoolRoleEntity1 = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity1);
         var userSchoolRoleEntity2 = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity2);
         userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity1, userSchoolRoleEntity2));
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        var userSchoolEntityBeforeUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+        var userSchoolEntityBeforeUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityBeforeUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(2);
 
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
         schoolUpdateEventDelegatorService.handleEvent(event);
 
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
         assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(1);
@@ -140,9 +137,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
     @Test
     public void testHandleEvent_givenEventTypeUPDATE_SCHOOL__whenTranscriptEligibilityIsFalseAndSchoolIsOpenAndUserHasNoGRADRole_shouldNotUpdateRole() throws IOException {
         var sagaId = UUID.randomUUID();
-        var school = createMockSchoolTombstone();
-        school.setCanIssueTranscripts(false);
-        school.setClosedDate(null);
+        var school = createMockGradSchool();
+        school.setCanIssueTranscripts("N");
 
         var userEntity = edxUserRepository.save(getEdxUserEntity());
         var permissionEntity = edxPermissionRepository.save(getEdxPermissionEntity());
@@ -152,16 +148,16 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         roleEntity.setEdxRolePermissionEntities(Set.of(rolePermissionEntity));
         edxRoleRepository.save(roleEntity);
 
-        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolId()));
+        var userSchoolEntity = getEdxUserSchoolEntity(userEntity, UUID.fromString(school.getSchoolID()));
         var userSchoolRoleEntity = getEdxUserSchoolRoleEntity(userSchoolEntity, roleEntity);
         userSchoolEntity.setEdxUserSchoolRoleEntities(Set.of(userSchoolRoleEntity));
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
         schoolUpdateEventDelegatorService.handleEvent(event);
 
-        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+        var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
         assertThat(userSchoolEntityAfterUpdate).hasSize(1);
         assertThat(userSchoolEntityAfterUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(1);

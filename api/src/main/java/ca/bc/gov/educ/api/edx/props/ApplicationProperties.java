@@ -79,4 +79,6 @@ public class ApplicationProperties {
    */
   @Value("${url.token}")
   private String tokenURL;
+  @Value("${url.api.grad.school}")
+  private String gradSchoolApiURL;
 }

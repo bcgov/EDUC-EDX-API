@@ -23,6 +23,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class EdxUsersServiceTests extends BaseEdxAPITest {
@@ -440,8 +441,12 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   @Test
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToFalse() {
     var school = createMockSchoolTombstone();
-    school.setCanIssueTranscripts(false);
     school.setClosedDate(String.valueOf(LocalDateTime.now().minusDays(1)));
+
+    var gradSchool = createMockGradSchool();
+    gradSchool.setSchoolID(school.getSchoolId());
+    gradSchool.setCanIssueTranscripts("Y");
+    when(this.restUtils.getGradSchoolBySchoolID(any())).thenReturn(Optional.of(gradSchool));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 
@@ -470,8 +475,12 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   @Test
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToTrueAndIsPastClosedDateBy3Months() {
     var school = createMockSchoolTombstone();
-    school.setCanIssueTranscripts(true);
     school.setClosedDate(String.valueOf(LocalDateTime.now().minusMonths(3).minusDays(1)));
+
+    var gradSchool = createMockGradSchool();
+    gradSchool.setSchoolID(school.getSchoolId());
+    gradSchool.setCanIssueTranscripts("Y");
+    when(this.restUtils.getGradSchoolBySchoolID(any())).thenReturn(Optional.of(gradSchool));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 
@@ -500,8 +509,12 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   @Test
   void testUpdateUserRolesForClosedSchools_givenSchoolWithTranscriptEligibleSetToYes_And_SchoolIsOpen() {
     var school = createMockSchoolTombstone();
-    school.setCanIssueTranscripts(true);
     school.setClosedDate(null);
+
+    var gradSchool = createMockGradSchool();
+    gradSchool.setSchoolID(school.getSchoolId());
+    gradSchool.setCanIssueTranscripts("Y");
+    when(this.restUtils.getGradSchoolBySchoolID(any())).thenReturn(Optional.of(gradSchool));
 
     when(this.restUtils.getSchools()).thenReturn(List.of(school));
 

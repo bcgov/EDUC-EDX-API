@@ -73,7 +73,8 @@ public enum EventType {
   GET_PAGINATED_SCHOOLS,
   MOVE_SCHOOL,
   ONBOARD_INITIAL_USER,
-  INVITE_INITIAL_USER
+  INVITE_INITIAL_USER,
+  UPDATE_GRAD_SCHOOL
 ;
   public static boolean isAValidEvent(String incomingEvent) {
     return Arrays.stream(values()).anyMatch(eventType -> eventType.toString().equalsIgnoreCase(incomingEvent));

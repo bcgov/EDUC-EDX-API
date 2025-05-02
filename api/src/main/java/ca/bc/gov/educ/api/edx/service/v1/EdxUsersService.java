@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
+import ca.bc.gov.educ.api.edx.struct.gradschool.v1.GradSchool;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
@@ -1070,16 +1071,17 @@ public class EdxUsersService {
 //     OR
 //     closed date is not null and transcript eligibility is false and today's date is past closed date
     List<UUID> schoolsEligibleForUserRoleRemoval = schools.stream()
-            .filter(school ->
-                    (StringUtils.isNotBlank(school.getClosedDate())
-                            && Boolean.TRUE.equals(school.getCanIssueTranscripts())
-                            && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
-                            ||
-                            (StringUtils.isNotBlank(school.getClosedDate())
-                            && Boolean.FALSE.equals(school.getCanIssueTranscripts())
-                            && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
-            ).map(SchoolTombstone::getSchoolId)
-            .map(UUID::fromString).toList();
+            .filter(school -> {
+              var gradSchool = restUtils.getGradSchoolBySchoolID(school.getSchoolId());
+              return (StringUtils.isNotBlank(school.getClosedDate())
+                      && gradSchool.isPresent() && gradSchool.get().getCanIssueTranscripts().equalsIgnoreCase("Y")
+                      && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)))
+                      ||
+                      (StringUtils.isNotBlank(school.getClosedDate())
+                              && gradSchool.isPresent() && gradSchool.get().getCanIssueTranscripts().equalsIgnoreCase("N")
+                              && LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).isBefore(LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT)));
+
+            }).map(SchoolTombstone::getSchoolId).map(UUID::fromString).toList();
 
     if(!schoolsEligibleForUserRoleRemoval.isEmpty()) {
       updatedUserSchoolEntities.addAll(removeUserRoles(schoolsEligibleForUserRoleRemoval));
@@ -1087,13 +1089,14 @@ public class EdxUsersService {
 
     //closed date is not null and transcript eligibility is true and today's date is after closed date and before closed date + 3 months
     List<UUID> transcriptEligibleClosedSchools = schools.stream()
-            .filter(school -> StringUtils.isNotBlank(school.getClosedDate())
-                    && Boolean.TRUE.equals(school.getCanIssueTranscripts())
-                    && (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isAfter(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-                    || LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isEqual(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
-                    && LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isBefore(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3)))
-            .map(SchoolTombstone::getSchoolId)
-            .map(UUID::fromString).toList();
+            .filter(school -> {
+              var gradSchool = restUtils.getGradSchoolBySchoolID(school.getSchoolId());
+              return StringUtils.isNotBlank(school.getClosedDate())
+                      && gradSchool.isPresent() && gradSchool.get().getCanIssueTranscripts().equalsIgnoreCase("Y")
+                      && (LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isAfter(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+                      || LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isEqual(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+                      && LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT).isBefore(LocalDateTime.parse(school.getClosedDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME).plusMonths(3));
+            }).map(SchoolTombstone::getSchoolId).map(UUID::fromString).toList();
 
     if(!transcriptEligibleClosedSchools.isEmpty()) {
       updatedUserSchoolEntities.addAll(updateUsersForTranscriptEligibleSchools(transcriptEligibleClosedSchools));
@@ -1104,8 +1107,8 @@ public class EdxUsersService {
   }
 
   @Transactional(propagation = Propagation.REQUIRES_NEW)
-  public void removeGradAdminRoleIfExists(School school) {
-    List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(school.getSchoolId()));
+  public void removeGradAdminRoleIfExists(GradSchool school) {
+    List<EdxUserSchoolEntity> edxSchoolUsers = edxUserSchoolsRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
     if(!edxSchoolUsers.isEmpty()) {
       List<EdxUserSchoolEntity> usersWithGradRole = edxSchoolUsers.stream().filter(user -> user.getEdxUserSchoolRoleEntities().stream().anyMatch(role -> role.getEdxRoleCode().equalsIgnoreCase(GRAD_SCHOOL_ADMIN_ROLE))).toList();
       if(!usersWithGradRole.isEmpty()) {
