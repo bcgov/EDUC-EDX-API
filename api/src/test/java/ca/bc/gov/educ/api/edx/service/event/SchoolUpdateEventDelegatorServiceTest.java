@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.service.event;
 
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
+import ca.bc.gov.educ.api.edx.model.v1.EdxEvent;
 import ca.bc.gov.educ.api.edx.repository.EdxPermissionRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxRoleRepository;
 import ca.bc.gov.educ.api.edx.repository.EdxUserRepository;
@@ -58,8 +59,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
+        final EdxEvent event = EdxEvent.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        schoolUpdateEventDelegatorService.processEvent(school, event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
@@ -87,8 +88,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
+        final EdxEvent event = EdxEvent.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        schoolUpdateEventDelegatorService.processEvent(school, event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
@@ -125,8 +126,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         var userSchoolEntityBeforeUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityBeforeUpdate.get(0).getEdxUserSchoolRoleEntities()).hasSize(2);
 
-        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
+        final EdxEvent event = EdxEvent.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        schoolUpdateEventDelegatorService.processEvent(school, event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();
@@ -154,8 +155,8 @@ public class SchoolUpdateEventDelegatorServiceTest extends BaseEdxAPITest {
         userSchoolEntity.setExpiryDate(null);
         edxUserSchoolRepository.save(userSchoolEntity);
 
-        final Event event = Event.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
-        schoolUpdateEventDelegatorService.handleEvent(event);
+        final EdxEvent event = EdxEvent.builder().eventType(UPDATE_GRAD_SCHOOL.toString()).sagaId(sagaId).eventPayload(JsonUtil.getJsonStringFromObject(school)).build();
+        schoolUpdateEventDelegatorService.processEvent(school, event);
 
         var userSchoolEntityAfterUpdate = edxUserSchoolRepository.findAllBySchoolID(UUID.fromString(school.getSchoolID()));
         assertThat(userSchoolEntityAfterUpdate).isNotEmpty();

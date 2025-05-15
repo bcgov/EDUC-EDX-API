@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.edx.messaging.jetstream;
 
 import ca.bc.gov.educ.api.edx.constants.EventOutcome;
 import ca.bc.gov.educ.api.edx.constants.EventType;
+import ca.bc.gov.educ.api.edx.model.v1.EdxEvent;
 import ca.bc.gov.educ.api.edx.model.v1.SagaEntity;
 import ca.bc.gov.educ.api.edx.struct.v1.ChoreographedEvent;
 import ca.bc.gov.educ.api.edx.struct.v1.Event;
@@ -79,6 +80,25 @@ public class Publisher {
       choreographedEvent.setEventID(event.getSagaId().toString());
       choreographedEvent.setCreateUser(saga.getCreateUser());
       choreographedEvent.setUpdateUser(saga.getUpdateUser());
+      try {
+        log.info("Broadcasting event :: {}", choreographedEvent);
+        val pub = this.jetStream.publishAsync(EDX_EVENT_TOPIC.toString(), JsonUtil.getJsonSBytesFromObject(choreographedEvent));
+        pub.thenAcceptAsync(result -> log.info("Event ID :: {} Published to JetStream :: {}", event.getSagaId(), result.getSeqno()));
+      } catch (IOException e) {
+        log.error("exception while broadcasting message to JetStream", e);
+      }
+    }
+  }
+
+  public void dispatchChoreographyEvent(final EdxEvent event) {
+    if (event != null && event.getSagaId() != null) {
+      val choreographedEvent = new ChoreographedEvent();
+      choreographedEvent.setEventType(EventType.valueOf(event.getEventType().toString()));
+      choreographedEvent.setEventOutcome(EventOutcome.valueOf(event.getEventOutcome().toString()));
+      choreographedEvent.setEventPayload(event.getEventPayload());
+      choreographedEvent.setEventID(event.getSagaId().toString());
+      choreographedEvent.setCreateUser(event.getCreateUser());
+      choreographedEvent.setUpdateUser(event.getUpdateUser());
       try {
         log.info("Broadcasting event :: {}", choreographedEvent);
         val pub = this.jetStream.publishAsync(EDX_EVENT_TOPIC.toString(), JsonUtil.getJsonSBytesFromObject(choreographedEvent));
