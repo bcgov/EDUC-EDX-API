@@ -32,7 +32,7 @@ public interface EdxEventRepository extends JpaRepository<EdxEvent, UUID> {
 
   List<EdxEvent> findByEventStatusAndEventTypeNotIn(String eventStatus, List<String> eventTypes);
 
-  @Query(value = "select event.* from INSTITUTE_EVENT event where event.EVENT_STATUS = :eventStatus " +
+  @Query(value = "select event.* from EDX_EVENT event where event.EVENT_STATUS = :eventStatus " +
           "AND event.CREATE_DATE < :createDate " +
           "AND event.EVENT_TYPE in :eventTypes " +
           "ORDER BY event.CREATE_DATE asc " +
