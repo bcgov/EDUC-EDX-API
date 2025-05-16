@@ -1,55 +1,41 @@
 package ca.bc.gov.educ.api.edx.service.v1.event;
 
 import ca.bc.gov.educ.api.edx.constants.EventType;
-import ca.bc.gov.educ.api.edx.orchestrator.base.EventHandler;
+import ca.bc.gov.educ.api.edx.model.v1.EdxEvent;
+import ca.bc.gov.educ.api.edx.repository.EdxEventRepository;
+import ca.bc.gov.educ.api.edx.service.v1.BaseService;
 import ca.bc.gov.educ.api.edx.service.v1.EdxUsersService;
 import ca.bc.gov.educ.api.edx.struct.gradschool.v1.GradSchool;
-import ca.bc.gov.educ.api.edx.struct.v1.Event;
-import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-
-import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.GRAD_SCHOOL_EVENTS_TOPIC;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class SchoolUpdateEventDelegatorService implements EventHandler {
+public class SchoolUpdateEventDelegatorService extends BaseService<GradSchool> {
 
     private final EdxUsersService edxUsersService;
-    public static final String PAYLOAD_LOG = "payload is :: {}";
+    private final EdxEventRepository eventRepository;
 
-    public SchoolUpdateEventDelegatorService(EdxUsersService edxUsersService) {
+    public SchoolUpdateEventDelegatorService(EdxUsersService edxUsersService, EdxEventRepository eventRepository) {
+        super(eventRepository);
         this.edxUsersService = edxUsersService;
+        this.eventRepository = eventRepository;
     }
 
-    @Async("subscriberExecutor")
     @Override
-    public void handleEvent(Event event) {
-      try {
-        if(event.getEventType().equalsIgnoreCase(EventType.UPDATE_GRAD_SCHOOL.toString())) {
-           log.info("Received UPDATE_GRAD_SCHOOL event :: {}", event.getSagaId());
-           log.trace(PAYLOAD_LOG, event.getEventPayload());
-           this.handleGradSchoolUpdateEvent(event);
-        } else {
-            log.info("silently ignoring other events.");
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processEvent(final GradSchool gradSchool, EdxEvent event) {
+        log.info("Received and processing event: " + event.getEventId());
+        if(gradSchool.getCanIssueTranscripts().equalsIgnoreCase("N")) {
+            edxUsersService.removeGradAdminRoleIfExists(gradSchool);
         }
-      } catch (final Exception e) {
-         log.error("Exception", e);
-      }
+        updateEvent(event);
     }
 
     @Override
-    public String getTopicToSubscribe() {
-        return GRAD_SCHOOL_EVENTS_TOPIC.toString();
-    }
-
-    public void handleGradSchoolUpdateEvent(Event event) throws IOException {
-     var school = JsonUtil.getJsonObjectFromBytes(GradSchool.class, event.getEventPayload().getBytes());
-         if(school.getCanIssueTranscripts().equalsIgnoreCase("N")) {
-            edxUsersService.removeGradAdminRoleIfExists(school);
-     }
+    public String getEventType() {
+        return EventType.UPDATE_GRAD_SCHOOL.toString();
     }
 }
