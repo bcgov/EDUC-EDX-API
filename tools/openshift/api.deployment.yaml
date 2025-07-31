@@ -76,6 +76,9 @@ objects:
               ports:
                 - containerPort: ${{CONTAINER_PORT}}
                   protocol: TCP
+              envFrom:
+                - configMapRef:
+                    name: "${APP_NAME}-config-map"
               resources:
                 requests:
                   cpu: "${MIN_CPU}"
@@ -145,7 +148,7 @@ objects:
           volumes:
             - name: tls-certs
               secret:
-                secretName: edx-api-cert
+                secretName: "${APP_NAME}-cert"
             - name: log-storage
               emptyDir: {}
             - name: flb-sc-config-volume
@@ -158,7 +161,7 @@ objects:
       labels:
         app: "${APP_NAME}-${BRANCH}"
       annotations:
-        service.alpha.openshift.io/serving-cert-secret-name: "edx-api-cert"
+        service.alpha.openshift.io/serving-cert-secret-name: "${APP_NAME}-cert"
     spec:
       selector:
         app: "${APP_NAME}-${BRANCH}"
