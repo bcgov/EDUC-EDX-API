@@ -155,4 +155,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<Object> handleUnauthorized(UnauthorizedException ex) {
+        log.warn("handleUnauthorized", ex);
+        return buildResponseEntity(ex.getError());
+    }
+
 }

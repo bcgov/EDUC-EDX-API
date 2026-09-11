@@ -674,6 +674,128 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
+  void testUpdateEdxUserName_GivenValidData_ShouldUpdateName_AndReturnOkStatus() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
+    edxUserNameUpdate.setFirstName("UpdatedFirst");
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))));
+
+    resultActions.andExpect(jsonPath("$.edxUserID", is(entity.getEdxUserID().toString())))
+        .andExpect(jsonPath("$.firstName", is("UPDATEDFIRST")))
+        .andExpect(jsonPath("$.lastName", is("UPDATEDLAST")))
+        .andExpect(jsonPath("$.email", is("TEST@EMAIL.COM")))
+        .andDo(print()).andExpect(status().isOk());
+
+    var updatedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
+    Assertions.assertTrue(updatedEntity.isPresent());
+    Assertions.assertEquals("UPDATEDFIRST", updatedEntity.get().getFirstName());
+    Assertions.assertEquals("UPDATEDLAST", updatedEntity.get().getLastName());
+    Assertions.assertEquals(entity.getCreateUser(), updatedEntity.get().getCreateUser());
+  }
+
+  @Test
+  void testUpdateEdxUserName_GivenMismatchedDigitalIdentityID_ShouldBeForbidden() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID(UUID.randomUUID().toString());
+    edxUserNameUpdate.setFirstName("UpdatedFirst");
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))));
+
+    resultActions.andDo(print()).andExpect(status().isForbidden());
+
+    var updatedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
+    Assertions.assertTrue(updatedEntity.isPresent());
+    Assertions.assertEquals(entity.getFirstName(), updatedEntity.get().getFirstName());
+    Assertions.assertEquals(entity.getLastName(), updatedEntity.get().getLastName());
+  }
+
+  @Test
+  void testUpdateEdxUserName_GivenUnknownUserID_ShouldBeNotFound() throws Exception {
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID(UUID.randomUUID().toString());
+    edxUserNameUpdate.setFirstName("UpdatedFirst");
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", UUID.randomUUID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+      .andDo(print()).andExpect(status().isNotFound());
+  }
+
+  @Test
+  void testUpdateEdxUserName_GivenMissingFirstName_ShouldBeBadRequest() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testUpdateEdxUserName_GivenInvalidDigitalIdentityID_ShouldBeBadRequest() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID("not-a-uuid");
+    edxUserNameUpdate.setFirstName("UpdatedFirst");
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+      .andDo(print()).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  void testUpdateEdxUserName_GivenMissingScope_ShouldBeForbidden() throws Exception {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
+    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
+    edxUserNameUpdate.setFirstName("UpdatedFirst");
+    edxUserNameUpdate.setLastName("UpdatedLast");
+    String json = getJsonString(edxUserNameUpdate);
+
+    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(json)
+        .accept(MediaType.APPLICATION_JSON)
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "READ_EDX_USERS"))))
+      .andDo(print()).andExpect(status().isForbidden());
+  }
+
+  @Test
   void testDeleteEdxSchoolUsers_GivenInValidData_AndReturnResultWithNotFound() throws Exception {
 
     this.mockMvc.perform(delete(URL.BASE_URL_USERS + "/{id}" + "/school/" + "{edxUserSchoolId}", UUID.randomUUID(), UUID.randomUUID())

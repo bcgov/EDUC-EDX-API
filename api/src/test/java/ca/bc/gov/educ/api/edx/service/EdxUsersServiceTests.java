@@ -3,7 +3,9 @@ package ca.bc.gov.educ.api.edx.service;
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.exception.UnauthorizedException;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
@@ -93,6 +95,56 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
 
     var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),Optional.empty(), null, null,Optional.empty());
     assertThat(edxUserEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  void updateEdxUserName_GivenMatchingDigitalIdentityID_ShouldUpdateNamesAndAuditColumns() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserEntity update = new EdxUserEntity();
+    update.setDigitalIdentityID(entity.getDigitalIdentityID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/" + entity.getEdxUserID());
+
+    var updated = this.service.updateEdxUserName(entity.getEdxUserID(), update);
+
+    assertThat(updated.getFirstName()).isEqualTo("NEWFIRST");
+    assertThat(updated.getLastName()).isEqualTo("NEWLAST");
+    assertThat(updated.getUpdateUser()).isEqualTo("EDX/" + entity.getEdxUserID());
+    assertThat(updated.getUpdateDate()).isNotNull();
+    assertThat(updated.getCreateUser()).isEqualTo(entity.getCreateUser());
+    assertThat(updated.getCreateDate()).isEqualToIgnoringNanos(entity.getCreateDate());
+    assertThat(updated.getEmail()).isEqualTo("TEST@EMAIL.COM");
+  }
+
+  @Test
+  void updateEdxUserName_GivenMismatchedDigitalIdentityID_ShouldThrowUnauthorizedException() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserEntity update = new EdxUserEntity();
+    update.setDigitalIdentityID(UUID.randomUUID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/other");
+
+    assertThrows(UnauthorizedException.class, () -> this.service.updateEdxUserName(entity.getEdxUserID(), update));
+
+    var unchangedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
+    assertThat(unchangedEntity).isPresent();
+    assertThat(unchangedEntity.get().getFirstName()).isEqualTo(entity.getFirstName());
+    assertThat(unchangedEntity.get().getLastName()).isEqualTo(entity.getLastName());
+  }
+
+  @Test
+  void updateEdxUserName_GivenUnknownUserID_ShouldThrowEntityNotFoundException() {
+    EdxUserEntity update = new EdxUserEntity();
+    update.setDigitalIdentityID(UUID.randomUUID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/other");
+
+    assertThrows(EntityNotFoundException.class, () -> this.service.updateEdxUserName(UUID.randomUUID(), update));
   }
 
   @Test
