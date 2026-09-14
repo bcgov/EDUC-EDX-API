@@ -104,7 +104,7 @@ public interface EdxUsersEndpoint {
   ResponseEntity<Void> deleteEdxUserById(@PathVariable UUID id);
 
   @Transactional
-  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_NAME')")
+  @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PutMapping("/{id}")
   @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "403", description = "FORBIDDEN"), @ApiResponse(responseCode = "404", description = "NOT FOUND.")})
   EdxUser updateEdxUserName(@PathVariable UUID id, @Validated @RequestBody EdxUserNameUpdate edxUserNameUpdate);

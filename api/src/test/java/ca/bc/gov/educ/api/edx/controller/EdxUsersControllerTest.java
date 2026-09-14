@@ -687,7 +687,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
 
     resultActions.andExpect(jsonPath("$.edxUserID", is(entity.getEdxUserID().toString())))
         .andExpect(jsonPath("$.firstName", is("UPDATEDFIRST")))
@@ -716,7 +716,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))));
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
 
     resultActions.andDo(print()).andExpect(status().isForbidden());
 
@@ -738,7 +738,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isNotFound());
   }
 
@@ -755,7 +755,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 
@@ -773,7 +773,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER_NAME"))))
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
       .andDo(print()).andExpect(status().isBadRequest());
   }
 

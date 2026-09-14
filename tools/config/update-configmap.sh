@@ -158,13 +158,6 @@ curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scope
   -d "{\"description\": \"Writing users in EDX_USER\",\"id\": \"WRITE_EDX_USER\",\"name\": \"WRITE_EDX_USER\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
 
 echo
-echo Writing scope WRITE_EDX_USER_NAME
-curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $TKN" \
-  -d "{\"description\": \"Updating first name and last name in EDX_USER\",\"id\": \"WRITE_EDX_USER_NAME\",\"name\": \"WRITE_EDX_USER_NAME\",\"protocol\": \"openid-connect\",\"attributes\" : {\"include.in.token.scope\" : \"true\",\"display.on.consent.screen\" : \"false\"}}"
-
-echo
 echo Writing scope DELETE_EDX_USER
 curl -sX POST "https://$SOAM_KC/auth/admin/realms/$SOAM_KC_REALM_ID/client-scopes" \
   -H "Content-Type: application/json" \
