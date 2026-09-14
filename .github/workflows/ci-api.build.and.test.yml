@@ -15,8 +15,8 @@ on:
     paths:
       - 'api/**'
 jobs:
-  unit_tests:
-    name: Unit Tests
+  quality_gate:
+    name: Quality Gate
     runs-on: ubuntu-22.04
 
     defaults:
@@ -44,19 +44,7 @@ jobs:
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
-
-  sonar_cloud:
-    name: Sonar Cloud
-    runs-on: ubuntu-22.04
-
-    defaults:
-      run:
-        working-directory: api
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      # Sonar requires a different version of Java
       - uses: actions/setup-java@v6
         with:
           distribution: temurin
