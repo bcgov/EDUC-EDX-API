@@ -128,7 +128,8 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     update.setLastName("NewLast");
     update.setUpdateUser("EDX/other");
 
-    assertThrows(UnauthorizedException.class, () -> this.service.updateEdxUserName(entity.getEdxUserID(), update));
+    UUID edxUserID = entity.getEdxUserID();
+    assertThrows(UnauthorizedException.class, () -> this.service.updateEdxUserName(edxUserID, update));
 
     var unchangedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
     assertThat(unchangedEntity).isPresent();
@@ -144,7 +145,8 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     update.setLastName("NewLast");
     update.setUpdateUser("EDX/other");
 
-    assertThrows(EntityNotFoundException.class, () -> this.service.updateEdxUserName(UUID.randomUUID(), update));
+    UUID randomUUID = UUID.randomUUID();
+    assertThrows(EntityNotFoundException.class, () -> this.service.updateEdxUserName(randomUUID, update));
   }
 
   @Test
