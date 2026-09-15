@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
+import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolRoleEntity;
 import ca.bc.gov.educ.api.edx.model.v1.MinistryOwnershipTeamEntity;
@@ -93,6 +94,67 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
 
     var edxUserEntities = this.service.findEdxUsers(Optional.of(entity.getDigitalIdentityID()),Optional.empty(), null, null,Optional.empty());
     assertThat(edxUserEntities).isNotNull().hasSize(1);
+  }
+
+  @Test
+  void updateEdxUserName_GivenValidData_ShouldUpdateNamesAndAuditColumns() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserEntity update = new EdxUserEntity();
+    update.setEdxUserID(entity.getEdxUserID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/" + entity.getEdxUserID());
+    update.setUpdateDate(LocalDateTime.now());
+
+    var updated = this.service.updateEdxUserName(entity.getEdxUserID(), update);
+
+    assertThat(updated.getFirstName()).isEqualTo("NEWFIRST");
+    assertThat(updated.getLastName()).isEqualTo("NEWLAST");
+    assertThat(updated.getUpdateUser()).isEqualTo("EDX/" + entity.getEdxUserID());
+    assertThat(updated.getUpdateDate()).isNotNull();
+    assertThat(updated.getCreateUser()).isEqualTo(entity.getCreateUser());
+    assertThat(updated.getCreateDate()).isEqualToIgnoringNanos(entity.getCreateDate());
+    assertThat(updated.getEmail()).isEqualTo("TEST@EMAIL.COM");
+    assertThat(updated.getDigitalIdentityID()).isEqualTo(entity.getDigitalIdentityID());
+  }
+
+  @Test
+  void updateEdxUserName_GivenNonNameFields_ShouldNotOverwriteCurrentRecord() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserEntity update = new EdxUserEntity();
+    update.setEdxUserID(UUID.randomUUID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/" + entity.getEdxUserID());
+    update.setEmail("OTHER@EMAIL.COM");
+    update.setDigitalIdentityID(UUID.randomUUID());
+    update.setUpdateDate(LocalDateTime.now());
+
+    var updated = this.service.updateEdxUserName(entity.getEdxUserID(), update);
+
+    assertThat(updated.getFirstName()).isEqualTo("NEWFIRST");
+    assertThat(updated.getLastName()).isEqualTo("NEWLAST");
+    assertThat(updated.getEdxUserID()).isEqualTo(entity.getEdxUserID());
+    assertThat(updated.getEmail()).isEqualTo("TEST@EMAIL.COM");
+    assertThat(updated.getDigitalIdentityID()).isEqualTo(entity.getDigitalIdentityID());
+    var storedEntity = this.edxUserRepository.findById(entity.getEdxUserID()).get();
+    assertThat(storedEntity.getFirstName()).isEqualTo("NEWFIRST");
+    assertThat(storedEntity.getEdxUserID()).isEqualTo(entity.getEdxUserID());
+    assertThat(storedEntity.getEmail()).isEqualTo("TEST@EMAIL.COM");
+    assertThat(storedEntity.getDigitalIdentityID()).isEqualTo(entity.getDigitalIdentityID());
+  }
+
+  @Test
+  void updateEdxUserName_GivenUnknownUserID_ShouldThrowEntityNotFoundException() {
+    EdxUserEntity update = new EdxUserEntity();
+    update.setEdxUserID(UUID.randomUUID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/other");
+
+    assertThrows(EntityNotFoundException.class, () -> this.service.updateEdxUserName(UUID.randomUUID(), update));
   }
 
   @Test

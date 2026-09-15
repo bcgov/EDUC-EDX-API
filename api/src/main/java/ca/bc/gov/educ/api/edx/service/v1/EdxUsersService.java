@@ -219,6 +219,13 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
+  public EdxUserEntity updateEdxUserName(final UUID edxUserID, final EdxUserEntity edxUserEntity) {
+    EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserID);
+    BeanUtils.copyProperties(edxUserEntity, currentEdxUserEntity, "edxUserSchoolEntities", "edxUserDistrictEntities", "digitalIdentityID", "email", "createUser", "createDate", "edxUserID");
+    TransformUtil.uppercaseFields(currentEdxUserEntity);
+    return this.getEdxUserRepository().save(currentEdxUserEntity);
+  }
+
   private void mapEdxUserDistrictAndRole(EdxUserEntity edxUserEntity) {
     if (!CollectionUtils.isEmpty(edxUserEntity.getEdxUserDistrictEntities())) {
       for (var entity : edxUserEntity.getEdxUserDistrictEntities()) {
