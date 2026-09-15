@@ -219,20 +219,10 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
-  /**
-   * Update the first name and last name of the edx user identified by the given edxUserID.
-   *
-   * @param edxUserID the edx user id
-   * @param edxUserEntity the edx user entity carrying the first name and last name
-   * @return the updated edx user entity
-   */
-  public EdxUserEntity updateEdxUserName(final UUID edxUserID, final EdxUserEntity edxUserEntity) {
-    EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserID);
-    currentEdxUserEntity.setFirstName(edxUserEntity.getFirstName());
-    currentEdxUserEntity.setLastName(edxUserEntity.getLastName());
+  public EdxUserEntity updateEdxUserName(final EdxUserEntity edxUserEntity) {
+    EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserEntity.getEdxUserID());
+    BeanUtils.copyProperties(edxUserEntity, currentEdxUserEntity, "edxUserSchoolEntities", "edxUserDistrictEntities", "digitalIdentityID", "email", "createUser", "createDate");
     TransformUtil.uppercaseFields(currentEdxUserEntity);
-    currentEdxUserEntity.setUpdateUser(edxUserEntity.getUpdateUser());
-    currentEdxUserEntity.setUpdateDate(LocalDateTime.now());
     return this.getEdxUserRepository().save(currentEdxUserEntity);
   }
 

@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.groups.Default;
+import ca.bc.gov.educ.api.edx.validator.EdxUserCreate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,7 +97,7 @@ public interface EdxUsersEndpoint {
   @PostMapping
   @ApiResponses(value = {@ApiResponse(responseCode = "201", description = "CREATED"), @ApiResponse(responseCode = "400", description = "BAD REQUEST")})
   @ResponseStatus(CREATED)
-  EdxUser createEdxUser(@Validated @RequestBody  EdxUser edxUser);
+  EdxUser createEdxUser(@Validated({Default.class, EdxUserCreate.class}) @RequestBody  EdxUser edxUser);
 
   @PreAuthorize("hasAuthority('SCOPE_DELETE_EDX_USER')")
   @DeleteMapping("/{id}")
@@ -103,11 +105,18 @@ public interface EdxUsersEndpoint {
   @ResponseStatus(NO_CONTENT)
   ResponseEntity<Void> deleteEdxUserById(@PathVariable UUID id);
 
+  /**
+   * Update the first name and last name of the edx user identified by the given id.
+   *
+   * @param id the edx user id
+   * @param edxUser the edx user carrying the updated first name and last name
+   * @return the updated edx user
+   */
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PutMapping("/{id}")
-  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "403", description = "FORBIDDEN"), @ApiResponse(responseCode = "404", description = "NOT FOUND.")})
-  EdxUser updateEdxUserName(@PathVariable UUID id, @Validated @RequestBody EdxUserNameUpdate edxUserNameUpdate);
+  @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK"), @ApiResponse(responseCode = "400", description = "BAD REQUEST"), @ApiResponse(responseCode = "404", description = "NOT FOUND.")})
+  EdxUser updateEdxUserName(@PathVariable UUID id, @Validated @RequestBody EdxUser edxUser);
 
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER_SCHOOL')")

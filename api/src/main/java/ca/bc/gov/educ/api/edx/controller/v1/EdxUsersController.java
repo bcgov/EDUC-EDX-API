@@ -55,8 +55,6 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   private static final MinistryTeamMapper mapper = MinistryTeamMapper.mapper;
   private static final EdxUserMapper userMapper = EdxUserMapper.mapper;
 
-  private static final EdxUserNameUpdateMapper USER_NAME_UPDATE_MAPPER = EdxUserNameUpdateMapper.mapper;
-
   private static final EdxUserSchoolMapper USER_SCHOOL_MAPPER = EdxUserSchoolMapper.mapper;
 
   private static final EdxUserDistrictMapper USER_DISTRICT_MAPPER = EdxUserDistrictMapper.mapper;
@@ -153,9 +151,10 @@ public class EdxUsersController extends BaseController implements EdxUsersEndpoi
   }
 
   @Override
-  public EdxUser updateEdxUserName(UUID id, EdxUserNameUpdate edxUserNameUpdate) {
-    RequestUtil.setAuditColumnsForUpdate(edxUserNameUpdate);
-    return userMapper.toStructure(getService().updateEdxUserName(id, USER_NAME_UPDATE_MAPPER.toModel(edxUserNameUpdate)));
+  public EdxUser updateEdxUserName(UUID id, EdxUser edxUser) {
+    validatePayload(() -> getEdxUserPayLoadValidator().validateEdxUserUpdatePayload(id, edxUser));
+    RequestUtil.setAuditColumnsForUpdate(edxUser);
+    return userMapper.toStructure(getService().updateEdxUserName(userMapper.toModel(edxUser)));
   }
 
   @Override

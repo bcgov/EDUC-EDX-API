@@ -38,6 +38,14 @@ public class EdxUserPayloadValidator {
         return new FieldError("EdxUser", fieldName, rejectedValue, false, null, null, message);
     }
 
+    public List<FieldError> validateEdxUserUpdatePayload(UUID edxUserId, EdxUser edxUser) {
+        final List<FieldError> apiValidationErrors = new ArrayList<>();
+        if (!edxUserId.toString().equals(edxUser.getEdxUserID())) {
+            apiValidationErrors.add(createFieldError(EDX_USER_ID, edxUser.getEdxUserID(), "edxUserID in path and payload edxUserId mismatch."));
+        }
+        return apiValidationErrors;
+    }
+
     public List<FieldError> validateCreateEdxUserSchoolPayload(UUID edxUserId, EdxUserSchool edxUserSchool) {
         return validateEdxUserSchoolPayload(edxUserId, edxUserSchool, true);
     }

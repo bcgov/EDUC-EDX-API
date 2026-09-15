@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.edx.struct.v1;
 
 import ca.bc.gov.educ.api.edx.struct.BaseRequest;
+import ca.bc.gov.educ.api.edx.validator.EdxUserCreate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,7 @@ public class EdxUser extends BaseRequest implements Serializable {
 
   String edxUserID;
 
-  @NotNull(message = "Digital Identity ID cannot be null")
+  @NotNull(message = "Digital Identity ID cannot be null", groups = {EdxUserCreate.class})
   String digitalIdentityID;
 
   @Size(max = 255, message = "First Name can have max 255 characters")
@@ -34,8 +35,8 @@ public class EdxUser extends BaseRequest implements Serializable {
   private List<EdxUserDistrict> edxUserDistricts;
 
   @Size(max = 255)
-  @NotNull(message = "Email cannot be null")
-  @Email(message = "Email address should be a valid email address")
+  @NotNull(message = "Email cannot be null", groups = {EdxUserCreate.class})
+  @Email(message = "Email address should be a valid email address", groups = {EdxUserCreate.class})
   String email;
 }
 
