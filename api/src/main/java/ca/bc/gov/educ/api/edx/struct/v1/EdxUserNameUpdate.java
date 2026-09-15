@@ -15,9 +15,6 @@ import java.io.Serializable;
 public class EdxUserNameUpdate extends BaseRequest implements Serializable {
   private static final long serialVersionUID = 6623189405271495827L;
 
-  @NotNull(message = "Digital Identity ID cannot be null")
-  String digitalIdentityID;
-
   @Size(max = 255, message = "First Name can have max 255 characters")
   @NotNull(message = "First Name cannot be null")
   String firstName;

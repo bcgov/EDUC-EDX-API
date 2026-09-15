@@ -38,18 +38,6 @@ public class EdxUserPayloadValidator {
         return new FieldError("EdxUser", fieldName, rejectedValue, false, null, null, message);
     }
 
-    public List<FieldError> validateEdxUserNamePayload(EdxUserNameUpdate edxUserNameUpdate) {
-        final List<FieldError> apiValidationErrors = new ArrayList<>();
-        if (edxUserNameUpdate.getDigitalIdentityID() != null) {
-            try {
-                UUID.fromString(edxUserNameUpdate.getDigitalIdentityID());
-            } catch (IllegalArgumentException e) {
-                apiValidationErrors.add(createFieldError("digitalIdentityID", edxUserNameUpdate.getDigitalIdentityID(), "digitalIdentityID should be a valid UUID."));
-            }
-        }
-        return apiValidationErrors;
-    }
-
     public List<FieldError> validateCreateEdxUserSchoolPayload(UUID edxUserId, EdxUserSchool edxUserSchool) {
         return validateEdxUserSchoolPayload(edxUserId, edxUserSchool, true);
     }

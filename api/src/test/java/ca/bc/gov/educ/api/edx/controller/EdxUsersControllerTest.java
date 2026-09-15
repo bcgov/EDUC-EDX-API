@@ -678,7 +678,6 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
     edxUserNameUpdate.setFirstName("UpdatedFirst");
     edxUserNameUpdate.setLastName("UpdatedLast");
     String json = getJsonString(edxUserNameUpdate);
@@ -703,33 +702,8 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
-  void testUpdateEdxUserName_GivenMismatchedDigitalIdentityID_ShouldBeForbidden() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-
-    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID(UUID.randomUUID().toString());
-    edxUserNameUpdate.setFirstName("UpdatedFirst");
-    edxUserNameUpdate.setLastName("UpdatedLast");
-    String json = getJsonString(edxUserNameUpdate);
-
-    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(json)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
-
-    resultActions.andDo(print()).andExpect(status().isForbidden());
-
-    var updatedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
-    Assertions.assertTrue(updatedEntity.isPresent());
-    Assertions.assertEquals(entity.getFirstName(), updatedEntity.get().getFirstName());
-    Assertions.assertEquals(entity.getLastName(), updatedEntity.get().getLastName());
-  }
-
-  @Test
   void testUpdateEdxUserName_GivenUnknownUserID_ShouldBeNotFound() throws Exception {
     EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID(UUID.randomUUID().toString());
     edxUserNameUpdate.setFirstName("UpdatedFirst");
     edxUserNameUpdate.setLastName("UpdatedLast");
     String json = getJsonString(edxUserNameUpdate);
@@ -747,25 +721,6 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
-    edxUserNameUpdate.setLastName("UpdatedLast");
-    String json = getJsonString(edxUserNameUpdate);
-
-    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(json)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
-      .andDo(print()).andExpect(status().isBadRequest());
-  }
-
-  @Test
-  void testUpdateEdxUserName_GivenInvalidDigitalIdentityID_ShouldBeBadRequest() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-
-    EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID("not-a-uuid");
-    edxUserNameUpdate.setFirstName("UpdatedFirst");
     edxUserNameUpdate.setLastName("UpdatedLast");
     String json = getJsonString(edxUserNameUpdate);
 
@@ -782,7 +737,6 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     EdxUserNameUpdate edxUserNameUpdate = new EdxUserNameUpdate();
-    edxUserNameUpdate.setDigitalIdentityID(entity.getDigitalIdentityID().toString());
     edxUserNameUpdate.setFirstName("UpdatedFirst");
     edxUserNameUpdate.setLastName("UpdatedLast");
     String json = getJsonString(edxUserNameUpdate);

@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.edx.service;
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
-import ca.bc.gov.educ.api.edx.exception.UnauthorizedException;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
@@ -98,11 +97,10 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   }
 
   @Test
-  void updateEdxUserName_GivenMatchingDigitalIdentityID_ShouldUpdateNamesAndAuditColumns() {
+  void updateEdxUserName_GivenValidData_ShouldUpdateNamesAndAuditColumns() {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     EdxUserEntity update = new EdxUserEntity();
-    update.setDigitalIdentityID(entity.getDigitalIdentityID());
     update.setFirstName("NewFirst");
     update.setLastName("NewLast");
     update.setUpdateUser("EDX/" + entity.getEdxUserID());
@@ -119,28 +117,8 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
   }
 
   @Test
-  void updateEdxUserName_GivenMismatchedDigitalIdentityID_ShouldThrowUnauthorizedException() {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-
-    EdxUserEntity update = new EdxUserEntity();
-    update.setDigitalIdentityID(UUID.randomUUID());
-    update.setFirstName("NewFirst");
-    update.setLastName("NewLast");
-    update.setUpdateUser("EDX/other");
-
-    UUID edxUserID = entity.getEdxUserID();
-    assertThrows(UnauthorizedException.class, () -> this.service.updateEdxUserName(edxUserID, update));
-
-    var unchangedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
-    assertThat(unchangedEntity).isPresent();
-    assertThat(unchangedEntity.get().getFirstName()).isEqualTo(entity.getFirstName());
-    assertThat(unchangedEntity.get().getLastName()).isEqualTo(entity.getLastName());
-  }
-
-  @Test
   void updateEdxUserName_GivenUnknownUserID_ShouldThrowEntityNotFoundException() {
     EdxUserEntity update = new EdxUserEntity();
-    update.setDigitalIdentityID(UUID.randomUUID());
     update.setFirstName("NewFirst");
     update.setLastName("NewLast");
     update.setUpdateUser("EDX/other");

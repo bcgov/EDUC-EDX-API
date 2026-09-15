@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.edx.service.v1;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
 import ca.bc.gov.educ.api.edx.exception.InvalidPayloadException;
-import ca.bc.gov.educ.api.edx.exception.UnauthorizedException;
 import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
@@ -220,11 +219,15 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
+  /**
+   * Update the first name and last name of the edx user identified by the given edxUserID.
+   *
+   * @param edxUserID the edx user id
+   * @param edxUserEntity the edx user entity carrying the first name and last name
+   * @return the updated edx user entity
+   */
   public EdxUserEntity updateEdxUserName(final UUID edxUserID, final EdxUserEntity edxUserEntity) {
     EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserID);
-    if (!currentEdxUserEntity.getDigitalIdentityID().equals(edxUserEntity.getDigitalIdentityID())) {
-      throw new UnauthorizedException(ApiError.builder().timestamp(LocalDateTime.now()).message("You are not authorized to update this user's first name and last name.").status(FORBIDDEN).build());
-    }
     currentEdxUserEntity.setFirstName(edxUserEntity.getFirstName());
     currentEdxUserEntity.setLastName(edxUserEntity.getLastName());
     TransformUtil.uppercaseFields(currentEdxUserEntity);
