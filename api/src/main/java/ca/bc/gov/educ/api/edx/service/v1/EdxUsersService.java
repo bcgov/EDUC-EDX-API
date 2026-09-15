@@ -219,9 +219,9 @@ public class EdxUsersService {
     return this.getEdxUserRepository().save(edxUserEntity);
   }
 
-  public EdxUserEntity updateEdxUserName(final EdxUserEntity edxUserEntity) {
-    EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserEntity.getEdxUserID());
-    BeanUtils.copyProperties(edxUserEntity, currentEdxUserEntity, "edxUserSchoolEntities", "edxUserDistrictEntities", "digitalIdentityID", "email", "createUser", "createDate");
+  public EdxUserEntity updateEdxUserName(final UUID edxUserID, final EdxUserEntity edxUserEntity) {
+    EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserID);
+    BeanUtils.copyProperties(edxUserEntity, currentEdxUserEntity, "edxUserSchoolEntities", "edxUserDistrictEntities", "digitalIdentityID", "email", "createUser", "createDate", "edxUserID");
     TransformUtil.uppercaseFields(currentEdxUserEntity);
     return this.getEdxUserRepository().save(currentEdxUserEntity);
   }

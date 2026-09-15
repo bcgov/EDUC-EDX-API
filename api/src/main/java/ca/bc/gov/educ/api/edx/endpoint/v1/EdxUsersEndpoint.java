@@ -105,13 +105,6 @@ public interface EdxUsersEndpoint {
   @ResponseStatus(NO_CONTENT)
   ResponseEntity<Void> deleteEdxUserById(@PathVariable UUID id);
 
-  /**
-   * Update the first name and last name of the edx user identified by the given id.
-   *
-   * @param id the edx user id
-   * @param edxUser the edx user carrying the updated first name and last name
-   * @return the updated edx user
-   */
   @Transactional
   @PreAuthorize("hasAuthority('SCOPE_WRITE_EDX_USER')")
   @PutMapping("/{id}")

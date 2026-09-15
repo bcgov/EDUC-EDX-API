@@ -709,7 +709,7 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
-  void testUpdateEdxUserName_GivenMismatchedPayloadEdxUserID_ShouldBeBadRequest() throws Exception {
+  void testUpdateEdxUserName_GivenPayloadEdxUserIDDifferentFromPath_ShouldUpdateRecordIdentifiedByPath() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
     EdxUser edxUser = new EdxUser();
@@ -718,17 +718,21 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
     edxUser.setLastName("UpdatedLast");
     String json = getJsonString(edxUser);
 
-    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
+    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))))
-      .andDo(print()).andExpect(status().isBadRequest());
+        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
+
+    resultActions.andExpect(jsonPath("$.edxUserID", is(entity.getEdxUserID().toString())))
+        .andExpect(jsonPath("$.firstName", is("UPDATEDFIRST")))
+        .andExpect(jsonPath("$.lastName", is("UPDATEDLAST")))
+        .andDo(print()).andExpect(status().isOk());
 
     var storedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
     Assertions.assertTrue(storedEntity.isPresent());
-    Assertions.assertEquals(entity.getFirstName(), storedEntity.get().getFirstName());
-    Assertions.assertEquals(entity.getLastName(), storedEntity.get().getLastName());
+    Assertions.assertEquals("UPDATEDFIRST", storedEntity.get().getFirstName());
+    Assertions.assertEquals("UPDATEDLAST", storedEntity.get().getLastName());
   }
 
   @Test
@@ -770,11 +774,9 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
 
   @Test
   void testUpdateEdxUserName_GivenUnknownUserID_ShouldBeNotFound() throws Exception {
-    EdxUser edxUser = this.createEdxUser();
-    edxUser.setEdxUserID(UUID.randomUUID().toString());
-    String json = getJsonString(edxUser);
+    String json = getJsonString(this.createEdxUser());
 
-    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", edxUser.getEdxUserID())
+    this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", UUID.randomUUID())
         .contentType(MediaType.APPLICATION_JSON)
         .content(json)
         .accept(MediaType.APPLICATION_JSON)
