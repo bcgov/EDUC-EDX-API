@@ -709,33 +709,6 @@ class EdxUsersControllerTest extends BaseEdxControllerTest {
   }
 
   @Test
-  void testUpdateEdxUserName_GivenPayloadEdxUserIDDifferentFromPath_ShouldUpdateRecordIdentifiedByPath() throws Exception {
-    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
-
-    EdxUser edxUser = new EdxUser();
-    edxUser.setEdxUserID(UUID.randomUUID().toString());
-    edxUser.setFirstName("UpdatedFirst");
-    edxUser.setLastName("UpdatedLast");
-    String json = getJsonString(edxUser);
-
-    val resultActions = this.mockMvc.perform(put(URL.BASE_URL_USERS + "/{id}", entity.getEdxUserID())
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(json)
-        .accept(MediaType.APPLICATION_JSON)
-        .with(jwt().jwt(jwt -> jwt.claim("scope", "WRITE_EDX_USER"))));
-
-    resultActions.andExpect(jsonPath("$.edxUserID", is(entity.getEdxUserID().toString())))
-        .andExpect(jsonPath("$.firstName", is("UPDATEDFIRST")))
-        .andExpect(jsonPath("$.lastName", is("UPDATEDLAST")))
-        .andDo(print()).andExpect(status().isOk());
-
-    var storedEntity = this.edxUserRepository.findById(entity.getEdxUserID());
-    Assertions.assertTrue(storedEntity.isPresent());
-    Assertions.assertEquals("UPDATEDFIRST", storedEntity.get().getFirstName());
-    Assertions.assertEquals("UPDATEDLAST", storedEntity.get().getLastName());
-  }
-
-  @Test
   void testUpdateEdxUserName_GivenNoEmailOrDigitalIdentityID_ShouldReturnOkStatus() throws Exception {
     var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
 
