@@ -39,3 +39,9 @@ hs_err_pid*
 .factorypath
 .vscode
 /api/src/main/resources/application-local.properties
+
+# Other shell stuff
+.vim/
+Session.vim
+.direnv
+.envrc
