@@ -2,7 +2,9 @@ package ca.bc.gov.educ.api.edx.service;
 
 import ca.bc.gov.educ.api.edx.BaseEdxAPITest;
 import ca.bc.gov.educ.api.edx.constants.InstituteTypeCode;
+import ca.bc.gov.educ.api.edx.constants.TopicsEnum;
 import ca.bc.gov.educ.api.edx.exception.EntityNotFoundException;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.model.v1.EdxActivationCodeEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserEntity;
 import ca.bc.gov.educ.api.edx.model.v1.EdxUserSchoolEntity;
@@ -15,7 +17,9 @@ import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.EdxPrimaryActivationCode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -25,12 +29,17 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class EdxUsersServiceTests extends BaseEdxAPITest {
 
   @Autowired
   EdxUsersService service;
+
+  @MockBean
+  private MessagePublisher messagePublisher;
 
   @Autowired
   private MinistryOwnershipTeamRepository ministryOwnershipTeamRepository;
@@ -117,6 +126,27 @@ class EdxUsersServiceTests extends BaseEdxAPITest {
     assertThat(updated.getCreateDate()).isEqualToIgnoringNanos(entity.getCreateDate());
     assertThat(updated.getEmail()).isEqualTo("TEST@EMAIL.COM");
     assertThat(updated.getDigitalIdentityID()).isEqualTo(entity.getDigitalIdentityID());
+  }
+
+  @Test
+  void updateEdxUserName_GivenValidData_ShouldPublishEdxUserCacheRefreshMessage() {
+    var entity = this.createUserEntity(this.edxUserRepository, this.edxPermissionRepository, this.edxRoleRepository, this.edxUserSchoolRepository, this.edxUserDistrictRepository);
+
+    EdxUserEntity update = new EdxUserEntity();
+    update.setEdxUserID(entity.getEdxUserID());
+    update.setFirstName("NewFirst");
+    update.setLastName("NewLast");
+    update.setUpdateUser("EDX/" + entity.getEdxUserID());
+    update.setUpdateDate(LocalDateTime.now());
+
+    this.service.updateEdxUserName(entity.getEdxUserID(), update);
+
+    var payloadCaptor = ArgumentCaptor.forClass(byte[].class);
+    verify(this.messagePublisher).dispatchMessage(eq(TopicsEnum.EDX_USER_CACHE_REFRESH_TOPIC.toString()), payloadCaptor.capture());
+    var payload = new String(payloadCaptor.getValue());
+    assertThat(payload).contains(entity.getEdxUserID().toString());
+    assertThat(payload).contains("\"firstName\":\"NEWFIRST\"");
+    assertThat(payload).contains("\"lastName\":\"NEWLAST\"");
   }
 
   @Test

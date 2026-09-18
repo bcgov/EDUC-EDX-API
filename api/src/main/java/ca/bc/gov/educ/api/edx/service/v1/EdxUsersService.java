@@ -7,10 +7,12 @@ import ca.bc.gov.educ.api.edx.exception.errors.ApiError;
 import ca.bc.gov.educ.api.edx.model.v1.*;
 import ca.bc.gov.educ.api.edx.props.ApplicationProperties;
 import ca.bc.gov.educ.api.edx.repository.*;
+import ca.bc.gov.educ.api.edx.messaging.MessagePublisher;
 import ca.bc.gov.educ.api.edx.rest.RestUtils;
 import ca.bc.gov.educ.api.edx.struct.gradschool.v1.GradSchool;
 import ca.bc.gov.educ.api.edx.struct.institute.v1.SchoolTombstone;
 import ca.bc.gov.educ.api.edx.struct.v1.*;
+import ca.bc.gov.educ.api.edx.utils.JsonUtil;
 import ca.bc.gov.educ.api.edx.utils.TransformUtil;
 import com.google.common.primitives.Chars;
 import jakarta.persistence.EntityExistsException;
@@ -26,6 +28,8 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.util.CollectionUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -37,6 +41,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ca.bc.gov.educ.api.edx.constants.TopicsEnum.EDX_USER_CACHE_REFRESH_TOPIC;
 import static org.springframework.http.HttpStatus.*;
 
 /**
@@ -75,6 +80,8 @@ public class EdxUsersService {
 
   private final RestUtils restUtils;
 
+  private final MessagePublisher messagePublisher;
+
   private static final String EDX_USER_ID = "edxUserID";
 
   private static final String EDX_ACTIVATION_CODE_ID = "edxActivationCodeId";
@@ -91,7 +98,7 @@ public class EdxUsersService {
   private static final String SECURE_EXCHANGE_SCHOOL_ROLE = "SECURE_EXCHANGE_SCHOOL";
 
   @Autowired
-  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props) {
+  public EdxUsersService(final MinistryOwnershipTeamRepository ministryOwnershipTeamRepository, final EdxUserSchoolRepository edxUserSchoolsRepository, final EdxUserRepository edxUserRepository, EdxUserDistrictRoleRepository edxUserDistrictRoleRepository, EdxUserDistrictRepository edxUserDistrictRepository, EdxUserSchoolRoleRepository edxUserSchoolRoleRepository, EdxRoleRepository edxRoleRepository, EdxActivationCodeRepository edxActivationCodeRepository, EdxActivationRoleRepository edxActivationRoleRepository, RestUtils restUtils, ApplicationProperties props, final MessagePublisher messagePublisher) {
     this.ministryOwnershipTeamRepository = ministryOwnershipTeamRepository;
     this.edxUserSchoolsRepository = edxUserSchoolsRepository;
     this.edxUserRepository = edxUserRepository;
@@ -103,6 +110,7 @@ public class EdxUsersService {
     this.edxActivationRoleRepository = edxActivationRoleRepository;
     this.restUtils = restUtils;
     this.props = props;
+    this.messagePublisher = messagePublisher;
   }
 
   public List<MinistryOwnershipTeamEntity> getMinistryTeamsList() {
@@ -223,7 +231,36 @@ public class EdxUsersService {
     EdxUserEntity currentEdxUserEntity = retrieveEdxUserByID(edxUserID);
     BeanUtils.copyProperties(edxUserEntity, currentEdxUserEntity, "edxUserSchoolEntities", "edxUserDistrictEntities", "digitalIdentityID", "email", "createUser", "createDate", "edxUserID");
     TransformUtil.uppercaseFields(currentEdxUserEntity);
-    return this.getEdxUserRepository().save(currentEdxUserEntity);
+    final var savedEntity = this.getEdxUserRepository().save(currentEdxUserEntity);
+    publishEdxUserCacheRefresh(savedEntity);
+    return savedEntity;
+  }
+
+  private void publishEdxUserCacheRefresh(final EdxUserEntity edxUserEntity) {
+    if (TransactionSynchronizationManager.isSynchronizationActive()) {
+      // publish only once the transaction commits, so other pods are never
+      // notified of a change that gets rolled back
+      TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+        @Override
+        public void afterCommit() {
+          dispatchEdxUserCacheRefreshMessage(edxUserEntity);
+        }
+      });
+    } else {
+      dispatchEdxUserCacheRefreshMessage(edxUserEntity);
+    }
+  }
+
+  private void dispatchEdxUserCacheRefreshMessage(final EdxUserEntity edxUserEntity) {
+    try {
+      final var payload = new HashMap<String, String>();
+      payload.put("edxUserID", edxUserEntity.getEdxUserID().toString());
+      payload.put("firstName", edxUserEntity.getFirstName());
+      payload.put("lastName", edxUserEntity.getLastName());
+      this.messagePublisher.dispatchMessage(EDX_USER_CACHE_REFRESH_TOPIC.toString(), JsonUtil.getJsonSBytesFromObject(payload));
+    } catch (final Exception e) {
+      log.error("Failed to publish EDX user cache refresh message for edxUserID :: {}", edxUserEntity.getEdxUserID(), e);
+    }
   }
 
   private void mapEdxUserDistrictAndRole(EdxUserEntity edxUserEntity) {
