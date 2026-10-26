@@ -45,10 +45,6 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       # Sonar requires a different version of Java
-      - uses: actions/setup-java@v6
-        with:
-          distribution: temurin
-          java-version: 21
       - name: Run Sonar Analysis
         run: mvn sonar:sonar
           -Dsonar.token=${{ secrets.SONAR_TOKEN }}
