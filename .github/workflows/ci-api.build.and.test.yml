@@ -16,6 +16,9 @@ on:
       - 'api/**'
 jobs:
   quality_gate:
+    permissions:
+      contents: read
+      pull-requests: read
     name: Quality Gate
     runs-on: ubuntu-22.04
 
