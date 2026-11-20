@@ -48,6 +48,8 @@ on:
 
 jobs:
   openshift-ci-cd:
+    permissions:
+      contents: read
     name: Deploy to OpenShift TEST
     # ubuntu-20.04 can also be used.
     runs-on: ubuntu-22.04
